@@ -20,10 +20,13 @@ LocalReport.create([
 ])
 ```
 
-Would create a report such as this...
+Would create an HTML report such as this, with an interactive Table and Plot component.
 
 ![Report Example](https://gblobscdn.gitbook.com/assets%2F-LnsT7A86qlOk1jk5wSj%2F-M3C-gLdrhOWo65CIbWB%2F-M3C0REll7dsea0Pw51q%2Fimage.png)
 
-With an interactive Table and Plot component.
+In addition to the this local library, Datapane.com provides a hosted platform which allows you to:
+
+1) Share and embed your reports online
+2) Upload your Jupyter Notebooks and Python scripts, so that others can run them online in order to generate reports dynamically.
 
 # Getting Started
