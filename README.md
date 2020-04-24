@@ -40,14 +40,21 @@ This would package a standalone HTML report such as the following, with an searc
 
 ![Report Example](https://i.imgur.com/RGp7RzM.png)
 
-# Mission
-
-Although there are many enterprise BI and reporting tools with drag and drop interfaces, using SQL with Python is often the best combination for querying, analysing, and visualising data. Unfortunately, it can be hard to package and share results in a way that is accessible and friendly to everyone. Datapane's goal is to provide the bridge between where you want to analyse data, and how other people want to interact with it.
 
 # Getting Started
 
 - [Read the documentation](https://docs.datapane.com)
 - [View samples and demos](https://docs.datapane.com)
+
+# Components
+
+Datapane currently contains the following components. Need something different? Open an issue (or make a PR!) 
+
+| Component | Description                                                                    | Supported Formats                                   | Example                                                                         |   |
+|-----------|--------------------------------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------|
+| Table     | A searchable, sortable table component for datasets. Supports up to 10m cells. | Pandas DataFrames, JSON documents, Local CSV files  | `Table.create(df)`                                                              |
+| Plot      | A wrapper for plots from Python visualisation libraries.                       | Altair charts, Bokeh plots, Matplotlib figures, SVG |  ```plot = alt.Chart(df).encode(x='x',y='y').mark_line() Plot.create(plot) ``` |
+| Markdown  | A simple Markdown component to document your report.                           | Markdown, Text                                      | `Markdown("# My fun title")`                                                  |
 
 # Datapane.com
 
@@ -55,3 +62,7 @@ In addition to the this local library, Datapane.com provides an API and hosted p
 
 1. Upload Jupyter Notebooks and Python scripts, so that other people can run them in their browser with parameters to generate reports dynamically
 2. Share and embed your script or reports online -- either publicly, or privately within your team
+
+# Mission
+
+Although there are many enterprise BI and reporting tools with drag and drop interfaces, using SQL with Python is often the best combination for querying, analysing, and visualising data. Unfortunately, it can be hard to package and share results in a way that is accessible and friendly to everyone. Datapane's goal is to provide the bridge between where you want to analyse data, and how other people want to interact with it.
