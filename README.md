@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://datapane.com">
-    <img src="https://datapane.com/static/datapane-logo-dark.png" width="150px" alt="Datapane" />
+    <img src="https://datapane.com/static/datapane-logo-dark.png" width="250px" alt="Datapane" />
   </a>
 </p>
 <p align="center">
@@ -18,9 +18,9 @@
 
 Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown. 
 
-Reports can be exported as standalone HTML documents, with rich components which allow data can explored and visualisations can be used interactively.
+Reports can be exported as standalone HTML documents, with rich components which allow data to be explored and visualisations to be used interactively.
 
-For example, create a report with a table viewer and an interactive plot:
+For example, if you wanted to create a report with a table viewer and an interactive plot:
 
 ```python
 import altair as alt
@@ -36,13 +36,15 @@ LocalReport.create([
 ])
 ```
 
-Would create an HTML report such as this, with an interactive Table and Plot component.
+This would package a standalone HTML report such as the following, with an searchable Table and Plot component.
 
 ![Report Example](https://gblobscdn.gitbook.com/assets%2F-LnsT7A86qlOk1jk5wSj%2F-M3C-gLdrhOWo65CIbWB%2F-M3C0REll7dsea0Pw51q%2Fimage.png)
 
+# Datapane.com
+
 In addition to the this local library, Datapane.com provides a hosted platform which allows you to:
 
-1) Share and embed your reports online
-2) Upload your Jupyter Notebooks and Python scripts, so that others can run them online in order to generate reports dynamically.
+1. Host, share, and embed your reports online
+2. Upload Jupyter Notebooks and Python scripts, so that others can run them in their browser with parameters to generate reports dynamically.
 
 # Getting Started
