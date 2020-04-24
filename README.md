@@ -53,8 +53,8 @@ Datapane currently contains the following components. Need something different? 
 | Component | Description                                                                    | Supported Formats                                   | Example                                                                         |
 |-----------|--------------------------------------------------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------|
 | Table     | A searchable, sortable table component for datasets. Supports up to 10m cells. | Pandas DataFrames, JSON documents, Local CSV files  | `Table.create(df)`                                                              |
-| Plot      | A wrapper for plots from Python visualisation libraries.                       | Altair charts, Bokeh plots, Matplotlib figures, SVG |  ``` plot = alt.Chart(df).encode(x='x',y='y').mark_line() Plot.create(plot) ``` |
-| Markdown  | A simple Markdown component to document your report.                           | Markdown, Text                                      | `Markdown("# My fun title")                                                     |
+| Plot      | A wrapper for plots from Python visualisation libraries.                       | Altair, Bokeh, Matplotlib, SVG |  `Plot.create(altair_chart)`
+| Markdown  | A simple Markdown component to document your report.                           | Markdown, Text                                      | `Markdown("# My fun title")`                                              |
 
 # Datapane.com
 
