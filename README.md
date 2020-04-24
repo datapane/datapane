@@ -38,13 +38,20 @@ LocalReport.create([
 
 This would package a standalone HTML report such as the following, with an searchable Table and Plot component.
 
-![Report Example](https://gblobscdn.gitbook.com/assets%2F-LnsT7A86qlOk1jk5wSj%2F-M3C-gLdrhOWo65CIbWB%2F-M3C0REll7dsea0Pw51q%2Fimage.png)
+![Report Example](https://i.imgur.com/RGp7RzM.png)
+
+# Mission
+
+Although there are many enterprise BI and reporting tools with drag and drop interfaces, using SQL with Python is often the best combination for querying, analysing, and visualising data. Unfortunately, it can be hard to package and share results in a way that is accessible and friendly to everyone. Datapane's goal is to provide the bridge between where you want to analyse data, and how other people want to interact with it.
+
+# Getting Started
+
+- [Read the documentation](https://docs.datapane.com)
+- [View samples and demos](https://docs.datapane.com)
 
 # Datapane.com
 
-In addition to the this local library, Datapane.com provides a hosted platform which allows you to:
+In addition to the this local library, Datapane.com provides an API and hosted platform which allows you to:
 
-1. Host, share, and embed your reports online
-2. Upload Jupyter Notebooks and Python scripts, so that others can run them in their browser with parameters to generate reports dynamically.
-
-# Getting Started
+1. Upload Jupyter Notebooks and Python scripts, so that other people can run them in their browser with parameters to generate reports dynamically
+2. Share and embed your script or reports online -- either publicly, or privately within your team
