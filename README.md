@@ -1,4 +1,20 @@
-![Datapane logo](https://datapane.com/static/datapane-logo-dark.png)
+<p align="center">
+  <a href="https://datapane.com">
+    <img src="https://datapane.com/static/datapane-logo-dark.png" width="150px" alt="Datapane" />
+  </a>
+</p>
+<p align="center">
+    <a href="https://datapane.com">Datapane.com</a> |
+    <a href="https://docs.datapane.com">Documentation</a> |
+    <a href="https://twitter.com/datapaneapp">Twitter</a>
+    <br /><br />
+    <a href="https://pypi.org/project/datapane/">
+        <img src="https://img.shields.io/pypi/dm/datapane?label=pip%20downloads" alt="Pip Downloads" />
+    </a>
+    <a href="https://pypi.org/project/datapane/">
+        <img src="https://img.shields.io/pypi/v/datapane?color=blue" alt="Latest release" />
+    </a>
+</p>
 
 Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown. 
 
