@@ -44,7 +44,7 @@ This would package a standalone HTML report such as the following, with an searc
 # Getting Started
 
 - [Read the documentation](https://docs.datapane.com)
-- [View samples and demos](https://docs.datapane.com)
+- [View samples and demos](https://github.com/datapane/datapane-demos/)
 
 # Components
 
