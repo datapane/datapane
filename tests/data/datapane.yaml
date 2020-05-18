@@ -1,0 +1,5 @@
+name: dp_test_script
+script: dp_script.py
+title: My awesome script
+parameters:
+  - {"name":"p1", "type": "string"}

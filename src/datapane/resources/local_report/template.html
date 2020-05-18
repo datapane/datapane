@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700|Inconsolata|Karla|Rubik&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      window.dpAssets = {{ assets }};
+      window.dpAssetMetadata = {{ asset_metadata }};
+      window.dpDatasets = {{ dataset_objs }};
+      window.dpLocal = true;
+    </script>
+    <style>
+      {% include "local-report-base.css" %}
+      body {
+        background-color: #f4f5f7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="max-w-screen-xl mx-auto pb-6 sm:px-6 lg:px-8">
+      <div class="px-4 py-6 sm:px-0">
+        <div class="shadow-lg">
+          <div id="report-root"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      {{ include_raw("local-report-base.js") }}
+      let dpReportObj = {{ report_obj }};
+      let { React, ReactDOM, ReportComponent } = UMDModules;
+      let ReportFactory = React.createFactory(ReportComponent);
+      ReactDOM.render(
+          ReportFactory({user: null, report: dpReportObj}),
+          document.querySelector("#report-root")
+      );
+    </script>
+  </body>
+</html>

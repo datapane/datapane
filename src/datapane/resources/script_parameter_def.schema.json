@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "configNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "(should be a valid Python variable name, e.g. field_name)",
+          "type": "string",
+          "pattern": "^[_a-zA-Z]\\w*$"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "required": {
+          "title": "Required",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": ["name"],
+      "oneOf": [
+        {
+          "title": "String",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "string",
+              "default": "string"
+            },
+            "default": {
+              "title": "Default Value",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "title": "Integer",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "integer",
+              "default": "integer"
+            },
+            "default": {
+              "type": "integer"
+            },
+            "min": {
+              "type": "integer"
+            },
+            "max": {
+              "type": "integer"
+            },
+            "step": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "title": "Float",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "float",
+              "default": "float"
+            },
+            "default": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "title": "Boolean",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "boolean",
+              "default": "boolean"
+            },
+            "default": {
+              "title": "Is true by default?",
+              "type": "boolean"
+            }
+          }
+        },
+        {
+          "title": "Enum",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "enum",
+              "default": "enum"
+            },
+            "choices": {
+              "title": "Choices",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "uniqueItems": true
+              }
+            }
+          }
+        },
+        {
+          "title": "List",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "list",
+              "default": "list"
+            },
+            "default": {
+              "title": "Default",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "title": "Date Time",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "datetime",
+              "default": "datetime"
+            },
+            "default": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        {
+          "title": "Date",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "date",
+              "default": "date"
+            },
+            "default": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        {
+          "title": "Time",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "time",
+              "default": "time"
+            },
+            "default": {
+              "type": "string",
+              "format": "time"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "title": "Config field",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/configNode"
+  }
+}

@@ -1,0 +1,12 @@
+name: dp_test_script
+
+parameters: [
+  {"name": "param1", "type": "string", "default": "hello"},
+  {"name": "param2", "type": "integer", "required": true}
+]
+
+include:
+  - sample.py
+
+requirements:
+  - requests

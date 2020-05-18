@@ -1,0 +1,2 @@
+Copyright (c) 2015-2020, StackHut Limited (trading as Datapane).
+All rights reserved.

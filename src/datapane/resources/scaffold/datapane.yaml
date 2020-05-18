@@ -1,0 +1,21 @@
+# Datapane config - see https://docs.datapane.com/tutorials/deploying-a-script#configuration
+
+# Script name (a combination of lower case letters, numbers, and dashes - must be unique to user)
+name: {{ name }}
+
+# Script title
+title: My awesome script
+
+# Script parameters
+parameters: [
+]
+
+## Additional files to include and exlcude (can use glob syntax)
+# include:
+# -
+# exclude:
+# -
+
+## Python packages required for the script
+#requirements:
+#  -

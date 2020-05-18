@@ -1,0 +1,1 @@
+../../../../../fe-components/dist/local-report-base.js
