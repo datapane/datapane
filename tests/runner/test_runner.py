@@ -12,7 +12,7 @@ if not (sys.platform == "linux" and sys.version_info.minor >= 7):
 
 import datapane as dp
 from datapane.client.api import Script, _report, Result
-from datapane.common.scripts import build_bundle, DatapaneCfg
+from datapane.client.scripts import build_bundle, DatapaneCfg
 from datapane.common.config import RunnerConfig
 from datapane.common import SDict
 from datapane.runner import __main__ as m
@@ -33,9 +33,9 @@ def test_make_env():
     assert "PWD" not in res
 
 
-def test_exec(shared_datadir: Path, monkeypatch, capsys):
+def test_exec(datadir: Path, monkeypatch, capsys):
     """Test running an isolated code snippet"""
-    monkeypatch.chdir(shared_datadir)
+    monkeypatch.chdir(datadir)
 
     res = exec_mod(Path("sample_module.py"), init_state={"x": 4})
     # print(res)
@@ -91,11 +91,11 @@ def _runner(params: SDict, script: Path, sdist: Path = Path(".")) -> RunResult:
 # TODO - fix exception handling stacktraces
 @mock.patch("datapane.runner.exec_script.setup_script", autospec=True)
 @mock.patch("datapane.client.api.Report.publish", autospec=True, side_effect=mock_report_publish)
-def test_run_single_script(rc, isc, shared_datadir: Path, monkeypatch, capfd):
+def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
     """Test running an isolated code snippet with params
     NOTE - we can simplify by calling exec_script.run directly, doesn't test as much of API however
     """
-    monkeypatch.chdir(shared_datadir)
+    monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")
     monkeypatch.setenv("DATAPANE_BY_DATAPANE", "true")
 
@@ -126,8 +126,8 @@ def test_run_single_script(rc, isc, shared_datadir: Path, monkeypatch, capfd):
 
 
 @mock.patch("datapane.client.api.Report.publish", autospec=True, side_effect=mock_report_publish)
-def test_run_bundle(rc, shared_datadir: Path, monkeypatch, capsys):
-    monkeypatch.chdir(shared_datadir)
+def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
+    monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")
     monkeypatch.setenv("DATAPANE_BY_DATAPANE", "true")
 

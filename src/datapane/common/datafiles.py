@@ -88,6 +88,7 @@ class DFFormatter(abc.ABC):
     # TODO - tie to mimetypes lib
     content_type: MIME
     ext: str
+    enum: str
 
     @staticmethod
     @abc.abstractmethod
@@ -106,6 +107,7 @@ DFFormatterCls = Type[DFFormatter]
 class ArrowFormat(DFFormatter):
     content_type = ARROW_MIMETYPE
     ext = ARROW_EXT
+    enum = "ARROW"
 
     def load_file(fn: str) -> pd.DataFrame:
         return pa.ipc.open_file(fn).read_pandas()
@@ -118,6 +120,7 @@ class ArrowFormat(DFFormatter):
 class CSVFormat(DFFormatter):
     content_type = "text/csv"
     ext = ".csv"
+    enum = "CSV"
 
     def load_file(fn: str) -> pd.DataFrame:
         try:
@@ -133,6 +136,7 @@ class CSVFormat(DFFormatter):
 class ExcelFormat(DFFormatter):
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ext = ".xlsx"
+    enum = "EXCEL"
 
     def load_file(fn: str) -> pd.DataFrame:
         return pd.read_excel(fn, engine="openpyxl")
@@ -149,4 +153,5 @@ class DatasetFormats(enum.Enum):
     ARROW = ArrowFormat
 
 
+# TODO - make into enums?
 df_ext_map: Dict[str, DFFormatterCls] = {x.value.ext: x.value for x in DatasetFormats}

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Optional
 
 import altair as alt
 import pandas as pd
@@ -12,42 +11,41 @@ from datapane.client import api
 from datapane.common import temp_fname
 from datapane.common.df_processor import convert_csv_pd
 
-from .common import gen_df, gen_headline, gen_name
+from .common import deletable, gen_df, gen_headline, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
 def test_report():
-    dp_report: Optional[dp.Report] = None
-    try:
-        df = gen_df()
-        name = gen_name()
-        headline = gen_headline()
+    df = gen_df()
+    name = gen_name()
+    headline = gen_headline()
 
-        # create a basic report
-        m = api.Markdown(content="hello world!!")
+    # create a basic report
+    m = api.Markdown(content="hello world!!")
 
-        # Asset tests
-        lis = [1, 2, 3]
-        json_list: str = json.dumps(lis)
-        plot = alt.Chart(df).mark_line().encode(x="x", y="y")
+    # Asset tests
+    lis = [1, 2, 3]
+    json_list: str = json.dumps(lis)
+    plot = alt.Chart(df).mark_line().encode(x="x", y="y")
 
-        # create the DP
-        with temp_fname(".json") as fn:
-            fn = Path(fn)
-            fn.write_text(json_list)
-            file_asset = api.Asset.upload_file(file=fn)
-            json_asset = api.Asset.upload_obj(data=json_list, is_json=True)
-            plot_asset = api.Asset.upload_obj(data=plot)
-            list_asset = api.Asset.upload_obj(data=lis, is_json=True)
-            df_asset = api.Asset.upload_df(df=df)
-            dp_report = api.Report(
-                m, file_asset, df_asset, json_asset, plot_asset, list_asset, name=name
-            )
-            dp_report.publish(headline=headline)
-            # make sure the user file wasn't deleted during /tmp/ cleanup
-            assert file_asset.file.exists()
+    # create the DP
+    with temp_fname(".json") as fn:
+        fn = Path(fn)
+        fn.write_text(json_list)
+        file_asset = api.Asset.upload_file(file=fn)
+        json_asset = api.Asset.upload_obj(data=json_list, is_json=True)
+        plot_asset = api.Asset.upload_obj(data=plot)
+        list_asset = api.Asset.upload_obj(data=lis, is_json=True)
+        df_asset = api.Asset.upload_df(df=df)
+        dp_report = api.Report(
+            m, file_asset, df_asset, json_asset, plot_asset, list_asset, name=name
+        )
+        dp_report.publish(headline=headline)
+        # make sure the user file wasn't deleted during /tmp/ cleanup
+        assert file_asset.file.exists()
 
+    with deletable(dp_report):
         # are the fields ok
         assert dp_report.headline == headline
         assert len(dp_report.blocks) == 6
@@ -109,13 +107,6 @@ def test_report():
         df1 = df_asset.download_df()
         check_df_equal(df1, df)
 
-    finally:
-        # delete the dp
-        if dp_report:
-            dp_report.delete()
-            with pytest.raises(api.HTTPError) as _:
-                _ = api.Report.get(dp_report.name)
-
 
 def test_complex_df_report():
     """Test our dataframe importing with types of DFs user's upload"""
@@ -140,40 +131,14 @@ def test_complex_df_report():
     df_desc = index_df.describe()
     df_desc_2 = df_desc.reset_index()
 
-    dp_report: Optional[dp.Report] = None
-    try:
-        tz_t = dp.Table.create(tz_df)
-        index_t = dp.Table.create(index_df)
-        df_desc_t = dp.Table.create(df_desc)
-        df_desc_2_t = dp.Table.create(df_desc_2)
+    tz_t = dp.Table.create(tz_df)
+    index_t = dp.Table.create(index_df)
+    df_desc_t = dp.Table.create(df_desc)
+    df_desc_2_t = dp.Table.create(df_desc_2)
 
-        dp_report = dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t, name=gen_name())
+    with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t, name=gen_name())) as dp_report:
         dp_report.publish()
-
         check_df_equal(tz_df, tz_t.download_df())
         check_df_equal(index_df, index_t.download_df())
         check_df_equal(df_desc, df_desc_t.download_df())
         check_df_equal(df_desc_2, df_desc_2_t.download_df())
-    finally:
-        if dp_report:
-            dp_report.delete()
-
-
-def test_local_report():
-    try:
-        # Asset tests
-        lis = [1, 2, 3]
-        df = gen_df(10000)
-        md_block = api.Markdown(content="# Test markdown block \n Test **content**")
-        list_asset = api.Asset.upload_obj(data=lis, title="List Asset", is_json=True)
-        # img_asset = api.Asset.upload_file(file=Path("/path/to/image.png"))
-        plot_asset = api.Asset.upload_obj(
-            data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), title="Plot Asset"
-        )
-        df_asset = api.Asset.upload_df(df=df, title="Test Dataframe")
-        report = api.Report(list_asset, df_asset, md_block, plot_asset, name="local_report")
-        report.save(path="test_out.html")
-    finally:
-        x = Path("test_out.html")
-        if x.exists():
-            x.unlink()

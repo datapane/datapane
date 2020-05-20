@@ -1,16 +1,15 @@
 # flake8: noqa isort:skip
 import tarfile
 import time
-from typing import Optional
 from pathlib import Path
 
 import pytest
 
 import datapane as dp
-from datapane.client import api
-from datapane.common import scripts as sc
+from datapane.client import scripts as sc
+from datapane.client.api import HTTPError
 
-from .common import gen_name
+from .common import deletable, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
@@ -18,16 +17,13 @@ pytestmark = pytest.mark.usefixtures("dp_login")
 def test_script_basic(shared_datadir: Path, monkeypatch):
     """Deploying and running a basic report-generating script"""
     monkeypatch.chdir(shared_datadir)
-    s: Optional[dp.Script] = None
-    report: Optional[dp.Report] = None
-    try:
+    # upload
+    name = gen_name()
+    dp_cfg = sc.DatapaneCfg.create_initial()
+    with sc.build_bundle(dp_cfg) as sdist:
+        s = dp.Script.upload_pkg(sdist, dp_cfg, name=name)
 
-        # upload
-        name = gen_name()
-        dp_cfg = sc.DatapaneCfg.create_initial()
-        with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.Script.upload_pkg(sdist, dp_cfg, name=name)
-
+    with deletable(s):
         # are fields added?
         assert s.name == name
 
@@ -45,34 +41,27 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
             time.sleep(2)
             run.refresh()
         assert run.status == "SUCCESS"
-        report = dp.Report.get(id_or_url=run.report)
-        assert report.web_url
-    finally:
-        if report:
-            report.delete()
-        if s:
-            s.delete()
-            with pytest.raises(api.HTTPError) as _:
-                _ = dp.Script(s.name)
+
+        with deletable(dp.Report.get(id_or_url=run.report)) as report:
+            assert report.web_url
 
 
 def test_script_complex(shared_datadir: Path, monkeypatch):
     """Deploy and run a complex script with no report and multiple params"""
     monkeypatch.chdir(shared_datadir)
-    s: Optional[dp.Script] = None
-    try:
-        # upload
-        dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_test_mod.yaml"))
+    # upload
+    dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_test_mod.yaml"))
 
-        with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.Script.upload_pkg(sdist, dp_cfg)
+    with sc.build_bundle(dp_cfg) as sdist:
+        s = dp.Script.upload_pkg(sdist, dp_cfg)
 
+    with deletable(s):
         assert "datapane-demos" in s.repo
         assert len(s.requirements) == 1
         assert "pytil" in s.requirements
 
         # attempt run with missing required param `p2`
-        with pytest.raises(api.HTTPError) as _:
+        with pytest.raises(HTTPError) as _:
             _ = s.run(parameters=dict(p1="A"))
 
         run = s.run(parameters=dict(p1="A", p2=1))
@@ -89,11 +78,6 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         assert run.status == "SUCCESS"
         assert run.report is None
         assert run.result == "hello , world!"
-    finally:
-        if s:
-            s.delete()
-            with pytest.raises(api.HTTPError) as _:
-                _ = dp.Script(s.name)
 
 
 def test_run_linked_script():

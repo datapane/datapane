@@ -19,11 +19,12 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane._version import __rev__, __version__
-from datapane.common import JDict, SDict, log, scripts
-from datapane.common.scripts import config as sc
+from datapane.common import JDict, SDict, log
 
 from . import api
 from . import config as c
+from . import scripts
+from .scripts import config as sc
 
 DEBUG: bool = False
 

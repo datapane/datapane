@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from datapane.common.scripts import config as sc
+from datapane.client.scripts import config as sc
 
 
 def test_extract_notebook(datadir: Path):

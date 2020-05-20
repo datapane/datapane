@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from datapane.client.commands import cli
 
-from ..test_local_cli import handle_res
+from ..local.test_cli import handle_res
 from .conftest import TEST_SERVER, TEST_TOKEN
 
 

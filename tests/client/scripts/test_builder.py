@@ -1,11 +1,9 @@
-import logging
 import tarfile
 import typing as t
 from pathlib import Path
 
+from datapane.client.scripts import DatapaneCfg, builder
 from datapane.common.utils import setup_logging
-from datapane.common.scripts import builder
-from datapane.common.scripts.config import DatapaneCfg
 
 # debug
 setup_logging(verbose_mode=True)

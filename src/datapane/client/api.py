@@ -36,12 +36,12 @@ from datapane.common import (
     log,
     temp_fname,
 )
-from datapane.common.datafiles import convert_df_table, write_table
+from datapane.common.datafiles import convert_df_table, df_ext_map, write_table
 from datapane.common.df_processor import process_df, to_df
-from datapane.common.scripts.config import DATAPANE_YAML, DatapaneCfg
 from datapane.common.utils import compress_file, guess_type, setup_logging
 
 from . import config as c
+from .scripts import DATAPANE_YAML, DatapaneCfg
 
 ###############################################################################
 # top level functions here - move to runner?
@@ -423,14 +423,12 @@ class ExportableObjectMixin:
 
     @staticmethod
     def get_export_format(fn: Path) -> str:
-        # TODO: Use DatasetFormats Enum
-        valid_formats = [".df.json", ".csv", ".xlsx"]
-        ext = "".join(fn.suffixes)
-        if ext not in valid_formats:
+        ext = fn.suffix
+        if ext not in df_ext_map:
             raise ValueError(
-                f"Extension {ext} not valid for exporting table. Must be one of {', '.join(valid_formats)}"
+                f"Extension {ext} not valid for exporting table. Must be one of {', '.join(df_ext_map.keys())}"
             )
-        return ext
+        return df_ext_map[ext].enum
 
 
 class Blob(BEObjectRef, ExportableObjectMixin):
@@ -617,7 +615,7 @@ class Report(BEObjectRef):
     path: str
     # Temp local report
     tmp_report: t.Optional[Path] = None
-    name: str
+    local_name: str
 
     def __init__(self, *blocks: BlockType, retrieve: bool = False, **kwargs):
         # If retrieve is True then fetch the remote report by passing kwargs into super
@@ -625,8 +623,8 @@ class Report(BEObjectRef):
         super_kwargs = kwargs if retrieve else {}
         super().__init__(**super_kwargs)
         self.blocks = list(blocks)
-        self.name = kwargs.get("name")
-        if not self.name and not retrieve:
+        self.local_name = kwargs.get("name")
+        if not self.local_name and not retrieve:
             # It's valid to not specify name from get(), if using id_or_url
             raise Exception("UndefinedReportName")
 
@@ -642,7 +640,7 @@ class Report(BEObjectRef):
     def publish(self, **kwargs):
         """Deploy the report and its Assets to Datapane"""
         new_blocks = [mk_block(b) for b in self.blocks]
-        res = Resource(self.endpoint).post(blocks=new_blocks, name=self.name, **kwargs)
+        res = Resource(self.endpoint).post(blocks=new_blocks, name=self.local_name, **kwargs)
         # upload assets and attach to the report
         #  - this is a bit hacky as relies on the ordering staying the same
         #  - could update by using refId
