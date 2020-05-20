@@ -38,10 +38,8 @@ def test_report():
         plot_asset = api.Asset.upload_obj(data=plot)
         list_asset = api.Asset.upload_obj(data=lis, is_json=True)
         df_asset = api.Asset.upload_df(df=df)
-        dp_report = api.Report(
-            m, file_asset, df_asset, json_asset, plot_asset, list_asset, name=name
-        )
-        dp_report.publish(headline=headline)
+        dp_report = api.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
+        dp_report.publish(name=name, headline=headline)
         # make sure the user file wasn't deleted during /tmp/ cleanup
         assert file_asset.file.exists()
 
@@ -131,13 +129,13 @@ def test_complex_df_report():
     df_desc = index_df.describe()
     df_desc_2 = df_desc.reset_index()
 
-    tz_t = dp.Table.create(tz_df)
-    index_t = dp.Table.create(index_df)
-    df_desc_t = dp.Table.create(df_desc)
-    df_desc_2_t = dp.Table.create(df_desc_2)
+    tz_t = dp.Table(tz_df)
+    index_t = dp.Table(index_df)
+    df_desc_t = dp.Table(df_desc)
+    df_desc_2_t = dp.Table(df_desc_2)
 
-    with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t, name=gen_name())) as dp_report:
-        dp_report.publish()
+    with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
+        dp_report.publish(name=gen_name())
         check_df_equal(tz_df, tz_t.download_df())
         check_df_equal(index_df, index_t.download_df())
         check_df_equal(df_desc, df_desc_t.download_df())

@@ -1,4 +1,5 @@
 # flake8: noqa F401
+from .datafiles import ArrowFormat
 from .dp_types import (
     SDict,
     SList,
@@ -18,5 +19,4 @@ from .dp_types import (
     REGISTRY,
     EnumType,
 )
-
 from .utils import log, get_logger, log_command, temp_fname, guess_type

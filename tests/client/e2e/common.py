@@ -2,12 +2,13 @@ import random
 import string
 import uuid
 from contextlib import contextmanager
-from typing import ContextManager, TypeVar
+from typing import ContextManager
 
 import pandas as pd
 import pytest
 
-from datapane.client.api import BEObjectRef, HTTPError, Report
+from datapane.client.api import HTTPError
+from datapane.client.api.dp_object import U
 
 
 code: str = """
@@ -33,9 +34,6 @@ def gen_title() -> str:
     return f"test - {uuid.uuid4().hex}"
 
 
-U = TypeVar("U", bound=BEObjectRef)
-
-
 @contextmanager
 def deletable(x: U) -> ContextManager[U]:
     try:
@@ -43,8 +41,4 @@ def deletable(x: U) -> ContextManager[U]:
     finally:
         x.delete()
         with pytest.raises(HTTPError) as _:
-            # TODO - fixme
-            if isinstance(x, Report):
-                _ = Report.get(x.name)
-            else:
-                _ = x.__class__(x.name)
+            _ = x.__class__.get(x.name)

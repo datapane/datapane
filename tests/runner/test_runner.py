@@ -11,7 +11,7 @@ if not (sys.platform == "linux" and sys.version_info.minor >= 7):
     pytest.skip("skipping linux-only 3.7+ tests", allow_module_level=True)
 
 import datapane as dp
-from datapane.client.api import Script, _report, Result
+from datapane.client.api.runtime import _report
 from datapane.client.scripts import build_bundle, DatapaneCfg
 from datapane.common.config import RunnerConfig
 from datapane.common import SDict
@@ -51,7 +51,7 @@ def test_exec(datadir: Path, monkeypatch, capsys):
     assert out == "x is 4\nin foo\nmy_df\n5\n"
 
 
-class MockScript(Script):
+class MockScript(dp.Script):
     """Use custom mock class to disable constructor but keep other methods"""
 
     script = ""
@@ -63,6 +63,14 @@ class MockScript(Script):
 
     def __init__(self, *a, **kw):
         pass
+
+    @classmethod
+    def get(cls, *a, **kw):
+        return cls()
+
+    @classmethod
+    def by_id(cls, id_or_url: str):
+        return cls()
 
 
 def mock_report_publish(self, **kwargs):
@@ -145,5 +153,5 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     assert "ran script" in out
     assert "p2=xyz" in out
     assert "WORLD" in out
-    assert Result.get() == "hello , world!"
+    assert dp.Result.get() == "hello , world!"
     assert res.report_id is None

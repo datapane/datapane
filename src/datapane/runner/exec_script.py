@@ -26,7 +26,7 @@ RUN_NAME = "__datapane__"  # <datapane> ??
 
 def run(script: api.Script, user_config: SDict) -> SDict:
     """Run a datapane python script/module"""
-    api.reset_api(params=user_config)
+    api._reset_runtime(params=user_config)
 
     # use the script id for unique, isolated dir per script
     env_dir = Path(script.id)

@@ -42,7 +42,7 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
             run.refresh()
         assert run.status == "SUCCESS"
 
-        with deletable(dp.Report.get(id_or_url=run.report)) as report:
+        with deletable(dp.Report.by_id(run.report)) as report:
             assert report.web_url
 
 

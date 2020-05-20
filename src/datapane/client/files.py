@@ -72,8 +72,7 @@ import abc
 import json
 import pickle
 from functools import singledispatch
-from pathlib import Path
-from typing import IO, Any, BinaryIO, Optional, TextIO, TypeVar, Union
+from typing import IO, Any, BinaryIO, Generic, TextIO, TypeVar
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -85,30 +84,23 @@ from numpy import ndarray
 
 from datapane.common import log
 
+from .api.common import DPTmpFile
+
 T = TypeVar("T")
-NPath = Union[Path, str]
-MIME_TYPE_ATTR = "user.mime_type"
-PLAIN_TEXT = "text/plain"
-RESULT_COUNTER: int = 1
 
 
-class BasePlot(abc.ABC):
+class BasePlot(Generic[T], abc.ABC):
     mimetype: str
     ext: str
     fig_type: T
     file_mode = "w"
 
-    # @staticmethod
-    # def _set_mimetype(filename: Path, mimetype: str) -> None:
-    #     with suppress(OSError):
-    #         # NOTE: doesn't work if run in tmpfs
-    #         setxattr(str(filename), MIME_TYPE_ATTR, mimetype.encode("utf8"))
-
-    def write(self, file_name: NPath, x: T) -> Path:
-        fn = Path(file_name).with_suffix(self.ext)
-        with fn.open(self.file_mode) as f:
+    def write(self, x: T) -> DPTmpFile:
+        fn = DPTmpFile(self.ext)
+        # fn = Path(file_name).with_suffix(self.ext)
+        with fn.file.open(self.file_mode) as f:
             self.write_file(f, x)
-        # self._set_mimetype(fn, self.mimetype)
+        # NOTE - used to set mime-type as extended-file attrib using xttrs here
         return fn
 
     def write_file(self, f: IO, x: T):
@@ -151,17 +143,12 @@ class BaseJsonWriter(BasePlot):
 
 
 class MatplotBasePlot(BasePlot):
-    def _write_figure(self, file_name: NPath, x: Figure) -> Path:
-        """ Creates an image from figure
+    ext = ".svg"
+    mimetype = "image/svg+xml"
 
-        :param file_name: Name of the file.
-        :param x: Matplotlib figure, can be created by `plt.figure() or plt.gcf() for the global`.
-        """
-
-        # let matplotlib guess the format from extension, defaulting to svg if none present
-        fn = Path(file_name)
-        if not fn.suffix:
-            fn = fn.with_suffix(".svg")
+    def _write_figure(self, x: Figure) -> DPTmpFile:
+        """Creates an SVG from figure"""
+        fn = DPTmpFile(self.ext)
         x = x or plt.gcf()
         x.savefig(str(fn))
         return fn
@@ -170,24 +157,24 @@ class MatplotBasePlot(BasePlot):
 class MatplotFigurePlot(MatplotBasePlot):
     fig_type = Figure
 
-    def write(self, file_name: NPath, x: Figure) -> Path:
-        return super()._write_figure(file_name, x)
+    def write(self, x: Figure) -> DPTmpFile:
+        return super()._write_figure(x)
 
 
 class MatplotAxesPlot(MatplotBasePlot):
     fig_type = Axes
 
-    def write(self, file_name: NPath, x: Axes) -> Path:
+    def write(self, x: Axes) -> DPTmpFile:
         f: Figure = x.get_figure()
-        return super()._write_figure(file_name, f)
+        return super()._write_figure(f)
 
 
 class MatplotNDArrayPlot(MatplotBasePlot):
     fig_type = ndarray
 
-    def write(self, file_name: NPath, x: ndarray) -> Path:
+    def write(self, x: ndarray) -> DPTmpFile:
         f: Figure = x.flatten()[0].get_figure()
-        return super()._write_figure(file_name, f)
+        return super()._write_figure(f)
 
 
 class TablePlot(BasePlot):
@@ -256,22 +243,5 @@ for p in plots:
     get_plotter.register(p.fig_type, lambda _, p=p, default_to_json=False: p())
 
 
-def show(
-    figure: Any,
-    filename: Optional[NPath] = None,
-    output_dir: Optional[NPath] = Path("."),
-    default_to_json: bool = False,
-) -> Path:
-    # NOTE - do not auto-generate a filename extension for `filename` param
-    # if exact extension not known, e.g. .obj
-    global RESULT_COUNTER
-    if not filename:
-        filename = Path(f"results_{RESULT_COUNTER:03d}")
-        RESULT_COUNTER += 1
-    else:
-        filename = Path(filename)
-
-    if not filename.is_absolute():
-        filename = output_dir / filename
-
-    return get_plotter(figure, default_to_json=default_to_json).write(filename, figure)
+def save(figure: Any, default_to_json: bool = False) -> DPTmpFile:
+    return get_plotter(figure, default_to_json=default_to_json).write(figure)

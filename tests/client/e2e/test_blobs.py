@@ -40,10 +40,10 @@ def test_blob_df():
         check_df_equal(df1, df)
 
         # test obj lookup using name
-        b2 = dp.Blob(b1.name)
+        b2 = dp.Blob.get(b1.name)
         assert b2.name == b1.name
         # test obj lookup using id
-        b3 = dp.Blob(id_or_url=b1.id)
+        b3 = dp.Blob.by_id(b1.id)
         assert b3.name == b2.name
 
 

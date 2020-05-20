@@ -22,4 +22,4 @@ chart = (
 )
 
 
-report = [dp.Plot.create(chart)]
+report = [dp.Plot(chart)]

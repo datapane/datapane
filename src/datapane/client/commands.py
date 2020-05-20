@@ -173,7 +173,7 @@ def upload(file: str, name: str, visibility: str):
 @click.argument("file", type=click.Path())
 def download(name: str, owner: str, version: str, file: str):
     """Download blob referenced by NAME to FILE"""
-    r = api.Blob(name, owner=owner, version=version)
+    r = api.Blob.get(name, owner=owner, version=version)
     r.download_file(file)
     success_msg(f"Downloaded {r.url} to {click.format_filename(file)}")
 
@@ -182,7 +182,7 @@ def download(name: str, owner: str, version: str, file: str):
 @click.argument("name")
 def delete(name: str):
     """Delete a blob"""
-    api.Blob(name).delete()
+    api.Blob.get(name).delete()
     success_msg(f"Deleted Blob {name}")
 
 
@@ -270,7 +270,7 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], vi
 @click.option("--owner")
 def download(name: str, owner: str, version: str):
     """Download script referenced by NAME to FILE"""
-    s = api.Script(name, owner=owner, version=version)
+    s = api.Script.get(name, owner=owner, version=version)
     fn = s.download_pkg()
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
@@ -279,7 +279,7 @@ def download(name: str, owner: str, version: str):
 @click.argument("name")
 def delete(name: str):
     """Delete a script"""
-    api.Script(name).delete()
+    api.Script.get(name).delete()
     success_msg(f"Deleted Script {name}")
 
 
@@ -330,7 +330,7 @@ def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str, s
     """Run a report"""
     params = process_cmd_param_vals(parameter)
     log.info(f"Running script with parameters {params}")
-    script = api.Script(name, owner=owner)
+    script = api.Script.get(name, owner=owner)
     with api_error_handler("Error running script"):
         r = script.run(parameters=params, cache=cache)
     if wait:
@@ -345,7 +345,7 @@ def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str, s
                 if r.result:
                     success_msg(f"Script result - '{r.result}'")
                 if r.report:
-                    report = api.Report.get(id_or_url=r.report)
+                    report = api.Report.by_id(r.report)
                     success_msg(f"Report generated at {report.web_url}")
             else:
                 failure_msg(f"Script run failed/cancelled\n{r.error_msg}: {r.error_detail}")
@@ -370,8 +370,8 @@ def report():
 def create(files: Tuple[str], name: str, headline: str, visibility: str):
     """Create a Report from the provided FILES"""
     blocks = [api.Asset.upload_file(file=Path(f)) for f in files]
-    r = api.Report(*blocks, name=name)
-    r.publish(visibility=visibility, headline=headline)
+    r = api.Report(*blocks)
+    r.publish(name=name, headline=headline, visibility=visibility)
     success_msg(f"Created Report {r.web_url}")
 
 
@@ -440,7 +440,7 @@ def list():
 @click.option("--show", is_flag=True, help="Print the variable value.")
 def get(name, owner, version, show):
     """Get variable value using variable name"""
-    res = api.Variable(name, owner=owner, version=version)
+    res = api.Variable.get(name, owner=owner, version=version)
     if show:
         print(str(res.value).strip())
     else:
@@ -451,5 +451,5 @@ def get(name, owner, version, show):
 @click.argument("name")
 def delete(name):
     """Delete a variable using variable name"""
-    api.Variable(name).delete()
+    api.Variable.get(name).delete()
     success_msg(f"Deleted variable {name}")

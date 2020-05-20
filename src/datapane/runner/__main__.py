@@ -6,6 +6,7 @@ import traceback
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 
+import datapane.client.api.common
 from datapane import __version__
 from datapane.client import api
 from datapane.client import config as c
@@ -25,13 +26,13 @@ def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = N
     # datapane.init(stream_logs, verbose=args.debug)
     api.init(config=config, debug=debug, logs_stream=logs)
     # check can login/ping
-    r = api.check_login()
+    r = datapane.client.api.common.check_login()
     log.debug(f"Running DP on DP as {r.username}")
 
 
 def run_api(run_config: RunnerConfig) -> RunResult:
     """Bootstrap the recursive calls into run"""
-    script = api.Script(id_or_url=run_config.script_id)
+    script = api.Script.by_id(run_config.script_id)
     # is the script compatible with the client runner/api
     version_check(__version__, script.api_version)
 
