@@ -78,6 +78,7 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         assert run.status == "SUCCESS"
         assert run.report is None
         assert run.result == "hello , world!"
+        assert "SAMPLE OUTPUT" in run.output
 
 
 def test_run_linked_script():

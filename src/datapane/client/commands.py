@@ -324,8 +324,9 @@ def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
 @click.option("--cache/--disable-cache", default=True)
 @click.option("--wait/--no-wait", default=True)
 @click.option("--owner")
+@click.option("--show-output", is_flag=True, default=False, help="Display the run output")
 @click.argument("name")
-def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str):
+def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str, show_output: bool):
     """Run a report"""
     params = process_cmd_param_vals(parameter)
     log.info(f"Running script with parameters {params}")
@@ -338,6 +339,8 @@ def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str):
                 time.sleep(2)
                 r.refresh()
             log.debug(f"Run completed with status {r.status}")
+            if show_output:
+                click.echo(r.output)
             if r.status == "SUCCESS":
                 if r.result:
                     success_msg(f"Script result - '{r.result}'")
@@ -345,9 +348,7 @@ def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str):
                     report = api.Report.get(id_or_url=r.report)
                     success_msg(f"Report generated at {report.web_url}")
             else:
-                failure_msg(
-                    f"Script run failed/cancelled\n{r.error_msg}: {r.error_detail}", do_exit=True
-                )
+                failure_msg(f"Script run failed/cancelled\n{r.error_msg}: {r.error_detail}")
 
     else:
         success_msg(f"Script run started, view at {script.web_url}")

@@ -23,7 +23,7 @@ c_txt_rel = Path("c.json").read_text()
 assert c_txt == c_txt_rel
 c_json = json.loads(c_txt)
 print(c_json["HELLO"])
-
+print("SAMPLE OUTPUT")
 # DP Results & 3rd-party libs
 if dp.Params["p3"]:
     t = f"""
