@@ -18,7 +18,7 @@ from jinja2 import Environment, FileSystemLoader
 from requests import HTTPError
 from tabulate import tabulate
 
-from datapane._version import __rev__, __version__
+from datapane import __rev__, __version__
 from datapane.common import JDict, SDict, log
 
 from . import api

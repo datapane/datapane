@@ -16,6 +16,7 @@ from .dp_types import (
     TD_1_HOUR,
     SECS_1_HOUR,
     SECS_1_WEEK,
+    DEFAULT_REGISTRY,
     REGISTRY,
     EnumType,
 )

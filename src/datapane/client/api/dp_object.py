@@ -14,7 +14,7 @@ import requests
 import validators as v
 from munch import Munch
 
-from datapane._version import __version__
+from datapane import __version__
 from datapane.client.scripts import DatapaneCfg
 from datapane.common import JSON, PKL_MIMETYPE, URL, NPath, SDict, log
 from datapane.common.datafiles import ArrowFormat, df_ext_map
