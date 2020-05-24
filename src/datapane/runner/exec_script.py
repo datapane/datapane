@@ -129,7 +129,7 @@ def setup_script(s: api.Script, env_dir: Path):
     assert tarfile.is_tarfile(sdist), "Invalid sdist file"
     shutil.unpack_archive(sdist, extract_dir=env_dir, format="gztar")
     sdist.unlink()
-    comp_r = compileall.compile_dir(env_dir, force=True, workers=0, quiet=1)
+    comp_r = compileall.compile_dir(env_dir, force=True, workers=1, quiet=1)
     if not comp_r:
         log.warning("Compiling script bundle failed - errors may occur")
 
