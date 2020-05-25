@@ -59,7 +59,7 @@ class MockScript(dp.Script):
     requirements = ["pytil"]
     pre_commands = ["echo PRE1", "echo PRE2"]
     post_commands = ["echo POST1", "echo POST2"]
-    api_version = "0.0.1"
+    api_version = dp.__version__
 
     def __init__(self, *a, **kw):
         pass

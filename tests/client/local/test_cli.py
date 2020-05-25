@@ -2,7 +2,6 @@ from pathlib import Path
 
 from click.testing import CliRunner, Result
 
-from datapane import __version__
 from datapane.client.commands import cli, process_cmd_param_vals
 from datapane.common.utils import pushd
 
@@ -17,10 +16,6 @@ def handle_res(r: Result):
         print(r.output)
         raise r.exception
     assert r.exit_code == 0
-
-
-def test_version():
-    assert __version__ == "0.0.1"
 
 
 def test_init(tmp_path: Path):

@@ -95,8 +95,6 @@ class IncompatibleVersionException(Exception):
 
 def check_pip_version() -> None:
     cli_version = Version(__version__)
-    if __version__ == "0.0.1":  # we're on dev version
-        return None
     url = "https://pypi.org/pypi/datapane/json"
     r = requests.get(url=url)
     r.raise_for_status()
