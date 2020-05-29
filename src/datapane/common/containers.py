@@ -42,7 +42,8 @@ class DockerURI:
             return f"{self.domain}/{self.image}"
 
     def with_tag(self, tag: str) -> "DockerURI":
-        return dc.replace(self, tag=tag)
+        path = f"{self.namespace}/{self.image}" if self.namespace else self.image
+        return dc.replace(self, tag=tag, path=path)
 
     def __str__(self) -> str:
         return self.full_name
