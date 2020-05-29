@@ -6,6 +6,7 @@ from click.testing import CliRunner
 from datapane.client.commands import cli
 
 from ..local.test_cli import handle_res
+from .common import gen_name
 from .conftest import TEST_SERVER, TEST_TOKEN
 
 
@@ -32,13 +33,14 @@ def test_auth(runner: CliRunner):
     assert "Logged out" in result.output
 
 
+@pytest.mark.timeout(5 * 60)  # allow 5m
 def test_cli_script(runner: CliRunner, tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     r = runner.invoke(cli, ["--debug", "script", "init"])
     handle_res(r)
-    script_name = "test_script"
-    r = runner.invoke(cli, ["--debug", "script", "deploy", script_name])
+    script_name = gen_name()
+    r = runner.invoke(cli, ["--debug", "script", "deploy", "--name", script_name])
     handle_res(r)
 
     if "Uploaded" in r.output:

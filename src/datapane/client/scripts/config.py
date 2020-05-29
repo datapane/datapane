@@ -21,7 +21,7 @@ DATAPANE_YAML = Path("datapane.yaml")
 PYPROJECT_TOML = Path("pyproject.toml")
 DEFAULT_PY = Path("dp_script.py")
 DEFAULT_IPYNB = Path("dp_script.ipynb")
-re_check_name = re.compile("^[a-z0-9_]+$")
+re_check_name = re.compile(r"^\w+$")
 
 # TODO - look at other libs
 #  - https://lidatong.github.io/dataclasses-json/ (or marshmallow)
@@ -56,7 +56,8 @@ class DatapaneCfg:
     proj_dir: ClassVar[Path] = None
 
     # run options
-    docker_image: Optional[str] = None
+    container_image_name: str = ""
+    # docker_image: Optional[str] = None
     parameters: List[SDict] = dc.field(default_factory=list)
     pre_commands: List[str] = dc.field(default_factory=list)
     post_commands: List[str] = dc.field(default_factory=list)

@@ -1,4 +1,5 @@
 # flake8: noqa F401
+from .containers import GCR_REGISTRY, DockerURI
 from .datafiles import ArrowFormat
 from .dp_types import (
     SDict,
@@ -16,8 +17,6 @@ from .dp_types import (
     TD_1_HOUR,
     SECS_1_HOUR,
     SECS_1_WEEK,
-    DEFAULT_REGISTRY,
-    REGISTRY,
     EnumType,
 )
 from .utils import log, get_logger, log_command, temp_fname, guess_type

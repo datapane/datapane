@@ -131,9 +131,9 @@ class Resource:
                 check_pip_version()
             else:
                 try:
-                    log.debug(pprint.pformat(r.json()))
+                    log.error(pprint.pformat(r.json()))
                 except ValueError:
-                    log.debug(pprint.pformat(r.text))
+                    log.error(pprint.pformat(r.text))
         r.raise_for_status()
         r_data = r.json()
         return munchify(r_data) if isinstance(r_data, dict) else r_data

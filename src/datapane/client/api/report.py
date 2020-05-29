@@ -2,9 +2,9 @@ import dataclasses as dc
 import shutil
 import typing as t
 import uuid
+import webbrowser
 from copy import deepcopy
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from urllib import parse as up
 
 import pandas as pd
@@ -13,7 +13,7 @@ from munch import Munch
 from datapane.client import config as c
 from datapane.common import JSON, JDict, NPath, guess_type, log
 
-from .common import Resource, tmp_dir
+from .common import DPTmpFile, Resource
 from .dp_object import BEObjectRef, ExportableObjectMixin
 from .runtime import _report
 
@@ -113,15 +113,16 @@ def mk_block(b: BlockType) -> JSON:
 class Report(BEObjectRef):
     endpoint: str = "/reports/"
     blocks: t.List[BEObjectRef]
-    path: str  # Path to local report
+    last_saved: t.Optional[str] = None  # Path to local report
     tmp_report: t.Optional[Path] = None  # Temp local report
 
     def __init__(self, *blocks: BlockType):
         super().__init__()
         self.blocks = list(blocks)
 
-    def publish(self, **kwargs):
+    def publish(self, name: str, open: bool = False, **kwargs):
         """Deploy the report and its Assets to Datapane"""
+        kwargs.update(name=name)
         new_blocks = [mk_block(b) for b in self.blocks]
         res = Resource(self.endpoint).post(blocks=new_blocks, **kwargs)
 
@@ -138,12 +139,15 @@ class Report(BEObjectRef):
         self.refresh()
         # add report to internal API handler for use by_datapane
         _report.append(self)
+        if open:
+            webbrowser.open_new_tab(self.web_url)
+        log.info(f"Report published to Datapane as {self.web_url}")
 
-    def save(self, path: str, headline: str = "Local Report", **kwargs):
+    def save(self, path: str, headline: str = "Local Report", open: bool = False, **kwargs):
         """Save the report to a local HTML file"""
         from ..report_file_writer import ReportFileWriter
 
-        self.path = path
+        self.last_saved = path
         # Don't change the blocks class variable as this would prioritise local properties over the DTO
         local_blocks = deepcopy(self.blocks)
         # local_assets is used to clean up any temp files once assets are encoded
@@ -157,6 +161,8 @@ class Report(BEObjectRef):
                 b.content_type = guess_type(b.file)
         writer = ReportFileWriter(*local_blocks, headline=headline, **kwargs)
         writer.write(path)
+        if open:
+            webbrowser.open_new_tab(path)
 
     def preview(self, width: int = 600, height: int = 500):
         """ Preview the report inside IPython notebooks in browser """
@@ -169,16 +175,14 @@ class Report(BEObjectRef):
 
             # We need to copy the report HTML to a local temp file,
             # as most browsers block iframes to absolute local paths.
-            with NamedTemporaryFile(
-                delete=False, dir=tmp_dir, mode="w", prefix="dpreport", suffix=".html"
-            ) as tmpfile:
-                if self.path:
-                    # Copy to tmp file if already saved
-                    shutil.copy(self.path, tmpfile.name)
-                else:
-                    # Else save directly to tmp file
-                    self.save(path=tmpfile.name)
-                self.tmp_report = Path(tmpfile.name)
+            tmpfile = DPTmpFile(ext=".html")
+            if self.last_saved:
+                # Copy to tmp file if already saved
+                shutil.copy(self.last_saved, tmpfile.name)
+            else:
+                # Else save directly to tmp file
+                self.save(path=tmpfile.name)
+            self.tmp_report = tmpfile.file
 
             # NOTE - iframe must be relative path
             iframe_src = self.tmp_report.relative_to(Path(".").absolute())

@@ -14,7 +14,6 @@ URL = str
 NPath = t.Union[PathLike, str]
 Hash = str
 EnumType = int  # alias for enum values
-REGISTRY = str
 
 # Constants
 # NOTE - PKL_MIMETYPE and ARROW_MIMETYPE are custom mimetypes
@@ -24,4 +23,3 @@ ARROW_EXT = ".arrow"
 TD_1_HOUR = timedelta(hours=1)
 SECS_1_HOUR: int = int(TD_1_HOUR.total_seconds())
 SECS_1_WEEK: int = int(timedelta(weeks=1).total_seconds())
-DEFAULT_REGISTRY: REGISTRY = "eu.gcr.io/datapane"

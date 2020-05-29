@@ -2,7 +2,6 @@ import dataclasses as dc
 import os
 import tarfile
 import time
-import traceback
 import typing as t
 import uuid
 from contextlib import contextmanager
@@ -59,8 +58,11 @@ def success_msg(msg: str):
 def failure_msg(msg: str, do_exit: bool = False):
     click.secho(msg, fg="red")
     if do_exit:
-        ctx: click.Context = click.get_current_context(silent=False)
-        ctx.exit(2)
+        ctx: click.Context = click.get_current_context(silent=True)
+        if ctx:
+            ctx.exit(2)
+        else:
+            exit(2)
 
 
 @contextmanager
@@ -68,7 +70,10 @@ def api_error_handler(err_msg: str):
     try:
         yield
     except HTTPError as e:
-        log.error(e)
+        if DEBUG:
+            log.exception(e)
+        else:
+            log.error(e)
         failure_msg(err_msg, do_exit=True)
 
 
@@ -86,8 +91,17 @@ class CatchIncompatibleVersion(click.Group):
         try:
             return self.main(*args, **kwargs)
         except api.IncompatibleVersionException as exc:
-            traceback.print_exc()
+            if DEBUG:
+                log.exception(exc)
             failure_msg(str(exc))
+        except HTTPError as e:
+            if DEBUG:
+                log.exception(e)
+            failure_msg(str(e), do_exit=True)
+        except Exception as e:
+            if DEBUG:
+                log.exception(e)
+            failure_msg(str(e), do_exit=True)
 
 
 ###############################################################################
@@ -235,7 +249,7 @@ def script_init(name: str):
 @script.command()
 @click.option("--config", type=click.Path(exists=True))
 @click.option("--script", type=click.Path(exists=True))
-@click.argument("name")
+@click.option("--name")
 @click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]), default="PRIVATE")
 def deploy(name: Optional[str], script: Optional[str], config: Optional[str], visibility: str):
     """Package and deploy a Python script or Jupyter notebook as a Datapane Script bundle"""
