@@ -1,4 +1,5 @@
 import dataclasses as dc
+import os.path as osp
 import shutil
 import typing as t
 import uuid
@@ -162,7 +163,8 @@ class Report(BEObjectRef):
         writer = ReportFileWriter(*local_blocks, headline=headline, **kwargs)
         writer.write(path)
         if open:
-            webbrowser.open_new_tab(path)
+            path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
+            webbrowser.open_new_tab(path_uri)
 
     def preview(self, width: int = 600, height: int = 500):
         """ Preview the report inside IPython notebooks in browser """
