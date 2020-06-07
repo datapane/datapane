@@ -63,7 +63,7 @@ def preprocess_src_dir(dp_config: DatapaneCfg) -> Path:
         new_mod = old_mod.with_suffix(".py")
         if new_mod.exists():
             new_mod = old_mod.with_name(f"_{old_mod.stem}.py")
-        new_mod.write_text(mod_code)
+        new_mod.write_text(mod_code, encoding="utf-8")
 
         dp_config.script = Path(new_mod.name)
         return new_mod

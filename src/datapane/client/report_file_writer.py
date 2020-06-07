@@ -69,7 +69,7 @@ class ReportFileWriter:
             report_obj=json.dumps(self.report_obj),
             dataset_objs=json.dumps(self.dataset_objs),
         )
-        Path(path).write_text(r)
+        Path(path).write_text(r, encoding="utf-8")
 
     def encode_assets(self, assets: t.List[Asset]):
         """ Convert asset files into base64 URLs that can be in-lined into the report HTML """

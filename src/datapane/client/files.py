@@ -93,12 +93,14 @@ class BasePlot(Generic[T], abc.ABC):
     mimetype: str
     ext: str
     fig_type: T
-    file_mode = "w"
+    file_mode: str = "w"
 
     def write(self, x: T) -> DPTmpFile:
         fn = DPTmpFile(self.ext)
         # fn = Path(file_name).with_suffix(self.ext)
-        with fn.file.open(self.file_mode) as f:
+        # add UTF-8 encoding if a text file
+        f_kwargs = {} if "b" in self.file_mode else dict(encoding="utf-8")
+        with fn.file.open(self.file_mode, **f_kwargs) as f:
             self.write_file(f, x)
         # NOTE - used to set mime-type as extended-file attrib using xttrs here
         return fn
