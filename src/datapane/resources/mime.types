@@ -5,6 +5,7 @@ application/vnd.bokeh.show+json     bokeh.json
 application/vnd.vegalite.v2+json    vl2.json
 application/vnd.vegalite.v3+json    vl.json
 application/vnd.vegalite.v3+json    vl3.json
+application/vnd.plotly.v1+json  pl.json
 
 # images - already handled
 
@@ -19,3 +20,5 @@ application/x-ipynb+json    ipynb
 application/vnd.pickle+binary    pkl
 application/x-pywheel+zip    whl
 application/x-tgz   tgz
+# base64'd objects
+application/base64  b64

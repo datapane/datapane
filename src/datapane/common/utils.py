@@ -24,6 +24,7 @@ double_ext_map = {
     ".vl2.json": "application/vnd.vegalite.v2+json",
     ".vl3.json": "application/vnd.vegalite.v3+json",
     ".bokeh.json": "application/vnd.bokeh.show+json",
+    ".pl.json": "application/vnd.plotly.v1+json",
     ".tar.gz": "application/x-tgz",
 }
 

@@ -69,6 +69,7 @@ Example
 """
 
 import abc
+import base64
 import json
 import pickle
 from functools import singledispatch
@@ -79,8 +80,10 @@ import pandas as pd
 from altair.utils import SchemaBase
 from bokeh.embed import json_item
 from bokeh.plotting.figure import Figure as BFigure
+from folium import Map
 from matplotlib.figure import Axes, Figure
 from numpy import ndarray
+from plotly.graph_objects import Figure as PFigure
 
 from datapane.common import log
 
@@ -223,11 +226,36 @@ class AltairPlot(BasePlot):
         json.dump(chart.to_dict(), f)
 
 
+class PlotlyPlot(BasePlot):
+    """Creates a plotly graph from a figure object"""
+
+    mimetype = "application/vnd.plotly.v1+json"
+    ext = ".pl.json"
+    fig_type = PFigure
+
+    def write_file(self, f: TextIO, chart: PFigure):
+        json.dump(chart.to_json(), f)
+
+
+class FoliumPlot(BasePlot):
+    mimetype = "application/base64"
+    ext = ".b64"
+    fig_type = Map
+    file_mode = "wb"
+
+    def write_file(self, f: BinaryIO, m: Map):
+        html = m.get_root().render().encode()
+        html_b64 = base64.b64encode(html)
+        f.write(html_b64)
+
+
 # register all the plot types
 plots = [
     TablePlot,
     BokehPlot,
     AltairPlot,
+    PlotlyPlot,
+    FoliumPlot,
     MatplotFigurePlot,
     MatplotAxesPlot,
     MatplotNDArrayPlot,
