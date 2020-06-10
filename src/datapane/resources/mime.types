@@ -12,6 +12,7 @@ application/vnd.plotly.v1+json  pl.json
 # misc
 # datafiles - handled directly as it's own type
 application/vnd.apache.arrow+binary    arrow
+application/vnd.apache.arrow.pv+binary   pvarrow
 # application/vnd.nstack.table+html html
 application/vnd.nstack.table+html    nstack
 # Jupyter notebooks

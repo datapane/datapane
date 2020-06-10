@@ -41,8 +41,8 @@ class Asset(BEObjectRef, ExportableObjectMixin):
         return cls(file=Path(file), kwargs=kwargs)
 
     @classmethod
-    def upload_df(cls, df: pd.DataFrame, **kwargs: JSON) -> "Asset":
-        fn = cls._save_df(df)
+    def upload_df(cls, df: pd.DataFrame, pivot: bool = False, **kwargs: JSON) -> "Asset":
+        fn = cls._save_df(df, pivot=pivot)
         return cls(file=fn.file, kwargs=kwargs)
 
     @classmethod
@@ -86,6 +86,12 @@ class Plot(Asset):
 class Table(Asset):
     def __init__(self, df: pd.DataFrame, **kwargs: JSON):
         fn = self._save_df(df)
+        super().__init__(file=fn.file, kwargs=kwargs)
+
+
+class PivotTable(Asset):
+    def __init__(self, df: pd.DataFrame, **kwargs: JSON):
+        fn = self._save_df(df, pivot=True)
         super().__init__(file=fn.file, kwargs=kwargs)
 
 

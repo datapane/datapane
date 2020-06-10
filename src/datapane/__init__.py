@@ -13,6 +13,7 @@ from .client.api import (
     Blob,
     Markdown,
     Params,
+    PivotTable,
     Plot,
     Report,
     Result,

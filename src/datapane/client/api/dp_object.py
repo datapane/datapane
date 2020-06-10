@@ -197,9 +197,10 @@ class ExportableObjectMixin:
             else:
                 return json.loads(fn.file.read_text())
 
-    @staticmethod
-    def _save_df(df: pd.DataFrame) -> DPTmpFile:
-        fn = DPTmpFile(ArrowFormat.ext)
+    @classmethod
+    def _save_df(cls, df: pd.DataFrame, pivot: bool = False) -> DPTmpFile:
+        ext = ".pvarrow" if pivot else ArrowFormat.ext
+        fn = DPTmpFile(ext)
         df = to_df(df)
         process_df(df)
         ArrowFormat.save_file(fn.name, df)

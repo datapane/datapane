@@ -75,13 +75,14 @@ class ReportFileWriter:
         """ Convert asset files into base64 URLs that can be in-lined into the report HTML """
         for a in assets:
             ext: str = "".join(a.file.suffixes)
-            if ext == ".arrow":
+            if ext in [".arrow", ".pvarrow"]:
                 encoded_body, file_resp = self.encode_arrow_asset(a)
-                # e.g. a json asset may be uploaded as a table and have its
-                # content-type change from json to arrow.
-                a.content_type = file_resp.content_type
                 self.create_asset_metadata(a, file_resp)
                 self.create_ds_obj(a, file_resp)
+                if ext == ".arrow":
+                    # e.g. a json asset may be uploaded as a table and have its
+                    # content-type change from json to arrow.
+                    a.content_type = file_resp.content_type
             else:
                 encoded_body = self.encode_asset(a)
                 self.create_asset_metadata(a)
