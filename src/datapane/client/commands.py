@@ -172,7 +172,7 @@ def blob():
 @blob.command()
 @click.argument("name")
 @click.argument("file", type=click.Path(exists=True))
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]), default="PRIVATE")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
 def upload(file: str, name: str, visibility: str):
     """Upload a csv or Excel file as a Datapane Blob"""
     log.info(f"Uploading {file}")
@@ -250,7 +250,7 @@ def script_init(name: str):
 @click.option("--config", type=click.Path(exists=True))
 @click.option("--script", type=click.Path(exists=True))
 @click.option("--name")
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]), default="PRIVATE")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
 def deploy(name: Optional[str], script: Optional[str], config: Optional[str], visibility: str):
     """Package and deploy a Python script or Jupyter notebook as a Datapane Script bundle"""
     script = script and Path(script)
@@ -380,7 +380,7 @@ def report():
 @click.argument("name")
 @click.argument("files", type=click.Path(), nargs=-1, required=True)
 @click.option("--headline", default="Untitled")
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]), default="PRIVATE")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
 def create(files: Tuple[str], name: str, headline: str, visibility: str):
     """Create a Report from the provided FILES"""
     blocks = [api.Asset.upload_file(file=Path(f)) for f in files]
@@ -424,7 +424,7 @@ def variable():
 @variable.command()
 @click.argument("name", required=True)
 @click.argument("value", required=True)
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]), default="PRIVATE")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
 def add(name: str, value: str, visibility: str):
     """
     Add a variable
@@ -432,7 +432,7 @@ def add(name: str, value: str, visibility: str):
     NAME: name of variable
     VALUE: value of variable
 
-    --visibility(default=PRIVATE):
+    --visibility:
     PUBLIC: visible to everyone,
     ORG: visible to all authenticated users in an organization (note: this option is only for organizations),
     PRIVATE: only visible to you

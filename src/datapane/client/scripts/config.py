@@ -66,7 +66,7 @@ class DatapaneCfg:
     title: str = dc.field(default_factory=default_title)
     description: str = "Datapane Script"
     repo: str = ""
-    visibility: str = "PRIVATE"
+    visibility: Optional[str] = None
 
     # build options
     include: List[str] = dc.field(default_factory=list)

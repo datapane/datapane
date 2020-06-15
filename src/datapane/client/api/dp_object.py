@@ -282,5 +282,5 @@ class Variable(BEObjectRef):
     list_fields = ["name", "versions"]
 
     @classmethod
-    def add(cls, name: str, value: str, visibility: str = "PRIVATE") -> "Variable":
+    def add(cls, name: str, value: str, visibility: Optional[str] = None) -> "Variable":
         return cls(cls.post(name=name, value=value, visibility=visibility))
