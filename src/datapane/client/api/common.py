@@ -17,7 +17,7 @@ from requests import HTTPError, Response  # noqa: F401
 from datapane import __version__
 from datapane.client import config as c
 from datapane.common import JSON, NPath, SDict
-from datapane.common.utils import log, setup_logging
+from datapane.common.utils import log, setup_local_logging
 
 ################################################################################
 # Tmpfile handling
@@ -73,7 +73,7 @@ def cleanup_tmp():
 def init(
     config_env: str = "default",
     config: t.Optional[c.Config] = None,
-    debug: bool = False,
+    verbosity: int = 0,
     logs_stream: t.Optional[t.TextIO] = None,
 ):
     """Init the API - this MUST handle being called multiple times"""
@@ -86,7 +86,7 @@ def init(
         config_f = c.load_from_envfile(config_env)
         log.debug(f"Loaded environment from {config_f}")
 
-    setup_logging(verbose_mode=debug, logs_stream=logs_stream)
+    setup_local_logging(verbosity=verbosity, logs_stream=logs_stream)
 
 
 class IncompatibleVersionException(Exception):

@@ -22,7 +22,7 @@ def test_init(tmp_path: Path):
     runner = CliRunner()
 
     with pushd(tmp_path):
-        result = runner.invoke(cli, ["--debug", "script", "init"])
+        result = runner.invoke(cli, ["-vv", "script", "init"])
 
     handle_res(result)
 

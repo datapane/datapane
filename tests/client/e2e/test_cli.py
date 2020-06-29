@@ -13,9 +13,7 @@ from .conftest import TEST_SERVER, TEST_TOKEN
 @pytest.fixture()
 def runner():
     _runner = CliRunner()
-    result = _runner.invoke(
-        cli, ["--debug", "login", "--token", TEST_TOKEN, "--server", TEST_SERVER]
-    )
+    result = _runner.invoke(cli, ["-vv", "login", "--token", TEST_TOKEN, "--server", TEST_SERVER])
     handle_res(result)
     assert "Logged in" in result.output
     return _runner
@@ -23,12 +21,12 @@ def runner():
 
 def test_auth(runner: CliRunner):
     # ping
-    result = runner.invoke(cli, ["--debug", "ping"])
+    result = runner.invoke(cli, ["-vv", "ping"])
     handle_res(result)
     assert "Connected to" in result.output
 
     # log out
-    result = runner.invoke(cli, ["--debug", "logout"])
+    result = runner.invoke(cli, ["-vv", "logout"])
     handle_res(result)
     assert "Logged out" in result.output
 
@@ -37,15 +35,15 @@ def test_auth(runner: CliRunner):
 def test_cli_script(runner: CliRunner, tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
-    r = runner.invoke(cli, ["--debug", "script", "init"])
+    r = runner.invoke(cli, ["-vv", "script", "init"])
     handle_res(r)
     script_name = gen_name()
-    r = runner.invoke(cli, ["--debug", "script", "deploy", "--name", script_name])
+    r = runner.invoke(cli, ["-vv", "script", "deploy", "--name", script_name])
     handle_res(r)
 
     if "Uploaded" in r.output:
-        r = runner.invoke(cli, ["--debug", "script", "run", script_name, "--wait"])
+        r = runner.invoke(cli, ["-vv", "script", "run", script_name, "--wait"])
         handle_res(r)
 
-        r = runner.invoke(cli, ["--debug", "script", "delete", script_name])
+        r = runner.invoke(cli, ["-vv", "script", "delete", script_name])
         handle_res(r)

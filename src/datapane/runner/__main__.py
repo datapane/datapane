@@ -24,7 +24,8 @@ def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = N
     # login, etc.
     config = c.Config(server=dp_host, token=dp_token, analytics=False)
     # datapane.init(stream_logs, verbose=args.debug)
-    api.init(config=config, debug=debug, logs_stream=logs)
+    verbosity = 2 if debug else 0
+    api.init(config=config, verbosity=verbosity, logs_stream=logs)
     # check can login/ping
     r = datapane.client.api.common.check_login()
     log.debug(f"Running DP on DP as {r.username}")

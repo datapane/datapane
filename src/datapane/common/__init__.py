@@ -19,4 +19,4 @@ from .dp_types import (
     SECS_1_WEEK,
     EnumType,
 )
-from .utils import log, get_logger, log_command, temp_fname, guess_type
+from .utils import log, log_command, temp_fname, guess_type

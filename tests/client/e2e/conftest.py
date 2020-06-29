@@ -12,4 +12,4 @@ TEST_TOKEN = os.environ.get("DP_TEST_TOKEN", "")
 @pytest.fixture(scope="session")
 def dp_login():
     test_config = c.Config(server=TEST_SERVER, token=TEST_TOKEN, analytics=True)
-    api.init(config=test_config, debug=True)
+    api.init(config=test_config, verbosity=2)

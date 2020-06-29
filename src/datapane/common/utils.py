@@ -1,5 +1,6 @@
 import gzip
 import logging
+import logging.config
 import mimetypes
 import os
 import shutil
@@ -12,7 +13,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 
 import importlib_resources as ir
-from colorlog import ColoredFormatter
 
 from .dp_types import MIME, NPath
 
@@ -30,45 +30,52 @@ double_ext_map = {
 
 ################################################################################
 # Logging
-logging.getLogger().disabled = True  # disable the root logger
+# logging.getLogger().disabled = True  # disable the root logger
 # export the default application logger at INFO level
 log: logging.Logger = logging.getLogger("datapane")
 if log.level == logging.NOTSET:
-    log.setLevel(logging.INFO)
-get_logger: t.Callable[..., logging.Logger] = log.getChild
+    log.setLevel(logging.WARNING)
 
 
-def setup_logging(verbose_mode: bool, logs_stream: t.TextIO = None) -> None:
-    """Call to configure logging outside of django for scripts / tasks"""
-    global log
-    log.propagate = False
-    log.setLevel(logging.DEBUG if verbose_mode else logging.INFO)
-    log_formatter = ColoredFormatter(
-        "%(blue)s%(asctime)s%(reset)s [%(log_color)s%(levelname)-5s%(reset)s] %(message)s",
-        datefmt="%H:%M:%S",
-        reset=True,
-        log_colors={
-            "DEBUG": "cyan",
-            "INFO": "green",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "red,bg_white",
+def setup_local_logging(verbosity: int = 0, logs_stream: t.TextIO = None) -> None:
+    log_level = "WARNING"
+    if verbosity == 1:
+        log_level = "INFO"
+    elif verbosity > 1:
+        log_level = "DEBUG"
+
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "colored": {
+                "()": "colorlog.ColoredFormatter",
+                "format": "[%(blue)s%(asctime)s%(reset)s] [%(log_color)s%(levelname)-5s%(reset)s] %(message)s",
+                "datefmt": "%H:%M:%S",
+                "reset": True,
+                "log_colors": {
+                    "DEBUG": "cyan",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "red,bg_white",
+                },
+                "style": "%",
+            }
         },
-        secondary_log_colors={},
-        style="%",
-    )
-
-    log.handlers.clear()
-
-    # file output
-    # fileHandler = logging.FileHandler(LOGFILE, mode='w')
-    # fileHandler.setFormatter(log_formatter)
-    # log.addHandler(fileHandler)
-
-    # console
-    console_handler = logging.StreamHandler(stream=logs_stream or sys.stdout)
-    console_handler.setFormatter(log_formatter)
-    log.addHandler(console_handler)
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": log_level,
+                "formatter": "colored",
+                "stream": logs_stream or sys.stderr,
+            }
+        },
+        "loggers": {"datapane": {"level": log_level, "propagate": True}},
+        # only show INFO for anything else
+        "root": {"handlers": ["console"], "level": "INFO"},
+    }
+    logging.config.dictConfig(log_config)
 
 
 @contextmanager

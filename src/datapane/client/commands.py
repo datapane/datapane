@@ -25,15 +25,15 @@ from . import config as c
 from . import scripts
 from .scripts import config as sc
 
-DEBUG: bool = False
+EXTRA_OUT: bool = False
 
 
 # TODO
 #  - add info subcommand
 #  - convert to use typer (https://github.com/tiangolo/typer) or autoclick
-def init(debug: Optional[bool], config_env: str):
+def init(verbosity: int, config_env: str):
     """Init the cmd-line env"""
-    api.init(config_env=config_env, debug=debug or False)
+    api.init(config_env=config_env, verbosity=verbosity)
 
     # config_f = c.load_from_envfile(config_env)
     # _debug = debug if debug is not None else c.config.debug
@@ -70,7 +70,7 @@ def api_error_handler(err_msg: str):
     try:
         yield
     except HTTPError as e:
-        if DEBUG:
+        if EXTRA_OUT:
             log.exception(e)
         else:
             log.error(e)
@@ -91,15 +91,15 @@ class CatchIncompatibleVersion(click.Group):
         try:
             return self.main(*args, **kwargs)
         except api.IncompatibleVersionException as exc:
-            if DEBUG:
+            if EXTRA_OUT:
                 log.exception(exc)
             failure_msg(str(exc))
         except HTTPError as e:
-            if DEBUG:
+            if EXTRA_OUT:
                 log.exception(e)
             failure_msg(str(e), do_exit=True)
         except Exception as e:
-            if DEBUG:
+            if EXTRA_OUT:
                 log.exception(e)
             failure_msg(str(e), do_exit=True)
 
@@ -107,15 +107,17 @@ class CatchIncompatibleVersion(click.Group):
 ###############################################################################
 # Main
 @click.group(cls=CatchIncompatibleVersion)
-@click.option("--debug/--no-debug", default=None, help="Enable additional debug output.")
+@click.option(
+    "-v", "--verbose", count=True, help="Increase logging verbosity - can add multiple times"
+)
 @click.option("--env", default=c.DEFAULT_ENV, help="Alternate config environment to use.")
 @click.version_option(version=f"{__version__} ({__rev__})")
 @click.pass_context
-def cli(ctx, debug: bool, env: str):
+def cli(ctx, verbose: int, env: str):
     """Datapane CLI Tool"""
-    global DEBUG
-    DEBUG = debug
-    init(debug, env)
+    global EXTRA_OUT
+    EXTRA_OUT = verbose > 0
+    init(verbosity=verbose, config_env=env)
     ctx.obj = DPContext(env=env)
 
 
@@ -267,7 +269,7 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], vi
     # start the build process
     with click_spinner.spinner(), scripts.build_bundle(dp_cfg) as sdist:
 
-        if DEBUG:
+        if EXTRA_OUT:
             tf: tarfile.TarFile
             log.debug("Bundle from following files:")
             with tarfile.open(sdist) as tf:
