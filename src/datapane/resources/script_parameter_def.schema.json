@@ -1,4 +1,5 @@
 {
+  "$comment": "We should replace oneOf with if/else to make more robust",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "configNode": {
@@ -20,7 +21,8 @@
           "default": true
         }
       },
-      "required": ["name"],
+      "required": ["name", "type"],
+      "additionalProperties": true,
       "oneOf": [
         {
           "title": "String",
@@ -112,7 +114,8 @@
                 "uniqueItems": true
               }
             }
-          }
+          },
+          "required": ["choices"]
         },
         {
           "title": "List",

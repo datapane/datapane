@@ -1,0 +1,22 @@
+[
+  {
+    "name": "testStr",
+    "type": "string",
+    "default": "asd"
+  },
+  {
+    "name": "_33",
+    "type": "integer",
+    "default": 2
+  },
+  {
+    "name": "testInt",
+    "type": "integer",
+    "required": true
+  },
+  {
+    "name": "testEnum",
+    "type": "enum",
+    "choices": ["b", "A", "A"]
+  }
+]
