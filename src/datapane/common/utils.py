@@ -13,6 +13,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 
 import importlib_resources as ir
+from chardet.universaldetector import UniversalDetector
 
 from .dp_types import MIME, NPath
 
@@ -189,3 +190,14 @@ def walk_path(path: Path) -> t.Iterable[Path]:
     for p in path.rglob("*"):
         if not p.is_dir():
             yield p
+
+
+def guess_encoding(fn: str) -> str:
+    with open(fn, "rb") as f:
+        detector = UniversalDetector()
+        for line in f.readlines():
+            detector.feed(line)
+            if detector.done:
+                break
+        detector.close()
+    return detector.result["encoding"]

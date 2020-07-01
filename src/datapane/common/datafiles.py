@@ -13,6 +13,7 @@ from pyarrow import RecordBatchFileWriter
 from .config import log
 from .df_processor import process_df
 from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME, Hash
+from .utils import guess_encoding
 
 # TODO - cleanup and refactor functions
 
@@ -123,11 +124,19 @@ class CSVFormat(DFFormatter):
     enum = "CSV"
 
     def load_file(fn: str) -> pd.DataFrame:
+
         try:
             return pd.read_csv(fn, engine="c", sep=",")
+        except UnicodeDecodeError:
+            encoding = guess_encoding(fn)
+            return pd.read_csv(fn, engine="c", sep=",", encoding=encoding)
         except ParserError as e:
             log.warning(f"Error parsing CSV file ({e}), trying python fallback")
-            return pd.read_csv(fn, engine="python", sep=None)
+            try:
+                return pd.read_csv(fn, engine="python", sep=None)
+            except UnicodeDecodeError:
+                encoding = guess_encoding(fn)
+                return pd.read_csv(fn, engine="python", sep=None, encoding=encoding)
 
     def save_file(fn: str, df: pd.DataFrame):
         df.to_csv(fn, index=False)
