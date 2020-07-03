@@ -133,6 +133,11 @@ class DatapaneCfg:
         if script:
             raw_config.update(script=script)
         raw_config.update(kw)
+        readme = config_file.parent / "README.md"
+        if readme.exists():
+            raw_config["description"] = readme.read_text()
+        elif "description" not in raw_config:
+            raw_config["description"] = cls.description
 
         dp_cfg = dacite.from_dict(cls, data=raw_config, config=dacite.Config(cast=[Path]))
         return dp_cfg
