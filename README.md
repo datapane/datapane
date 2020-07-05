@@ -1,3 +1,3 @@
-# TODO
+### Datapane Python Client
 
-- merge with README.md in OSS repo
+- See https://github.com/datapane/datapane/

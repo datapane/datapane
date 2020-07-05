@@ -6,11 +6,11 @@ authors = ["Datapane Team <dev@datapane.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://www.datapane.com"
-repository = "https://www.github/datapane/datapane-cli"
+repository = "https://www.github/datapane/datapane"
 documentation = "https://docs.datapane.com"
 
 
-keywords = ["datapane", "data", "jupyter", "pandas", "altair"]
+keywords = ["data", "analysis", "jupyter", "pandas", "altair"]
 classifiers = [
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -27,7 +27,7 @@ classifiers = [
 #]
 
 # extra files (allows overriding gitignore)
-include = ["README.md", "LICENSE", "NOTICE"]
+include = ["NOTICE"] #"README.md", "LICENSE"]
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
