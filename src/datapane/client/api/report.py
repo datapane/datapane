@@ -129,6 +129,7 @@ class Report(BEObjectRef):
 
     def publish(self, name: str, open: bool = False, **kwargs):
         """Deploy the report and its Assets to Datapane"""
+        print("Publishing report and associated data - please wait..")
         kwargs.update(name=name)
         new_blocks = [mk_block(b) for b in self.blocks]
         res = Resource(self.endpoint).post(blocks=new_blocks, **kwargs)
@@ -148,7 +149,7 @@ class Report(BEObjectRef):
         _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
-        log.info(f"Report published to Datapane as {self.web_url}")
+        print(f"Report successfully published at {self.web_url}")
 
     def save(self, path: str, headline: str = "Local Report", open: bool = False, **kwargs):
         """Save the report to a local HTML file"""
