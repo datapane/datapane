@@ -26,10 +26,11 @@ from datapane.common.utils import log, setup_local_logging
 # to cleanup for us on shutdown
 # This tmp-dir needs to be in the cwd rather than /tmp so can be previewed in Jupyter
 
+# NOTE - temporarily disabled due to some Jupyter kernel conflict
 # Remove any old ./dp-tmp-* dirs which might not have been cleaned up due to unexpected exit
-prev_tmp_dirs = list(p for p in Path(".").glob("dp-tmp-*") if p.is_dir())
-for path in prev_tmp_dirs:
-    shutil.rmtree(path, ignore_errors=True)
+# prev_tmp_dirs = list(p for p in Path(".").glob("dp-tmp-*") if p.is_dir())
+# for path in prev_tmp_dirs:
+#     shutil.rmtree(path, ignore_errors=True)
 
 # Temporary directory name
 tmp_dir = Path(mkdtemp(prefix="dp-tmp-", dir=".")).absolute()
