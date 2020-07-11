@@ -5,7 +5,7 @@ except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
 
-__version__ = "0.6.11"
+__version__ = "0.6.12"
 
 # Public API re-exports
 from .client.api import (
