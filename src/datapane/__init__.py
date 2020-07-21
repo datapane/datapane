@@ -9,11 +9,11 @@ __version__ = "0.6.12"
 
 # Public API re-exports
 from .client.api import (
-    Asset,
+    Blocks,
     Blob,
+    File,
     Markdown,
     Params,
-    PivotTable,
     Plot,
     Report,
     Result,

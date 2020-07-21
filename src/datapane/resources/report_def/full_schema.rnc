@@ -1,0 +1,73 @@
+# This schema currently covers all report states - eventually to be split out to handle all substates
+# (want to delay splitting out as long as possible for simplicities sake)
+# NOTE - generate the Relax-NG .rng file using `java -jar trang.jar`
+#default namespace = "https://datapane.com/report"
+
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+
+start = element Report {
+  attribute xml:id { xsd:ID },
+  # unsignedByte ?
+  attribute version { xsd:positiveInteger },
+  Meta, Main
+}
+
+# Metadata fields
+# we extract these into the Report DB fields for quick lookup
+Meta = element Meta {
+  element Author { xsd:string { minLength = "1" maxLength = "127" } } &
+  element CreatedOn { xsd:dateTime } &
+  element Title { xsd:string { minLength = "1" maxLength = "127" } } &
+  element Headline { xsd:string { minLength = "1" maxLength = "1024" } }
+}
+
+block_id = attribute id { xsd:ID }
+
+# TODO - layout
+Main = element Main { Blocks+ }
+
+Blocks = (Text | File | Plot | Table | element Blocks { block_id, Blocks+ })
+
+# Markdown Text
+Text = element Text {
+  block_id,
+  xsd:string { minLength = "1" }
+}
+
+# Assets
+assetAttributes =
+  block_id,
+  # TODO - should attachment be it's own attribute?
+  attribute src { xsd:anyURI { pattern = "(http|https|cas|file|data|attachment):.+"} },
+  attribute preview { xsd:anyURI { pattern = "(http|https|cas|file|data):.+"} }?,
+  # TODO - do we validate export_url protocol?
+  attribute export_url { xsd:anyURI }?,
+  attribute type { xsd:string { pattern = '\w+/[\w.+\-]+' } },
+  attribute size { xsd:positiveInteger },
+  element Caption { text }?
+
+File = element File {
+  assetAttributes,
+
+  [ a:defaultValue = "true" ]
+  attribute can_download { xsd:boolean },
+
+  attribute name { xsd:string }
+  }
+
+Plot = element Plot {
+  assetAttributes,
+  attribute width { xsd:positiveInteger },
+  attribute height { xsd:positiveInteger }
+}
+
+Table = element Table {
+  assetAttributes,
+  attribute rows { xsd:positiveInteger },
+  attribute columns { xsd:positiveInteger },
+
+  [ a:defaultValue = "true" ]
+  attribute can_pivot { xsd:boolean }
+
+  # attribute cells { xsd:positiveInteger }
+}

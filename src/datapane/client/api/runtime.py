@@ -7,6 +7,9 @@ from pathlib import Path
 from datapane.client.scripts import DATAPANE_YAML, DatapaneCfg
 from datapane.common import NPath, SDict, log
 
+if t.TYPE_CHECKING:
+    from .report import Report
+
 ###############################################################################
 # top level functions here - move to runner?
 # TODO - make thread/context safe and determine a better approach for vars

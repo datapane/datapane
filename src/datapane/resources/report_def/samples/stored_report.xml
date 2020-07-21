@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--<?xml-model href="file://full_schema.rnc" type="application/relax-ng-compact-syntax"?>-->
+<!--<Report xmlns="https://datapane.com/report"-->
+<!--        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--        xsi:schemaLocation="https://datapane.com/report file://../full_schema.rnc"-->
+<!--<Report xmlns="https://datapane.com/report">-->
+<Report xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../full_schema.rnc"
+        xml:id="abcd"
+        version="1">
+    <Meta>
+        <Author>Mandeep</Author>
+        <CreatedOn>2020-07-01T09:00:00Z</CreatedOn>
+        <Title>My Report</Title>
+        <Headline>xyz</Headline>
+    </Meta>
+    <Main>
+        <Text id="block-1"># This is inline text (as markdown)</Text>
+        <File id="block-2" name="test" src="cas://abcd" type="application/x-tgz" download="true" size="50"/>
+        <Plot id="block-3" src="cas://def1" type="application/vnd.bokeh.show+json" size="100" width="100" height="50"/>
+        <Text id="block-4">
+            ## asdas
+            Hello world
+        </Text>
+        <Table id="block-5" src="cas://199a" type="application/vnd.apache.arrow+binary" size="8192" rows="300" columns="10">
+            <Caption>This is the main dataset</Caption>
+        </Table>
+        <Table id="block-6" src="cas://199a" type="application/vnd.apache.arrow+binary" size="8192" rows="300" columns="10" can_pivot="true">
+            <Caption>A Pivot Table</Caption>
+        </Table>
+    </Main>
+</Report>

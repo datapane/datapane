@@ -81,6 +81,30 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         assert "SAMPLE OUTPUT" in run.output
 
 
+def test_script_complex_report(shared_datadir: Path, monkeypatch):
+    """
+    Deploy and run a complex script that generates a complex report
+    NOTE - this doesn't test the FE rendering
+    """
+    monkeypatch.chdir(shared_datadir)
+    # upload
+    dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_complex_report.yaml"))
+
+    with sc.build_bundle(dp_cfg) as sdist:
+        s = dp.Script.upload_pkg(sdist, dp_cfg)
+
+    with deletable(s):
+        run = s.run()
+        # poll until complete
+        while not run.is_complete():
+            time.sleep(2)
+            run.refresh()
+
+        assert run.status == "SUCCESS"
+        report = dp.Report.by_id(run.report)
+        assert report.num_blocks == 11
+
+
 def test_run_linked_script():
     """Test running a code snippet calling other ones"""
     ...

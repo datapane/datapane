@@ -2,7 +2,6 @@ import json
 import os
 import pickle
 import pprint
-import time
 import typing as t
 from pathlib import Path
 from typing import Optional, Type
@@ -10,8 +9,8 @@ from urllib import parse as up
 
 # TODO - import only during type checking and import future.annotations when dropping py 3.6
 import pandas as pd
-import requests
 import validators as v
+from furl import furl
 from munch import Munch
 
 from datapane import __version__
@@ -19,9 +18,8 @@ from datapane.client.scripts import DatapaneCfg
 from datapane.common import JSON, PKL_MIMETYPE, URL, NPath, SDict, log
 from datapane.common.datafiles import ArrowFormat, df_ext_map
 from datapane.common.df_processor import process_df, to_df
-from datapane.common.utils import compress_file, guess_type
 
-from .common import DPTmpFile, Resource, _download_file
+from .common import DPTmpFile, FileList, Resource, do_download_file
 
 U = t.TypeVar("U", bound="BEObjectRef")
 
@@ -97,22 +95,22 @@ class BEObjectRef:
         return x
 
     @classmethod
-    def post_with_file(cls: Type[U], file: Path, **kwargs) -> JSON:
-        # get signed url
-        upload_name = f"{int(time.time())}-{file.name}"
-        upload_url = Resource("/generate-upload-url/").post(import_path=upload_name)
-        # post text to blob store
-        # TODO - we should disable compression where unneeded, e.g. .gz, .zip, .png, etc
-        with compress_file(str(file)) as fn_gz, Path(fn_gz).expanduser().open("rb") as fp:
-            log.info(f"Uploading {file}")
-            headers = {"Content-Encoding": "gzip", "Content-Type": guess_type(file)}
-            requests.put(upload_url, data=fp, headers=headers).raise_for_status()
-        return cls.post(import_path=upload_name, **kwargs)
+    def post_with_files(
+        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, **kwargs
+    ) -> U:
+        # TODO - move into UploadedFileMixin ?
+        if file:
+            # wrap up a single file into a FileList
+            files: FileList = dict(uploaded_file=[file])
+
+        res = Resource(cls.endpoint).post_files(files, **kwargs)
+        return cls(res)
 
     @classmethod
-    def post(cls: Type[U], **kwargs) -> JSON:
+    def post(cls: Type[U], **kwargs) -> U:
         """post object to api"""
-        return Resource(cls.endpoint).post(**kwargs)
+        res = Resource(cls.endpoint).post(**kwargs)
+        return cls(res)
 
     def __getattr__(self, attr):
         if self.has_dto and not attr.startswith("__"):
@@ -161,7 +159,7 @@ class ExportableObjectMixin:
 
     def download_df(self) -> pd.DataFrame:
         with DPTmpFile(ArrowFormat.ext) as fn:
-            _download_file(self.gcs_signed_url, fn.name)
+            do_download_file(self.gcs_signed_url, fn.name)
             return ArrowFormat.load_file(fn.name)
 
     def download_file(self, fn: NPath):
@@ -177,17 +175,18 @@ class ExportableObjectMixin:
 
         # If file is of arrow type, export it. Otherwise use the gcs url directly.
         if self.content_type == ArrowFormat.content_type:
-            with self.res.nest_endpoint(
-                endpoint=f"export/?export_format={get_export_format()}"
-            ) as nest_res:
-                download_url = nest_res.get()
+            # TODO - export_url should include the host
+            x = furl(self.export_url)
+            x.args["export_format"] = get_export_format()
+            x.origin = furl(self.url).origin
+            download_url = x.url
         else:
             download_url = self.gcs_signed_url
-        _download_file(download_url, fn)
+        do_download_file(download_url, fn)
 
     def download_obj(self) -> t.Any:
         with DPTmpFile(".obj") as fn:
-            _download_file(self.gcs_signed_url, fn.name)
+            do_download_file(self.gcs_signed_url, fn.name)
             # In the case that the original object was a Python object or bytes-like object,
             # the downloaded obj will be a pickle which needs to be unpickled.
             # Otherwise it's a stringified JSON object (e.g. an Altair plot) that can be returned as JSON.
@@ -197,10 +196,11 @@ class ExportableObjectMixin:
             else:
                 return json.loads(fn.file.read_text())
 
+
+class UploadableObjectMixin:
     @classmethod
-    def _save_df(cls, df: pd.DataFrame, pivot: bool = False) -> DPTmpFile:
-        ext = ".pvarrow" if pivot else ArrowFormat.ext
-        fn = DPTmpFile(ext)
+    def _save_df(cls, df: pd.DataFrame) -> DPTmpFile:
+        fn = DPTmpFile(ArrowFormat.ext)
         df = to_df(df)
         process_df(df)
         ArrowFormat.save_file(fn.name, df)
@@ -217,22 +217,22 @@ class ExportableObjectMixin:
         return fn
 
 
-class Blob(BEObjectRef, ExportableObjectMixin):
+class Blob(BEObjectRef, UploadableObjectMixin, ExportableObjectMixin):
     endpoint: str = "/blobs/"
 
     @classmethod
     def upload_df(cls, df: pd.DataFrame, **kwargs) -> "Blob":
         with cls._save_df(df) as fn:
-            return cls(cls.post_with_file(fn.file, **kwargs))
+            return cls.post_with_files(file=fn.file, **kwargs)
 
     @classmethod
     def upload_file(cls, fn: NPath, **kwargs) -> "Blob":
-        return cls(cls.post_with_file(Path(fn), **kwargs))
+        return cls.post_with_files(file=Path(fn), **kwargs)
 
     @classmethod
     def upload_obj(cls, data: t.Any, is_json: bool = False, **kwargs: JSON) -> "Blob":
         with cls._save_obj(data, is_json) as fn:
-            return cls(cls.post_with_file(fn.file, **kwargs))
+            return cls.post_with_files(file=fn.file, **kwargs)
 
 
 class Script(BEObjectRef):
@@ -240,13 +240,14 @@ class Script(BEObjectRef):
 
     @classmethod
     def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> "Script":
+        # TODO - use DPTmpFile
         # merge all the params for the API-call
         kwargs["api_version"] = __version__
         new_kwargs = {**dp_cfg.to_dict(), **kwargs}
-        return cls(cls.post_with_file(sdist, **new_kwargs))
+        return cls.post_with_files(file=sdist, **new_kwargs)
 
     def download_pkg(self) -> Path:
-        fn = _download_file(self.gcs_signed_url)
+        fn = do_download_file(self.gcs_signed_url)
         return Path(fn)
 
     def call(self, **params):
@@ -261,7 +262,7 @@ class Script(BEObjectRef):
     def run(self, parameters=None, cache=True) -> "Run":
         """(remote) run the given app (cloning if needed?)"""
         parameters = parameters or dict()
-        return Run(Run.post(script=self.url, parameter_vals=parameters, cache=cache))
+        return Run.post(script=self.url, parameter_vals=parameters, cache=cache)
 
     def local_run(self, parameters=None) -> "Run":
         """(local) run the given script"""
@@ -283,4 +284,4 @@ class Variable(BEObjectRef):
 
     @classmethod
     def add(cls, name: str, value: str, visibility: Optional[str] = None) -> "Variable":
-        return cls(cls.post(name=name, value=value, visibility=visibility))
+        return cls.post(name=name, value=value, visibility=visibility)

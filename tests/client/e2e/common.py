@@ -16,8 +16,9 @@ print("hello world")
 """
 
 
-def gen_df(dim: int = 4) -> pd.DataFrame:
-    axis = [i for i in range(0, dim)]
+def gen_df(n: int = 4) -> pd.DataFrame:
+    """Build a (reprodcible) df of 2 cols and n rows"""
+    axis = [i for i in range(0, n)]
     data = {"x": axis, "y": axis}
     return pd.DataFrame.from_dict(data)
 

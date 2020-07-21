@@ -7,9 +7,6 @@
       rel="stylesheet"
     />
     <script>
-      window.dpAssets = {{ assets }};
-      window.dpAssetMetadata = {{ asset_metadata }};
-      window.dpDatasets = {{ dataset_objs }};
       window.dpLocal = true;
     </script>
     <style>
@@ -29,12 +26,12 @@
     </div>
     <script>
       {{ include_raw("local-report-base.js") }}
-      let dpReportObj = {{ report_obj }};
-      let { React, ReactDOM, ReportComponent } = UMDModules;
-      let ReportFactory = React.createFactory(ReportComponent);
+      const report = { served_document: `{{ report_doc }}` };
+      const { React, ReactDOM, ReportComponent } = UMDModules;
+      const ReportFactory = React.createFactory(ReportComponent);
       ReactDOM.render(
-          ReportFactory({user: null, report: dpReportObj}),
-          document.querySelector("#report-root")
+        ReportFactory({ report }),
+        document.querySelector("#report-root")
       );
     </script>
   </body>

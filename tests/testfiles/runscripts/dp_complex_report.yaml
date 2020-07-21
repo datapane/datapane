@@ -1,0 +1,5 @@
+name: dp_complex_report
+script: dp_complex_report.py
+title: My awesome script
+include:
+  - datapane-logo.png

@@ -32,6 +32,8 @@ include = ["NOTICE"] #"README.md", "LICENSE"]
 [tool.poetry.dependencies]
 python = "^3.6.1"
 dataclasses = {version = "0.7", python = "~3.6.1"}
+#python = ">=3.6.1, < 4.0.0"
+#dataclasses = { version="^0.7", python=">=3.6.0, <3.7" }
 
 # DS
 numpy = "^1.18.0"
@@ -61,7 +63,7 @@ click-spinner = "^0.1.8"
 # httpx = "^0.7.5"
 "ruamel.yaml" = "^0.16.5"
 requests = "^2.20.0"
-validators = "^0.15.0"
+validators = "^0.16.0"
 jinja2 = "^2.11.1"
 jsonschema = "^3.2.0"
 tabulate = "^0.8.7"
@@ -70,6 +72,9 @@ tabulate = "^0.8.7"
 toolz = "^0.10.0"
 flit-core = "~2.3.0"
 importlib_resources = "^3.0.0"
+lxml = "^4.5.2"
+requests-toolbelt = "^0.9.1"
+furl = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.3.5"

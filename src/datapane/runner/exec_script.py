@@ -46,7 +46,7 @@ def run(script: api.Script, user_config: SDict) -> SDict:
             raise CodeRaisedError.from_exception(partial(filter_frame_by_filename, "<module>"))
 
 
-# def run(run_config: RunnerConfig) -> List[api.BlockType]:
+# def run(run_config: RunnerConfig) -> List[api.ReportBlock]:
 #     """Snippet - run a python function embedded within in the snippet config field"""
 #     code = run_config.code
 #     user_config: SDict = Munch.fromDict(run_config.format())
@@ -103,7 +103,7 @@ def script_env(env_dir: Path) -> t.ContextManager[None]:
         try:
             sys.path.remove(full_env_dir)
         except ValueError as e:
-            raise CodeError(f"sys.path not as expected - was it modified?") from e
+            raise CodeError("sys.path not as expected - was it modified?") from e
         os.chdir(cwd)
         log.debug(f"[cd] {cwd} <- {env_dir}")
         # shutil.rmtree(env_dir, ignore_errors=True)

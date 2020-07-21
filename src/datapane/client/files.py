@@ -182,6 +182,7 @@ class MatplotNDArrayPlot(MatplotBasePlot):
         return super()._write_figure(f)
 
 
+# TODO - remove this and move Arrow/Dataframe/Table support here
 class TablePlot(BasePlot):
     """Creates an html table from the dataframe"""
 
@@ -238,14 +239,16 @@ class PlotlyPlot(BasePlot):
 
 
 class FoliumPlot(BasePlot):
-    mimetype = "application/base64"
-    ext = ".b64"
+    # mimetype = "application/base64"
+    # ext = ".b64"
+    mimetype = "application/vnd.folium+base64"
+    ext = ".fl.b64"
     fig_type = Map
     file_mode = "wb"
 
     def write_file(self, f: BinaryIO, m: Map):
-        html = m.get_root().render().encode()
-        html_b64 = base64.b64encode(html)
+        html: str = m.get_root().render()
+        html_b64: bytes = base64.b64encode(html.encode())
         f.write(html_b64)
 
 

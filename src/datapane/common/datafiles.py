@@ -64,9 +64,9 @@ def import_from_csv(in_f_path: Path, arrow_f_name: str) -> pa.Table:
     Import a local file to a local arrow file,
     we use filenames rather than open files as pyarrow docs mention it's more performant
     """
-    ext: str = "".join(in_f_path.suffixes)
+    # ext: str = "".join(in_f_path.suffixes)
     # pull imported file and read into an arrow table
-    table = convert_csv_table(str(in_f_path), arrow_f_name, ext=ext)
+    table = convert_csv_table(str(in_f_path), arrow_f_name, ext=in_f_path.suffix)
     log.debug(f"Imported CSV file of size {table.shape} with following schema: \n{table.schema}")
     return table
 

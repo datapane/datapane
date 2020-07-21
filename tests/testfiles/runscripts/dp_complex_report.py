@@ -1,0 +1,130 @@
+"""datapane script"""
+import altair as alt
+import pandas as pd
+import datapane as dp
+from bokeh.plotting import figure
+from pathlib import Path
+import folium
+import plotly.graph_objects as go
+from matplotlib.collections import EventCollection
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def gen_df(dim: int = 4) -> pd.DataFrame:
+    axis = [i for i in range(0, dim)]
+    data = {"x": axis, "y": axis}
+    return pd.DataFrame.from_dict(data)
+
+
+lis = [1, 2, 3]
+df = gen_df(10000)
+
+# Bokeh
+p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+p.line([1, 2, 3, 4, 5], [6, 7, 2, 4, 5], legend_label="Temp.", line_width=2)
+bokeh_asset = dp.Plot(data=p)
+
+# Folium
+m = folium.Map(
+    location=[45.372, -121.6972],
+    zoom_start=12,
+    tiles='Stamen Terrain'
+)
+folium.Marker(
+    location=[45.3288, -121.6625],
+    popup='Mt. Hood Meadows',
+    icon=folium.Icon(icon='cloud')
+).add_to(m)
+folium.Marker(
+    location=[45.3311, -121.7113],
+    popup='Timberline Lodge',
+    icon=folium.Icon(color='green')
+).add_to(m)
+folium.Marker(
+    location=[45.3300, -121.6823],
+    popup='Some Other Location',
+    icon=folium.Icon(color='red', icon='info-sign')
+).add_to(m)
+folium_asset = dp.Plot(data=m)
+
+# Plotly
+fig = go.Figure()
+fig.add_trace(
+    go.Scatter(
+        x=[0, 1, 2, 3, 4, 5],
+        y=[1.5, 1, 1.3, 0.7, 0.8, 0.9]
+    ))
+fig.add_trace(
+    go.Bar(
+        x=[0, 1, 2, 3, 4, 5],
+        y=[1, 0.5, 0.7, -1.2, 0.3, 0.4]
+    ))
+plotly_asset = dp.Plot(data=fig)
+
+# Markdown
+md_block = dp.Markdown(text="# Test markdown block \n Test **content**")
+
+# In-line JSON
+list_asset = dp.File(data=lis, is_json=True)
+
+# Downloadable file
+file_asset = dp.File(data=lis)
+
+# In-line image
+img_asset = dp.File(file=Path("./datapane-logo.png"))
+
+# Vega
+vega_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"))
+
+# Table
+df_asset = dp.Table(df, can_pivot=False)
+
+# Pivot table
+pv_asset = dp.Table(gen_df(10), can_pivot=True)
+
+# Matplotlib
+np.random.seed(19680801)
+xdata = np.random.random([2, 10])
+xdata1 = xdata[0, :]
+xdata2 = xdata[1, :]
+xdata1.sort()
+xdata2.sort()
+ydata1 = xdata1 ** 2
+ydata2 = 1 - xdata2 ** 3
+mpl_fig = plt.figure(figsize=(15, 15))
+ax = mpl_fig.add_subplot(1, 1, 1)
+ax.plot(xdata1, ydata1, color='tab:blue')
+ax.plot(xdata2, ydata2, color='tab:orange')
+xevents1 = EventCollection(xdata1, color='tab:blue', linelength=0.05)
+xevents2 = EventCollection(xdata2, color='tab:orange', linelength=0.05)
+yevents1 = EventCollection(ydata1, color='tab:blue', linelength=0.05,
+                           orientation='vertical')
+yevents2 = EventCollection(ydata2, color='tab:orange', linelength=0.05,
+                           orientation='vertical')
+ax.add_collection(xevents1)
+ax.add_collection(xevents2)
+ax.add_collection(yevents1)
+ax.add_collection(yevents2)
+ax.set_xlim([0, 1])
+ax.set_ylim([0, 1])
+ax.set_title('line plot with data points')
+mpl_asset = dp.Plot(mpl_fig)
+
+# Report
+report = dp.Report(
+    list_asset,
+    df_asset,
+    md_block,
+    vega_asset,
+    pv_asset,
+    img_asset,
+    file_asset,
+    bokeh_asset,
+    plotly_asset,
+    folium_asset,
+    mpl_asset
+)
+
+report.save(path="local_xml_report.html")
+report.publish(name="xml_report")

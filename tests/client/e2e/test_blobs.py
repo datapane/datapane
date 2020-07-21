@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 import pytest
 from matplotlib import pyplot as plt
-from tests import check_df_equal
 
 import datapane as dp
+from tests import check_df_equal
 
 from .common import code, deletable, gen_df, gen_name
 

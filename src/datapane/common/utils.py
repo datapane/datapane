@@ -1,3 +1,4 @@
+import datetime
 import gzip
 import logging
 import logging.config
@@ -20,14 +21,16 @@ from .dp_types import MIME, NPath
 mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
 # TODO - hardcode as temporary fix until mimetypes double extension issue is sorted
-double_ext_map = {
+_double_ext_map = {
     ".vl.json": "application/vnd.vegalite.v3+json",
     ".vl2.json": "application/vnd.vegalite.v2+json",
     ".vl3.json": "application/vnd.vegalite.v3+json",
     ".bokeh.json": "application/vnd.bokeh.show+json",
     ".pl.json": "application/vnd.plotly.v1+json",
     ".tar.gz": "application/x-tgz",
+    ".fl.b64": "application/vnd.folium+base64",
 }
+double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.items()}
 
 ################################################################################
 # Logging
@@ -126,12 +129,22 @@ def unix_compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
 
 
 @contextmanager
+def unix_decompress_file(f_name: NPath) -> t.ContextManager[str]:
+    """(UNIX only) Return path to a compressed version of the input filename"""
+    subprocess.run(["gunzip", "-kf", f_name], check=True)
+    f_name_gz = f"{f_name}.gz"
+    try:
+        yield f_name_gz
+    finally:
+        os.unlink(f_name_gz)
+
+
+@contextmanager
 def compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
     """(X-Plat) Return path to a compressed version of the input filename"""
     f_name_gz = f"{f_name}.gz"
-    with open(f_name, "rb") as f_in:
-        with gzip.open(f_name_gz, "wb", compresslevel=level) as f_out:
-            shutil.copyfileobj(f_in, f_out)
+    with open(f_name, "rb") as f_in, gzip.open(f_name_gz, "wb", compresslevel=level) as f_out:
+        shutil.copyfileobj(f_in, f_out)
     try:
         yield f_name_gz
     finally:
@@ -182,8 +195,9 @@ def guess_type(filename: Path) -> MIME:
     ext = "".join(filename.suffixes)
     if ext in double_ext_map.keys():
         return double_ext_map[ext]
+    mtype: str
     mtype, _ = mimetypes.guess_type(str(filename))
-    return mtype or "application/octet-stream"
+    return MIME(mtype or "application/octet-stream")
 
 
 def walk_path(path: Path) -> t.Iterable[Path]:
@@ -201,3 +215,8 @@ def guess_encoding(fn: str) -> str:
                 break
         detector.close()
     return detector.result["encoding"]
+
+
+def timestamp(x: t.Optional[datetime.datetime] = None) -> str:
+    x = x or datetime.datetime.utcnow()
+    return f'{x.isoformat(timespec="seconds")}{"" if x.tzinfo else "Z"}'

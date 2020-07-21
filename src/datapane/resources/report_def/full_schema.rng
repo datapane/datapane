@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This schema currently covers all report states - eventually to be split out to handle all substates
+  (want to delay splitting out as long as possible for simplicities sake)
+  NOTE - generate the Relax-NG .rng file using `java -jar trang.jar`
+  default namespace = "https://datapane.com/report"
+-->
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <element name="Report">
+      <attribute name="xml:id">
+        <data type="ID"/>
+      </attribute>
+      <!-- unsignedByte ? -->
+      <attribute name="version">
+        <data type="positiveInteger"/>
+      </attribute>
+      <ref name="Meta"/>
+      <ref name="Main"/>
+    </element>
+  </start>
+  <!--
+    Metadata fields
+    we extract these into the Report DB fields for quick lookup
+  -->
+  <define name="Meta">
+    <element name="Meta">
+      <interleave>
+        <element name="Author">
+          <data type="string">
+            <param name="minLength">1</param>
+            <param name="maxLength">127</param>
+          </data>
+        </element>
+        <element name="CreatedOn">
+          <data type="dateTime"/>
+        </element>
+        <element name="Title">
+          <data type="string">
+            <param name="minLength">1</param>
+            <param name="maxLength">127</param>
+          </data>
+        </element>
+        <element name="Headline">
+          <data type="string">
+            <param name="minLength">1</param>
+            <param name="maxLength">1024</param>
+          </data>
+        </element>
+      </interleave>
+    </element>
+  </define>
+  <define name="block_id">
+    <attribute name="id">
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <!-- TODO - layout -->
+  <define name="Main">
+    <element name="Main">
+      <oneOrMore>
+        <ref name="Blocks"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="Blocks">
+    <choice>
+      <ref name="Text"/>
+      <ref name="File"/>
+      <ref name="Plot"/>
+      <ref name="Table"/>
+      <element name="Blocks">
+        <ref name="block_id"/>
+        <oneOrMore>
+          <ref name="Blocks"/>
+        </oneOrMore>
+      </element>
+    </choice>
+  </define>
+  <!-- Markdown Text -->
+  <define name="Text">
+    <element name="Text">
+      <ref name="block_id"/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
+  <!-- Assets -->
+  <define name="assetAttributes">
+    <ref name="block_id"/>
+    <!-- TODO - should attachment be it's own attribute? -->
+    <attribute name="src">
+      <data type="anyURI">
+        <param name="pattern">(http|https|cas|file|data|attachment):.+</param>
+      </data>
+    </attribute>
+    <optional>
+      <attribute name="preview">
+        <data type="anyURI">
+          <param name="pattern">(http|https|cas|file|data):.+</param>
+        </data>
+      </attribute>
+    </optional>
+    <optional>
+      <!-- TODO - do we validate export_url protocol? -->
+      <attribute name="export_url">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+    <attribute name="type">
+      <data type="string">
+        <param name="pattern">\w+/[\w.+\-]+</param>
+      </data>
+    </attribute>
+    <attribute name="size">
+      <data type="positiveInteger"/>
+    </attribute>
+    <optional>
+      <element name="Caption">
+        <text/>
+      </element>
+    </optional>
+  </define>
+  <define name="File">
+    <element name="File">
+      <ref name="assetAttributes"/>
+      <attribute name="can_download" a:defaultValue="true">
+        <data type="boolean"/>
+      </attribute>
+      <attribute name="name">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="Plot">
+    <element name="Plot">
+      <ref name="assetAttributes"/>
+      <attribute name="width">
+        <data type="positiveInteger"/>
+      </attribute>
+      <attribute name="height">
+        <data type="positiveInteger"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="Table">
+    <element name="Table">
+      <group>
+        <ref name="assetAttributes"/>
+        <attribute name="rows">
+          <data type="positiveInteger"/>
+        </attribute>
+        <attribute name="columns">
+          <data type="positiveInteger"/>
+        </attribute>
+        <attribute name="can_pivot" a:defaultValue="true">
+          <data type="boolean"/>
+        </attribute>
+      </group>
+      <!-- attribute cells { xsd:positiveInteger } -->
+    </element>
+  </define>
+</grammar>

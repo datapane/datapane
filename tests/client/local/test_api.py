@@ -7,6 +7,7 @@ import pytest
 
 import datapane as dp
 from datapane.client import api
+from datapane.common.report import validate_report_doc
 
 from ..e2e.common import gen_df
 
@@ -37,22 +38,70 @@ def test_params_loading(datadir: Path):
     assert dp.Params["p3"] == initial_vals["p3"]
 
 
+def gen_report_simple() -> dp.Report:
+    return dp.Report(
+        blocks=[
+            dp.Markdown(text="# Test markdown block <hello/> \n Test **content**", id="test-id-1"),
+            "Simple string Markdown",
+        ]
+    )
+
+
+def gen_report_with_files(datadir: Path, single_file: bool = False) -> dp.Report:
+    # Asset tests
+    lis = [1, 2, 3]
+    df = gen_df(10000)
+    md_block = dp.Markdown(text="# Test markdown block <hello/> \n Test **content**")
+
+    list_asset = dp.File(data=lis, name="List Asset", is_json=True)
+
+    img_asset = dp.File(file=datadir / "datapane-logo.png")
+
+    plot_asset = dp.Plot(
+        data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset"
+    )
+
+    df_asset = dp.Table(df=df, caption="Test Dataframe Table")
+
+    pivot_asset = dp.Table(df=df, caption="Test Dataframe PivotTable", can_pivot=True)
+
+    if single_file:
+        return dp.Report(dp.Blocks([md_block, plot_asset]))
+    else:
+        return dp.Report(list_asset, img_asset, df_asset, md_block, plot_asset, pivot_asset)
+
+
+def test_gen_report_simple():
+    report = gen_report_simple()
+    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+
+    print(report_str)
+    assert len(attachments) == 0
+    assert len(report.top_block.blocks) == 2
+    assert report.top_block.blocks[0].id == "test-id-1"
+    assert report.top_block.blocks[1].id == "block-1"
+    assert isinstance(report.top_block.blocks[1], dp.Markdown)
+    assert validate_report_doc(xml_str=report_str)
+
+
+def test_gen_report_with_files(datadir: Path):
+    report = gen_report_with_files(datadir)
+    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+
+    print(report_str)
+    assert len(attachments) == 5
+    assert validate_report_doc(xml_str=report_str)
+
+
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
-def test_local_report():
-    try:
-        # Asset tests
-        lis = [1, 2, 3]
-        df = gen_df(10000)
-        md_block = api.Markdown(content="# Test markdown block \n Test **content**")
-        list_asset = api.Asset.upload_obj(data=lis, title="List Asset", is_json=True)
-        # img_asset = api.Asset.upload_file(file=Path("/path/to/image.png"))
-        plot_asset = api.Asset.upload_obj(
-            data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), title="Plot Asset"
-        )
-        df_asset = api.Asset.upload_df(df=df, title="Test Dataframe")
-        report = api.Report(list_asset, df_asset, md_block, plot_asset)
-        report.save(path="test_out.html")
-    finally:
-        x = Path("test_out.html")
-        if x.exists():
-            x.unlink()
+def test_local_report_simple(datadir: Path, monkeypatch):
+    monkeypatch.chdir(datadir)
+    report = gen_report_simple()
+    report.save(path="test_out.html")
+
+
+@pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
+def test_local_report_with_files(datadir: Path, monkeypatch):
+    monkeypatch.chdir(datadir)
+    report = gen_report_with_files(datadir)
+    report.save(path="test_out.html")

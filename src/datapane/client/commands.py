@@ -130,7 +130,7 @@ def cli(ctx, verbose: int, env: str):
 def login(obj: DPContext, token, server):
     """Login to a server with the given API token."""
     config = c.Config(server=server, token=token)
-    r = api.check_login(config=config)
+    r = api.check_login(config=config, cli_login=True)
 
     # update config with valid values
     with c.update_config(obj.env) as x:

@@ -13,6 +13,6 @@ df = pd.DataFrame.from_dict({"x": [4, 3, 2, 1], "y": [10.5, 20.5, 30.5, 40.5]})
 """Render and return your datapane report components"""
 api.Report(
     # api.Markdown(f"Dummy Markdown block - {parameters.val}"),
-    api.Markdown(f"Dummy Markdown block"),
+    api.Markdown("Dummy Markdown block"),
     api.Asset.upload_df(df),
 )

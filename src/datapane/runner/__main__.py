@@ -9,7 +9,6 @@ import traceback
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 
-import datapane.client.api.common
 from datapane import __version__
 from datapane.client import api
 from datapane.client import config as c
@@ -30,8 +29,8 @@ def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = N
     verbosity = 2 if debug else 0
     api.init(config=config, verbosity=verbosity, logs_stream=logs)
     # check can login/ping
-    r = datapane.client.api.common.check_login()
-    log.debug(f"Running DP on DP as {r.username}")
+    api.check_login()
+    log.debug("Running DP on DP")
 
 
 def run_api(run_config: RunnerConfig) -> RunResult:

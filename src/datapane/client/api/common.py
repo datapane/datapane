@@ -1,10 +1,13 @@
 import atexit
+import json
 import os
 import pprint
 import shutil
+import time
 import typing as t
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from copy import copy
+from datetime import timedelta
 from pathlib import Path
 from tempfile import mkdtemp, mkstemp
 from urllib import parse as up
@@ -13,11 +16,12 @@ import requests
 from munch import munchify
 from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
+from requests_toolbelt import MultipartEncoder
 
 from datapane import __version__
 from datapane.client import config as c
-from datapane.common import JSON, NPath, SDict
-from datapane.common.utils import log, setup_local_logging
+from datapane.common import JSON, MIME, NPath, SDict, guess_type
+from datapane.common.utils import compress_file, log, setup_local_logging
 
 ################################################################################
 # Tmpfile handling
@@ -25,15 +29,21 @@ from datapane.common.utils import log, setup_local_logging
 # we attempt to delete where possible, but where not, we allow the atexit handler
 # to cleanup for us on shutdown
 # This tmp-dir needs to be in the cwd rather than /tmp so can be previewed in Jupyter
+# To avoid cluttering up the user's cwd, we nest these inside a `dp-cache` intermediate dir
+cache_dir = Path("dp-cache").absolute()
+cache_dir.mkdir(parents=True, exist_ok=True)
 
-# NOTE - temporarily disabled due to some Jupyter kernel conflict
-# Remove any old ./dp-tmp-* dirs which might not have been cleaned up due to unexpected exit
-# prev_tmp_dirs = list(p for p in Path(".").glob("dp-tmp-*") if p.is_dir())
-# for path in prev_tmp_dirs:
-#     shutil.rmtree(path, ignore_errors=True)
+# Remove any old ./dp-tmp-* dirs over 24hrs old which might not have been cleaned up due to unexpected exit
+one_day_ago = time.time() - timedelta(days=1).total_seconds()
+prev_tmp_dirs = (
+    p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago
+)
+for p in prev_tmp_dirs:
+    print(f"Remove stale temp dir {p}")
+    shutil.rmtree(p, ignore_errors=True)
 
-# Temporary directory name
-tmp_dir = Path(mkdtemp(prefix="dp-tmp-", dir=".")).absolute()
+# create new dp-tmp for this session, nested inside `dp-cache`
+tmp_dir = Path(mkdtemp(prefix="dp-tmp-", dir=cache_dir)).absolute()
 
 
 class DPTmpFile:
@@ -64,6 +74,10 @@ class DPTmpFile:
     def full_name(self) -> str:
         return str(self.file.absolute())
 
+    @property
+    def mime(self) -> MIME:
+        return guess_type(self.file)
+
     def __str__(self):
         return str(self.file)
 
@@ -71,8 +85,12 @@ class DPTmpFile:
 @atexit.register
 def cleanup_tmp():
     """Ensure we cleanup the tmp_dir on Python VM exit"""
-    # log.debug(f"Removing DP tmp work dir {tmp_dir}")
+    log.debug(f"Removing current session DP tmp work dir {tmp_dir}")
     shutil.rmtree(tmp_dir, ignore_errors=True)
+    # try remove cache_dir if empty
+    with suppress(OSError):
+        cache_dir.rmdir()
+        log.debug("Removed empty dp-cache dir")
 
 
 ################################################################################
@@ -84,7 +102,7 @@ def init(
 ):
     """Init the API - this MUST handle being called multiple times"""
     if c.get_config() is not None:
-        log.debug("Already init")
+        log.debug("Reinitialising API config")
 
     if config:
         c.set_config(config)
@@ -113,20 +131,27 @@ def check_pip_version() -> None:
         )
 
 
+FileList = t.Dict[str, t.List[Path]]
+
+
 # TODO - make generic and return a dataclass from server?
 #  - we can just use Munch and proxying for now, and type later if/when needed
 #  - look at using types.DynamicClassAttribute
 class Resource:
-    # TODO - this should probably hold a requests session object
     endpoint: str
-    headers: t.Dict
     url: str
+    # keep session as classvar to share across all DP accesses - however will be
+    # tied to current instance config
+    session = requests.Session()
+    timeout = (3.05, 27)
 
     def __init__(self, endpoint: str, config: t.Optional[c.Config] = None):
+
         self.endpoint = endpoint.split("/api", maxsplit=1)[-1]
+        # NOTE - changing config isn't threadsafe
         self.config = config or c.config
         self.url = up.urljoin(self.config.server, f"api{self.endpoint}")
-        self.headers = dict(
+        self.session.headers.update(
             Authorization=f"Token {self.config.token}", Datapane_API_Version=__version__
         )
 
@@ -135,6 +160,10 @@ class Resource:
             # check if upgrade is required
             if r.status_code == 426:
                 check_pip_version()
+            elif r.status_code == 403 and self.config.token == c.DEFAULT_TOKEN:
+                log.error(
+                    "Permission error - please rerun `dp.init()` or restart your Python/Jupyter instance"
+                )
             else:
                 try:
                     log.error(pprint.pformat(r.json()))
@@ -146,21 +175,38 @@ class Resource:
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()
-        # headers = {**self.headers, **{"Content-Type": "application/json"}}
-        # json_data = json.dumps(data, default=lambda x: str(x))
-        r = requests.post(self.url, json=data, params=params, headers=self.headers)
+        r = self.session.post(self.url, json=data, params=params, timeout=self.timeout)
         return self._process_res(r)
 
-    def get(self, **data) -> JSON:
-        r = requests.get(self.url, data, headers=self.headers)
+    def post_files(self, files: FileList, **data: JSON) -> JSON:
+        # upload files using custom json-data protocol
+        # build the fields
+        file_header = {"Content-Encoding": "gzip"}
+
+        def mk_file_fields(field_name: str, f: Path):
+            # compress the file, in-place
+            # TODO - disable compression where unneeded, e.g. .gz, .zip, .png, etc
+            with compress_file(f) as f_gz:
+                return (field_name, (f.name, open(f_gz, "rb"), guess_type(f), file_header))
+
+        fields = [mk_file_fields(k, x) for (k, v) in files.items() for x in v]
+        fields.append(("json_data", json.dumps(data)))
+
+        m = MultipartEncoder(fields=fields)
+        extra_headers = {"Content-Type": f"{m.content_type}; dp-files=True"}
+        r = self.session.post(self.url, data=m, headers=extra_headers, timeout=self.timeout)
+        return self._process_res(r)
+
+    def get(self, **params) -> JSON:
+        r = self.session.get(self.url, params=params, timeout=self.timeout)
         return self._process_res(r)
 
     def patch(self, **data: JSON) -> JSON:
-        r = requests.patch(self.url, data, headers=self.headers)
+        r = self.session.patch(self.url, data, timeout=self.timeout)
         return self._process_res(r)
 
     def delete(self) -> None:
-        r: Response = requests.delete(self.url, headers=self.headers)
+        r: Response = self.session.delete(self.url, timeout=self.timeout)
         r.raise_for_status()
 
     @contextmanager
@@ -173,8 +219,8 @@ class Resource:
         log.debug(f"Unnesting endpoint {endpoint}")
 
 
-def _download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
-    """Download a file to cwd, using fn if provided, else content-disposition, else tmpfile"""
+def do_download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
+    """Download a file to `cwd`, using `fn` if provided, else Content-Disposition, else tmpfile"""
     with requests.get(download_url, stream=True) as r:
         x = r.headers.get("Content-Disposition")
         if not fn:
@@ -192,7 +238,7 @@ def _download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
     return fn
 
 
-def check_login(config=None) -> SDict:
-    r = Resource(endpoint="/settings/details/", config=config).get()
+def check_login(config=None, cli_login: bool = False) -> SDict:
+    r = Resource(endpoint="/settings/details/", config=config).get(cli_login=cli_login)
     log.debug(f"Connected successfully to DP Server as {r.username}")
     return t.cast(SDict, r)
