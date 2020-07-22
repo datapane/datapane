@@ -126,8 +126,8 @@ def check_pip_version() -> None:
     log.debug(f"CLI version {cli_version}, latest pip version {pip_version}")
     if pip_version > cli_version:
         raise IncompatibleVersionException(
-            f"Your client is out-of-date (version {cli_version}) and may be causing errors, please upgrade to {pip_version}"
-            f' using pip ("pip3 install --upgrade [--user] datapane")'
+            f"Your client is out-of-date (version {cli_version}) and may be causing errors, "
+            + f'please upgrade to {pip_version} using pip ("pip3 install --upgrade [--user] datapane")'
         )
 
 
