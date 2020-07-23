@@ -18,7 +18,7 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import JDict, SDict, log
+from datapane.common import JDict, SDict, log, setup_local_logging
 
 from . import api
 from . import config as c
@@ -33,7 +33,8 @@ EXTRA_OUT: bool = False
 #  - convert to use typer (https://github.com/tiangolo/typer) or autoclick
 def init(verbosity: int, config_env: str):
     """Init the cmd-line env"""
-    api.init(config_env=config_env, verbosity=verbosity)
+    c.init(config_env=config_env)
+    setup_local_logging(verbosity=verbosity)
 
     # config_f = c.load_from_envfile(config_env)
     # _debug = debug if debug is not None else c.config.debug
@@ -267,7 +268,7 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], vi
     log.debug(f"Packaging and uploading Datapane project {dp_cfg.name}")
 
     # start the build process
-    with click_spinner.spinner(), scripts.build_bundle(dp_cfg) as sdist:
+    with scripts.build_bundle(dp_cfg) as sdist:
 
         if EXTRA_OUT:
             tf: tarfile.TarFile

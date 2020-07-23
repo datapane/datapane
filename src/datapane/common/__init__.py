@@ -4,21 +4,24 @@
 from .containers import GCR_REGISTRY, DockerURI
 from .datafiles import ArrowFormat
 from .dp_types import (
-    SDict,
-    SList,
-    JSON,
-    JDict,
-    JList,
-    MIME,
-    URL,
-    NPath,
-    Hash,
-    ARROW_MIMETYPE,
-    PKL_MIMETYPE,
     ARROW_EXT,
-    TD_1_HOUR,
+    ARROW_MIMETYPE,
+    DPMode,
+    JSON,
+    MIME,
+    PKL_MIMETYPE,
     SECS_1_HOUR,
     SECS_1_WEEK,
+    TD_1_HOUR,
+    URL,
     EnumType,
+    Hash,
+    JDict,
+    JList,
+    NPath,
+    SDict,
+    SList,
+    get_dp_mode,
+    set_dp_mode,
 )
-from .utils import log, log_command, temp_fname, guess_type, timestamp
+from .utils import guess_type, log, log_command, setup_local_logging, temp_fname, timestamp

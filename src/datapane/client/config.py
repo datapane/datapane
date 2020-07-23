@@ -1,4 +1,5 @@
 import dataclasses as dc
+import typing as t
 from contextlib import contextmanager
 from pathlib import Path
 from typing import ContextManager, Dict, Optional
@@ -6,6 +7,8 @@ from typing import ContextManager, Dict, Optional
 import click
 import dacite
 from ruamel.yaml import YAML
+
+from datapane import log
 
 APP_NAME = "datapane"
 APP_DIR = Path(click.get_app_dir(APP_NAME))
@@ -44,7 +47,7 @@ class Config:
 config: Optional[Config] = None
 
 
-def set_config(c: Config):
+def set_config(c: Optional[Config]):
     global config
     config = c
 
@@ -86,3 +89,17 @@ def load_from_envfile(config_env: str) -> Path:
     set_config(c_obj)
 
     return config_f
+
+
+def init(
+    config_env: str = "default", config: t.Optional[Config] = None,
+):
+    """Init an API config - this MUST handle being called multiple times"""
+    if get_config() is not None:
+        log.debug("Reinitialising client config")
+
+    if config:
+        set_config(config)
+    else:
+        config_f = load_from_envfile(config_env)
+        log.debug(f"Loaded client environment from {config_f}")

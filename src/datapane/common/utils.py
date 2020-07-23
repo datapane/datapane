@@ -16,7 +16,7 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
 
-from .dp_types import MIME, NPath
+from .dp_types import MIME, DPMode, NPath, get_dp_mode
 
 mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
@@ -34,20 +34,37 @@ double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.item
 
 ################################################################################
 # Logging
-# logging.getLogger().disabled = True  # disable the root logger
-# export the default application logger at INFO level
+# export the application logger at WARNING level by default
 log: logging.Logger = logging.getLogger("datapane")
 if log.level == logging.NOTSET:
     log.setLevel(logging.WARNING)
 
 
+_have_setup_logging: bool = False
+
+
 def setup_local_logging(verbosity: int = 0, logs_stream: t.TextIO = None) -> None:
+    global _have_setup_logging
+
     log_level = "WARNING"
     if verbosity == 1:
         log_level = "INFO"
     elif verbosity > 1:
         log_level = "DEBUG"
 
+    # don't configure global logging config when running as a library
+    if get_dp_mode() == DPMode.LIBRARY:
+        raise AssertionError("Can't configure logging in library mode")
+        # return None
+
+    # TODO - only allow setting once?
+    if _have_setup_logging:
+        log.warning(f"Reconfiguring datapane logger when running as {get_dp_mode().name}")
+        # raise AssertionError("Attempting to reconfigure datapane logger")
+        return None
+
+    # initial setup via dict-config
+    _have_setup_logging = True
     log_config = {
         "version": 1,
         "disable_existing_loggers": False,

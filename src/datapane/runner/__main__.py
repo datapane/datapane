@@ -12,9 +12,9 @@ from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 from datapane import __version__
 from datapane.client import api
 from datapane.client import config as c
-from datapane.common import log
+from datapane.common import log, setup_local_logging
 from datapane.common.config import RunnerConfig, decode
-from datapane.common.versioning import version_check
+from datapane.common.versioning import is_version_compatible
 
 from .exceptions import ModelRunError
 from .typedefs import ErrorResult, RunResult
@@ -22,12 +22,11 @@ from .typedefs import ErrorResult, RunResult
 
 def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = None):
     """Init the Datapane API for automated use"""
-    # setup input and config
-    # login, etc.
+    # setup input and config, logging, login, etc.
     config = c.Config(server=dp_host, token=dp_token, analytics=False)
-    # datapane.init(stream_logs, verbose=args.debug)
     verbosity = 2 if debug else 0
-    api.init(config=config, verbosity=verbosity, logs_stream=logs)
+    setup_local_logging(verbosity=verbosity, logs_stream=logs)
+    c.init(config=config)
     # check can login/ping
     api.check_login()
     log.debug("Running DP on DP")
@@ -37,7 +36,11 @@ def run_api(run_config: RunnerConfig) -> RunResult:
     """Bootstrap the recursive calls into run"""
     script = api.Script.by_id(run_config.script_id)
     # is the script compatible with the client runner/api
-    version_check(__version__, script.api_version)
+    if not is_version_compatible(__version__, script.api_version, raise_exception=False):
+        log.warning(
+            f"Script developed for an older version of Datapane ({script.api_version}) - "
+            + "this run may fail, please update."
+        )
 
     # TODO - we should pull param defaults from script and add in the call
     script.call(**run_config.format())
@@ -118,9 +121,9 @@ def main():
         "w"
     ) as results_stream:
         try:
-            # check cli compatible with server
+            # check cli compatible with server - should never really fail
             if args.server_version:
-                version_check(args.server_version, __version__)
+                is_version_compatible(args.server_version, __version__)
 
             # read the config files
             # NOTE - we could supply config also by env-var or already write k8s volume in the future

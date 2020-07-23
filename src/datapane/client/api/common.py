@@ -12,16 +12,17 @@ from pathlib import Path
 from tempfile import mkdtemp, mkstemp
 from urllib import parse as up
 
+import click
 import requests
 from munch import munchify
 from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
-from requests_toolbelt import MultipartEncoder
+from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import __version__
 from datapane.client import config as c
 from datapane.common import JSON, MIME, NPath, SDict, guess_type
-from datapane.common.utils import compress_file, log, setup_local_logging
+from datapane.common.utils import compress_file, log
 
 ################################################################################
 # Tmpfile handling
@@ -39,7 +40,8 @@ prev_tmp_dirs = (
     p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago
 )
 for p in prev_tmp_dirs:
-    print(f"Remove stale temp dir {p}")
+    # TODO - split datapane and dp-server loggers
+    # log.debug(f"Removing stale temp dir {p}")
     shutil.rmtree(p, ignore_errors=True)
 
 # create new dp-tmp for this session, nested inside `dp-cache`
@@ -94,25 +96,6 @@ def cleanup_tmp():
 
 
 ################################################################################
-def init(
-    config_env: str = "default",
-    config: t.Optional[c.Config] = None,
-    verbosity: int = 0,
-    logs_stream: t.Optional[t.TextIO] = None,
-):
-    """Init the API - this MUST handle being called multiple times"""
-    if c.get_config() is not None:
-        log.debug("Reinitialising API config")
-
-    if config:
-        c.set_config(config)
-    else:
-        config_f = c.load_from_envfile(config_env)
-        log.debug(f"Loaded environment from {config_f}")
-
-    setup_local_logging(verbosity=verbosity, logs_stream=logs_stream)
-
-
 class IncompatibleVersionException(Exception):
     ...
 
@@ -124,11 +107,15 @@ def check_pip_version() -> None:
     r.raise_for_status()
     pip_version = Version(r.json()["info"]["version"])
     log.debug(f"CLI version {cli_version}, latest pip version {pip_version}")
+
     if pip_version > cli_version:
-        raise IncompatibleVersionException(
+        error_msg = (
             f"Your client is out-of-date (version {cli_version}) and may be causing errors, "
-            + f'please upgrade to {pip_version} using pip ("pip3 install --upgrade [--user] datapane")'
+            + f"please upgrade to version {pip_version}"
         )
+    else:  # no newer pip - perhaps local dev?
+        error_msg = f"Your client is out-of-date (version {cli_version}) with the server and may be causing errors"
+    raise IncompatibleVersionException(error_msg)
 
 
 FileList = t.Dict[str, t.List[Path]]
@@ -155,7 +142,7 @@ class Resource:
             Authorization=f"Token {self.config.token}", Datapane_API_Version=__version__
         )
 
-    def _process_res(self, r: Response) -> JSON:
+    def _process_res(self, r: Response, empty_ok: bool = False) -> JSON:
         if not r.ok:
             # check if upgrade is required
             if r.status_code == 426:
@@ -170,7 +157,10 @@ class Resource:
                 except ValueError:
                     log.error(pprint.pformat(r.text))
         r.raise_for_status()
-        r_data = r.json()
+        if empty_ok and not r.content:
+            r_data = {}
+        else:
+            r_data = r.json()
         return munchify(r_data) if isinstance(r_data, dict) else r_data
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
@@ -192,9 +182,30 @@ class Resource:
         fields = [mk_file_fields(k, x) for (k, v) in files.items() for x in v]
         fields.append(("json_data", json.dumps(data)))
 
-        m = MultipartEncoder(fields=fields)
-        extra_headers = {"Content-Type": f"{m.content_type}; dp-files=True"}
-        r = self.session.post(self.url, data=m, headers=extra_headers, timeout=self.timeout)
+        e = MultipartEncoder(fields=fields)
+        extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
+        if e.len > 1e6:  # 1 MB
+            log.debug("Using upload monitor")
+            fill_char = click.style("=", fg="yellow")
+            with click.progressbar(
+                length=e.len, width=0, show_eta=True, label="Uploading files", fill_char=fill_char
+            ) as bar:
+
+                def f(m: MultipartEncoderMonitor):
+                    # update every 100KB
+                    m.buf_bytes_read += m.bytes_read - m.prev_bytes_read
+                    m.prev_bytes_read = m.bytes_read
+                    if m.buf_bytes_read >= 1e5:
+                        # print(f"{m.buf_bytes_read=}, {m.prev_bytes_read=}")
+                        bar.update(m.buf_bytes_read)
+                        m.buf_bytes_read = 0
+
+                m = MultipartEncoderMonitor(e, callback=f)
+                m.buf_bytes_read = 0
+                m.prev_bytes_read = 0
+                r = self.session.post(self.url, data=m, headers=extra_headers, timeout=self.timeout)
+        else:
+            r = self.session.post(self.url, data=e, headers=extra_headers, timeout=self.timeout)
         return self._process_res(r)
 
     def get(self, **params) -> JSON:
@@ -206,8 +217,8 @@ class Resource:
         return self._process_res(r)
 
     def delete(self) -> None:
-        r: Response = self.session.delete(self.url, timeout=self.timeout)
-        r.raise_for_status()
+        r = self.session.delete(self.url, timeout=self.timeout)
+        self._process_res(r, empty_ok=True)
 
     @contextmanager
     def nest_endpoint(self, endpoint: str) -> t.ContextManager["Resource"]:

@@ -5,6 +5,7 @@
   <xsl:output omit-xml-declaration="no" indent="no" encoding="utf-8"
               method='xml' cdata-section-elements="Text"/>
   <xsl:strip-space elements="*"/>
+  <xsl:param name="embedded"/>
 
   <!--  Match and copy across everything, i.e. id -->
   <xsl:template match="@* | node()">
@@ -15,5 +16,22 @@
 
   <!--  Strip all comments-->
   <xsl:template match="comment()"/>
+
+  <!-- Drop blocks if embedded -->
+  <xsl:template match="/Report/Main//Blocks">
+    <xsl:choose>
+      <xsl:when test="$embedded">
+        <xsl:apply-templates/>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <!-- <xsl:copy-of select="."/>-->
+        <xsl:copy>
+          <xsl:apply-templates select="@* | node()"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
 
 </xsl:stylesheet>

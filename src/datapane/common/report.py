@@ -1,3 +1,4 @@
+import logging
 import typing as t
 
 import importlib_resources as ir
@@ -21,7 +22,8 @@ def validate_report_doc(
     if xml_str:
         xml_doc = etree.fromstring(xml_str)
     # TODO - should remove this debug log at some point
-    log.debug(f"Validating\n{etree.tounicode(xml_doc, pretty_print=True)}")
+    if log.isEnabledFor(logging.DEBUG):
+        log.debug(f"Validating\n{etree.tounicode(xml_doc, pretty_print=True)}")
     if raise_exception:
         rng_validator.assertValid(xml_doc)
         return True

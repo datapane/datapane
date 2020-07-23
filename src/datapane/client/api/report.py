@@ -303,7 +303,9 @@ class Report(BEObjectRef):
         report_doc.set("{http://www.w3.org/XML/1998/namespace}id", f"_{uuid.uuid4().hex}")
 
         # post_process and validate
-        processed_report_doc = local_post_transform(report_doc)
+        processed_report_doc = local_post_transform(
+            report_doc, embedded="true()" if embedded else "false()"
+        )
         validate_report_doc(xml_doc=processed_report_doc)
 
         # convert to string

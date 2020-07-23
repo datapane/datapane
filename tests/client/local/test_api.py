@@ -75,7 +75,7 @@ def test_gen_report_simple():
     report = gen_report_simple()
     report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
 
-    print(report_str)
+    # print(report_str)
     assert len(attachments) == 0
     assert len(report.top_block.blocks) == 2
     assert report.top_block.blocks[0].id == "test-id-1"
@@ -88,7 +88,7 @@ def test_gen_report_with_files(datadir: Path):
     report = gen_report_with_files(datadir)
     report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
 
-    print(report_str)
+    # print(report_str)
     assert len(attachments) == 5
     assert validate_report_doc(xml_str=report_str)
 

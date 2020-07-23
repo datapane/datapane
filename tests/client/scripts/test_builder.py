@@ -3,10 +3,6 @@ import typing as t
 from pathlib import Path
 
 from datapane.client.scripts import DatapaneCfg, builder
-from datapane.common.utils import setup_local_logging
-
-# debug
-setup_local_logging(verbosity=2)
 
 
 def gen_build_cfg() -> DatapaneCfg:

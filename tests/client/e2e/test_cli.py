@@ -12,6 +12,7 @@ from .conftest import TEST_SERVER, TEST_TOKEN
 
 @pytest.fixture()
 def runner():
+    # NOTE - this will overwrite the default config profile and logging conf - not an issue on CI
     _runner = CliRunner()
     result = _runner.invoke(cli, ["-vv", "login", "--token", TEST_TOKEN, "--server", TEST_SERVER])
     handle_res(result)
