@@ -1,8 +1,8 @@
-from datapane.common import DPMode, set_dp_mode, setup_local_logging
+from datapane.common import DPMode, _setup_dp_logging, set_dp_mode
 
 # run this at global level as want debug logging for all tests
 set_dp_mode(DPMode.APP)
-setup_local_logging(verbosity=2)
+_setup_dp_logging(verbosity=2)
 
 
 # @pytest.fixture(scope="session")

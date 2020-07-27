@@ -18,7 +18,7 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import JDict, SDict, log, setup_local_logging
+from datapane.common import JDict, SDict, _setup_dp_logging, log
 
 from . import api
 from . import config as c
@@ -34,7 +34,7 @@ EXTRA_OUT: bool = False
 def init(verbosity: int, config_env: str):
     """Init the cmd-line env"""
     c.init(config_env=config_env)
-    setup_local_logging(verbosity=verbosity)
+    _setup_dp_logging(verbosity=verbosity)
 
     # config_f = c.load_from_envfile(config_env)
     # _debug = debug if debug is not None else c.config.debug

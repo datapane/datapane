@@ -40,8 +40,7 @@ prev_tmp_dirs = (
     p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago
 )
 for p in prev_tmp_dirs:
-    # TODO - split datapane and dp-server loggers
-    # log.debug(f"Removing stale temp dir {p}")
+    log.debug(f"Removing stale temp dir {p}")
     shutil.rmtree(p, ignore_errors=True)
 
 # create new dp-tmp for this session, nested inside `dp-cache`

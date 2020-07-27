@@ -12,7 +12,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 from datapane import __version__
 from datapane.client import api
 from datapane.client import config as c
-from datapane.common import log, setup_local_logging
+from datapane.common import _setup_dp_logging, log
 from datapane.common.config import RunnerConfig, decode
 from datapane.common.versioning import is_version_compatible
 
@@ -25,7 +25,7 @@ def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = N
     # setup input and config, logging, login, etc.
     config = c.Config(server=dp_host, token=dp_token, analytics=False)
     verbosity = 2 if debug else 0
-    setup_local_logging(verbosity=verbosity, logs_stream=logs)
+    _setup_dp_logging(verbosity=verbosity, logs_stream=logs)
     c.init(config=config)
     # check can login/ping
     api.check_login()

@@ -13,7 +13,7 @@ except ImportError:
 __version__ = "0.7.0"
 
 # Other useful re-exports
-from .common.utils import log, setup_local_logging
+from .common.utils import log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
