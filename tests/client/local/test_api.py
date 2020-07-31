@@ -79,7 +79,7 @@ def test_gen_report_simple():
     assert len(attachments) == 0
     assert len(report.top_block.blocks) == 2
     assert report.top_block.blocks[0].id == "test-id-1"
-    assert report.top_block.blocks[1].id == "block-1"
+    assert report.top_block.blocks[1].id == "block-2"
     assert isinstance(report.top_block.blocks[1], dp.Markdown)
     assert validate_report_doc(xml_str=report_str)
 

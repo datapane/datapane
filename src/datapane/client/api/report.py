@@ -1,4 +1,5 @@
 import dataclasses as dc
+import itertools
 import shutil
 import typing as t
 import uuid
@@ -26,6 +27,7 @@ from .runtime import _report
 E = ElementMaker()  # XML Tag Factory
 local_post_xslt = etree.parse(str(report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
+id_count = itertools.count(start=1)
 
 
 @contextfunction
@@ -70,7 +72,6 @@ class BuilderState:
 
     embedded: bool
     attachment_count: int = 0
-    block_id_count: int = 1
     # TODO - store as single element or a list?
     # element: t.Optional[etree.Element] = None  # Empty Blocks Element?
     elements: t.List[etree.Element] = dc.field(default_factory=list)
@@ -79,10 +80,6 @@ class BuilderState:
     def add_element(
         self, block: "ReportBlock", e: etree.Element, f: t.Optional[Path] = None
     ) -> "BuilderState":
-        # generate id if not provided
-        if block.id is None:
-            block.id = f"block-{self.block_id_count}"
-            self.block_id_count += 1
         e.set("id", block.id)
 
         self.elements.append(e)
@@ -107,7 +104,7 @@ class ReportBlock(ABC):
         return v1.lower() if isinstance(v, bool) else v1
 
     def __init__(self, id: str = None, **kwargs):
-        self.id = str(id) if id else None
+        self.id = str(id) if id else f"block-{next(id_count)}"
         self.attributes = {str(k): self._conv_attrib(v) for (k, v) in kwargs.items()}
 
     @abstractmethod
