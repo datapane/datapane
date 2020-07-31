@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datapane"
-version = "0.7.0"
+version = "0.7.1"
 description = "Datapane client library and CLI tool"
 authors = ["Datapane Team <dev@datapane.com>"]
 license = "Apache-2.0"

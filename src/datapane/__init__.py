@@ -10,7 +10,7 @@ except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 # Other useful re-exports
 from .common.utils import log, _setup_dp_logging
