@@ -26,7 +26,7 @@
     </div>
     <script>
       {{ include_raw("local-report-base.js") }}
-      const report = { served_document: `{{ report_doc }}` };
+      const report = { document: `{{ report_doc }}` };
       const { React, ReactDOM, ReportComponent } = UMDModules;
       const ReportFactory = React.createFactory(ReportComponent);
       ReactDOM.render(
