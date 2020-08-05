@@ -136,6 +136,8 @@ class BEObjectRef:
         log.debug(f"Deleted object {self.url}")
 
     def update(self, **kwargs):
+        # filter None values
+        kwargs = {k: v for (k, v) in kwargs.items() if v is not None}
         self.res.patch(**kwargs)
         self.refresh()
         log.debug(f"Updated object {self.url}")
@@ -145,12 +147,17 @@ class BEObjectRef:
         """Return a list of the resources """
         endpoint: t.Optional[str] = cls.endpoint
 
+        def process_field(v):
+            if isinstance(v, dict):
+                return json.dumps(v, indent=True)
+            return v
+
         while endpoint:
             r = Resource(endpoint=endpoint)
             items = r.get()
             # filter the items, ordering as needed
             for x in items.results:
-                yield {k: x[k] for k in cls.list_fields if k in x}
+                yield {k: process_field(x[k]) for k in cls.list_fields if k in x}
             endpoint = items.next if items.next else None
 
 
@@ -283,5 +290,17 @@ class Variable(BEObjectRef):
     list_fields = ["name", "versions"]
 
     @classmethod
-    def add(cls, name: str, value: str, visibility: Optional[str] = None) -> "Variable":
+    def create(cls, name: str, value: str, visibility: Optional[str] = None) -> "Variable":
         return cls.post(name=name, value=value, visibility=visibility)
+
+
+class Schedule(BEObjectRef):
+    endpoint: str = "/schedules/"
+    list_fields = ["id", "script", "cron", "parameter_vals"]
+
+    @classmethod
+    def create(cls, script: Script, cron: str, parameters: SDict) -> "Schedule":
+        return cls.post(script=script.url, cron=cron, parameter_vals=parameters)
+
+    def update(self, cron: str = None, parameters: SDict = None) -> None:
+        super().update(cron=cron, parameter_vals=parameters)

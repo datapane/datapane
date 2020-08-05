@@ -82,9 +82,9 @@ def gen_name() -> str:
     return f"new_{uuid.uuid4().hex}"
 
 
-def print_table(xs: t.Iterable[SDict], obj_name: str) -> None:
+def print_table(xs: t.Iterable[SDict], obj_name: str, showindex: bool = True) -> None:
     success_msg(f"Available {obj_name}:")
-    print(tabulate(xs, headers="keys", showindex=True))
+    print(tabulate(xs, headers="keys", showindex=showindex))
 
 
 class CatchIncompatibleVersion(click.Group):
@@ -428,9 +428,9 @@ def variable():
 @click.argument("name", required=True)
 @click.argument("value", required=True)
 @click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
-def add(name: str, value: str, visibility: str):
+def create(name: str, value: str, visibility: str):
     """
-    Add a variable
+    Create a variable
 
     NAME: name of variable
     VALUE: value of variable
@@ -440,7 +440,7 @@ def add(name: str, value: str, visibility: str):
     ORG: visible to all authenticated users in an organization (note: this option is only for organizations),
     PRIVATE: only visible to you
     """
-    api.Variable.add(name, value, visibility)
+    api.Variable.create(name, value, visibility)
     success_msg(f"Created variable: {name}")
 
 
@@ -470,3 +470,75 @@ def delete(name):
     """Delete a variable using variable name"""
     api.Variable.get(name).delete()
     success_msg(f"Deleted variable {name}")
+
+
+#############################################################################
+# Schedules
+@cli.group()
+def schedule():
+    """Commands to work with Schedules"""
+    ...
+
+
+@schedule.command()
+@click.option("--parameter", "-p", multiple=True)
+@click.argument("script", required=True)
+@click.argument("cron", required=True)
+def create(script: str, cron: str, parameter: Tuple[str]):
+    """
+    Create a schedule
+
+    SCRIPT: ID/URL of the Script to run
+    CRON: crontab representing the schedule interval
+    PARAMETERS: key/value list of parameters to use when running the script on schedule
+    """
+    params = process_cmd_param_vals(parameter)
+    log.info(f"Adding schedule with parameters {params}")
+    script_obj = api.Script.by_id(script)
+    schedule_obj = api.Schedule.create(script_obj, cron, params)
+    success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
+
+
+@schedule.command()
+@click.option("--parameter", "-p", multiple=True)
+@click.argument("id", required=True)
+@click.argument("cron", required=False)
+def update(id: str, cron: str, parameter: Tuple[str]):
+    """
+    Add a schedule
+
+    ID: ID/URL of the Schedule
+    CRON: crontab representing the schedule interval
+    PARAMETERS: key/value list of parameters to use when running the script on schedule
+    """
+
+    params = process_cmd_param_vals(parameter)
+    assert cron or parameter, "Must update either cron or parameters"
+
+    log.info(f"Updating schedule with parameters {params}")
+
+    schedule_obj = api.Schedule.by_id(id)
+    schedule_obj.update(cron, params)
+    success_msg(f"Updated schedule: {schedule_obj.id} ({schedule_obj.url})")
+
+
+@schedule.command()
+def list():
+    """List all schedules"""
+    print_table(api.Schedule.list(), "Schedules", showindex=False)
+
+
+# @schedule.command()
+# @click.argument("id", required=True)
+# def get(id: str):
+#     """Get variable value using variable name"""
+#     res = api.Schedule.by_id(id)
+#     print_table([res.dto], "Schedule")
+
+
+@schedule.command()
+@click.argument("id", required=True)
+def delete(id: str):
+    """Delete a schedule by its id/url"""
+    api.Schedule.by_id(id).delete()
+    success_msg(f"Deleted schedule {id}")

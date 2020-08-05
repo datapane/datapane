@@ -19,7 +19,7 @@ from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
-from datapane import __version__
+from datapane import TEST_ENV, __version__
 from datapane.client import config as c
 from datapane.common import JSON, MIME, NPath, SDict, guess_type
 from datapane.common.utils import compress_file, log
@@ -129,7 +129,7 @@ class Resource:
     # keep session as classvar to share across all DP accesses - however will be
     # tied to current instance config
     session = requests.Session()
-    timeout = (3.05, 27)
+    timeout = None if TEST_ENV else (3.05, 27)
 
     def __init__(self, endpoint: str, config: t.Optional[c.Config] = None):
 
@@ -211,8 +211,9 @@ class Resource:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
         return self._process_res(r)
 
-    def patch(self, **data: JSON) -> JSON:
-        r = self.session.patch(self.url, data, timeout=self.timeout)
+    def patch(self, params: t.Dict = None, **data: JSON) -> JSON:
+        params = params or dict()
+        r = self.session.patch(self.url, json=data, params=params, timeout=self.timeout)
         return self._process_res(r)
 
     def delete(self) -> None:

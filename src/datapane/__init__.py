@@ -1,6 +1,7 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
 # flake8: noqa F401
+import os
 import sys
 from pathlib import Path
 
@@ -11,6 +12,8 @@ except ImportError:
     __rev__ = "local"
 
 __version__ = "0.7.1"
+
+TEST_ENV: bool = "DP_TEST_ENV" in os.environ
 
 # Other useful re-exports
 from .common.utils import log, _setup_dp_logging
@@ -27,6 +30,7 @@ from .client.api import (
     Result,
     Run,
     Script,
+    Schedule,
     Table,
     Variable,
     by_datapane,

@@ -42,4 +42,7 @@ def deletable(x: U) -> ContextManager[U]:
     finally:
         x.delete()
         with pytest.raises(HTTPError) as _:
-            _ = x.__class__.get(x.name)
+            try:
+                _ = x.__class__.get(x.name)
+            except AttributeError:
+                _ = x.__class__.by_id(x.id)

@@ -34,9 +34,13 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
         tar = tarfile.open(sdist_file)
         assert "dp_script.py" in tar.getnames()
 
+        ########################################################################
+        # Test running
         # no need to test obj lookup (covered by other tests)
         # basic report gen
-        run = s.run(parameters=dict(p1="A"))
+        params = dict(p1="A")
+
+        run = s.run(parameters=params)
         while not run.is_complete():
             time.sleep(2)
             run.refresh()
@@ -44,6 +48,17 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
 
         with deletable(dp.Report.by_id(run.report)) as report:
             assert report.web_url
+
+        ########################################################################
+        # Test scheduling
+        cron1 = "00 00 * * SUN"
+        cron2 = "00 00 * * SAT"
+
+        # create schedule, update, and delete - we don't run atm
+        with deletable(dp.Schedule.create(s, cron1, params)) as s1:
+            assert s1.cron == cron1
+            s1.update(cron=cron2)
+            assert s1.cron == cron2
 
 
 def test_script_complex(shared_datadir: Path, monkeypatch):
