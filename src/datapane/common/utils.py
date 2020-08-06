@@ -32,6 +32,8 @@ _double_ext_map = {
 }
 double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.items()}
 
+ON_WINDOWS = sys.platform == "win32"
+
 ################################################################################
 # Logging
 # export the application logger at WARNING level by default
@@ -165,7 +167,9 @@ def compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
     try:
         yield f_name_gz
     finally:
-        os.unlink(f_name_gz)
+        # NOTE - disable on windows temporarily
+        if not ON_WINDOWS:
+            os.unlink(f_name_gz)
 
 
 @contextmanager
