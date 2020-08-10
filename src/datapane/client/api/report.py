@@ -12,20 +12,20 @@ from pathlib import Path
 
 import importlib_resources as ir
 import pandas as pd
-from jinja2 import Environment, FileSystemLoader, Markup, contextfunction
+from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
 from lxml import etree
 from lxml.builder import ElementMaker
 from lxml.etree import Element
 
 from datapane.common import NPath, guess_type, log, timestamp
-from datapane.common.report import report_def, validate_report_doc
+from datapane.common.report import local_report_def, validate_report_doc
 
-from .common import DPTmpFile, Resource
+from .common import DPTmpFile, Resource, do_download_file
 from .dp_object import BEObjectRef, UploadableObjectMixin
 from .runtime import _report
 
 E = ElementMaker()  # XML Tag Factory
-local_post_xslt = etree.parse(str(report_def / "local_post_process.xslt"))
+local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 id_count = itertools.count(start=1)
 
@@ -48,22 +48,35 @@ def is_jupyter():
 class ReportFileWriter:
     """ Collects data needed to display a local report, and generates the local HTML """
 
-    def __init__(self):
-        self.template = self._setup_template()
+    template: t.Optional[Template] = None
+    assets: Path
+    asset_url = "https://datapane.com/static"
+    asset_js = "local-report-base.css"
+    asset_css = "local-report-base.js"
+
+    def _setup_template(self) -> Template:
+        """ Jinja template setup for local rendering """
+        # check we have the files, download if not
+        self.assets = ir.files("datapane.resources.local_report")
+        if not (self.assets / self.asset_js).exists():
+            log.warning("Can't find report assets, downloading")
+            do_download_file(f"{self.asset_url}/{self.asset_js}", self.assets / self.asset_js)
+            do_download_file(f"{self.asset_url}/{self.asset_css}", self.assets / self.asset_css)
+
+        template_loader = FileSystemLoader(self.assets)
+        template_env = Environment(loader=template_loader)
+        template_env.globals["include_raw"] = include_raw
+        self.template = template_env.get_template("template.html")
 
     def write(self, report_doc: str, path: str):
+        # create template on demand
+        if not self.template:
+            self._setup_template()
+
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
         r = self.template.render(report_doc=report_doc_esc)
         Path(path).write_text(r, encoding="utf-8")
-
-    @staticmethod
-    def _setup_template():
-        """ Jinja template setup for local rendering """
-        template_loader = FileSystemLoader(ir.files("datapane.resources.local_report"))
-        template_env = Environment(loader=template_loader)
-        template_env.globals["include_raw"] = include_raw
-        return template_env.get_template("template.html")
 
 
 @dc.dataclass

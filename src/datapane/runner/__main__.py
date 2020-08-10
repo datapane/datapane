@@ -59,12 +59,12 @@ def run_api(run_config: RunnerConfig) -> RunResult:
 
 
 # ensure we copy PYTHONPATH across
-ENV_WHITELIST = ("LANG", "PATH", "HOME", "PYTHON_VERSION", "PYTHONPATH")
+ENV_ALLOWLIST = ("LANG", "PATH", "HOME", "PYTHON_VERSION", "PYTHONPATH")
 USER_USER = "usercode"
 
 
 def make_env(
-    input_env: Mapping[str, str], allowed: Iterable[str] = ENV_WHITELIST
+    input_env: Mapping[str, str], allowed: Iterable[str] = ENV_ALLOWLIST
 ) -> Dict[str, str]:
 
     return {k: input_env[k] for k in allowed if k in input_env}

@@ -6,8 +6,8 @@ from lxml import etree
 
 from .utils import log
 
-report_def = ir.files("datapane.resources.report_def")
-rng_validator = etree.RelaxNG(file=str(report_def / "full_schema.rng"))
+local_report_def = ir.files("datapane.resources.report_def")
+rng_validator = etree.RelaxNG(file=str(local_report_def / "full_schema.rng"))
 
 dp_namespace: str = "https://datapane.com/schemas/report/1/"
 

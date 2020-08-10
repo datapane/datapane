@@ -1,7 +1,6 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
 # flake8: noqa F401
-from .containers import GCR_REGISTRY, DockerURI
 from .datafiles import ArrowFormat
 from .dp_types import (
     ARROW_EXT,
