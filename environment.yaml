@@ -36,4 +36,4 @@ dependencies:
   - tabulate>=0.8.7,<0.9.0
   - toolz>=0.10.0,<0.11.0
   - flit-core>=2.3.0,<2.4.0
-  - importlib_resources>=1.5.0,<2.0.0
+  - importlib_resources>=3.0.0,<4.0.0
