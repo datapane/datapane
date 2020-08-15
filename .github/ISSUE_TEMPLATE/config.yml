@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Datapane Community Support
+    url: https://discuss.datapane.com/
+    about: Ask and answer questions with the wider community.
+#  - name: GitHub Security Bug Bounty
+#    url: https://bounty.github.com/
+#    about: Please report security vulnerabilities here.

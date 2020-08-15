@@ -1,2 +1,28 @@
 test_proj*
 .ipynb_checkpoints
+
+# Log file
+*.log
+
+# python
+__pycache__
+*.egg-info
+.venv
+*.env
+.pytest_cache
+.mypy_cache
+pip-wheel-metadata
+dist
+*.whl
+_version.py
+.python-version
+
+# IDEs
+.idea
+*.swp
+
+# datapane specific
+*-service-account.json
+*_key.json
+dp-cache
+dp-tmp-*

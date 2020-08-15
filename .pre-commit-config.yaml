@@ -1,0 +1,83 @@
+# pre-commit config file (https://pre-commit.com/
+fail_fast: true
+# global excludes - exclude generated files, e.g. django migrations
+exclude: '^(src/datapane/resources/scaffold/|tests/client/scripts/test_config/|tests/testfiles/)'
+default_language_version:
+  python: python3
+# default_stages: [commit, push]
+
+repos:
+  #- repo: https://github.com/asottile/add-trailing-comma
+  #  rev: v2.0.1
+  #  hooks:
+  #    - id: add-trailing-comma
+  #      args: [--py36-plus]
+  # Run flake8 & isort on files using .flake8 and .isort.cfg config
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        additional_dependencies: ["flake8-isort >= 3.0.0", "flake8-no-implicit-concat >= 0.1.3", "flake8_tuple >= 0.4.1"]
+  # Black Python formatter
+  - repo: https://github.com/ambv/black
+    rev: 19.10b0
+    hooks:
+      - id: black
+        args: [--config=./pyproject.toml, --verbose]
+  # Built-ins
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
+    hooks:
+      ## PYTHON CODE
+      # check for debugger imports and py37+ breakpoint()
+      - id: debug-statements
+      # DISABLED - ensures test files are named correctly
+      #- id: name-tests-test
+      #  args: [--django]
+      # remove 'coding: utf-8' pragma from files
+      - id: fix-encoding-pragma
+        args: [--remove]
+      ## CONFIG FILES
+      # check json is valid format
+      - id: check-json
+      # check yaml is valid format
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      # DISABLED - sort yaml keys in simple (i.e. top-level, unested) files
+      # - id: sort-simple-yaml
+
+      ## GENERAL FILE FORMATTING
+      # trims trailing whitespace, preserving in case of Markdown hard linebreaks
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      # makes sure files end in a single newline-only
+      - id: end-of-file-fixer
+        exclude: '^(.bumpversion.cfg)$'
+
+      # forbid files which have a UTF-8 byte-order marker
+      - id: check-byte-order-marker
+      - id: check-executables-have-shebangs
+      # only allow \n (i.e. lf) for line-endings
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+      # REPO HEALTH
+      # check for files that contain merge conflict strings
+      - id: check-merge-conflict
+      # disallow adding files larger than 500kb that don't use git lfs
+      - id: check-added-large-files
+        args: [--maxkb=500]
+        # exclude package*.json files
+        exclude: 'package.*\.json'
+      # check for dangling symlinks
+      - id: check-symlinks
+        exclude: '^(src/datapane/resources/local-report-base.*)$'
+      # ensure links to vcs sites are permalinks
+      - id: check-vcs-permalinks
+      # ensure no private keys are being commited
+      - id: detect-private-key
+      # submodules are evil :)
+      - id: forbid-new-submodules
+      # disallow directly committing to the specified branches
+      # - id: no-commit-to-branch
+      #  args: [--branch, master]
