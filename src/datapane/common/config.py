@@ -31,7 +31,12 @@ class RunnerConfig:
         """Convert a config object using the specified formats"""
         if v is not None:
             if format == "date":
-                return datetime.date.fromisoformat(v)
+                try:
+                    return datetime.date.fromisoformat(v)
+                except ValueError:
+                    # if the date contains time component parse it and return the date
+                    utc_t: str = v.replace("Z", "+00:00")
+                    return datetime.datetime.fromisoformat(utc_t).date()
             elif format == "time":
                 utc_t: str = v.replace("Z", "+00:00")
                 return datetime.time.fromisoformat(utc_t)
