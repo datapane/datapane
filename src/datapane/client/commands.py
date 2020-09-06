@@ -109,7 +109,7 @@ class CatchIncompatibleVersion(click.Group):
 # Main
 @click.group(cls=CatchIncompatibleVersion)
 @click.option(
-    "-v", "--verbose", count=True, help="Increase logging verbosity - can add multiple times"
+    "-v", "--verbose", count=True, help="Increase logging verbosity - can add multiple times",
 )
 @click.option("--env", default=c.DEFAULT_ENV, help="Alternate config environment to use.")
 @click.version_option(version=f"{__version__} ({__rev__})")
@@ -343,7 +343,9 @@ def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
 @click.option("--owner")
 @click.option("--show-output", is_flag=True, default=False, help="Display the run output")
 @click.argument("name")
-def run(name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str, show_output: bool):
+def run(
+    name: str, parameter: Tuple[str], cache: bool, wait: bool, owner: str, show_output: bool,
+):
     """Run a report"""
     params = process_cmd_param_vals(parameter)
     log.info(f"Running script with parameters {params}")
@@ -461,7 +463,9 @@ def get(name, owner, version, show):
     if show:
         print(str(res.value).strip())
     else:
-        print_table([{"name": name, "value": res.value, "visibility": res.visibility}], "Variable")
+        print_table(
+            [{"name": name, "value": res.value, "visibility": res.visibility}], "Variable",
+        )
 
 
 @variable.command()

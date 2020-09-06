@@ -95,6 +95,8 @@ name = "datapane"
 [tool.poetry2conda.dependencies]
 pyarrow = { channel = "conda-forge" }
 
+[tool.black]
+line-length = 100
 
 # FOR PEP-517/518
 [build-system]

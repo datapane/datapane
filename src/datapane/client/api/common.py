@@ -14,6 +14,7 @@ from urllib import parse as up
 
 import click
 import requests
+from furl import furl
 from munch import munchify
 from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
@@ -99,6 +100,10 @@ class IncompatibleVersionException(Exception):
     ...
 
 
+class UnsupportedResourceException(Exception):
+    ...
+
+
 def check_pip_version() -> None:
     cli_version = Version(__version__)
     url = "https://pypi.org/pypi/datapane/json"
@@ -137,6 +142,8 @@ class Resource:
         # NOTE - changing config isn't threadsafe
         self.config = config or c.config
         self.url = up.urljoin(self.config.server, f"api{self.endpoint}")
+        # check if access to the resource is allowed
+        self._check_endpoint(self.url)
         self.session.headers.update(
             Authorization=f"Token {self.config.token}", Datapane_API_Version=__version__
         )
@@ -162,6 +169,20 @@ class Resource:
             r_data = r.json()
         return munchify(r_data) if isinstance(r_data, dict) else r_data
 
+    def _check_endpoint(self, url: str):
+        # raise exception if unavailable object is being accessed on the public datapane
+        public_endpoints = ["files", "oembed", "reports", "settings", "users"]
+        url = furl(url)
+        url_parts = url.path.segments
+        if (
+            url.host in ["datapane.com"]  # , "localhost"] - we want to access OrgSolo locally
+            and url_parts[0] == "api"
+            and url_parts[1] not in public_endpoints
+        ):
+            raise UnsupportedResourceException(
+                f"Invalid Operation: {url_parts[1].title()} are not available on public datapane."
+            )
+
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()
         r = self.session.post(self.url, json=data, params=params, timeout=self.timeout)
@@ -176,7 +197,10 @@ class Resource:
             # compress the file, in-place
             # TODO - disable compression where unneeded, e.g. .gz, .zip, .png, etc
             with compress_file(f) as f_gz:
-                return (field_name, (f.name, open(f_gz, "rb"), guess_type(f), file_header))
+                return (
+                    field_name,
+                    (f.name, open(f_gz, "rb"), guess_type(f), file_header),
+                )
 
         fields = [mk_file_fields(k, x) for (k, v) in files.items() for x in v]
         fields.append(("json_data", json.dumps(data)))
@@ -187,7 +211,7 @@ class Resource:
             log.debug("Using upload monitor")
             fill_char = click.style("=", fg="yellow")
             with click.progressbar(
-                length=e.len, width=0, show_eta=True, label="Uploading files", fill_char=fill_char
+                length=e.len, width=0, show_eta=True, label="Uploading files", fill_char=fill_char,
             ) as bar:
 
                 def f(m: MultipartEncoderMonitor):

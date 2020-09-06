@@ -23,4 +23,11 @@ from .dp_types import (
     get_dp_mode,
     set_dp_mode,
 )
-from .utils import guess_type, log, log_command, _setup_dp_logging, temp_fname, timestamp
+from .utils import (
+    guess_type,
+    log,
+    log_command,
+    _setup_dp_logging,
+    temp_fname,
+    timestamp,
+)

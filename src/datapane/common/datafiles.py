@@ -35,7 +35,7 @@ def convert_df_table(df: pd.DataFrame) -> pa.Table:
 
 
 def convert_csv_table(
-    _input: Union[str, TextIO], output: Optional[Union[str, BinaryIO]] = None, ext: str = ".csv"
+    _input: Union[str, TextIO], output: Optional[Union[str, BinaryIO]] = None, ext: str = ".csv",
 ) -> pa.Table:
     """Convert & return csv/excel file to an arrow table via pandas, optionally writing it disk"""
     df = df_ext_map[ext].load_file(fn=_input)

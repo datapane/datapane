@@ -20,7 +20,10 @@ from datapane.common import SDict, log
 
 from .exceptions import CodeError, CodeRaisedError, CodeSyntaxError
 
-ENVIRON_CONFIG = {"banned_builtins": {"compile", "exec", "eval"}, "default_environment": []}
+ENVIRON_CONFIG = {
+    "banned_builtins": {"compile", "exec", "eval"},
+    "default_environment": [],
+}
 RUN_NAME = "__datapane__"  # <datapane> ??
 
 
