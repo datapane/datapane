@@ -98,7 +98,7 @@ def preexec():
     drop_privileges(USER_USER, USER_USER)
 
 
-def parse_args(argv: Optional[List[str]] = None,) -> Tuple[argparse.Namespace, List[str]]:
+def parse_args(argv: Optional[List[str]] = None) -> Tuple[argparse.Namespace, List[str]]:
     # TODO - min version param
     parser = argparse.ArgumentParser()
     parser.add_argument("--debug", action="store_true", default=False, help="Enable debug output")

@@ -265,7 +265,12 @@ class Table(Asset):
         fn = self._save_df(df)
         (rows, columns) = df.shape
         super().__init__(
-            file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id,
+            file=fn.file,
+            caption=caption,
+            rows=rows,
+            columns=columns,
+            can_pivot=can_pivot,
+            id=id,
         )
 
 

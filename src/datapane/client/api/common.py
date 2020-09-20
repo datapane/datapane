@@ -211,7 +211,11 @@ class Resource:
             log.debug("Using upload monitor")
             fill_char = click.style("=", fg="yellow")
             with click.progressbar(
-                length=e.len, width=0, show_eta=True, label="Uploading files", fill_char=fill_char,
+                length=e.len,
+                width=0,
+                show_eta=True,
+                label="Uploading files",
+                fill_char=fill_char,
             ) as bar:
 
                 def f(m: MultipartEncoderMonitor):

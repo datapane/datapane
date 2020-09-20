@@ -10,7 +10,7 @@ StackFilter = Callable[[FrameType], bool]
 
 
 def get_user_stack_depth(tb: TracebackType, f: StackFilter) -> int:
-    """ Determines the depth of the stack within user-code.
+    """Determines the depth of the stack within user-code.
 
     Takes a 'StackFilter' function that filters frames by whether
     they are in user code or not and returns the number of frames

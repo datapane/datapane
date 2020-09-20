@@ -44,7 +44,8 @@ pyarrow = "0.17.*"
 matplotlib = "^3.1.0"
 altair = "^4.0.0"
 bokeh = "^2.0.0"
-nbconvert = "^5.6.1"
+# we need to stick to 6.0.x until we drop py 3.6 support
+nbconvert = "6.0.*"
 plotly = "^4.8.1"
 folium = "0.11.*"
 # ipython = "^7.7.0" # needed for nbconvert?
@@ -54,7 +55,7 @@ dacite = "^1.2.0"
 colorlog = "^4.1.0"
 munch = "^2.5.0"
 stringcase = "^1.2.0"
-PyYAML = "^5.3.0"
+PyYAML = "^5.1.0"
 packaging = "^20.3"
 
 # CLI
@@ -63,7 +64,7 @@ click-spinner = "^0.1.8"
 # httpx = "^0.7.5"
 "ruamel.yaml" = "^0.16.5"
 requests = "^2.20.0"
-validators = "^0.17.0"
+validators = "^0.18.0"
 jinja2 = "^2.11.1"
 jsonschema = "^3.2.0"
 tabulate = "^0.8.7"
@@ -96,7 +97,8 @@ name = "datapane"
 pyarrow = { channel = "conda-forge" }
 
 [tool.black]
-line-length = 100
+line-length = 120
+target-version = ['py38']
 
 # FOR PEP-517/518
 [build-system]

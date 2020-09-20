@@ -92,7 +92,8 @@ def load_from_envfile(config_env: str) -> Path:
 
 
 def init(
-    config_env: str = "default", config: t.Optional[Config] = None,
+    config_env: str = "default",
+    config: t.Optional[Config] = None,
 ):
     """Init an API config - this MUST handle being called multiple times"""
     if get_config() is not None:

@@ -82,7 +82,7 @@ class BEObjectRef:
 
     @classmethod
     def get(
-        cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None,
+        cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None
     ) -> U:
         res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner, version=version)
         return cls(res)
