@@ -118,7 +118,7 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
         # asserts
         isc.assert_called()
         (rc_args, rc_kwargs) = rc.call_args
-        assert rc_kwargs["headline"] == "My Report"
+        assert rc_kwargs["description"] == "Description"
         _r: dp.Report = rc_args[0]
         _blocks = _r.top_block.blocks
         assert isinstance(_blocks, list)

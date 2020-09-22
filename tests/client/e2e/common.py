@@ -10,7 +10,6 @@ import pytest
 from datapane.client.api import HTTPError
 from datapane.client.api.dp_object import U
 
-
 code: str = """
 print("hello world")
 """
@@ -27,7 +26,7 @@ def gen_name(n=10):
     return f"Test_{''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=n))}"
 
 
-def gen_headline() -> str:
+def gen_description() -> str:
     return f"test - {uuid.uuid4().hex}"
 
 

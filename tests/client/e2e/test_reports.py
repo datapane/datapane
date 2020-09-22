@@ -10,14 +10,14 @@ from datapane.client import api
 from datapane.common.df_processor import convert_csv_pd
 
 from ..local.test_api import gen_report_simple, gen_report_with_files
-from .common import deletable, gen_df, gen_headline, gen_name
+from .common import deletable, gen_description, gen_df, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
 def test_report_simple():
     report = gen_report_simple()
-    report.publish(name="TEST", headline="HEADLINE")
+    report.publish(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
@@ -26,14 +26,14 @@ def test_report_with_single_file(datadir: Path):
     report = gen_report_with_files(datadir, single_file=True)
     # Test we can save then publish
     report.save(str(datadir / "test_report.html"))
-    report.publish(name="TEST", headline="HEADLINE")
+    report.publish(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_with_files(datadir)
-    report.publish(name="TEST", headline="HEADLINE")
+    report.publish(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
@@ -41,7 +41,7 @@ def test_report_with_files(datadir: Path):
 def test_report(tmp_path: Path):
     df = gen_df()
     name = gen_name()
-    headline = gen_headline()
+    description = gen_description()
 
     # create a basic report
     m = dp.Markdown("hello world!!")
@@ -60,11 +60,11 @@ def test_report(tmp_path: Path):
     list_asset = dp.File(data=lis, is_json=True)
     df_asset = dp.Table(df=df, caption="Our Dataframe")
     dp_report = api.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
-    dp_report.publish(name=name, headline=headline)
+    dp_report.publish(name=name, description=description)
 
     with deletable(dp_report):
         # are the fields ok
-        assert dp_report.headline == headline
+        assert dp_report.description == description
         assert len(dp_report.top_block.blocks) == 6
 
         # NOTE - Asset objects no longer exists - thus below tests can't be supported

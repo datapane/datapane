@@ -41,10 +41,9 @@
             <param name="maxLength">127</param>
           </data>
         </element>
-        <element name="Headline">
+        <element name="Description">
           <data type="string">
-            <param name="minLength">1</param>
-            <param name="maxLength">1024</param>
+            <param name="maxLength">10240</param>
           </data>
         </element>
       </interleave>

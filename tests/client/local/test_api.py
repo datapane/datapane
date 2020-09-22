@@ -73,7 +73,9 @@ def gen_report_with_files(datadir: Path, single_file: bool = False) -> dp.Report
 
 def test_gen_report_simple():
     report = gen_report_simple()
-    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+    report_str, attachments = report._gen_report(
+        embedded=False, title="TITLE", description="DESCRIPTION"
+    )
 
     # print(report_str)
     assert len(attachments) == 0
@@ -86,7 +88,9 @@ def test_gen_report_simple():
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_with_files(datadir)
-    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+    report_str, attachments = report._gen_report(
+        embedded=False, title="TITLE", description="DESCRIPTION"
+    )
 
     # print(report_str)
     assert len(attachments) == 5

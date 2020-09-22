@@ -392,13 +392,12 @@ def report():
 @report.command()
 @click.argument("name")
 @click.argument("files", type=click.Path(), nargs=-1, required=True)
-@click.option("--headline", default="Untitled")
 @click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
-def create(files: Tuple[str], name: str, headline: str, visibility: str):
+def create(files: Tuple[str], name: str, visibility: str):
     """Create a Report from the provided FILES"""
     blocks = [api.Asset.upload_file(file=Path(f)) for f in files]
     r = api.Report(*blocks)
-    r.publish(name=name, headline=headline, visibility=visibility)
+    r.publish(name=name, visibility=visibility)
     success_msg(f"Created Report {r.web_url}")
 
 

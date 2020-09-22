@@ -11,4 +11,4 @@ if dp.on_datapane:
 if __name__ == "__datapane__":  # same as dp.by_datapane
     print("by datapane")
     report = dp.Report(blocks=blocks)
-    report.publish(name="dp_report", headline="My Report")
+    report.publish(name="dp_report", description="Description")

@@ -18,7 +18,7 @@ Meta = element Meta {
   element Author { xsd:string { minLength = "1" maxLength = "127" } } &
   element CreatedOn { xsd:dateTime } &
   element Title { xsd:string { minLength = "1" maxLength = "127" } } &
-  element Headline { xsd:string { minLength = "1" maxLength = "1024" } }
+  element Description { xsd:string { maxLength = "10240" } }
 }
 
 block_id = attribute id { xsd:ID }

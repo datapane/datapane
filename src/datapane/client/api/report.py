@@ -297,7 +297,9 @@ class Report(BEObjectRef):
         else:
             self.top_block = Blocks(blocks=_blocks)
 
-    def _gen_report(self, embedded: bool, title: str, headline: str) -> t.Tuple[str, t.List[Path]]:
+    def _gen_report(
+        self, embedded: bool, title: str, description: str
+    ) -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Blocks to XML
         s = BuilderState(embedded)
@@ -310,7 +312,7 @@ class Report(BEObjectRef):
                 E.Author("Anonymous"),  # TODO - get username from config?
                 E.CreatedOn(timestamp()),
                 E.Title(title),
-                E.Headline(headline),
+                E.Description(description),
             ),
             E.Main(*_s.elements),
             version="1",
@@ -329,12 +331,17 @@ class Report(BEObjectRef):
         log.info(report_str)
         return (report_str, _s.attachments)
 
-    def publish(self, name: str, headline: str = "Untitled", open: bool = False, **kwargs):
+    def publish(
+        self, name: str, description: str = "", open: bool = False, tags: list = None, **kwargs
+    ):
         """Deploy the report and its Assets to Datapane"""
+        tags = tags or []
         print("Publishing report and associated data - please wait..")
-        kwargs.update(name=name, headline=headline)
+        kwargs.update(name=name, description=description, tags=tags)
 
-        report_str, attachments = self._gen_report(embedded=False, title=name, headline=headline)
+        report_str, attachments = self._gen_report(
+            embedded=False, title=name, description=description
+        )
         res = Resource(self.endpoint).post_files(
             dict(attachments=attachments), document=report_str, **kwargs
         )
@@ -349,11 +356,13 @@ class Report(BEObjectRef):
             webbrowser.open_new_tab(self.web_url)
         print(f"Report successfully published at {self.web_url}")
 
-    def save(self, path: str, headline: str = "Local Report", open: bool = False, **kwargs):
+    def save(self, path: str, open: bool = False, **kwargs):
         """Save the report to a local HTML file"""
         self.last_saved = path
 
-        local_doc, _ = self._gen_report(embedded=True, title="Local Report", headline=headline)
+        local_doc, _ = self._gen_report(
+            embedded=True, title="Local Report", description="Description"
+        )
 
         self.local_writer.write(local_doc, path)
 
