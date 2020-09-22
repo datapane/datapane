@@ -47,6 +47,37 @@ def gen_report_simple() -> dp.Report:
     )
 
 
+def gen_report_nested_mixed() -> dp.Report:
+    return dp.Report(
+        dp.Blocks(
+            dp.Markdown(text="# Test markdown block <hello/> \n Test **content**", id="test-id-1"),
+            "Simple string Markdown",
+        ),
+        "Simple string Markdown #2",
+    )
+
+
+def gen_report_nested_blocks() -> dp.Report:
+    return dp.Report(
+        blocks=[
+            dp.Blocks(
+                dp.Markdown(
+                    text="# Test markdown block <hello/> \n Test **content**", id="test-id-1"
+                ),
+                "Simple string Markdown",
+            ),
+            dp.Blocks(
+                blocks=[
+                    dp.Markdown(
+                        text="# Test markdown block <hello/> \n Test **content**", id="test-id-2"
+                    ),
+                    "Simple string Markdown",
+                ]
+            ),
+        ]
+    )
+
+
 def gen_report_with_files(datadir: Path, single_file: bool = False) -> dp.Report:
     # Asset tests
     lis = [1, 2, 3]
@@ -66,7 +97,7 @@ def gen_report_with_files(datadir: Path, single_file: bool = False) -> dp.Report
     pivot_asset = dp.Table(df=df, caption="Test Dataframe PivotTable", can_pivot=True)
 
     if single_file:
-        return dp.Report(dp.Blocks([md_block, plot_asset]))
+        return dp.Report(dp.Blocks(blocks=[md_block, plot_asset]))
     else:
         return dp.Report(list_asset, img_asset, df_asset, md_block, plot_asset, pivot_asset)
 
@@ -79,10 +110,38 @@ def test_gen_report_simple():
 
     # print(report_str)
     assert len(attachments) == 0
+    assert len(report.top_block.blocks[0].blocks) == 2
+    assert isinstance(report.top_block.blocks[0].blocks[1], dp.Markdown)
+    assert report.top_block.blocks[0].blocks[0].id == "test-id-1"
+    assert report.top_block.blocks[0].blocks[1].id == "block-1"
+    assert validate_report_doc(xml_str=report_str)
+
+
+def test_gen_report_nested_mixed():
+    report = gen_report_nested_mixed()
+    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+
+    # print(report_str)
+    assert len(attachments) == 0
+    assert len(report.top_block.blocks[0].blocks) == 2
+    assert isinstance(report.top_block.blocks[0].blocks[0], dp.Blocks)
+    assert isinstance(report.top_block.blocks[0].blocks[1], dp.Markdown)
+    assert report.top_block.blocks[0].blocks[0].blocks[0].id == "test-id-1"
+    assert validate_report_doc(xml_str=report_str)
+
+
+def test_gen_report_nested_blocks():
+    report = gen_report_nested_blocks()
+    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+
+    # print(report_str)
+    assert len(attachments) == 0
+    # No additional wrapper block
     assert len(report.top_block.blocks) == 2
-    assert report.top_block.blocks[0].id == "test-id-1"
-    assert report.top_block.blocks[1].id == "block-2"
-    assert isinstance(report.top_block.blocks[1], dp.Markdown)
+    assert isinstance(report.top_block.blocks[0], dp.Blocks)
+    assert isinstance(report.top_block.blocks[1], dp.Blocks)
+    assert isinstance(report.top_block.blocks[1].blocks[1], dp.Markdown)
+    assert report.top_block.blocks[0].blocks[0].id == "test-id-1"
     assert validate_report_doc(xml_str=report_str)
 
 

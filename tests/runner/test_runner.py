@@ -120,7 +120,7 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
         (rc_args, rc_kwargs) = rc.call_args
         assert rc_kwargs["description"] == "Description"
         _r: dp.Report = rc_args[0]
-        _blocks = _r.top_block.blocks
+        _blocks = _r.top_block.blocks[0].blocks
         assert isinstance(_blocks, list)
         assert len(_blocks) == 2
         assert val in _blocks[0].text

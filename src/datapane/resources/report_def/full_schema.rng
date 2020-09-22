@@ -49,18 +49,30 @@
       </interleave>
     </element>
   </define>
-  <define name="block_id">
-    <attribute name="id">
-      <data type="ID"/>
-    </attribute>
-  </define>
-  <!-- TODO - layout -->
   <define name="Main">
     <element name="Main">
       <oneOrMore>
         <ref name="Blocks"/>
       </oneOrMore>
+      <attribute name="full_width">
+        <data type="boolean"/>
+      </attribute>
     </element>
+  </define>
+  <!-- TODO - we shuold only allow Blocks and Tabs at top-level, i.e. 2-level recursion -->
+  <define name="block_id">
+    <attribute name="id">
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="blocks_attributes">
+    <ref name="block_id"/>
+    <attribute name="rows">
+      <data type="nonNegativeInteger"/>
+    </attribute>
+    <attribute name="columns">
+      <data type="nonNegativeInteger"/>
+    </attribute>
   </define>
   <define name="Blocks">
     <choice>
@@ -69,7 +81,7 @@
       <ref name="Plot"/>
       <ref name="Table"/>
       <element name="Blocks">
-        <ref name="block_id"/>
+        <ref name="blocks_attributes"/>
         <oneOrMore>
           <ref name="Blocks"/>
         </oneOrMore>

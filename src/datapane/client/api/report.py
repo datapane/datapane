@@ -20,7 +20,7 @@ from lxml.etree import Element
 from datapane.common import NPath, guess_type, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from .common import DPTmpFile, Resource, do_download_file
+from .common import DPException, DPTmpFile, Resource, do_download_file
 from .dp_object import BEObjectRef, UploadableObjectMixin
 from .runtime import _report
 
@@ -68,14 +68,14 @@ class ReportFileWriter:
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template("template.html")
 
-    def write(self, report_doc: str, path: str):
+    def write(self, report_doc: str, path: str, full_width: bool):
         # create template on demand
         if not self.template:
             self._setup_template()
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
-        r = self.template.render(report_doc=report_doc_esc)
+        r = self.template.render(report_doc=report_doc_esc, full_width=full_width)
         Path(path).write_text(r, encoding="utf-8")
 
 
@@ -106,23 +106,32 @@ class BuilderState:
 
 ################################################################################
 # API Blocks
+def _conv_attrib(v) -> str:
+    """Convert a value to a str for use as an ElementBuilder attribute"""
+    # TODO - use a proper serialisation framework here / lxml features
+    v1 = str(v)
+    return v1.lower() if isinstance(v, bool) else v1
+
+
 class ReportBlock(ABC):
     attributes: t.Dict[str, str]
     tag: str
     id: t.Optional[str] = None
 
-    def _conv_attrib(self, v) -> str:
-        # TODO - use a proper serialisation framework here / lxml features
-        v1 = str(v)
-        return v1.lower() if isinstance(v, bool) else v1
-
     def __init__(self, id: str = None, **kwargs):
         self.id = str(id) if id else f"block-{next(id_count)}"
-        self.attributes = {str(k): self._conv_attrib(v) for (k, v) in kwargs.items()}
+        self.attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items()}
 
     @abstractmethod
     def to_xml(self, s: BuilderState) -> BuilderState:
         ...
+
+
+BlockOrStr = t.Union[ReportBlock, str]
+
+
+class BlockLayoutException(DPException):
+    ...
 
 
 class Blocks(ReportBlock):
@@ -134,10 +143,30 @@ class Blocks(ReportBlock):
     tag = "Blocks"
     blocks: t.List[ReportBlock] = None
 
-    def __init__(self, blocks: t.List[ReportBlock], id: str = None):
-        super().__init__(id=id)
+    def __init__(
+        self,
+        *arg_blocks: BlockOrStr,
+        blocks: t.List[BlockOrStr] = None,
+        id: str = None,
+        rows: int = 0,
+        columns: int = 1,
+    ):
         # wrap str in Markdown block
-        self.blocks = [(Markdown(b) if isinstance(b, str) else b) for b in blocks]
+        _blocks = blocks or list(arg_blocks)
+        self.blocks = [(Markdown(b) if isinstance(b, str) else b) for b in _blocks]
+
+        # set row/column handling
+        if rows == 1 and columns == 1:
+            raise BlockLayoutException("Can't set both rows and columns to 1")
+        if rows == 0 and columns == 0:
+            raise BlockLayoutException("Can't set both rows and columns to 0")
+        if rows > 0 and columns > 0 and len(_blocks) > rows * columns:
+            raise BlockLayoutException("Too many blocks for given rows & columns")
+        if rows > 0 and columns == 1:
+            # if user has set rows and not changed columns, convert columns to auto-flow mode
+            columns = 0
+
+        super().__init__(id=id, rows=rows, columns=columns)
 
     def to_xml(self, s: BuilderState) -> BuilderState:
         # recurse into the elements and pull them out
@@ -146,7 +175,7 @@ class Blocks(ReportBlock):
         _s1: BuilderState = dc.replace(s, elements=[])
         _s2: BuilderState = reduce(lambda _s, x: x.to_xml(_s), self.blocks, _s1)
         _s3: BuilderState = dc.replace(_s2, elements=s.elements)
-        _s3.add_element(self, E.Blocks(*_s2.elements))
+        _s3.add_element(self, E.Blocks(*_s2.elements, **self.attributes))
         return _s3
 
 
@@ -287,15 +316,20 @@ class Report(BEObjectRef):
     last_saved: t.Optional[str] = None  # Path to local report
     tmp_report: t.Optional[Path] = None  # Temp local report
     local_writer = ReportFileWriter()
+    full_width: bool = False
 
-    def __init__(self, *arg_blocks: ReportBlock, blocks: t.List[ReportBlock] = None):
+    def __init__(
+        self, *arg_blocks: BlockOrStr, blocks: t.List[BlockOrStr] = None, full_width: bool = False
+    ):
         super().__init__()
-        # wrap blocks into single Blocks element, unless it already is one
+        self.full_width = full_width
+        # wrap blocks within a single Blocks root element during generation
         _blocks = blocks or list(arg_blocks)
-        if len(_blocks) == 1 and isinstance(_blocks[0], Blocks):
-            self.top_block = t.cast(Blocks, _blocks[0])
-        else:
+        if all(isinstance(b, Blocks) for b in _blocks):
             self.top_block = Blocks(blocks=_blocks)
+        else:
+            # add additional top-level Blocks element to group mixed elements
+            self.top_block = Blocks(blocks=[Blocks(blocks=_blocks)])
 
     def _gen_report(
         self, embedded: bool, title: str, description: str
@@ -305,6 +339,8 @@ class Report(BEObjectRef):
         s = BuilderState(embedded)
         _s = self.top_block.to_xml(s)
         assert len(_s.elements) == 1
+        # unwrap blocks from top_block
+        _top_blocks: t.List[Element] = _s.elements[0].getchildren()
 
         # add main structure and Meta
         report_doc: Element = E.Report(
@@ -314,7 +350,7 @@ class Report(BEObjectRef):
                 E.Title(title),
                 E.Description(description),
             ),
-            E.Main(*_s.elements),
+            E.Main(*_top_blocks, full_width=_conv_attrib(self.full_width)),
             version="1",
         )
         report_doc.set("{http://www.w3.org/XML/1998/namespace}id", f"_{uuid.uuid4().hex}")
@@ -364,7 +400,7 @@ class Report(BEObjectRef):
             embedded=True, title="Local Report", description="Description"
         )
 
-        self.local_writer.write(local_doc, path)
+        self.local_writer.write(local_doc, path, self.full_width)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"

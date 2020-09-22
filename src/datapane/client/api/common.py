@@ -96,11 +96,15 @@ def cleanup_tmp():
 
 
 ################################################################################
-class IncompatibleVersionException(Exception):
+class DPException(Exception):
     ...
 
 
-class UnsupportedResourceException(Exception):
+class IncompatibleVersionException(DPException):
+    ...
+
+
+class UnsupportedResourceException(DPException):
     ...
 
 

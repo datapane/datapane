@@ -21,12 +21,17 @@ Meta = element Meta {
   element Description { xsd:string { maxLength = "10240" } }
 }
 
+Main = element Main { Blocks+, attribute full_width { xsd:boolean } }
+
+# TODO - we shuold only allow Blocks and Tabs at top-level, i.e. 2-level recursion
 block_id = attribute id { xsd:ID }
 
-# TODO - layout
-Main = element Main { Blocks+ }
+blocks_attributes =
+  block_id,
+  attribute rows { xsd:nonNegativeInteger },
+  attribute columns { xsd:nonNegativeInteger }
 
-Blocks = (Text | File | Plot | Table | element Blocks { block_id, Blocks+ })
+Blocks = (Text | File | Plot | Table | element Blocks { blocks_attributes, Blocks+ })
 
 # Markdown Text
 Text = element Text {

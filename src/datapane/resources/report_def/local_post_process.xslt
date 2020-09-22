@@ -18,6 +18,8 @@
   <xsl:template match="comment()"/>
 
   <!-- Drop blocks if embedded -->
+  <!-- Disabled for now as local report rendering handles Blocks -->
+  <!--
   <xsl:template match="/Report/Main//Blocks">
     <xsl:choose>
       <xsl:when test="$embedded">
@@ -25,7 +27,6 @@
       </xsl:when>
 
       <xsl:otherwise>
-        <!-- <xsl:copy-of select="."/>-->
         <xsl:copy>
           <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
@@ -33,5 +34,6 @@
     </xsl:choose>
 
   </xsl:template>
+  -->
 
 </xsl:stylesheet>
