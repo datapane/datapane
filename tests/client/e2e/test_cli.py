@@ -32,6 +32,7 @@ def test_auth(runner: CliRunner):
     assert "Logged out" in result.output
 
 
+@pytest.mark.org
 @pytest.mark.timeout(5 * 60)  # allow 5m
 def test_cli_script(runner: CliRunner, tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)

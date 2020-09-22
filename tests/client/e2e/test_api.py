@@ -7,6 +7,7 @@ from .common import deletable, gen_name
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
+@pytest.mark.org
 def test_variable():
     test_value = "test_var_value"
 

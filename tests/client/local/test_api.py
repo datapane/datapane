@@ -119,7 +119,9 @@ def test_gen_report_simple():
 
 def test_gen_report_nested_mixed():
     report = gen_report_nested_mixed()
-    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+    report_str, attachments = report._gen_report(
+        embedded=False, title="TITLE", description="DESCRIPTION"
+    )
 
     # print(report_str)
     assert len(attachments) == 0
@@ -132,7 +134,9 @@ def test_gen_report_nested_mixed():
 
 def test_gen_report_nested_blocks():
     report = gen_report_nested_blocks()
-    report_str, attachments = report._gen_report(embedded=False, title="TITLE", headline="HEADLINE")
+    report_str, attachments = report._gen_report(
+        embedded=False, title="TITLE", description="DESCRIPTION"
+    )
 
     # print(report_str)
     assert len(attachments) == 0

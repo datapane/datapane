@@ -18,6 +18,7 @@ visibility = "PUBLIC"
 
 
 # TODO - split these tests out and add export
+@pytest.mark.org
 def test_blob_df():
     name = gen_name()
 
@@ -47,6 +48,7 @@ def test_blob_df():
         assert b3.name == b2.name
 
 
+@pytest.mark.org
 def test_blob_csv(tmp_path: Path):
     # upload a csv file
     # TODO - use df_processor?
@@ -67,6 +69,7 @@ def test_blob_csv(tmp_path: Path):
         check_df_equal(df, df2)
 
 
+@pytest.mark.org
 def test_blob_file(tmp_path: Path):
     # upload plain text
     fn = tmp_path / "initial.py"
@@ -80,6 +83,7 @@ def test_blob_file(tmp_path: Path):
         assert code1 == code
 
 
+@pytest.mark.org
 def test_blob_json(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     obj = {"foo": "bar"}
@@ -97,6 +101,7 @@ def test_blob_json(tmp_path: Path, monkeypatch):
         assert obj == b3.download_obj()
 
 
+@pytest.mark.org
 def test_blob_plot(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     # upload mpl figure

@@ -14,6 +14,7 @@ from .common import deletable, gen_name
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
+@pytest.mark.org
 def test_script_basic(shared_datadir: Path, monkeypatch):
     """Deploying and running a basic report-generating script"""
     monkeypatch.chdir(shared_datadir)
@@ -61,6 +62,7 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
             assert s1.cron == cron2
 
 
+@pytest.mark.org
 def test_script_complex(shared_datadir: Path, monkeypatch):
     """Deploy and run a complex script with no report and multiple params"""
     monkeypatch.chdir(shared_datadir)
@@ -96,6 +98,7 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         assert "SAMPLE OUTPUT" in run.output
 
 
+@pytest.mark.org
 def test_script_complex_report(shared_datadir: Path, monkeypatch):
     """
     Deploy and run a complex script that generates a complex report
@@ -120,6 +123,7 @@ def test_script_complex_report(shared_datadir: Path, monkeypatch):
         assert report.num_blocks == 11
 
 
+@pytest.mark.org
 def test_run_linked_script():
     """Test running a code snippet calling other ones"""
     ...
