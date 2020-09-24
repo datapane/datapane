@@ -11,8 +11,20 @@
     <script>
       window.dpLocal = true;
     </script>
+    {% if standalone %}
+      <style>
+        {% include "local-report-base.css" %}
+      </style>
+      <script>
+        {{ include_raw("local-report-base.js") }}
+      </script>
+    {% else %}
+      <link href="{{ cdn_base }}/static/base.css" rel="stylesheet"/>
+      <link href="{{ cdn_base }}/static/report-base.css" rel="stylesheet"/>
+      <script src="{{ cdn_base }}/static/base.js"></script>
+      <script src="{{ cdn_base }}/static/report-base.js"></script>
+    {% endif %}
     <style>
-      {% include "local-report-base.css" %}
       body {
         background-color: #f4f5f7;
       }
@@ -28,7 +40,6 @@
       </div>
     </div>
     <script>
-      {{ include_raw("local-report-base.js") }}
       const report = { document: `{{ report_doc }}` };
       const { React, ReactDOM, ReportComponent } = UMDModules;
       const ReportFactory = React.createFactory(ReportComponent);

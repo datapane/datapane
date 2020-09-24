@@ -68,14 +68,19 @@ class ReportFileWriter:
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template("template.html")
 
-    def write(self, report_doc: str, path: str, full_width: bool):
+    def write(self, report_doc: str, path: str, full_width: bool, standalone: bool):
         # create template on demand
         if not self.template:
             self._setup_template()
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
-        r = self.template.render(report_doc=report_doc_esc, full_width=full_width)
+        r = self.template.render(
+            report_doc=report_doc_esc,
+            full_width=full_width,
+            standalone=standalone,
+            cdn_base="https://datapane.com",
+        )
         Path(path).write_text(r, encoding="utf-8")
 
 
@@ -392,7 +397,13 @@ class Report(BEObjectRef):
             webbrowser.open_new_tab(self.web_url)
         print(f"Report successfully published at {self.web_url}")
 
-    def save(self, path: str, open: bool = False, **kwargs):
+    def save(
+        self,
+        path: str,
+        open: bool = False,
+        standalone: bool = False,
+        **kwargs,
+    ):
         """Save the report to a local HTML file"""
         self.last_saved = path
 
@@ -400,7 +411,7 @@ class Report(BEObjectRef):
             embedded=True, title="Local Report", description="Description"
         )
 
-        self.local_writer.write(local_doc, path, self.full_width)
+        self.local_writer.write(local_doc, path, self.full_width, standalone)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
