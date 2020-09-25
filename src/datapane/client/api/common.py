@@ -184,7 +184,7 @@ class Resource:
             and url_parts[1] not in public_endpoints
         ):
             raise UnsupportedResourceException(
-                f"Invalid Operation: {url_parts[1].title()} are not available on public datapane."
+                f"{url_parts[1].title()} are part of Datapane for Teams."
             )
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
