@@ -3,7 +3,6 @@ from pathlib import Path
 from click.testing import CliRunner, Result
 
 from datapane.client.commands import cli, process_cmd_param_vals
-from datapane.common.utils import pushd
 
 # TODO
 #  - add tests for other commands
@@ -18,12 +17,19 @@ def handle_res(r: Result):
     assert r.exit_code == 0
 
 
-def test_init(tmp_path: Path):
+def test_report_init(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
     runner = CliRunner()
+    result = runner.invoke(cli, ["-vv", "report", "init"])
+    handle_res(result)
 
-    with pushd(tmp_path):
-        result = runner.invoke(cli, ["-vv", "script", "init"])
 
+def test_script_init(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["-vv", "script", "init"])
     handle_res(result)
 
 

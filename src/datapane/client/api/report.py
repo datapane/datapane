@@ -20,7 +20,8 @@ from lxml.etree import Element
 from datapane.common import NPath, guess_type, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from .common import DPException, DPTmpFile, Resource, do_download_file
+from ..utils import DPException
+from .common import DPTmpFile, Resource, do_download_file
 from .dp_object import BEObjectRef, UploadableObjectMixin
 from .runtime import _report
 
@@ -40,7 +41,7 @@ def include_raw(ctx, name):
 def is_jupyter():
     """Checks if inside ipython shell inside browser"""
     return (
-        "get_ipython" in __builtins__
+        hasattr(__builtins__, "get_ipython")
         and get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
     )
 

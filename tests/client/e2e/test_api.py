@@ -1,3 +1,4 @@
+"""General API tests"""
 import pytest
 
 import datapane as dp
@@ -5,6 +6,11 @@ import datapane as dp
 from .common import deletable, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
+
+
+def test_login_fixture():
+    """Test that the fixture-based login, using config object, works"""
+    dp.ping()
 
 
 @pytest.mark.org

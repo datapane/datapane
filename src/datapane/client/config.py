@@ -1,14 +1,18 @@
 import dataclasses as dc
 import typing as t
+import webbrowser
 from contextlib import contextmanager
 from pathlib import Path
 from typing import ContextManager, Dict, Optional
 
 import click
 import dacite
+from furl import furl
 from ruamel.yaml import YAML
 
 from datapane import log
+
+from .utils import InvalidToken
 
 APP_NAME = "datapane"
 APP_DIR = Path(click.get_app_dir(APP_NAME))
@@ -25,7 +29,7 @@ server: {DEFAULT_SERVER}
 # API token - copy and paste from https://server/settings/
 token: {DEFAULT_TOKEN}
 # analytics - set to true to send usage and error reporting
-analytics: False
+analytics: false
 """
 
 
@@ -45,6 +49,7 @@ class Config:
 
 # TODO - wrap into a singleton object that includes callable?
 config: Optional[Config] = None
+last_config_env: Optional[str] = None
 
 
 def set_config(c: Optional[Config]):
@@ -57,23 +62,46 @@ def get_config() -> Config:
     return config
 
 
+def check_get_config() -> Config:
+    """Attempt to get a config object, reloading if necessary"""
+    global config
+    if config and config.token == DEFAULT_TOKEN:
+        # try reinit, as may have ran login in another terminal/subprocess
+        global last_config_env
+        init(last_config_env)
+        if config.token == DEFAULT_TOKEN:
+            # still don't have a token set for the env, open up the browser
+            f = furl(path="/home/", origin=config.server)
+            webbrowser.open(url=str(f), new=2)
+            raise InvalidToken(
+                "Please sign-up and login - if you already have then please restart your Jupyter kernel/Python instance to initialize your new token"
+            )
+    return config
+
+
 @contextmanager
 def update_config(config_env: str) -> ContextManager[Dict]:
-    """Update config file without losing comments"""
+    """Update config file without losing comments and reinit in-memory config"""
     config_f = get_config_file(config_env)
     yaml = YAML()
 
-    with config_f.open("r") as inp:
-        code = yaml.load(inp)
+    with config_f.open("r") as f:
+        code = yaml.load(f)
 
     yield code
 
     with config_f.open("w") as f:
         yaml.dump(code, f)
 
+    # reinit if already in process
+    init(config_env=config_env)
+
 
 def load_from_envfile(config_env: str) -> Path:
     """Init the cmd-line env"""
+    global last_config_env
+    last_config_env = config_env
+
     config_f = get_config_file(config_env)
     yaml = YAML()
 
@@ -91,10 +119,7 @@ def load_from_envfile(config_env: str) -> Path:
     return config_f
 
 
-def init(
-    config_env: str = "default",
-    config: t.Optional[Config] = None,
-):
+def init(config_env: str = "default", config: t.Optional[Config] = None):
     """Init an API config - this MUST handle being called multiple times"""
     if get_config() is not None:
         log.debug("Reinitialising client config")

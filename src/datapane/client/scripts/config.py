@@ -163,9 +163,9 @@ def extract_py_notebook(in_file: Path) -> str:
     """Extract the python code from a given notebook"""
     # we use config for importing
     c = TConfig()
-    c.PythonExporter.preprocessors = []
+    # c.PythonExporter.preprocessors = []
     # load the notebook
-    notebook: nbformat.NotebookNode = nbformat.read(str(in_file), as_version=4)
+    notebook: nbformat.NotebookNode = nbformat.read(str(in_file), as_version=nbformat.NO_CONVERT)
     # TODO - any preprocessing here
     # convert it
     conv = nbconvert.PythonExporter(config=c)
@@ -174,4 +174,14 @@ def extract_py_notebook(in_file: Path) -> str:
     # write the notebook
     # writer = nbconvert.writers.FilesWriter()
     # writer.write(body, resources, "output_notebook")
-    return body
+
+    # TODO - use nbconvert jinja support once v6 supports custom templates properly
+    # postprocess body
+    # we need to mock get_ipython as nbconvert doesn't comment it out
+    header = """# inject get_ipython mock for magic functions
+from unittest.mock import Mock
+get_ipython = Mock()
+"""
+
+    script = header + body
+    return script

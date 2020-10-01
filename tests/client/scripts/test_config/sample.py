@@ -1,8 +1,13 @@
+# inject get_ipython mock for magic functions
+from unittest.mock import Mock
+get_ipython = Mock()
 #!/usr/bin/env python
 # coding: utf-8
 
 # In[89]:
 
+
+get_ipython().run_line_magic('matplotlib', 'inline')
 
 """Sample notebook"""
 import pandas as pd

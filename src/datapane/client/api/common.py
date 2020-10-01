@@ -22,7 +22,12 @@ from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import TEST_ENV, __version__
 from datapane.client import config as c
-from datapane.common import JSON, MIME, NPath, SDict, guess_type
+from datapane.client.utils import (
+    IncompatibleVersionException,
+    UnsupportedResourceException,
+    failure_msg,
+)
+from datapane.common import JSON, MIME, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
 ################################################################################
@@ -87,27 +92,15 @@ class DPTmpFile:
 @atexit.register
 def cleanup_tmp():
     """Ensure we cleanup the tmp_dir on Python VM exit"""
-    log.debug(f"Removing current session DP tmp work dir {tmp_dir}")
+    # log.debug(f"Removing current session DP tmp work dir {tmp_dir}")
     shutil.rmtree(tmp_dir, ignore_errors=True)
     # try remove cache_dir if empty
     with suppress(OSError):
         cache_dir.rmdir()
-        log.debug("Removed empty dp-cache dir")
+        # log.debug("Removed empty dp-cache dir")
 
 
 ################################################################################
-class DPException(Exception):
-    ...
-
-
-class IncompatibleVersionException(DPException):
-    ...
-
-
-class UnsupportedResourceException(DPException):
-    ...
-
-
 def check_pip_version() -> None:
     cli_version = Version(__version__)
     url = "https://pypi.org/pypi/datapane/json"
@@ -126,6 +119,28 @@ def check_pip_version() -> None:
     raise IncompatibleVersionException(error_msg)
 
 
+def _process_res(r: Response, empty_ok: bool = False) -> JSON:
+    if not r.ok:
+        # check if upgrade is required
+        if r.status_code == 426:
+            check_pip_version()
+        elif r.status_code == 401:
+            failure_msg(
+                f"Couldn't successfully connect to {c.config.server}, please check your login details"
+            )
+        else:
+            try:
+                log.error(pprint.pformat(r.json()))
+            except ValueError:
+                log.error(pprint.pformat(r.text))
+    r.raise_for_status()
+    if empty_ok and not r.content:
+        r_data = {}
+    else:
+        r_data = r.json()
+    return munchify(r_data) if isinstance(r_data, dict) else r_data
+
+
 FileList = t.Dict[str, t.List[Path]]
 
 
@@ -140,38 +155,15 @@ class Resource:
     session = requests.Session()
     timeout = None if TEST_ENV else (3.05, 27)
 
-    def __init__(self, endpoint: str, config: t.Optional[c.Config] = None):
-
+    def __init__(self, endpoint: str):
         self.endpoint = endpoint.split("/api", maxsplit=1)[-1]
-        # NOTE - changing config isn't threadsafe
-        self.config = config or c.config
-        self.url = up.urljoin(self.config.server, f"api{self.endpoint}")
+        config = c.check_get_config()
+        self.url = up.urljoin(config.server, f"api{self.endpoint}")
         # check if access to the resource is allowed
         self._check_endpoint(self.url)
         self.session.headers.update(
-            Authorization=f"Token {self.config.token}", Datapane_API_Version=__version__
+            Authorization=f"Token {config.token}", Datapane_API_Version=__version__
         )
-
-    def _process_res(self, r: Response, empty_ok: bool = False) -> JSON:
-        if not r.ok:
-            # check if upgrade is required
-            if r.status_code == 426:
-                check_pip_version()
-            elif r.status_code == 403 and self.config.token == c.DEFAULT_TOKEN:
-                log.error(
-                    "Permission error - please rerun `dp.init()` or restart your Python/Jupyter instance"
-                )
-            else:
-                try:
-                    log.error(pprint.pformat(r.json()))
-                except ValueError:
-                    log.error(pprint.pformat(r.text))
-        r.raise_for_status()
-        if empty_ok and not r.content:
-            r_data = {}
-        else:
-            r_data = r.json()
-        return munchify(r_data) if isinstance(r_data, dict) else r_data
 
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the public datapane
@@ -190,7 +182,7 @@ class Resource:
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()
         r = self.session.post(self.url, json=data, params=params, timeout=self.timeout)
-        return self._process_res(r)
+        return _process_res(r)
 
     def post_files(self, files: FileList, **data: JSON) -> JSON:
         # upload files using custom json-data protocol
@@ -237,20 +229,20 @@ class Resource:
                 r = self.session.post(self.url, data=m, headers=extra_headers, timeout=self.timeout)
         else:
             r = self.session.post(self.url, data=e, headers=extra_headers, timeout=self.timeout)
-        return self._process_res(r)
+        return _process_res(r)
 
     def get(self, **params) -> JSON:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
-        return self._process_res(r)
+        return _process_res(r)
 
     def patch(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()
         r = self.session.patch(self.url, json=data, params=params, timeout=self.timeout)
-        return self._process_res(r)
+        return _process_res(r)
 
     def delete(self) -> None:
         r = self.session.delete(self.url, timeout=self.timeout)
-        self._process_res(r, empty_ok=True)
+        _process_res(r, empty_ok=True)
 
     @contextmanager
     def nest_endpoint(self, endpoint: str) -> t.ContextManager["Resource"]:
@@ -279,9 +271,3 @@ def do_download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
             for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
                 f.write(chunk)
     return fn
-
-
-def check_login(config=None, cli_login: bool = False) -> SDict:
-    r = Resource(endpoint="/settings/details/", config=config).get(cli_login=cli_login)
-    log.debug(f"Connected successfully to DP Server as {r.username}")
-    return t.cast(SDict, r)

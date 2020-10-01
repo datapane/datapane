@@ -28,7 +28,7 @@ def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = N
     _setup_dp_logging(verbosity=verbosity, logs_stream=logs)
     c.init(config=config)
     # check can login/ping
-    api.check_login()
+    api.ping(config=config)
     log.debug("Running DP on DP")
 
 

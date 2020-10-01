@@ -102,5 +102,5 @@ target-version = ['py38']
 
 # FOR PEP-517/518
 [build-system]
-requires = ["poetry>=1.0.0"]
+requires = ["poetry>=1.0.0,<1.1.0"]
 build-backend = "poetry.masonry.api"

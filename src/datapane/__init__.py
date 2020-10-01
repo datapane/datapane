@@ -34,7 +34,10 @@ from .client.api import (
     Table,
     Variable,
     by_datapane,
+    login,
+    logout,
     on_datapane,
+    ping,
 )
 from .client.config import init
 

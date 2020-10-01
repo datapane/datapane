@@ -22,8 +22,9 @@ from datapane.common import JDict, SDict, _setup_dp_logging, log
 
 from . import api
 from . import config as c
-from . import scripts
+from . import scripts, utils
 from .scripts import config as sc
+from .utils import failure_msg, success_msg
 
 EXTRA_OUT: bool = False
 
@@ -52,20 +53,6 @@ class DPContext:
     env: str
 
 
-def success_msg(msg: str):
-    click.secho(msg, fg="green")
-
-
-def failure_msg(msg: str, do_exit: bool = False):
-    click.secho(msg, fg="red")
-    if do_exit:
-        ctx: click.Context = click.get_current_context(silent=True)
-        if ctx:
-            ctx.exit(2)
-        else:
-            exit(2)
-
-
 @contextmanager
 def api_error_handler(err_msg: str):
     try:
@@ -87,11 +74,11 @@ def print_table(xs: t.Iterable[SDict], obj_name: str, showindex: bool = True) ->
     print(tabulate(xs, headers="keys", showindex=showindex))
 
 
-class CatchIncompatibleVersion(click.Group):
+class GlobalCommandHandler(click.Group):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
-        except api.IncompatibleVersionException as exc:
+        except utils.IncompatibleVersionException as exc:
             if EXTRA_OUT:
                 log.exception(exc)
             failure_msg(str(exc))
@@ -107,7 +94,7 @@ class CatchIncompatibleVersion(click.Group):
 
 ###############################################################################
 # Main
-@click.group(cls=CatchIncompatibleVersion)
+@click.group(cls=GlobalCommandHandler)
 @click.option(
     "-v",
     "--verbose",
@@ -129,41 +116,27 @@ def cli(ctx, verbose: int, env: str):
 # Auth
 @cli.command()
 @click.option("--token", prompt="Your API Token", help="API Token to the Datapane server.")
-@click.option("--server", default="https://datapane.com", help="Datapane API Server URL.")
+@click.option("--server", default=c.DEFAULT_SERVER, help="Datapane API Server URL.")
 @click.pass_obj
 def login(obj: DPContext, token, server):
     """Login to a server with the given API token."""
-    config = c.Config(server=server, token=token)
-    r = api.check_login(config=config, cli_login=True)
-
-    # update config with valid values
-    with c.update_config(obj.env) as x:
-        x["server"] = server
-        x["token"] = token
-
+    api.login(token, server, env=obj.env)
     # click.launch(f"{server}/settings/")
-    success_msg(f"Logged in to {server} as {r.username}")
 
 
 @cli.command()
 @click.pass_obj
 def logout(obj: DPContext):
     """Logout from the server and reset the API token in the config file."""
-    with c.update_config(obj.env) as x:
-        x["server"] = c.DEFAULT_SERVER
-        x["token"] = c.DEFAULT_TOKEN
-
-    success_msg(f"Logged out from {c.config.server}")
+    api.logout(obj.env)
 
 
 @cli.command()
 def ping():
     """Check can connect to the server."""
     try:
-        r = api.check_login()
-        success_msg(f"Connected to {c.config.server} as {r.username}")
+        api.ping()
     except HTTPError as e:
-        failure_msg(f"Couldn't successfully connect to {c.config.server}, check your login details")
         log.error(e)
 
 
@@ -207,7 +180,7 @@ def delete(name: str):
 
 
 @blob.command()
-def list():
+def blob_list():
     """List blobs"""
     print_table(api.Blob.list(), "Blobs")
 
@@ -220,10 +193,8 @@ def script():
     ...
 
 
-@script.command(name="init")
-@click.argument("name", default=lambda: os.path.basename(os.getcwd()))
-def script_init(name: str):
-    """Initialise a new script project"""
+def write_templates(scaffold_name: str, context: SDict):
+    """Write templates for the given local scaffold (TODO - support git repos)"""
     # NOTE - only supports single hierarchy project dirs
     env = Environment(loader=FileSystemLoader("."))
 
@@ -233,22 +204,29 @@ def script_init(name: str):
 
     # copy the scaffolds into the service
     def copy_scaffold() -> List[Path]:
-        dir_path = ir.files("datapane.resources") / "scaffold"
+        dir_path = ir.files("datapane.resources.templates") / scaffold_name
         copy_tree(dir_path, ".")
         return [Path(x.name) for x in dir_path.iterdir()]
 
+    # run the scripts
+    files = copy_scaffold()
+    for f in files:
+        if f.exists() and f.is_file():
+            render_file(f, context=context)
+
+
+@script.command(name="init")
+@click.argument("name", default=lambda: os.path.basename(os.getcwd()))
+def script_init(name: str):
+    """Initialise a new script project"""
     if sc.DATAPANE_YAML.exists():
-        raise ValueError("Found existing project, cancelling")
+        failure_msg("Found existing project, cancelling", do_exit=True)
 
     name = name.replace("-", "_")
     sc.validate_name(name)
-    files = copy_scaffold()
-
-    # run the scripts
     _context = dict(name=name)
-    for f in files:
-        if f.exists() and f.is_file():
-            render_file(f, context=_context)
+
+    write_templates("script", _context)
     success_msg(f"Created dp_script.py for project '{name}', edit as needed and upload")
 
 
@@ -304,7 +282,7 @@ def delete(name: str):
 
 
 @script.command()
-def list():
+def script_list():
     """List Scripts"""
     print_table(api.Script.list(), "Scripts")
 
@@ -402,6 +380,28 @@ def report():
 #     success_msg(f"Created Report {r.web_url}")
 
 
+@report.command(name="init")
+@click.argument("name", default=lambda: os.path.basename(os.getcwd()))
+@click.option("--format", type=click.Choice(["notebook", "script"]), default="notebook")
+def report_init(name: str, format: str):
+    """Initialise a new report"""
+
+    if format == "notebook":
+        template = "report_ipynb"
+    else:
+        template = "report_py"
+
+    if len(list(Path(".").glob("dp_report.*"))):
+        failure_msg("Found existing project, cancelling", do_exit=True)
+
+    name = name.replace("-", "_")
+    sc.validate_name(name)
+    _context = dict(name=name)
+
+    write_templates(template, _context)
+    success_msg("Created sample report `dp_report`, edit as needed and run")
+
+
 @report.command()
 @click.argument("name")
 def delete(name: str):
@@ -411,7 +411,7 @@ def delete(name: str):
 
 
 @report.command()
-def list():
+def report_list():
     """List Reports"""
     print_table(api.Report.list(), "Reports")
 
@@ -455,7 +455,7 @@ def create(name: str, value: str, visibility: str):
 
 
 @variable.command()
-def list():
+def variable_list():
     """List all variables"""
     print_table(api.Variable.list(), "Variables")
 
@@ -495,19 +495,23 @@ def schedule():
 
 @schedule.command()
 @click.option("--parameter", "-p", multiple=True)
-@click.argument("script", required=True)
+@click.argument("name", required=True)
 @click.argument("cron", required=True)
-def create(script: str, cron: str, parameter: Tuple[str]):
+@click.option("--version")
+@click.option("--owner")
+def create(name: str, cron: str, parameter: Tuple[str], owner: str, version: str):
     """
     Create a schedule
 
-    SCRIPT: ID/URL of the Script to run
+    NAME: Name of the Script to run
     CRON: crontab representing the schedule interval
     PARAMETERS: key/value list of parameters to use when running the script on schedule
+    [OWNER]: Script owner
+    [VERSION]: Script version
     """
     params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
-    script_obj = api.Script.by_id(script)
+    script_obj = api.Script.get(name, owner=owner, version=version)
     schedule_obj = api.Schedule.create(script_obj, cron, params)
     success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
 
@@ -536,7 +540,7 @@ def update(id: str, cron: str, parameter: Tuple[str]):
 
 
 @schedule.command()
-def list():
+def schedule_list():
     """List all schedules"""
     print_table(api.Schedule.list(), "Schedules", showindex=False)
 

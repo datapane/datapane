@@ -16,7 +16,7 @@ def runner():
     _runner = CliRunner()
     result = _runner.invoke(cli, ["-vv", "login", "--token", TEST_TOKEN, "--server", TEST_SERVER])
     handle_res(result)
-    assert "Logged in" in result.output
+    assert "Connected successfully" in result.output
     return _runner
 
 
@@ -24,7 +24,7 @@ def test_auth(runner: CliRunner):
     # ping
     result = runner.invoke(cli, ["-vv", "ping"])
     handle_res(result)
-    assert "Connected to" in result.output
+    assert "Connected successfully" in result.output
 
     # log out
     result = runner.invoke(cli, ["-vv", "logout"])
