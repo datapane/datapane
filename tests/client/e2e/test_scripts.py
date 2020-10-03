@@ -84,7 +84,7 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         run = s.run(parameters=dict(p1="A", p2=1))
         assert run.script == s.url
         assert "p2" in run.parameter_vals
-        assert run.status == "QUEUED"
+        assert run.status == "RUNNING"
 
         # poll until complete
         while not run.is_complete():
