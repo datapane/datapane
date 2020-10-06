@@ -2,7 +2,8 @@ from pathlib import Path
 
 from click.testing import CliRunner, Result
 
-from datapane.client.commands import cli, process_cmd_param_vals
+from datapane.client.commands import cli
+from datapane.client.utils import process_cmd_param_vals
 
 # TODO
 #  - add tests for other commands

@@ -6,9 +6,8 @@ import typing as t
 import uuid
 from contextlib import contextmanager
 from distutils.dir_util import copy_tree
-from distutils.util import strtobool
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import click
 import click_spinner
@@ -18,13 +17,13 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import JDict, SDict, _setup_dp_logging, log
+from datapane.common import SDict, _setup_dp_logging, log
 
 from . import api
 from . import config as c
 from . import scripts, utils
 from .scripts import config as sc
-from .utils import failure_msg, success_msg
+from .utils import failure_msg, process_cmd_param_vals, success_msg
 
 EXTRA_OUT: bool = False
 
@@ -179,7 +178,7 @@ def delete(name: str):
     success_msg(f"Deleted Blob {name}")
 
 
-@blob.command()
+@blob.command("list")
 def blob_list():
     """List blobs"""
     print_table(api.Blob.list(), "Blobs")
@@ -281,40 +280,10 @@ def delete(name: str):
     success_msg(f"Deleted Script {name}")
 
 
-@script.command()
+@script.command("list")
 def script_list():
     """List Scripts"""
     print_table(api.Script.list(), "Scripts")
-
-
-def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
-    """Convert a list of k=v to a typed JSON dict"""
-
-    def convert_param_val(x: str) -> t.Union[int, float, str, bool]:
-        # TODO - this can be optimised / cleaned-up
-        try:
-            return int(x)
-        except ValueError:
-            try:
-                return float(x)
-            except ValueError:
-                try:
-                    return bool(strtobool(x))
-                except ValueError:
-                    return x
-
-    def split_param(xs: Tuple[str]) -> Iterator[t.Tuple[str, str]]:
-        err_msg = "'{}', should be name=value"
-        for x in xs:
-            try:
-                k, v = x.split("=", maxsplit=1)
-            except ValueError:
-                raise click.BadParameter(err_msg.format(x))
-            if not k or not v:
-                raise click.BadParameter(err_msg.format(x))
-            yield (k, v)
-
-    return {k: convert_param_val(v) for (k, v) in split_param(params)}
 
 
 @script.command()
@@ -410,7 +379,7 @@ def delete(name: str):
     success_msg(f"Deleted Report {name}")
 
 
-@report.command()
+@report.command("list")
 def report_list():
     """List Reports"""
     print_table(api.Report.list(), "Reports")
@@ -454,7 +423,7 @@ def create(name: str, value: str, visibility: str):
     success_msg(f"Created variable: {name}")
 
 
-@variable.command()
+@variable.command("list")
 def variable_list():
     """List all variables"""
     print_table(api.Variable.list(), "Variables")
@@ -539,7 +508,7 @@ def update(id: str, cron: str, parameter: Tuple[str]):
     success_msg(f"Updated schedule: {schedule_obj.id} ({schedule_obj.url})")
 
 
-@schedule.command()
+@schedule.command("list")
 def schedule_list():
     """List all schedules"""
     print_table(api.Schedule.list(), "Schedules", showindex=False)

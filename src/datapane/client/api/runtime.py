@@ -35,6 +35,10 @@ class _Params(dict):
         else:
             log.debug("Ignoring call to load_defaults as by datapane")
 
+    def replace(self, new_vals: dict) -> None:
+        self.clear()
+        self.update(new_vals)
+
 
 Params: _Params = _Params()
 

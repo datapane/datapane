@@ -40,7 +40,6 @@ from .client.api import (
     ping,
 )
 from .client.config import init
-
 from .common.dp_types import DPMode, set_dp_mode, get_dp_mode
 
 script_name = sys.argv[0]
@@ -58,3 +57,7 @@ else:
 # only init fully in library-mode, as framework and app init explicitly
 if get_dp_mode() == DPMode.LIBRARY:
     init()
+    # parse any command0line params
+    from .client.utils import parse_command_line
+
+    parse_command_line()
