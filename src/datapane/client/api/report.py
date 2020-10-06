@@ -12,6 +12,7 @@ from pathlib import Path
 
 import importlib_resources as ir
 import pandas as pd
+from furl import furl
 from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -300,12 +301,7 @@ class Table(Asset):
         fn = self._save_df(df)
         (rows, columns) = df.shape
         super().__init__(
-            file=fn.file,
-            caption=caption,
-            rows=rows,
-            columns=columns,
-            can_pivot=can_pivot,
-            id=id,
+            file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id
         )
 
 
@@ -374,7 +370,13 @@ class Report(BEObjectRef):
         return (report_str, _s.attachments)
 
     def publish(
-        self, name: str, description: str = "", open: bool = False, tags: list = None, **kwargs
+        self,
+        name: str,
+        description: str = "",
+        open: bool = False,
+        tags: list = None,
+        tweet: t.Union[bool, str] = False,
+        **kwargs,
     ):
         """Deploy the report and its Assets to Datapane"""
         tags = tags or []
@@ -396,6 +398,20 @@ class Report(BEObjectRef):
         _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
+        if tweet:
+            if isinstance(tweet, str):
+                desc = tweet[:260]
+            elif description:
+                desc = description[:260]
+            else:
+                desc = f"Check out my new report - {name}"[:260]
+            tweet_url = (
+                furl(url="https://twitter.com/intent/tweet")
+                .add({"text": desc, "url": self.web_url, "hashtags": "datapane,python"})
+                .url
+            )
+            webbrowser.open_new_tab(tweet_url)
+
         print(f"Report successfully published at {self.web_url}")
 
     def save(
