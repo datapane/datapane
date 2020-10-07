@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
+from bokeh.layouts import column
 
 from datapane.client.files import save
 
@@ -41,6 +42,13 @@ def test_save_bokeh(tmp_path: Path):
     p = figure()
     p.circle(x="x", y="y", source=source)
     save(p)
+
+
+def test_save_bokeh_layout(tmp_path: Path):
+    source = ColumnDataSource(data)
+    p = figure()
+    p.circle(x="x", y="y", source=source)
+    save(column(p, p))
 
 
 def test_save_altair(tmp_path: Path):
