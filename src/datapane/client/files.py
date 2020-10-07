@@ -80,6 +80,7 @@ import pandas as pd
 from altair.utils import SchemaBase
 from bokeh.embed import json_item
 from bokeh.plotting.figure import Figure as BFigure
+from bokeh.layouts import LayoutDOM as BLayout
 from folium import Map
 from matplotlib.figure import Axes, Figure
 from numpy import ndarray
@@ -205,15 +206,26 @@ class TablePlot(BasePlot):
             dataframe.to_html(f)
 
 
-class BokehPlot(BasePlot):
-    """Returns an interactive Bokeh application"""
-
+class BokehBasePlot(BasePlot):
     mimetype = "application/vnd.bokeh.show+json"
     ext = ".bokeh.json"
+
+    def _write_file(self, f: TextIO, app: any) -> DPTmpFile:
+        json.dump(json_item(app), f)
+
+class BokehPlot(BokehBasePlot):
+    """Returns an interactive Bokeh application"""
     fig_type = BFigure
 
-    def write_file(self, f: TextIO, app: BFigure):
-        json.dump(json_item(app), f)
+    def write_file(self, f: TextIO, app: BFigure) -> DPTmpFile:
+        super()._write_file(f, app)
+
+
+class BokehLayoutPlot(BokehBasePlot):
+    fig_type = BLayout
+
+    def write_file(self, f: TextIO, app: BLayout) -> DPTmpFile:
+        super()._write_file(f, app)
 
 
 class AltairPlot(BasePlot):
@@ -256,6 +268,7 @@ class FoliumPlot(BasePlot):
 plots = [
     TablePlot,
     BokehPlot,
+    BokehLayoutPlot,
     AltairPlot,
     PlotlyPlot,
     FoliumPlot,
