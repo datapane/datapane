@@ -77,7 +77,7 @@ def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
 def parse_command_line() -> None:
     """Called in library mode to pull any parameters into dp.Config"""
     parser = argparse.ArgumentParser(
-        description="Datapane additional args", conflict_handler="resolve", add_help=True
+        description="Datapane additional args", conflict_handler="resolve", add_help=False
     )
     parser.add_argument(
         "--parameter",
