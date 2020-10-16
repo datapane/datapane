@@ -11,7 +11,6 @@ from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 
 from datapane import __version__
 from datapane.client import api
-from datapane.client import config as c
 from datapane.common import _setup_dp_logging, log
 from datapane.common.config import RunnerConfig, decode
 from datapane.common.versioning import is_version_compatible
@@ -20,15 +19,13 @@ from .exceptions import ModelRunError
 from .typedefs import ErrorResult, RunResult
 
 
-def setup_api(dp_host: str, dp_token: str, debug: bool = False, logs: TextIO = None):
+def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: TextIO = None):
     """Init the Datapane API for automated use"""
+    # login, ping, and create the default env file for CMD usage
+    api.login(token=dp_token, server=dp_host)
     # setup input and config, logging, login, etc.
-    config = c.Config(server=dp_host, token=dp_token, analytics=False)
     verbosity = 2 if debug else 0
     _setup_dp_logging(verbosity=verbosity, logs_stream=logs)
-    c.init(config=config)
-    # check can login/ping
-    api.ping(config=config)
     log.debug("Running DP on DP")
 
 
@@ -128,7 +125,7 @@ def main():
             # read the config files
             # NOTE - we could supply config also by env-var or already write k8s volume in the future
             run_config = decode(args.config, compressed=True)
-            setup_api(args.dp_host, args.dp_token, args.debug, stream_logs)
+            setup_api(args.dp_token, args.dp_host, args.debug, stream_logs)
             res = run_api(run_config)
         except ModelRunError as e:
             ErrorResult(error=e.error, error_detail=e.details).to_json(results_stream)

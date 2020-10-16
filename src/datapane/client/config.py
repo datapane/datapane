@@ -34,7 +34,11 @@ analytics: false
 
 
 def get_config_file(env: str = DEFAULT_ENV) -> Path:
-    return APP_DIR / f"{env}.yaml"
+    config_f = APP_DIR / f"{env}.yaml"
+    if not config_f.exists():
+        config_f.write_text(get_default_config())
+        log.debug(f"Creating default config file at {config_f}")
+    return config_f
 
 
 @dc.dataclass(frozen=True)
@@ -104,9 +108,6 @@ def load_from_envfile(config_env: str) -> Path:
 
     config_f = get_config_file(config_env)
     yaml = YAML()
-
-    if not config_f.exists():
-        config_f.write_text(get_default_config())
 
     with config_f.open("r") as f:
         c_yaml = yaml.load(f)

@@ -10,10 +10,12 @@ from ..utils import success_msg
 from .common import _process_res
 
 
-def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV) -> None:
+def login(
+    token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = False
+) -> None:
     """Login to datapane server, storing the token under env for future use"""
     config = c.Config(server=server, token=token)
-    ping(config=config, cli_login=True)
+    ping(config=config, cli_login=cli_login)
 
     # update config with valid values
     with c.update_config(env) as x:
