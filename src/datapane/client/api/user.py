@@ -11,7 +11,7 @@ from .common import _process_res
 
 
 def login(
-    token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = False
+    token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True
 ) -> None:
     """Login to datapane server, storing the token under env for future use"""
     config = c.Config(server=server, token=token)

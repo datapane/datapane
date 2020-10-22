@@ -22,7 +22,7 @@ from .typedefs import ErrorResult, RunResult
 def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: TextIO = None):
     """Init the Datapane API for automated use"""
     # login, ping, and create the default env file for CMD usage
-    api.login(token=dp_token, server=dp_host)
+    api.login(token=dp_token, server=dp_host, cli_login=False)
     # setup input and config, logging, login, etc.
     verbosity = 2 if debug else 0
     _setup_dp_logging(verbosity=verbosity, logs_stream=logs)

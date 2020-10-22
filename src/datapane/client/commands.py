@@ -119,7 +119,7 @@ def cli(ctx, verbose: int, env: str):
 @click.pass_obj
 def login(obj: DPContext, token, server):
     """Login to a server with the given API token."""
-    api.login(token, server, env=obj.env, cli_login=True)
+    api.login(token, server, env=obj.env)
     # click.launch(f"{server}/settings/")
 
 

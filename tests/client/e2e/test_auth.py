@@ -25,7 +25,7 @@ def test_auth():
             dp.ping()
 
         # login
-        dp.login(token=TEST_TOKEN, server=TEST_SERVER, env=TEST_ENV)
+        dp.login(token=TEST_TOKEN, server=TEST_SERVER, env=TEST_ENV, cli_login=False)
         dp.ping()
         # logout
         dp.logout(env=TEST_ENV)
