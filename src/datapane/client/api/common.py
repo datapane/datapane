@@ -153,7 +153,7 @@ class Resource:
     # keep session as classvar to share across all DP accesses - however will be
     # tied to current instance config
     session = requests.Session()
-    timeout = None if TEST_ENV else (3.05, 27)
+    timeout = None if TEST_ENV else (6.10, 54)
 
     def __init__(self, endpoint: str):
         self.endpoint = endpoint.split("/api", maxsplit=1)[-1]
