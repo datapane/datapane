@@ -74,7 +74,9 @@ def downcast_numbers(data: pd.DataFrame):
         ser = pd.to_numeric(ser, downcast="unsigned")
         return ser
 
-    df_num = data.select_dtypes("number")
+    # A result of downcast(timedelta64[ns]) is int <ns> and hard to understand.
+    # e.g.) 0 days 00:54:38.777572 -> 3278777572000 [ns]
+    df_num = data.select_dtypes("number", exclude="timedelta")
     data[df_num.columns] = df_num.apply(downcast)
 
 
@@ -82,6 +84,11 @@ def to_str(df: pd.DataFrame):
     """Converts remaining objects columns to str"""
     df_str = df.select_dtypes("object")
     df[df_str.columns] = df_str.astype(str)
+    # timedelta (duration in pyarrow) is not supported in parquet,
+    # so that converts it to str
+    # See https://issues.apache.org/jira/browse/ARROW-6780
+    df_timedelta = df.select_dtypes("timedelta")
+    df[df_timedelta.columns] = df_timedelta.astype(str)
     df_cat = df.select_dtypes("category")
 
     def to_str_cat_vals(x: pd.Series) -> pd.Series:
