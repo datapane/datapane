@@ -85,7 +85,7 @@ class BEObjectRef:
         cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None
     ) -> U:
         res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner, version=version)
-        return cls(res)
+        return cls(dto=res)
 
     @classmethod
     def by_id(cls: Type[U], id_or_url: str) -> U:

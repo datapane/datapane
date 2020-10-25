@@ -321,9 +321,13 @@ class Report(BEObjectRef):
     full_width: bool = False
 
     def __init__(
-        self, *arg_blocks: BlockOrStr, blocks: t.List[BlockOrStr] = None, full_width: bool = False
+        self,
+        *arg_blocks: BlockOrStr,
+        blocks: t.List[BlockOrStr] = None,
+        full_width: bool = False,
+        **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self.full_width = full_width
         # wrap blocks within a single Blocks root element during generation
         _blocks = blocks or list(arg_blocks)

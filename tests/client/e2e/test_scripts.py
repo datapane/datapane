@@ -9,7 +9,7 @@ import datapane as dp
 from datapane.client import scripts as sc
 from datapane.client.api import HTTPError
 
-from .common import deletable, gen_name
+from .common import deletable, gen_name, check_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
@@ -26,7 +26,7 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
 
     with deletable(s):
         # are fields added?
-        assert s.name == name
+        check_name(s, name)
 
         # download and check the import was as expected
         assert s.script == dp_cfg.script.name

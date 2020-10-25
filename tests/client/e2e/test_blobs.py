@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 import datapane as dp
 from tests import check_df_equal
 
-from .common import code, deletable, gen_df, gen_name
+from .common import check_name, code, deletable, gen_df, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
@@ -25,7 +25,7 @@ def test_blob_df():
     # upload the blob
     with deletable(dp.Blob.upload_df(df=df, visibility=visibility, name=name)) as b1:
         # are fields added?
-        assert b1.name == name
+        check_name(b1, name)
         # was the import as expected?
         assert b1.num_rows == 4
         assert b1.num_columns == 2

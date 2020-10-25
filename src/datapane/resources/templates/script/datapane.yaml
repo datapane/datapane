@@ -1,10 +1,7 @@
 # Datapane config - see https://docs.datapane.com/tutorials/deploying-a-script#configuration
 
-# Script name (a combination of lower case letters, numbers, and dashes - must be unique to user)
-name: {{ name }}
-
-# Script title
-title: My awesome script
+# Script name (can include spaces, numbers, etc.)
+name: Covid Demo {{ name }}
 
 # Script parameters
 parameters: [

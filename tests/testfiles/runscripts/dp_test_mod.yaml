@@ -1,6 +1,5 @@
-name: dp_test_mod
+name: DP Test Mod
 script: dp_test_mod.py
-title: DP Test Mod
 repo: https://github.com/datapane/datapane-demos
 parameters:
   - {"name":"p1", "type": "string"}

@@ -6,6 +6,7 @@ from typing import ContextManager
 
 import pandas as pd
 import pytest
+import stringcase
 
 from datapane.client.api import HTTPError
 from datapane.client.api.dp_object import U
@@ -23,14 +24,15 @@ def gen_df(n: int = 4) -> pd.DataFrame:
 
 
 def gen_name(n=10):
-    return f"Test_{''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=n))}"
+    return f"Test {''.join(random.choices(string.ascii_lowercase, k=n))}"
+
+
+def check_name(obj, orig_name: str):
+    assert obj.title == orig_name
+    assert obj.name == stringcase.spinalcase(orig_name)
 
 
 def gen_description() -> str:
-    return f"test - {uuid.uuid4().hex}"
-
-
-def gen_title() -> str:
     return f"test - {uuid.uuid4().hex}"
 
 

@@ -1,8 +1,5 @@
-# Script name (a combination of lower case letters, numbers, and dashes - must be unique to user)
-name: test_proj2
-
-# Script title
-title: My awesome script
+# Script name
+name: Test proj 2
 
 # Script parameter definitions - see docs.data
 # see xyz for configuration docs

@@ -10,7 +10,7 @@ from datapane.client import api
 from datapane.common.df_processor import convert_csv_pd
 
 from ..local.test_api import gen_report_simple, gen_report_with_files
-from .common import deletable, gen_description, gen_df, gen_name
+from .common import check_name, deletable, gen_description, gen_df, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
@@ -64,6 +64,7 @@ def test_report(tmp_path: Path):
 
     with deletable(dp_report):
         # are the fields ok
+        check_name(dp_report, name)
         assert dp_report.description == description
         assert len(dp_report.top_block.blocks[0].blocks) == 6
 

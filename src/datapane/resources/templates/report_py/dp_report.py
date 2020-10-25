@@ -18,7 +18,7 @@ plot = alt.Chart(df).mark_area(opacity=0.4, stroke='black').encode(
 # embed data and plot into a Datapane report and publish
 report = dp.Report("## Covid data per continent", dp.Plot(plot), dp.Table(df))
 report.publish(
-    name="{{ name }}",
+    name="Covid Demo {{ name }}",
     description="Plot of Covid infections per continent, using data from ourworldindata",
     open=True,
 )

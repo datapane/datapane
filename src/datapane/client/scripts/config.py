@@ -11,6 +11,7 @@ import importlib_resources as ir
 import jsonschema
 import nbconvert
 import nbformat
+import stringcase
 import yaml
 from traitlets.config import Config as TConfig
 
@@ -21,7 +22,7 @@ DATAPANE_YAML = Path("datapane.yaml")
 PYPROJECT_TOML = Path("pyproject.toml")
 DEFAULT_PY = Path("dp_script.py")
 DEFAULT_IPYNB = Path("dp_script.ipynb")
-re_check_name = re.compile(r"^\w+$")
+re_check_name = re.compile(r"^[\S ]+$")
 
 # TODO - look at other libs
 #  - https://lidatong.github.io/dataclasses-json/ (or marshmallow)
@@ -34,13 +35,15 @@ re_check_name = re.compile(r"^\w+$")
 #  - convert notebook (use 1st markdown as docstring?)
 
 
+def generate_name(postfix: str) -> str:
+    dir_name = stringcase.titlecase(os.path.basename(os.getcwd()))
+    return f"{dir_name} {postfix}"
+
+
+# TODO(obsolete) - not really needed now, can remove in future
 def validate_name(x: str):
     if re_check_name.match(x) is None:
-        raise AssertionError(f"'{x}' is not a valid service name, must be [a-z0-9-_]")
-
-
-def default_title() -> str:
-    return "New Untitled Script"
+        raise AssertionError(f"'{x}' is not a valid service name")
 
 
 @dc.dataclass
@@ -63,7 +66,6 @@ class DatapaneCfg:
     post_commands: List[str] = dc.field(default_factory=list)
 
     # metadata
-    title: str = dc.field(default_factory=default_title)
     description: str = "Datapane Script"
     repo: str = ""
     visibility: Optional[str] = None

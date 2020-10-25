@@ -1,5 +1,4 @@
 import dataclasses as dc
-import os
 import tarfile
 import time
 import typing as t
@@ -215,13 +214,12 @@ def write_templates(scaffold_name: str, context: SDict):
 
 
 @script.command(name="init")
-@click.argument("name", default=lambda: os.path.basename(os.getcwd()))
+@click.argument("name", default=lambda: sc.generate_name("Report"))
 def script_init(name: str):
     """Initialise a new script project"""
     if sc.DATAPANE_YAML.exists():
         failure_msg("Found existing project, cancelling", do_exit=True)
 
-    name = name.replace("-", "_")
     sc.validate_name(name)
     _context = dict(name=name)
 
@@ -350,7 +348,7 @@ def report():
 
 
 @report.command(name="init")
-@click.argument("name", default=lambda: os.path.basename(os.getcwd()))
+@click.argument("name", default=lambda: sc.generate_name("Script"))
 @click.option("--format", type=click.Choice(["notebook", "script"]), default="notebook")
 def report_init(name: str, format: str):
     """Initialise a new report"""
@@ -363,7 +361,6 @@ def report_init(name: str, format: str):
     if len(list(Path(".").glob("dp_report.*"))):
         failure_msg("Found existing project, cancelling", do_exit=True)
 
-    name = name.replace("-", "_")
     sc.validate_name(name)
     _context = dict(name=name)
 
