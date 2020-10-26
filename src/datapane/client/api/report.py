@@ -380,12 +380,13 @@ class Report(BEObjectRef):
         open: bool = False,
         tags: list = None,
         tweet: t.Union[bool, str] = False,
+        source_url: str = "",
         **kwargs,
     ):
         """Deploy the report and its Assets to Datapane"""
         tags = tags or []
         print("Publishing report and associated data - please wait..")
-        kwargs.update(name=name, description=description, tags=tags)
+        kwargs.update(name=name, description=description, tags=tags, source_url=source_url)
 
         report_str, attachments = self._gen_report(
             embedded=False, title=name, description=description

@@ -5,7 +5,7 @@ parameters: [
   {"name": "param2", "type": "integer", "required": true}
 ]
 
-repo: https://github.com/datapane/test
+source_url: https://github.com/datapane/test
 
 include:
   - sample.ipynb

@@ -16,3 +16,6 @@ parameters: [
 ## Python packages required for the script
 #requirements:
 #  -
+
+# link to the source code, e.g. git repo
+# source_url:

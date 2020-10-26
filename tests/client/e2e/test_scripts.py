@@ -73,7 +73,7 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
         s = dp.Script.upload_pkg(sdist, dp_cfg)
 
     with deletable(s):
-        assert "datapane-demos" in s.repo
+        assert "datapane-demos" in s.source_url
         assert len(s.requirements) == 1
         assert "pytil" in s.requirements
 

@@ -42,7 +42,7 @@ def test_report(tmp_path: Path):
     df = gen_df()
     name = gen_name()
     description = gen_description()
-
+    source_url = "https://github.com/datapane/datapane"
     # create a basic report
     m = dp.Markdown("hello world!!")
 
@@ -60,12 +60,13 @@ def test_report(tmp_path: Path):
     list_asset = dp.File(data=lis, is_json=True)
     df_asset = dp.Table(df=df, caption="Our Dataframe")
     dp_report = api.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
-    dp_report.publish(name=name, description=description)
+    dp_report.publish(name=name, description=description, source_url=source_url)
 
     with deletable(dp_report):
         # are the fields ok
         check_name(dp_report, name)
         assert dp_report.description == description
+        assert dp_report.source_url == source_url
         assert len(dp_report.top_block.blocks[0].blocks) == 6
 
         # NOTE - Asset objects no longer exists - thus below tests can't be supported

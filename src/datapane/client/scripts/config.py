@@ -67,7 +67,7 @@ class DatapaneCfg:
 
     # metadata
     description: str = "Datapane Script"
-    repo: str = ""
+    source_url: str = ""
     visibility: Optional[str] = None
 
     # build options
