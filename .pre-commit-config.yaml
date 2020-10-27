@@ -1,7 +1,7 @@
 # pre-commit config file (https://pre-commit.com/
 fail_fast: true
 # global excludes - exclude generated files, e.g. django migrations
-exclude: '^(src/datapane/resources/scaffold/|tests/client/scripts/test_config/|tests/testfiles/)'
+exclude: '^(src/datapane/resources/templates/|tests/client/scripts/test_config/|tests/testfiles/)'
 default_language_version:
   python: python3
 # default_stages: [commit, push]
@@ -20,7 +20,7 @@ repos:
         additional_dependencies: ["flake8-isort >= 3.0.0", "flake8-no-implicit-concat >= 0.1.3", "flake8_tuple >= 0.4.1"]
   # Black Python formatter
   - repo: https://github.com/ambv/black
-    rev: 19.10b0
+    rev: 20.8b1
     hooks:
       - id: black
         args: [--config=./pyproject.toml, --verbose]
@@ -71,7 +71,7 @@ repos:
         exclude: 'package.*\.json'
       # check for dangling symlinks
       - id: check-symlinks
-        exclude: '^(src/datapane/resources/local-report-base.*)$'
+        exclude: '^(src/datapane/resources/local_report/local-report-base.*)$'
       # ensure links to vcs sites are permalinks
       - id: check-vcs-permalinks
       # ensure no private keys are being commited
