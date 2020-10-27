@@ -11,8 +11,8 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6] #, 3.7, 3.8]
+        os: [ubuntu-latest, windows-latest] # macos-latest, windows-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -43,19 +43,19 @@ jobs:
           import sys
           print(f"::set-env name=PYTHON_VERSION::{sys.hexversion}")
       # TODO - cache the poetry pypi cache dir? (tho as we cache the venv is it needed?)
-      - name: Cache .venv
-        uses: actions/cache@v1
-        with:
-          path: .venv
-          key: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
-      - name: Cache pip dir (${{ env.PIP_DIR }})
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.PIP_DIR }}
-          key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
-          restore-keys: |
-            datapane-pip-${{ runner.os }}-
+#      - name: Cache .venv
+#        uses: actions/cache@v1
+#        with:
+#          path: .venv
+#          key: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
+#          restore-keys: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+#      - name: Cache pip dir (${{ env.PIP_DIR }})
+#        uses: actions/cache@v1
+#        with:
+#          path: ${{ env.PIP_DIR }}
+#          key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
+#          restore-keys: |
+#            datapane-pip-${{ runner.os }}-
       - name: Run Tests
         run: |
           pip install "poetry>=1.0.0,<1.1.0"
