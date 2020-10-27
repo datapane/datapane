@@ -43,12 +43,12 @@ jobs:
           import sys
           print(f"::set-env name=PYTHON_VERSION::{sys.hexversion}")
       # TODO - cache the poetry pypi cache dir? (tho as we cache the venv is it needed?)
-#      - name: Cache .venv
-#        uses: actions/cache@v1
-#        with:
-#          path: .venv
-#          key: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-#          restore-keys: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+      - name: Cache .venv
+        uses: actions/cache@v1
+        with:
+          path: .venv
+          key: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: datapane-venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
 #      - name: Cache pip dir (${{ env.PIP_DIR }})
 #        uses: actions/cache@v1
 #        with:
