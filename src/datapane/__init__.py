@@ -11,7 +11,7 @@ except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
 
-__version__ = "0.8.2"
+__version__ = "0.8.3"
 
 TEST_ENV: bool = "DP_TEST_ENV" in os.environ
 
