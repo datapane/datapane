@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
+from bokeh.layouts import column
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
-from bokeh.layouts import column
 
 from datapane.client.files import save
 
