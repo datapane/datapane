@@ -79,6 +79,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from altair.utils import SchemaBase
 from bokeh.embed import json_item
+from bokeh.layouts import LayoutDOM as BLayout
 from bokeh.plotting.figure import Figure as BFigure
 from folium import Map
 from matplotlib.figure import Axes, Figure
@@ -194,26 +195,35 @@ class TablePlot(BasePlot):
     def write_file(self, f: TextIO, dataframe: pd.DataFrame):
         n_cells = dataframe.shape[0] * dataframe.shape[1]
         if n_cells > self.TABLE_CELLS_LIMIT:
-            log.warning(
-                f"Dataframe is has more than {self.TABLE_CELLS_LIMIT} cells. Omitting output."
-            )
+            log.warning(f"Dataframe is has more than {self.TABLE_CELLS_LIMIT} cells. Omitting output.")
             # TODO - this should truncate rather than replace
-            f.write(
-                f"<table><tr><td>omitted as over {self.TABLE_CELLS_LIMIT} cells</td></tr></table>"
-            )
+            f.write(f"<table><tr><td>omitted as over {self.TABLE_CELLS_LIMIT} cells</td></tr></table>")
         else:
             dataframe.to_html(f)
 
 
-class BokehPlot(BasePlot):
-    """Returns an interactive Bokeh application"""
+class BokehBasePlot(BasePlot):
+    """Returns an interactive Bokeh application, supports both basic plots and layout plots via subclasses"""
 
     mimetype = "application/vnd.bokeh.show+json"
     ext = ".bokeh.json"
+
+    def _write_file(self, f: TextIO, app: any) -> DPTmpFile:
+        json.dump(json_item(app), f)
+
+
+class BokehPlot(BokehBasePlot):
     fig_type = BFigure
 
-    def write_file(self, f: TextIO, app: BFigure):
-        json.dump(json_item(app), f)
+    def write_file(self, f: TextIO, app: BFigure) -> DPTmpFile:
+        super()._write_file(f, app)
+
+
+class BokehLayoutPlot(BokehBasePlot):
+    fig_type = BLayout
+
+    def write_file(self, f: TextIO, app: BLayout) -> DPTmpFile:
+        super()._write_file(f, app)
 
 
 class AltairPlot(BasePlot):
@@ -256,6 +266,7 @@ class FoliumPlot(BasePlot):
 plots = [
     TablePlot,
     BokehPlot,
+    BokehLayoutPlot,
     AltairPlot,
     PlotlyPlot,
     FoliumPlot,
