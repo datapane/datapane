@@ -58,7 +58,7 @@ jobs:
             datapane-pip-${{ runner.os }}-
       - name: Run Tests
         run: |
-          pip install "poetry>=1.0.0"
+          pip install "poetry>=1.0.0,<1.1.0"
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install
