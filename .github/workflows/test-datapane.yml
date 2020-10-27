@@ -20,6 +20,8 @@ jobs:
         run: git config --global core.symlinks true
         if: startsWith(runner.os, 'Windows')
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
