@@ -1,7 +1,9 @@
 name: Test [Datapane]
 
 on:
-  # Run on all PRs (any branch)
+  # Run on any push to master and all PRs (any branch)
+  push:
+    branches: [ master ]
   pull_request:
 
 jobs:
