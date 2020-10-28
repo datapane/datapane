@@ -41,6 +41,18 @@ def parse_dates(data: pd.DataFrame, force_utc: bool = False):
     data[potential_dates.columns] = potential_dates.apply(try_to_datetime)
 
 
+def parse_timedelta(data: pd.DataFrame):
+    """Tries to convert strings to timedelta, ignores existing panda timedelta"""
+
+    # if timedelta is not parsed, it might be interpreted as categories or strings
+    potential_timedeltas = data.select_dtypes(object)
+
+    def try_to_timedelta(ser: pd.Series) -> pd.Series:
+        return pd.to_timedelta(ser, errors="ignore")
+
+    data[potential_timedeltas.columns] = potential_timedeltas.apply(try_to_timedelta)
+
+
 def parse_categories(data: pd.DataFrame):
     """Detect and converts categories"""
     potential_cats = data.select_dtypes(object)
@@ -107,6 +119,7 @@ def process_df(df: pd.DataFrame) -> None:
     """
     convert_indices(df)
     parse_dates(df)
+    parse_timedelta(df)
     parse_categories(df)
     downcast_numbers(df)
     to_str(df)
@@ -146,7 +159,7 @@ def to_df(value: Any) -> pd.DataFrame:
 
         return pd.DataFrame({"Result": value})
 
-    if isinstance(value, (Number, str, bool, datetime.datetime)):
+    if isinstance(value, (Number, str, bool, datetime.datetime, datetime.timedelta)):
         return pd.DataFrame({"Result": value}, index=[0])
 
     if isinstance(value, np.ndarray):
