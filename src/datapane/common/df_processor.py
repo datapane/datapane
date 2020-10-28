@@ -18,12 +18,7 @@ def convert_indices(df: pd.DataFrame):
     """
     col_names: List[str] = df.columns.values.tolist()
     if (
-        all(
-            [
-                df.index.get_level_values(x).dtype != np.dtype("int64")
-                for x in range(df.index.nlevels)
-            ]
-        )
+        all([df.index.get_level_values(x).dtype != np.dtype("int64") for x in range(df.index.nlevels)])
         and len(set(df.index.names)) == len(df.index.names)
         and not any([x in col_names for x in df.index.names])
     ):
