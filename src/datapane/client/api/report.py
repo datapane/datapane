@@ -39,12 +39,12 @@ def include_raw(ctx, name):
     return Markup(env.loader.get_source(env, name)[0])
 
 
-def is_jupyter():
+def is_jupyter() -> bool:
     """Checks if inside ipython shell inside browser"""
-    return (
-        hasattr(__builtins__, "get_ipython")
-        and get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
-    )
+    try:
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
+    except Exception:
+        return False
 
 
 class ReportFileWriter:
@@ -97,9 +97,7 @@ class BuilderState:
     elements: t.List[etree.Element] = dc.field(default_factory=list)
     attachments: t.List[Path] = dc.field(default_factory=list)
 
-    def add_element(
-        self, block: "ReportBlock", e: etree.Element, f: t.Optional[Path] = None
-    ) -> "BuilderState":
+    def add_element(self, block: "ReportBlock", e: etree.Element, f: t.Optional[Path] = None) -> "BuilderState":
         e.set("id", block.id)
 
         self.elements.append(e)
@@ -300,9 +298,7 @@ class Table(Asset):
     ):
         fn = self._save_df(df)
         (rows, columns) = df.shape
-        super().__init__(
-            file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id
-        )
+        super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id)
 
 
 ################################################################################
@@ -337,9 +333,7 @@ class Report(BEObjectRef):
             # add additional top-level Blocks element to group mixed elements
             self.top_block = Blocks(blocks=[Blocks(blocks=_blocks)])
 
-    def _gen_report(
-        self, embedded: bool, title: str, description: str
-    ) -> t.Tuple[str, t.List[Path]]:
+    def _gen_report(self, embedded: bool, title: str, description: str) -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Blocks to XML
         s = BuilderState(embedded)
@@ -362,9 +356,7 @@ class Report(BEObjectRef):
         report_doc.set("{http://www.w3.org/XML/1998/namespace}id", f"_{uuid.uuid4().hex}")
 
         # post_process and validate
-        processed_report_doc = local_post_transform(
-            report_doc, embedded="true()" if embedded else "false()"
-        )
+        processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
         validate_report_doc(xml_doc=processed_report_doc)
 
         # convert to string
@@ -388,12 +380,8 @@ class Report(BEObjectRef):
         print("Publishing report and associated data - please wait..")
         kwargs.update(name=name, description=description, tags=tags, source_url=source_url)
 
-        report_str, attachments = self._gen_report(
-            embedded=False, title=name, description=description
-        )
-        res = Resource(self.endpoint).post_files(
-            dict(attachments=attachments), document=report_str, **kwargs
-        )
+        report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
+        res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)
 
         # Set dto based on new URL
         self.url = res.url
@@ -429,9 +417,7 @@ class Report(BEObjectRef):
         """Save the report to a local HTML file"""
         self.last_saved = path
 
-        local_doc, _ = self._gen_report(
-            embedded=True, title="Local Report", description="Description"
-        )
+        local_doc, _ = self._gen_report(embedded=True, title="Local Report", description="Description")
 
         self.local_writer.write(local_doc, path, self.full_width, standalone)
 
@@ -462,3 +448,5 @@ class Report(BEObjectRef):
             # NOTE - iframe must be relative path
             iframe_src = self.tmp_report.relative_to(Path(".").absolute())
             return IFrame(src=str(iframe_src), width=width, height=height)
+        else:
+            log.warning("Can't preview - are you running in Jupyter?")
