@@ -25,13 +25,13 @@ merge the changes back into to our monorepo, and then repush them back here - th
 
 - That's great - it's always good to hear feedback and new ideas!
 
-- If it's a large feature, consider opening up an issue first or discussing on our [discussions forum](https://discuss.datapane.com/) and start writing code.
+- If it's a large feature, consider discussing on our [discussions board](https://github.com/datapane/datapane/discussions) and start writing code.
 
 #### **Do you have questions about the source code?**
 
-- Ask any questions in our [discussions forum](https://discuss.datapane.com/).
+- Ask any questions in either our GitHub [discussions board](https://github.com/datapane/datapane/discussions) or our [discussions forum](https://discuss.datapane.com/).
 
-#### **Do you want to contribute to the Rails documentation?**
+#### **Do you want to contribute to the Datapane community?**
 
 Datapane is a joint startup and community effort. We encourage you to pitch in and join to add any features you are interested in!
 
