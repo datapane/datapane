@@ -1,8 +1,16 @@
 from typing import List
 
 import pandas as pd
+import pytest
 
-from datapane.common.df_processor import convert_csv_pd, parse_categories, parse_dates
+from datapane.common.df_processor import (
+    convert_csv_pd,
+    downcast_numbers,
+    parse_categories,
+    parse_dates,
+    parse_timedelta,
+    to_str,
+)
 
 
 def _check_dates_parsed(df: pd.DataFrame, date_columns: List[str]):
@@ -11,6 +19,14 @@ def _check_dates_parsed(df: pd.DataFrame, date_columns: List[str]):
 
 def _check_categories_parsed(df: pd.DataFrame, categorical_columns: List[str]):
     assert set(list(df.select_dtypes("category").columns)) == set(categorical_columns)
+
+
+def _check_timedelta_parsed(df: pd.DataFrame, timedelta_columns: List[str]):
+    assert set(list(df.select_dtypes("timedelta").columns)) == set(timedelta_columns)
+
+
+def _check_is_object(df: pd.DataFrame, object_columns: List[str]):
+    assert set(list(df.select_dtypes("object").columns)) == set(object_columns)
 
 
 def test_parse_dates_regular():
@@ -55,6 +71,58 @@ def test_parse_dates_nulls():
     _check_dates_parsed(data, ["timestamp"])
 
 
+def test_parse_timedelta_regular():
+    data = convert_csv_pd(
+        """
+        timedelta_col,float_col,string_col
+        "1 day, 4:08:25.159814",0.23,bla1
+        "1 day, 18:34:16.196687",0.23,bla1
+        """
+    )
+    parse_timedelta(data)
+    _check_timedelta_parsed(data, ["timedelta_col"])
+
+
+def test_parse_timedelta_with_assertion_error():
+    data = convert_csv_pd(
+        """
+        timedelta_col1,timedelta_col2,float_col,string_col
+        4:08:25.159814,"1 day, 4:08:25.159814",0.23,bla1
+        18:34:16.196687,"1 day, 18:34:16.196687",0.23,bla1
+        """
+    )
+    parse_timedelta(data)
+    # timedelta_col1's dtype is a datetime64[ns]
+    _check_dates_parsed(data, ["timedelta_col1"])
+    with pytest.raises(AssertionError):
+        _check_timedelta_parsed(data, ["timedelta_col1", "timedelta_col2"])
+
+
+def test_parse_timedelta_explicit_convert():
+    def convert_csv_pd_(string: str) -> pd.DataFrame:
+        import textwrap
+        from io import StringIO
+
+        from datapane.common.df_processor import process_df
+
+        buf = StringIO(textwrap.dedent(string).strip())
+        df = pd.read_csv(buf, engine="c", sep=",")
+        df["timedelta_col1"] = pd.to_timedelta(df["timedelta_col1"])
+        process_df(df)
+        return df
+
+    # timedelta_col1 is parsed by `parse_dates` unless it is converted explicitly
+    data = convert_csv_pd_(
+        """
+        timedelta_col1,timedelta_col2,float_col,string_col
+        4:08:25.159814,"1 day, 4:08:25.159814",0.23,bla1
+        18:34:16.196687,"1 day, 18:34:16.196687",0.23,bla1
+        """
+    )
+    parse_timedelta(data)
+    _check_timedelta_parsed(data, ["timedelta_col1", "timedelta_col2"])
+
+
 def test_parse_categories():
     data = convert_csv_pd(
         """
@@ -84,3 +152,29 @@ def test_parse_categories():
     )
     parse_categories(data)
     _check_categories_parsed(data, ["str2"])
+
+
+def test_downcast_numbers_timedelta():
+    data = convert_csv_pd(
+        """
+        timedelta_col,float_col,string_col
+        "1 day, 4:08:25.159814",0.23,bla1
+        "1 day, 18:34:16.196687",0.23,bla1
+        """
+    )
+    parse_timedelta(data)
+    downcast_numbers(data)
+    _check_timedelta_parsed(data, ["timedelta_col"])
+
+
+def test_to_str_timedelta():
+    data = convert_csv_pd(
+        """
+        timedelta_col,float_col,string_col
+        "1 day, 4:08:25.159814",0.23,bla1
+        "1 day, 18:34:16.196687",0.23,bla1
+        """
+    )
+    parse_timedelta(data)
+    to_str(data)
+    _check_is_object(data, ["timedelta_col"])

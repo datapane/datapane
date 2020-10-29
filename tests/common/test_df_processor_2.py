@@ -1,4 +1,5 @@
 import unittest
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
@@ -79,6 +80,11 @@ def test_to_df_datetime():
 def test_to_df_datetime_timezoned():
     now = pd.to_datetime("now", utc=True)
     assert_scalar_works(now)
+
+
+def test_to_df_timedelta():
+    delta = pd.to_timedelta(timedelta(days=1, seconds=10000, microseconds=100000))
+    assert_scalar_works(delta)
 
 
 def test_to_df_2_dim_numpy_array():

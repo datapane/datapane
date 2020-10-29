@@ -18,12 +18,7 @@ def convert_indices(df: pd.DataFrame):
     """
     col_names: List[str] = df.columns.values.tolist()
     if (
-        all(
-            [
-                df.index.get_level_values(x).dtype != np.dtype("int64")
-                for x in range(df.index.nlevels)
-            ]
-        )
+        all([df.index.get_level_values(x).dtype != np.dtype("int64") for x in range(df.index.nlevels)])
         and len(set(df.index.names)) == len(df.index.names)
         and not any([x in col_names for x in df.index.names])
     ):
@@ -39,6 +34,18 @@ def parse_dates(data: pd.DataFrame, force_utc: bool = False):
         return pd.to_datetime(ser, infer_datetime_format=True, errors="ignore", utc=force_utc)
 
     data[potential_dates.columns] = potential_dates.apply(try_to_datetime)
+
+
+def parse_timedelta(data: pd.DataFrame):
+    """Tries to convert strings to timedelta, ignores existing panda timedelta"""
+
+    # if timedelta is not parsed, it might be interpreted as categories or strings
+    potential_timedeltas = data.select_dtypes(object)
+
+    def try_to_timedelta(ser: pd.Series) -> pd.Series:
+        return pd.to_timedelta(ser, errors="ignore")
+
+    data[potential_timedeltas.columns] = potential_timedeltas.apply(try_to_timedelta)
 
 
 def parse_categories(data: pd.DataFrame):
@@ -74,7 +81,9 @@ def downcast_numbers(data: pd.DataFrame):
         ser = pd.to_numeric(ser, downcast="unsigned")
         return ser
 
-    df_num = data.select_dtypes("number")
+    # A result of downcast(timedelta64[ns]) is int <ns> and hard to understand.
+    # e.g.) 0 days 00:54:38.777572 -> 3278777572000 [ns]
+    df_num = data.select_dtypes("number", exclude="timedelta")
     data[df_num.columns] = df_num.apply(downcast)
 
 
@@ -82,6 +91,11 @@ def to_str(df: pd.DataFrame):
     """Converts remaining objects columns to str"""
     df_str = df.select_dtypes("object")
     df[df_str.columns] = df_str.astype(str)
+    # timedelta (duration in pyarrow) is not supported in parquet,
+    # so that converts it to str
+    # See https://issues.apache.org/jira/browse/ARROW-6780
+    df_timedelta = df.select_dtypes("timedelta")
+    df[df_timedelta.columns] = df_timedelta.astype(str)
     df_cat = df.select_dtypes("category")
 
     def to_str_cat_vals(x: pd.Series) -> pd.Series:
@@ -100,6 +114,7 @@ def process_df(df: pd.DataFrame) -> None:
     """
     convert_indices(df)
     parse_dates(df)
+    parse_timedelta(df)
     parse_categories(df)
     downcast_numbers(df)
     to_str(df)
@@ -139,7 +154,7 @@ def to_df(value: Any) -> pd.DataFrame:
 
         return pd.DataFrame({"Result": value})
 
-    if isinstance(value, (Number, str, bool, datetime.datetime)):
+    if isinstance(value, (Number, str, bool, datetime.datetime, datetime.timedelta)):
         return pd.DataFrame({"Result": value}, index=[0])
 
     if isinstance(value, np.ndarray):
