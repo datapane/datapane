@@ -4,9 +4,12 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 import pytest
+import requests
+from furl import furl
 
 import datapane as dp
 from datapane.client import api
+from datapane.client import config as c
 from datapane.common.df_processor import convert_csv_pd
 
 from ..local.test_api import gen_report_simple, gen_report_with_files
@@ -20,6 +23,23 @@ def test_report_simple():
     report.publish(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
+
+
+@pytest.mark.org
+def test_report_simple_permissions():
+    report = gen_report_simple()
+    report.publish(name="TEST", description="DESCRIPTION", visibility="PRIVATE")
+    with deletable(report):
+        # check we can't access api & web urls
+        r = requests.get(url=report.url)
+        assert r.status_code == 401
+        r = requests.get(url=report.web_url)
+        assert r.history[0].status_code == 302  # redirect to login
+        assert r.status_code == 200
+        # check we can't embed a private report
+        f = furl(origin=c.config.server, path="api/oembed", args=dict(url=report.web_url))
+        r = requests.get(url=str(f))
+        assert r.status_code == 401
 
 
 def test_report_with_single_file(datadir: Path):
@@ -147,9 +167,7 @@ def test_complex_df_report():
         "preTestScore": [4, 24, 31, 2, 3],
         "postTestScore": [25, 94, 57, 62, 70],
     }
-    index_df = pd.DataFrame(
-        raw_data, columns=["first_name", "last_name", "age", "preTestScore", "postTestScore"]
-    )
+    index_df = pd.DataFrame(raw_data, columns=["first_name", "last_name", "age", "preTestScore", "postTestScore"])
     df_desc = index_df.describe()
     df_desc_2 = df_desc.reset_index()
 
