@@ -3,9 +3,9 @@ contact_links:
   - name: Datapane Discussions
     url: https://github.com/datapane/datapane/discussions
     about: Ask and answer questions with the open-source community.
-  - name: Datapane Community Support
-    url: https://discuss.datapane.com/
-    about: Ask and answer questions with the wider DS community.
+#  - name: Datapane Community Support
+#    url: https://discuss.datapane.com/
+#    about: Ask and answer questions with the wider DS community.
 #  - name: GitHub Security Bug Bounty
 #    url: https://bounty.github.com/
 #    about: Please report security vulnerabilities here.

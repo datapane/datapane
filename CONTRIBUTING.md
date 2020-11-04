@@ -29,7 +29,7 @@ merge the changes back into to our monorepo, and then repush them back here - th
 
 #### **Do you have questions about the source code?**
 
-- Ask any questions in either our GitHub [discussions board](https://github.com/datapane/datapane/discussions) or our [discussions forum](https://discuss.datapane.com/).
+- Ask any questions on our [GitHub discussions board](https://github.com/datapane/datapane/discussions).
 
 #### **Do you want to contribute to the Datapane community?**
 
