@@ -1,39 +1,22 @@
-name: Test [Datapane]
+name: Update API Docs
 
 on:
   # Run on any push to master and all PRs (any branch)
   push:
     branches: [ master ]
-  pull_request:
 
 jobs:
-  datapane-multi-env:
-    defaults:
-      run:
-        shell: bash
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
+  main:
+    runs-on: ubuntu-latest
     steps:
-      - name: Enable symlinks on Windows
-        run: git config --global core.symlinks true
-        if: startsWith(runner.os, 'Windows')
       - uses: actions/checkout@v2
         with:
           lfs: true
-      - name: Set up Python ${{ matrix.python-version }}
+          depth: 5
+      - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Dump Runner Info
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: |
-          echo "${RUNNER_CONTEXT}"
-          which python
+          python-version: 3.8
       - name: set pip cache dir
         shell: python
         run: |
@@ -57,11 +40,20 @@ jobs:
           path: ${{ env.PIP_DIR }}
           key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
           restore-keys: datapane-pip-${{ runner.os }}-
-      - name: Run Tests
+      - name: Build Docs
         run: |
           pip install "poetry>=1.0.0,<1.1.0"
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install
-          # run CLI tests (junit tests not captured yet)
-          poetry run python -m pytest --ignore=tests/client/e2e/ . --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
+          pdoc --html --config show_source_code=False --config list_class_variables_in_index=False --config sort_identifiers=False --config 'google_analytics="UA-167952366-2"' --config 'lunr_search={"fuzziness": 1, "index_docstrings": True}' -f --output-dir ./docs datapane.client.api
+          # HACK for lunr js sarch not working fully - see https://github.com/pdoc3/pdoc/issues/250
+          mv -v docs/datapane/client/api/index.js docs/datapane/client/api/search.html docs/datapane
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          # force_orphan: true
+          # user_name: 'github-actions[bot]'
+          # user_email: 'github-actions[bot]@users.noreply.github.com'

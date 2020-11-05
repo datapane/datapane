@@ -32,6 +32,16 @@ local_post_transform = etree.XSLT(local_post_xslt)
 id_count = itertools.count(start=1)
 
 
+# only these types will be documented by default
+__all__ = ["ReportBlock", "Blocks", "Markdown", "File", "Plot", "Table", "Report"]
+
+__pdoc__ = {
+    "ReportBlock.attributes": False,
+    "Report.endpoint": False,
+    "Report.post": False,
+}
+
+
 @contextfunction
 def include_raw(ctx, name):
     """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
@@ -119,8 +129,10 @@ def _conv_attrib(v) -> str:
 
 
 class ReportBlock(ABC):
+    """Base Block class - not used directly"""
+
     attributes: t.Dict[str, str]
-    tag: str
+    _tag: str
     id: t.Optional[str] = None
 
     def __init__(self, id: str = None, **kwargs):
@@ -128,7 +140,7 @@ class ReportBlock(ABC):
         self.attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items()}
 
     @abstractmethod
-    def to_xml(self, s: BuilderState) -> BuilderState:
+    def _to_xml(self, s: BuilderState) -> BuilderState:
         ...
 
 
@@ -145,7 +157,7 @@ class Blocks(ReportBlock):
     as Tables, Plots, and even recursive Blocks
     """
 
-    tag = "Blocks"
+    _tag = "Blocks"
     blocks: t.List[ReportBlock] = None
 
     def __init__(
@@ -173,12 +185,12 @@ class Blocks(ReportBlock):
 
         super().__init__(id=id, rows=rows, columns=columns)
 
-    def to_xml(self, s: BuilderState) -> BuilderState:
+    def _to_xml(self, s: BuilderState) -> BuilderState:
         # recurse into the elements and pull them out
         # NOTE - this works depth-first to create all sub-elements before the current, resulting in
         # simpler implementation, but out-of-order id's - to fix by creating Block first and passing down
         _s1: BuilderState = dc.replace(s, elements=[])
-        _s2: BuilderState = reduce(lambda _s, x: x.to_xml(_s), self.blocks, _s1)
+        _s2: BuilderState = reduce(lambda _s, x: x._to_xml(_s), self.blocks, _s1)
         _s3: BuilderState = dc.replace(_s2, elements=s.elements)
         _s3.add_element(self, E.Blocks(*_s2.elements, **self.attributes))
         return _s3
@@ -190,13 +202,13 @@ class Markdown(ReportBlock):
     """
 
     text: str
-    tag = "Text"
+    _tag = "Text"
 
     def __init__(self, text: str, id: str = None):
         super().__init__(id=id)
         self.text = text
 
-    def to_xml(self, s: BuilderState) -> BuilderState:
+    def _to_xml(self, s: BuilderState) -> BuilderState:
         # NOTE - do we use etree.CDATA wrapper?
         return s.add_element(self, E.Text(etree.CDATA(self.text)))
 
@@ -215,8 +227,8 @@ class Asset(ReportBlock, UploadableObjectMixin):
         self.file = Path(file)
         self.caption = caption or ""
 
-    def to_xml(self, s: BuilderState) -> BuilderState:
-        _E = getattr(E, self.tag)
+    def _to_xml(self, s: BuilderState) -> BuilderState:
+        _E = getattr(E, self._tag)
 
         content_type = guess_type(self.file)
         file_size = str(self.file.stat().st_size)
@@ -248,7 +260,7 @@ class Asset(ReportBlock, UploadableObjectMixin):
 class File(Asset):
     """File blocks store a file that can be displayed and downloaded"""
 
-    tag = "File"
+    _tag = "File"
 
     def __init__(
         self,
@@ -274,7 +286,7 @@ class Plot(Asset):
     that can be displayed in your report
     """
 
-    tag = "Plot"
+    _tag = "Plot"
 
     def __init__(self, data: t.Any, caption: t.Optional[str] = None, id: str = None):
         out_fn = self._save_obj(data, is_json=False)
@@ -287,7 +299,7 @@ class Table(Asset):
     Provides pivot-table functionality by default.
     """
 
-    tag = "Table"
+    _tag = "Table"
 
     def __init__(
         self,
@@ -307,14 +319,18 @@ class Report(BEObjectRef):
     """
     Reports collate plots, text, and tables into an interactive report that can be analysed by users
     in their Browser
+
+    .. note:: Blocks can be passed with using arg parameters or the `blocks` kwarg, e.g.
+      `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
     """
 
     endpoint: str = "/reports/"
-    top_block: Blocks
-    last_saved: t.Optional[str] = None  # Path to local report
-    tmp_report: t.Optional[Path] = None  # Temp local report
-    local_writer = ReportFileWriter()
+    _top_block: Blocks  # Test
+    _last_saved: t.Optional[str] = None  # Path to local report
+    _tmp_report: t.Optional[Path] = None  # Temp local report
+    _local_writer = ReportFileWriter()
     full_width: bool = False
+    """When set, the report is full-width suitable for use in a dashboard"""
 
     def __init__(
         self,
@@ -323,21 +339,30 @@ class Report(BEObjectRef):
         full_width: bool = False,
         **kwargs,
     ):
+        """
+        Args:
+            *arg_blocks: Blocks to add to report
+            blocks: Allows providing the report blocks as a single list
+            full_width: Set to `True` to increase the report width, for instance when creating a dashboard
+
+        Returns:
+            A `Report` object that can be published, saved, etc.
+        """
         super().__init__(**kwargs)
         self.full_width = full_width
         # wrap blocks within a single Blocks root element during generation
         _blocks = blocks or list(arg_blocks)
         if all(isinstance(b, Blocks) for b in _blocks):
-            self.top_block = Blocks(blocks=_blocks)
+            self._top_block = Blocks(blocks=_blocks)
         else:
             # add additional top-level Blocks element to group mixed elements
-            self.top_block = Blocks(blocks=[Blocks(blocks=_blocks)])
+            self._top_block = Blocks(blocks=[Blocks(blocks=_blocks)])
 
     def _gen_report(self, embedded: bool, title: str, description: str) -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Blocks to XML
         s = BuilderState(embedded)
-        _s = self.top_block.to_xml(s)
+        _s = self._top_block._to_xml(s)
         assert len(_s.elements) == 1
         # unwrap blocks from top_block
         _top_blocks: t.List[Element] = _s.elements[0].getchildren()
@@ -375,7 +400,7 @@ class Report(BEObjectRef):
         source_url: str = "",
         **kwargs,
     ):
-        """Deploy the report and its Assets to Datapane"""
+        """Publish the report, including its attached assets, to the logged-in Datapane Server"""
         tags = tags or []
         print("Publishing report and associated data - please wait..")
         kwargs.update(name=name, description=description, tags=tags, source_url=source_url)
@@ -407,46 +432,46 @@ class Report(BEObjectRef):
 
         print(f"Report successfully published at {self.web_url}")
 
-    def save(
-        self,
-        path: str,
-        open: bool = False,
-        standalone: bool = False,
-        **kwargs,
-    ):
-        """Save the report to a local HTML file"""
-        self.last_saved = path
+    def save(self, path: str, open: bool = False, standalone: bool = False) -> None:
+        """Save the report to a local HTML file
+
+        Args:
+            path: location to save the HTML file
+            open: set to `True` to open the file in your browser after creating
+            standalone: set to `True` to create a fully standalone HTML report (this can result in large files)
+        """
+        self._last_saved = path
 
         local_doc, _ = self._gen_report(embedded=True, title="Local Report", description="Description")
 
-        self.local_writer.write(local_doc, path, self.full_width, standalone)
+        self._local_writer.write(local_doc, path, self.full_width, standalone)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    def preview(self, width: int = 600, height: int = 500):
+    def preview(self, width: int = 600, height: int = 500) -> None:
         """ Preview the report inside IPython notebooks in browser """
         if is_jupyter():
             from IPython.display import IFrame
 
             # Remove the previous temp report if it's been generated
-            if self.tmp_report and self.tmp_report.exists():
-                self.tmp_report.unlink()
+            if self._tmp_report and self._tmp_report.exists():
+                self._tmp_report.unlink()
 
             # We need to copy the report HTML to a local temp file,
             # as most browsers block iframes to absolute local paths.
             tmpfile = DPTmpFile(ext=".html")
-            if self.last_saved:
+            if self._last_saved:
                 # Copy to tmp file if already saved
-                shutil.copy(self.last_saved, tmpfile.name)
+                shutil.copy(self._last_saved, tmpfile.name)
             else:
                 # Else save directly to tmp file
                 self.save(path=tmpfile.name)
-            self.tmp_report = tmpfile.file
+            self._tmp_report = tmpfile.file
 
             # NOTE - iframe must be relative path
-            iframe_src = self.tmp_report.relative_to(Path(".").absolute())
+            iframe_src = self._tmp_report.relative_to(Path(".").absolute())
             return IFrame(src=str(iframe_src), width=width, height=height)
         else:
             log.warning("Can't preview - are you running in Jupyter?")

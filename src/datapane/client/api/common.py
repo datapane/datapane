@@ -30,6 +30,8 @@ from datapane.client.utils import (
 from datapane.common import JSON, MIME, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
+__all__ = []
+
 ################################################################################
 # Tmpfile handling
 # We create a tmp-dir per Python execution that stores all working files,
@@ -42,9 +44,7 @@ cache_dir.mkdir(parents=True, exist_ok=True)
 
 # Remove any old ./dp-tmp-* dirs over 24hrs old which might not have been cleaned up due to unexpected exit
 one_day_ago = time.time() - timedelta(days=1).total_seconds()
-prev_tmp_dirs = (
-    p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago
-)
+prev_tmp_dirs = (p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago)
 for p in prev_tmp_dirs:
     log.debug(f"Removing stale temp dir {p}")
     shutil.rmtree(p, ignore_errors=True)
@@ -125,9 +125,7 @@ def _process_res(r: Response, empty_ok: bool = False) -> JSON:
         if r.status_code == 426:
             check_pip_version()
         elif r.status_code == 401:
-            failure_msg(
-                f"Couldn't successfully connect to {c.config.server}, please check your login details"
-            )
+            failure_msg(f"Couldn't successfully connect to {c.config.server}, please check your login details")
         else:
             try:
                 log.error(pprint.pformat(r.json()))
@@ -161,9 +159,7 @@ class Resource:
         self.url = up.urljoin(config.server, f"api{self.endpoint}")
         # check if access to the resource is allowed
         self._check_endpoint(self.url)
-        self.session.headers.update(
-            Authorization=f"Token {config.token}", Datapane_API_Version=__version__
-        )
+        self.session.headers.update(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
 
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the public datapane
@@ -175,9 +171,7 @@ class Resource:
             and url_parts[0] == "api"
             and url_parts[1] not in public_endpoints
         ):
-            raise UnsupportedResourceException(
-                f"{url_parts[1].title()} are part of Datapane for Teams."
-            )
+            raise UnsupportedResourceException(f"{url_parts[1].title()} are part of Datapane for Teams.")
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()

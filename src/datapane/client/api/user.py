@@ -10,10 +10,8 @@ from ..utils import success_msg
 from .common import _process_res
 
 
-def login(
-    token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True
-) -> None:
-    """Login to datapane server, storing the token under env for future use"""
+def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True) -> None:
+    """Login to the specified Datapane Server, storing the token within a config-file called `env` for future use"""
     config = c.Config(server=server, token=token)
     ping(config=config, cli_login=cli_login)
 
@@ -24,6 +22,7 @@ def login(
 
 
 def logout(env: str = c.DEFAULT_ENV) -> None:
+    """Logout from Datapane Server, removing local credentials"""
     with c.update_config(env) as x:
         server = x["server"]
         x["server"] = c.DEFAULT_SERVER
@@ -32,6 +31,7 @@ def logout(env: str = c.DEFAULT_ENV) -> None:
 
 
 def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> None:
+    """Ping the Datapane Server to check login credentials"""
     # hardcode ping check as used for login/logout logic independent of main API requests
     config = config or c.check_get_config()
     endpoint = "/api/settings/details/"

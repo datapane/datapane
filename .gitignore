@@ -2,6 +2,7 @@ test_proj*
 test_report*
 test_script*
 .ipynb_checkpoints
+/docs
 
 # Log file
 *.log

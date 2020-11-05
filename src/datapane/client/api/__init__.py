@@ -1,3 +1,10 @@
+"""# API docs for Datapane Client interface
+
+- Report API docs in `datapane.client.api.report.Report`
+
+
+"""
+
 # flake8: noqa F401
 # Internal API re-exports
 from .dp_object import BEObjectRef, Blob, Run, Schedule, Script, Variable

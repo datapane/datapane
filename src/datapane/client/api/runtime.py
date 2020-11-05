@@ -15,6 +15,9 @@ if t.TYPE_CHECKING:
 # TODO - make thread/context safe and determine a better approach for vars
 # TODO - add API tests
 
+__all__ = []
+
+
 # we're running on datapane platform
 on_datapane: bool = "DATAPANE_ON_DATAPANE" in os.environ
 # we're running the datapane runner (also checked by __name__ == "__datapane__" in user script)

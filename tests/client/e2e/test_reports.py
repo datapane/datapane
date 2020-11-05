@@ -87,7 +87,7 @@ def test_report(tmp_path: Path):
         check_name(dp_report, name)
         assert dp_report.description == description
         assert dp_report.source_url == source_url
-        assert len(dp_report.top_block.blocks[0].blocks) == 6
+        assert len(dp_report._top_block.blocks[0].blocks) == 6
 
         # NOTE - Asset objects no longer exists - thus below tests can't be supported
         # we do store `id` on the object, that can be used to pull out from the XML report
