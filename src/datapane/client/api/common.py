@@ -1,3 +1,9 @@
+"""## Common objects
+
+Common/shared objects and types used throughout the client API
+
+..note:: This module is not used directly
+"""
 import atexit
 import json
 import os

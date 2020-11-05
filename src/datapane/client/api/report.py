@@ -1,3 +1,9 @@
+"""
+Datapane Reports API
+
+This includes the APIs for the `Blocks` that make up a `Report` and APIs for saving and pblishing them.
+"""
+
 import dataclasses as dc
 import itertools
 import shutil
@@ -23,7 +29,7 @@ from datapane.common.report import local_report_def, validate_report_doc
 
 from ..utils import DPException
 from .common import DPTmpFile, Resource, do_download_file
-from .dp_object import BEObjectRef, UploadableObjectMixin
+from .dp_object import DPObjectRef, UploadableObjectMixin
 from .runtime import _report
 
 E = ElementMaker()  # XML Tag Factory
@@ -37,8 +43,10 @@ __all__ = ["ReportBlock", "Blocks", "Markdown", "File", "Plot", "Table", "Report
 
 __pdoc__ = {
     "ReportBlock.attributes": False,
+    "File.caption": False,
+    "Plot.file": False,
+    "Table.file": False,
     "Report.endpoint": False,
-    "Report.post": False,
 }
 
 
@@ -129,13 +137,20 @@ def _conv_attrib(v) -> str:
 
 
 class ReportBlock(ABC):
-    """Base Block class - not used directly"""
+    """Base Block class - subclassed by all Block types
+
+    ..note:: The class is not used directly.
+    """
 
     attributes: t.Dict[str, str]
     _tag: str
     id: t.Optional[str] = None
 
     def __init__(self, id: str = None, **kwargs):
+        """
+        Args:
+            id: A unique id to reference the block, used when querying blocks via XPath to aid embedding
+        """
         self.id = str(id) if id else f"block-{next(id_count)}"
         self.attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items()}
 
@@ -153,8 +168,10 @@ class BlockLayoutException(DPException):
 
 class Blocks(ReportBlock):
     """
-    Block objects at as a container that may hold a list of other Blocks object, such
-    as Tables, Plots, and even recursive Blocks
+    Block objects act as a container that hold a list of nested Blocks object, such
+    as Tables, Plots, etc.. - they may even hold Blocks themselves recursively.
+
+    Blocks are used to provide a grouping for blocks can have layout options applied to them
     """
 
     _tag = "Blocks"
@@ -168,6 +185,17 @@ class Blocks(ReportBlock):
         rows: int = 0,
         columns: int = 1,
     ):
+        """
+        Args:
+            *arg_blocks: Blocks to add to report
+            blocks: Allows providing the report blocks as a single list
+            id: A unique id for the blocks to aid querying (optional)
+            rows: Display the contained blocks, e.g. Plots, using _n_ rows
+            columns: Display the contained blocks, e.g. Plots, using _n_ columns
+
+        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
+          `dp.Blocks(plot, table, columns=2)` or `dp.Blocks(blocks=[plot, table], columns=2)`
+        """
         # wrap str in Markdown block
         _blocks = blocks or list(arg_blocks)
         self.blocks = [(Markdown(b) if isinstance(b, str) else b) for b in _blocks]
@@ -199,12 +227,19 @@ class Blocks(ReportBlock):
 class Markdown(ReportBlock):
     """
     Markdown objects store Markdown text that can be displayed as formatted text when viewing your report
+
+    ..note:: This object is also available as `dp.Text`
     """
 
     text: str
     _tag = "Text"
 
     def __init__(self, text: str, id: str = None):
+        """
+        Args:
+            text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
+            id: A unique id for the block to aid querying (optional)
+        """
         super().__init__(id=id)
         self.text = text
 
@@ -258,7 +293,11 @@ class Asset(ReportBlock, UploadableObjectMixin):
 
 
 class File(Asset):
-    """File blocks store a file that can be displayed and downloaded"""
+    """
+    File blocks are used to attach a file to the report that can be displayed (if possible) and downloaded by report viewers
+
+    Any types of files may be attached, for instance, images (png / jpg), PDFs, JSON data, Excel files, etc.
+    """
 
     _tag = "File"
 
@@ -271,10 +310,22 @@ class File(Asset):
         name: t.Optional[str] = None,
         id: str = None,
     ):
+        """
+        Args:
+            data: A python object to attach to the report (e.g. a dictionary)
+            file: Path to a file to attach to the report (e.g. a JPEG image)
+            is_json: If `True`, treat the `data` as JSON data already
+            can_download: Allow users to download the file when viewing the report
+            name: Name to be used when downloading the file
+            id: A unique id for the block to aid querying (optional)
+
+
+        ..note:: either `data` or `file` must be provided
+        """
         if file:
             file = Path(file)
         else:
-            out_fn = self._save_obj(data, is_json=is_json)
+            out_fn = self._save_obj(data, as_json=is_json)
             file = out_fn.file
 
         super().__init__(file=file, name=name or file.name, can_download=can_download, id=id)
@@ -282,21 +333,28 @@ class File(Asset):
 
 class Plot(Asset):
     """
-    Plot blocks store a Python-based plot, such as Altair, Boken, Matplotlib, or Plotly,
-    that can be displayed in your report
+    Plot blocks store a Python-based plot object, including ones created by Altair, Plotly, Matplotlib, Bokeh, and Folium,
+    for interactive display in your report when viewed in the browser.
     """
 
     _tag = "Plot"
 
     def __init__(self, data: t.Any, caption: t.Optional[str] = None, id: str = None):
-        out_fn = self._save_obj(data, is_json=False)
+        """
+
+        Args:
+            data: The `plot` object to attach
+            caption: A caption to display below the plot (optional)
+            id: A unique id for the block to aid querying (optional)
+        """
+        out_fn = self._save_obj(data, as_json=False)
         super().__init__(file=out_fn.file, caption=caption, width=640, height=480, id=id)
 
 
 class Table(Asset):
     """
-    Table blocks store a dataframe that can be viewed and filtered in your report, and exported to CSV or Excel.
-    Provides pivot-table functionality by default.
+    Table blocks store a dataframe that can be viewed and filtered by users viewing your report,
+    and downloaded by them as a CSV or Excel file.
     """
 
     _tag = "Table"
@@ -308,6 +366,16 @@ class Table(Asset):
         can_pivot: bool = True,
         id: str = None,
     ):
+        """
+        Args:
+            df: The pandas dataframe to attach to the report
+            caption: A caption to display below the plot (optional)
+            can_pivot: Is the table pivotable (not yet supported)
+            id: A unique id for the block to aid querying (optional)
+
+            ..hint:: `can_pivot` is currently unsupported and can be ignored
+
+        """
         fn = self._save_df(df)
         (rows, columns) = df.shape
         super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id)
@@ -315,13 +383,11 @@ class Table(Asset):
 
 ################################################################################
 # Report DPObject
-class Report(BEObjectRef):
+class Report(DPObjectRef):
     """
-    Reports collate plots, text, and tables into an interactive report that can be analysed by users
-    in their Browser
+    Reports collate plots, text, tables, and files into an interactive report that
+    can be analysed and shared by users in their Browser
 
-    .. note:: Blocks can be passed with using arg parameters or the `blocks` kwarg, e.g.
-      `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
     """
 
     endpoint: str = "/reports/"
@@ -347,6 +413,9 @@ class Report(BEObjectRef):
 
         Returns:
             A `Report` object that can be published, saved, etc.
+
+        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
+          `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
         """
         super().__init__(**kwargs)
         self.full_width = full_width
@@ -394,16 +463,29 @@ class Report(BEObjectRef):
         self,
         name: str,
         description: str = "",
-        open: bool = False,
-        tags: list = None,
-        tweet: t.Union[bool, str] = False,
         source_url: str = "",
+        visibility: t.Optional[str] = None,
+        open: bool = False,
+        tags: t.List[str] = None,
+        tweet: t.Union[bool, str] = False,
         **kwargs,
-    ):
-        """Publish the report, including its attached assets, to the logged-in Datapane Server"""
+    ) -> None:
+        """
+        Publish the report, including its attached assets, to the logged-in Datapane Server.
+
+        Args:
+            name: The report name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
+            description: A high-level description for the report, this is displayed in searches and thumbnails
+            source_url: A URL pointing to the source code for the report, e.g. a GitHub repo or a Colab report
+            visibility: one of `"PUBLIC"` _(default on Public)_, `"UNLISTED"`, `"ORG"` _(Teams only)_, or `"PRIVATE"` _(Teams only)_
+            open: Open the file in your browser after creating
+            tags: A list of tags (as strings) used to categorise your report
+            tweet: Open twitter to tweet your published report - can customise the tweet by passing the message in as this parameter
+        """
+
         tags = tags or []
         print("Publishing report and associated data - please wait..")
-        kwargs.update(name=name, description=description, tags=tags, source_url=source_url)
+        kwargs.update(name=name, description=description, tags=tags, source_url=source_url, visibility=visibility)
 
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
         res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)
@@ -437,8 +519,8 @@ class Report(BEObjectRef):
 
         Args:
             path: location to save the HTML file
-            open: set to `True` to open the file in your browser after creating
-            standalone: set to `True` to create a fully standalone HTML report (this can result in large files)
+            open: Open the file in your browser after creating
+            standalone: Create a fully standalone HTML report with no external/network dependencies _(this can result in large files)_
         """
         self._last_saved = path
 
@@ -451,7 +533,13 @@ class Report(BEObjectRef):
             webbrowser.open_new_tab(path_uri)
 
     def preview(self, width: int = 600, height: int = 500) -> None:
-        """ Preview the report inside IPython notebooks in browser """
+        """
+        Preview the report inside your currently running Jupyter notebook
+
+        Args:
+            width: Width of the report preview in Jupyter (default: 600)
+            height: Height of the report preview in Jupyter (default: 500)
+        """
         if is_jupyter():
             from IPython.display import IFrame
 

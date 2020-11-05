@@ -92,7 +92,7 @@ def test_blob_json(tmp_path: Path, monkeypatch):
     # upload object
     b2 = dp.Blob.upload_obj(data=obj, name=gen_name())
     # upload object using JSON writer
-    b3 = dp.Blob.upload_obj(data=obj, is_json=True, name=gen_name())
+    b3 = dp.Blob.upload_obj(data=obj, as_json=True, name=gen_name())
     with deletable(b1), deletable(b2), deletable(b3):
         # download objects
         # is the result of the uploaded pickle the same as the uploaded object?

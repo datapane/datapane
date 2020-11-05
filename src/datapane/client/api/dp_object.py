@@ -1,30 +1,37 @@
+"""## Base classes
+
+The base classes used by all Datapane objects stored on the Datapane Server
+and accessible by the client API
+
+..note:: This module is not used directly
+"""
 import json
 import os
-import pickle
 import pprint
 import typing as t
 from pathlib import Path
 from typing import Optional, Type
 from urllib import parse as up
 
-# TODO - import only during type checking and import future.annotations when dropping py 3.6
 import pandas as pd
 import validators as v
-from furl import furl
 from munch import Munch
 
-from datapane import __version__
-from datapane.client.scripts import DatapaneCfg
-from datapane.common import JSON, PKL_MIMETYPE, URL, NPath, SDict, log
-from datapane.common.datafiles import ArrowFormat, df_ext_map
+from datapane import log
+from datapane.client.api import Resource
+from datapane.client.api.common import DPTmpFile, FileList
+from datapane.common import JSON, URL, ArrowFormat, SDict
+
+__all__ = ["DPObjectRef", "UploadableObjectMixin"]
+
 from datapane.common.df_processor import process_df, to_df
 
-from .common import DPTmpFile, FileList, Resource, do_download_file
-
-U = t.TypeVar("U", bound="BEObjectRef")
+U = t.TypeVar("U", bound="DPObjectRef")
 
 
-class BEObjectRef:
+class DPObjectRef:
+    """Abstract class used to reference core Datapane server objects - not used directly."""
+
     endpoint: str
     res: Resource
 
@@ -75,29 +82,45 @@ class BEObjectRef:
         self._url = self.res.url
 
     def __init__(self, dto: Optional[JSON] = None):
-        # Save a server-round trip if we alread have the DTO
+        # Save a server-round trip if we already have the DTO
         if dto:
             self.dto = dto
             self.url = dto.id
 
     @classmethod
-    def get(
-        cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None
-    ) -> U:
+    def get(cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None) -> U:
+        """
+        Lookup and retrieve an object from the Datapane Server by its name
+
+        Args:
+            name: The name of the object, e.g. `my-blob 3`
+            owner: The owner of the object, e.g. `fred`
+            version: The version of the object (optional, defaults to latest)
+
+        Returns:
+            The version of the object if found
+        """
         res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner, version=version)
         return cls(dto=res)
 
     @classmethod
     def by_id(cls: Type[U], id_or_url: str) -> U:
+        """
+        Lookup and retrieve an object from the Datapane Server by its id
+
+        Args:
+            id_or_url: The `id`, or full URL that represents the object
+
+        Returns:
+            The version of the object if found
+        """
         x = cls()
         x.url = id_or_url
         x.refresh()
         return x
 
     @classmethod
-    def post_with_files(
-        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, **kwargs
-    ) -> U:
+    def post_with_files(cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, **kwargs) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList
@@ -108,7 +131,6 @@ class BEObjectRef:
 
     @classmethod
     def post(cls: Type[U], **kwargs) -> U:
-        """post object to api"""
         res = Resource(cls.endpoint).post(**kwargs)
         return cls(res)
 
@@ -125,13 +147,14 @@ class BEObjectRef:
     def __repr__(self) -> str:
         return pprint.pformat(self._dto.toDict()) if self.has_dto else self.__str__()
 
-    # helper functions
+    # user-facing helper functions
     def refresh(self):
-        """Update the local representation of the object"""
+        """Refresh the object with the latest data from the Datapane Server"""
         self.dto = self.res.get()
         log.debug(f"Refreshed {self.url}")
 
     def delete(self):
+        """Delete the object on the server"""
         self.res.delete()
         log.debug(f"Deleted object {self.url}")
 
@@ -144,7 +167,9 @@ class BEObjectRef:
 
     @classmethod
     def list(cls) -> t.Iterable[SDict]:
-        """Return a list of the resources """
+        """
+        Returns: A list of the Datapane objects of this type that are owned by the user
+        """
         endpoint: t.Optional[str] = cls.endpoint
 
         def process_field(v):
@@ -161,47 +186,9 @@ class BEObjectRef:
             endpoint = items.next if items.next else None
 
 
-class ExportableObjectMixin:
-    """Used by both Assets and Blobs to abstract over uploading/downloading and exporting"""
-
-    def download_df(self) -> pd.DataFrame:
-        with DPTmpFile(ArrowFormat.ext) as fn:
-            do_download_file(self.gcs_signed_url, fn.name)
-            return ArrowFormat.load_file(fn.name)
-
-    def download_file(self, fn: NPath):
-        fn = Path(fn)
-
-        def get_export_format() -> str:
-            ext = fn.suffix
-            if ext not in df_ext_map:
-                raise ValueError(
-                    f"Extension {ext} not valid for exporting table. Must be one of {', '.join(df_ext_map.keys())}"
-                )
-            return df_ext_map[ext].enum
-
-        # If file is of arrow type, export it. Otherwise use the gcs url directly.
-        if self.content_type == ArrowFormat.content_type:
-            # TODO - export_url should include the host
-            x = furl(self.export_url)
-            x.args["export_format"] = get_export_format()
-            x.origin = furl(self.url).origin
-            download_url = x.url
-        else:
-            download_url = self.gcs_signed_url
-        do_download_file(download_url, fn)
-
-    def download_obj(self) -> t.Any:
-        with DPTmpFile(".obj") as fn:
-            do_download_file(self.gcs_signed_url, fn.name)
-            # In the case that the original object was a Python object or bytes-like object,
-            # the downloaded obj will be a pickle which needs to be unpickled.
-            # Otherwise it's a stringified JSON object (e.g. an Altair plot) that can be returned as JSON.
-            if self.content_type == PKL_MIMETYPE:
-                with fn.file.open("rb") as fp:
-                    return pickle.load(fp)
-            else:
-                return json.loads(fn.file.read_text())
+# NOTE - this has been inlined into Blobs for now
+# class ExportableObjectMixin:
+#    """Used by both Assets and Blobs to abstract over uploading/downloading and exporting"""
 
 
 class UploadableObjectMixin:
@@ -215,92 +202,10 @@ class UploadableObjectMixin:
         return fn
 
     @classmethod
-    def _save_obj(cls, data: t.Any, is_json: bool) -> DPTmpFile:
+    def _save_obj(cls, data: t.Any, as_json: bool) -> DPTmpFile:
         # import here as a very slow module due to nested imports
         from ..files import save
 
-        fn = save(data, default_to_json=is_json)
+        fn = save(data, default_to_json=as_json)
         log.debug(f"Saved object to {fn} ({os.path.getsize(fn.file)} bytes)")
         return fn
-
-
-class Blob(BEObjectRef, UploadableObjectMixin, ExportableObjectMixin):
-    endpoint: str = "/blobs/"
-
-    @classmethod
-    def upload_df(cls, df: pd.DataFrame, **kwargs) -> "Blob":
-        with cls._save_df(df) as fn:
-            return cls.post_with_files(file=fn.file, **kwargs)
-
-    @classmethod
-    def upload_file(cls, fn: NPath, **kwargs) -> "Blob":
-        return cls.post_with_files(file=Path(fn), **kwargs)
-
-    @classmethod
-    def upload_obj(cls, data: t.Any, is_json: bool = False, **kwargs: JSON) -> "Blob":
-        with cls._save_obj(data, is_json) as fn:
-            return cls.post_with_files(file=fn.file, **kwargs)
-
-
-class Script(BEObjectRef):
-    endpoint: str = "/scripts/"
-
-    @classmethod
-    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> "Script":
-        # TODO - use DPTmpFile
-        # merge all the params for the API-call
-        kwargs["api_version"] = __version__
-        new_kwargs = {**dp_cfg.to_dict(), **kwargs}
-        return cls.post_with_files(file=sdist, **new_kwargs)
-
-    def download_pkg(self) -> Path:
-        fn = do_download_file(self.gcs_signed_url)
-        return Path(fn)
-
-    def call(self, **params):
-        """Download, install, and call the script with the provided params"""
-        # NOTE - use __call__??
-        # TODO - move exec_script here?
-        # TODO - call should handle param defaults
-        from datapane.runner.exec_script import run
-
-        run(self, params)
-
-    def run(self, parameters=None, cache=True) -> "Run":
-        """(remote) run the given app (cloning if needed?)"""
-        parameters = parameters or dict()
-        return Run.post(script=self.url, parameter_vals=parameters, cache=cache)
-
-    def local_run(self, parameters=None) -> "Run":
-        """(local) run the given script"""
-        # NOTE -is there a use-case for this?
-        raise NotImplementedError()
-
-
-class Run(BEObjectRef):
-    endpoint: str = "/runs/"
-
-    def is_complete(self) -> bool:
-        """Return true if the run has finished"""
-        return self.status in ["SUCCESS", "ERROR", "CANCELLED"]
-
-
-class Variable(BEObjectRef):
-    endpoint: str = "/uservariables/"
-    list_fields = ["name", "versions"]
-
-    @classmethod
-    def create(cls, name: str, value: str, visibility: Optional[str] = None) -> "Variable":
-        return cls.post(name=name, value=value, visibility=visibility)
-
-
-class Schedule(BEObjectRef):
-    endpoint: str = "/schedules/"
-    list_fields = ["id", "script", "cron", "parameter_vals"]
-
-    @classmethod
-    def create(cls, script: Script, cron: str, parameters: SDict) -> "Schedule":
-        return cls.post(script=script.url, cron=cron, parameter_vals=parameters)
-
-    def update(self, cron: str = None, parameters: SDict = None) -> None:
-        super().update(cron=cron, parameter_vals=parameters)

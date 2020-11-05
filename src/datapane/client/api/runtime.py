@@ -1,3 +1,9 @@
+"""## Script runtime API
+
+Runtime API used when running a Datapane Script
+
+..note:: The objects in this module are available on the Teams Plan
+"""
 import dataclasses as dc
 import os
 import typing as t
