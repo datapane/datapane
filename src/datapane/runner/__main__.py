@@ -60,9 +60,7 @@ ENV_ALLOWLIST = ("LANG", "PATH", "HOME", "PYTHON_VERSION", "PYTHONPATH")
 USER_USER = "usercode"
 
 
-def make_env(
-    input_env: Mapping[str, str], allowed: Iterable[str] = ENV_ALLOWLIST
-) -> Dict[str, str]:
+def make_env(input_env: Mapping[str, str], allowed: Iterable[str] = ENV_ALLOWLIST) -> Dict[str, str]:
 
     return {k: input_env[k] for k in allowed if k in input_env}
 
@@ -114,9 +112,7 @@ def main():
     preexec()
     retcode: int
 
-    with (out_dir / "logs.txt").open("w") as stream_logs, (out_dir / "results.json").open(
-        "w"
-    ) as results_stream:
+    with (out_dir / "logs.txt").open("w") as stream_logs, (out_dir / "results.json").open("w") as results_stream:
         try:
             # check cli compatible with server - should never really fail
             if args.server_version:
@@ -133,9 +129,7 @@ def main():
         except Exception:
             log.exception("Unhandled Exception in Model Runner")
             # we could send traceback as details, but not useful to end user
-            ErrorResult(error="Unhandled Exception", debug=traceback.format_exc()).to_json(
-                results_stream
-            )
+            ErrorResult(error="Unhandled Exception", debug=traceback.format_exc()).to_json(results_stream)
             retcode = 104
         else:
             res.to_json(results_stream)

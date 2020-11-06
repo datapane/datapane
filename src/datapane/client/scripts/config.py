@@ -52,9 +52,7 @@ class DatapaneCfg:
 
     name: str = "datapane"
     # relative path to script
-    script: Path = dc.field(
-        default_factory=lambda: DEFAULT_IPYNB if DEFAULT_IPYNB.exists() else DEFAULT_PY
-    )
+    script: Path = dc.field(default_factory=lambda: DEFAULT_IPYNB if DEFAULT_IPYNB.exists() else DEFAULT_PY)
     config: dc.InitVar[Path] = None
     proj_dir: ClassVar[Path] = None
 
@@ -81,9 +79,7 @@ class DatapaneCfg:
         # TODO - support running config/script from another dir with abs paths
         # all paths are relative and we're running from the same dir
         if config:
-            assert (
-                config.parent == self.script.parent == Path(".")
-            ), "All files must be in the main project directory"
+            assert config.parent == self.script.parent == Path("."), "All files must be in the main project directory"
         # we must be in the project dir for now
         # TODO - move this logic to create_initial
         self.proj_dir = self.script.resolve(strict=False).parent
@@ -96,9 +92,7 @@ class DatapaneCfg:
 
         # validate config
         if self.parameters:
-            config_schema = json.loads(
-                ir.read_text("datapane.resources", "script_parameter_def.schema.json")
-            )
+            config_schema = json.loads(ir.read_text("datapane.resources", "script_parameter_def.schema.json"))
             jsonschema.validate(self.parameters, config_schema)
 
     @classmethod
