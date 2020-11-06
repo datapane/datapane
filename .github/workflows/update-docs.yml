@@ -46,7 +46,8 @@ jobs:
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install
-          poetry run pdoc --html --config show_source_code=False --config list_class_variables_in_index=False --config sort_identifiers=False --config 'google_analytics="UA-167952366-2"' --config 'lunr_search={"fuzziness": 1, "index_docstrings": True}' -f --output-dir ./docs1 datapane.client.api
+          # --config 'lunr_search={"fuzziness": 1, "index_docstrings": True}'
+          poetry run pdoc --html --config show_source_code=False --config list_class_variables_in_index=False --config sort_identifiers=False --config 'google_analytics="UA-167952366-2"' --config show_inherited_members=True -f --output-dir ./docs1 datapane.client.api
           # HACK for lunr js sarch not working fully - see https://github.com/pdoc3/pdoc/issues/250
           # mv -v docs1/datapane/client/api/* docs
           mkdir ./docs

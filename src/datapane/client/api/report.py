@@ -229,6 +229,8 @@ class Markdown(ReportBlock):
     Markdown objects store Markdown text that can be displayed as formatted text when viewing your report
 
     ..note:: This object is also available as `dp.Text`
+
+    ..tip:: You can embed a dataframe in a Markdown block by using `df.to_markdown()`, or use dp.Table for larger data if you need sorting, filtering and more.
     """
 
     text: str
@@ -353,8 +355,10 @@ class Plot(Asset):
 
 class Table(Asset):
     """
-    Table blocks store a dataframe that can be viewed and filtered by users viewing your report,
+    Table blocks store a dataframe that can be viewed, sorted, filtered by users viewing your report,
     and downloaded by them as a CSV or Excel file.
+
+    ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider embedding your dataframe in a Datapane Markdown block, e.g. `dp.Markdown(df.to_markdown())`
     """
 
     _tag = "Table"
