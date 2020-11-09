@@ -2,7 +2,7 @@
 
 These docs describe the Python API for building Datapane Reports, along with additional information on the Datapane Teams API.
 
-Usage docs for Datapane can be found at https://docs.datapane.com.
+Usage docs for Datapane can be found at https://docs.datapane.com
 
 These objects are all available under the `datapane` module, via `import datapane as dp` (they are re-exported from `datapane.client.api`).
 
