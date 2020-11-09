@@ -180,6 +180,8 @@ class Variable(DPObjectRef):
     @classmethod
     def create(cls, name: str, value: str, visibility: Optional[str] = "ORG") -> "Variable":
         """
+        Create a shareable Datapane User Variable with provided `name` and `value`
+
         Args:
             name: Name of the variable
             value: Value of the variable

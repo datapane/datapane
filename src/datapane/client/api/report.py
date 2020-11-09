@@ -226,11 +226,11 @@ class Blocks(ReportBlock):
 
 class Markdown(ReportBlock):
     """
-    Markdown objects store Markdown text that can be displayed as formatted text when viewing your report
+    Markdown objects store Markdown text that can be displayed as formatted text when viewing your report.
 
-    ..note:: This object is also available as `dp.Text`
+    ..note:: This object is also available as `dp.Text`, and any strings provided directly to the Report/Blocks object are converted automatically to Markdown blocks
 
-    ..tip:: You can embed a dataframe in a Markdown block by using `df.to_markdown()`, or use dp.Table for larger data if you need sorting, filtering and more.
+    ..tip:: You can insert a dataframe in a Markdown block as a table by using `df.to_markdown()`, or use dp.Table for larger data if you need sorting, filtering and more.
     """
 
     text: str

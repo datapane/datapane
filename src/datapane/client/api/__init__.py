@@ -1,5 +1,9 @@
 """# API docs for Datapane Client
 
+These docs describe the Python API for building Datapane Reports, along with additional information on the Datapane Teams API.
+
+Usage docs for Datapane can be found at https://docs.datapane.com.
+
 These objects are all available under the `datapane` module, via `import datapane as dp` (they are re-exported from `datapane.client.api`).
 
 ### Datapane Reports API
@@ -23,7 +27,7 @@ Additional API docs for teams and enterprise features are found in `datapane.cli
   - `datapane.client.api.teams.Schedule`
 
 
-.. note::  These docs represent the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
+.. note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
     <a href="https://pypi.org/project/datapane/">
         <img src="https://img.shields.io/pypi/v/datapane?color=blue" alt="Latest release" />
     </a>
@@ -40,3 +44,5 @@ from .runtime import Params, Result, by_datapane, on_datapane, _reset_runtime, _
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionException
 from ..config import init
+
+Text = Markdown

@@ -260,7 +260,7 @@ def do_download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
         x = r.headers.get("Content-Disposition")
         if not fn:
             if x and "filename" in x:
-                # 'attachment; filename="datapane_test_test_dp_1588192318-1588192318-py3-none-any.whl"'
+                # 'attachment; filename="datapane-test_test_dp_1588192318-1588192318-py3-none-any.whl"'
                 y = x.split("filename=", maxsplit=1)[1].strip('"')
                 fn = str(Path.cwd() / y)
             else:

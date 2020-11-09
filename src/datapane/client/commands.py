@@ -90,6 +90,15 @@ class GlobalCommandHandler(click.Group):
             failure_msg(str(e), do_exit=True)
 
 
+def recursive_help(cmd, parent=None):
+    ctx = click.core.Context(cmd, info_name=cmd.name, parent=parent)
+    print(cmd.get_help(ctx))
+    print()
+    commands = getattr(cmd, "commands", {})
+    for sub in commands.values():
+        recursive_help(sub, ctx)
+
+
 ###############################################################################
 # Main
 @click.group(cls=GlobalCommandHandler)
@@ -108,6 +117,11 @@ def cli(ctx, verbose: int, env: str):
     EXTRA_OUT = verbose > 0
     init(verbosity=verbose, config_env=env)
     ctx.obj = DPContext(env=env)
+
+
+# @cli.command()
+# def dumphelp():
+#     recursive_help(cli)
 
 
 ###############################################################################

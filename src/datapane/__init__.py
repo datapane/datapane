@@ -32,6 +32,7 @@ from .client.api import (
     Script,
     Schedule,
     Table,
+    Text,
     Variable,
     by_datapane,
     login,
