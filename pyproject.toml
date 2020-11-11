@@ -38,7 +38,7 @@ dataclasses = {version = "0.7", python = "~3.6.1"}
 # DS
 numpy = "^1.18.0"
 pandas = "^1.0.1"
-pyarrow = "0.17.*"
+pyarrow = "^2.0.0"
 
 # viz
 matplotlib = "^3.1.0"
