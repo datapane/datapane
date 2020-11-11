@@ -279,16 +279,9 @@
     <!-- TODO - should attachment be it's own attribute? -->
     <attribute name="src">
       <data type="anyURI">
-        <param name="pattern">(http|https|cas|file|data|attachment):.+</param>
+        <param name="pattern">((http|https|cas|file|data|attachment):|/).+</param>
       </data>
     </attribute>
-    <optional>
-      <attribute name="preview">
-        <data type="anyURI">
-          <param name="pattern">(http|https|cas|file|data):.+</param>
-        </data>
-      </attribute>
-    </optional>
     <optional>
       <!-- TODO - do we validate export_url protocol? -->
       <attribute name="export_url">

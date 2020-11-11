@@ -80,7 +80,6 @@ vega_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"))
 # Table
 df_asset = dp.DataTable(df)
 
-
 # Matplotlib
 np.random.seed(19680801)
 xdata = np.random.random([2, 10])

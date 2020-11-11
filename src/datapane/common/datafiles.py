@@ -1,8 +1,7 @@
+"""Dataset Format handling"""
 import abc
 import enum
-import os
-from dataclasses import dataclass
-from typing import BinaryIO, Dict, Type, Union
+from typing import IO, BinaryIO, Dict, Type, Union
 
 import pandas as pd
 import pyarrow as pa
@@ -11,31 +10,8 @@ from pyarrow import RecordBatchFileWriter
 
 from .config import log
 from .df_processor import process_df
-from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME, Hash
+from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME
 from .utils import guess_encoding
-
-
-@dataclass
-class ImportFileResp:
-    cas_ref: Hash
-    content_type: MIME
-    file_size: int
-    num_rows: int
-    num_columns: int
-
-
-def import_arrow_file(table: pa.Table, arrow_f_name: str, cas_ref: str = None) -> ImportFileResp:
-    file_size = os.path.getsize(arrow_f_name)
-    # schema unused atm
-    _: pa.Schema = table.schema
-
-    return ImportFileResp(
-        cas_ref=cas_ref,
-        content_type=ARROW_MIMETYPE,
-        file_size=file_size,
-        num_rows=table.num_rows,
-        num_columns=table.num_columns,
-    )
 
 
 def write_table(table: pa.Table, sink: Union[str, BinaryIO]):
@@ -45,8 +21,9 @@ def write_table(table: pa.Table, sink: Union[str, BinaryIO]):
     writer.close()
 
 
-####################################################################################################
-# Dataset Format handling
+PathOrFile = Union[str, IO]
+
+
 class DFFormatter(abc.ABC):
     # TODO - tie to mimetypes lib
     content_type: MIME
@@ -55,12 +32,12 @@ class DFFormatter(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def load_file(fn: str) -> pd.DataFrame:
+    def load_file(fn: PathOrFile) -> pd.DataFrame:
         ...
 
     @staticmethod
     @abc.abstractmethod
-    def save_file(fn: str, df: pd.DataFrame):
+    def save_file(fn: PathOrFile, df: pd.DataFrame):
         ...
 
 
@@ -72,10 +49,10 @@ class ArrowFormat(DFFormatter):
     ext = ARROW_EXT
     enum = "ARROW"
 
-    def load_file(fn: str) -> pd.DataFrame:
+    def load_file(fn: PathOrFile) -> pd.DataFrame:
         return pa.ipc.open_file(fn).read_pandas()
 
-    def save_file(fn: str, df: pd.DataFrame):
+    def save_file(fn: PathOrFile, df: pd.DataFrame):
         df = process_df(df)
         # NOTE - can pass expected schema and columns for output df here
         table: pa.Table = pa.Table.from_pandas(df, preserve_index=False)
@@ -87,7 +64,7 @@ class CSVFormat(DFFormatter):
     ext = ".csv"
     enum = "CSV"
 
-    def load_file(fn: str) -> pd.DataFrame:
+    def load_file(fn: PathOrFile) -> pd.DataFrame:
 
         try:
             return pd.read_csv(fn, engine="c", sep=",")
@@ -102,7 +79,7 @@ class CSVFormat(DFFormatter):
                 encoding = guess_encoding(fn)
                 return pd.read_csv(fn, engine="python", sep=None, encoding=encoding)
 
-    def save_file(fn: str, df: pd.DataFrame):
+    def save_file(fn: PathOrFile, df: pd.DataFrame):
         df.to_csv(fn, index=False)
 
 
@@ -111,10 +88,10 @@ class ExcelFormat(DFFormatter):
     ext = ".xlsx"
     enum = "EXCEL"
 
-    def load_file(fn: str) -> pd.DataFrame:
+    def load_file(fn: PathOrFile) -> pd.DataFrame:
         return pd.read_excel(fn, engine="openpyxl")
 
-    def save_file(fn: str, df: pd.DataFrame):
+    def save_file(fn: PathOrFile, df: pd.DataFrame):
         df.to_excel(fn, index=False, engine="openpyxl")
 
 

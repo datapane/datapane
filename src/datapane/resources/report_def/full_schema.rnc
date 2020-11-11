@@ -109,8 +109,7 @@ BigNumber = element BigNumber {
 assetAttributes =
   block_id_label,
   # TODO - should attachment be it's own attribute?
-  attribute src { xsd:anyURI { pattern = "(http|https|cas|file|data|attachment):.+"} },
-  attribute preview { xsd:anyURI { pattern = "(http|https|cas|file|data):.+"} }?,
+  attribute src { xsd:anyURI { pattern = "((http|https|cas|file|data|attachment):|/).+"} },
   # TODO - do we validate export_url protocol?
   attribute export_url { xsd:anyURI }?,
   attribute type { xsd:string { pattern = '\w+/[\w.+\-]+' } },
@@ -139,7 +138,6 @@ Table = element Table {
 DataTable = element DataTable {
   assetAttributes,
   attribute rows { xsd:positiveInteger },
-  attribute columns { xsd:positiveInteger },
-
+  attribute columns { xsd:positiveInteger }
   # attribute cells { xsd:positiveInteger }
 }

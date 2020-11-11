@@ -18,14 +18,6 @@ def convert_indices(df: pd.DataFrame):
         # Int64Index -> RangeIndex if possible
         df.reset_index(inplace=True, drop=True)
 
-    # col_names: List[str] = df.columns.values.tolist()
-    # if (
-    #     all([df.index.get_level_values(x).dtype != np.dtype("int64") for x in range(df.index.nlevels)])
-    #     and len(set(df.index.names)) == len(df.index.names)
-    #     and not any([x in col_names for x in df.index.names])
-    # ):
-    #     df.reset_index(inplace=True)
-
 
 def downcast_numbers(data: pd.DataFrame):
     """Downcast numerics"""
@@ -49,7 +41,6 @@ def timedelta_to_str(df: pd.DataFrame):
     convert timedelta to str - NOTE - only until arrow.js supports Duration type
     """
     df_td = df.select_dtypes("timedelta")
-    # df[df_timedelta.columns] = df_timedelta.astype("string")
     df[df_td.columns] = np.where(pd.isnull(df_td), pd.NA, df_td.astype("string"))
 
 
@@ -83,14 +74,11 @@ def obj_to_str(df: pd.DataFrame):
     """Converts remaining objects columns to str"""
     # convert objects to str / NA
     df_str = df.select_dtypes("object")
-    # df[df_str.columns] = np.where(pd.isnull(df_str), pd.NA, df_str.astype("string"))
     df[df_str.columns] = df_str.astype("string")
 
     # convert categorical values (as strings if object)
     def to_str_cat_vals(x: pd.Series) -> pd.Series:
         if x.cat.categories.dtype == np.dtype("object"):
-            # x.cat.categories = x.cat.categories.astype(str)
-            # x.cat.categories = np.where(pd.isnull(x.cat.categories), pd.NA, x.cat.categories.astype("string"))
             x.cat.categories = x.cat.categories.astype("string")
         return x
 
@@ -104,7 +92,7 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     We only modify the dataframe to optimise size,
     rather than convert/infer types, e.g. no longer parsing dates from strings
 
-    NOTE - this mutates the dataframe by default
+    NOTE - this mutates the dataframe by default but returns it - use the returned copy!
     """
     if copy:
         df = df.copy(deep=True)

@@ -117,7 +117,7 @@ class Blob(DPObjectRef):
             A pandas dataframe generated from the blob
         """
         with DPTmpFile(ArrowFormat.ext) as fn:
-            do_download_file(self.gcs_signed_url, fn.name)
+            do_download_file(self.data_url, fn.name)
             return ArrowFormat.load_file(fn.name)
 
     def download_file(self, fn: NPath) -> None:
@@ -139,13 +139,11 @@ class Blob(DPObjectRef):
 
         # If file is of arrow type, export it. Otherwise use the gcs url directly.
         if self.content_type == ArrowFormat.content_type:
-            # TODO - export_url should include the host
-            x = furl(self.export_url)
-            x.args["export_format"] = get_export_format()
-            x.origin = furl(self.url).origin
-            download_url = x.url
+            download_url = furl(self.export_url)
+            download_url.args["export_format"] = get_export_format()
         else:
-            download_url = self.gcs_signed_url
+            download_url = furl(self.data_url)
+
         do_download_file(download_url, fn)
 
     def download_obj(self) -> t.Any:
@@ -156,7 +154,7 @@ class Blob(DPObjectRef):
             The object created by deserialising the Blob (either via Pickle or JSON decoding)
         """
         with DPTmpFile(".obj") as fn:
-            do_download_file(self.gcs_signed_url, fn.name)
+            do_download_file(self.data_url, fn.name)
             # In the case that the original object was a Python object or bytes-like object,
             # the downloaded obj will be a pickle which needs to be unpickled.
             # Otherwise it's a stringified JSON object (e.g. an Altair plot) that can be returned as JSON.
@@ -216,7 +214,7 @@ class Script(DPObjectRef):
         return cls.post_with_files(file=sdist, **new_kwargs)
 
     def download_pkg(self) -> Path:
-        fn = do_download_file(self.gcs_signed_url)
+        fn = do_download_file(self.data_url)
         return Path(fn)
 
     def call(self, **params):

@@ -57,7 +57,7 @@ def test_report_with_files(datadir: Path):
         ...
 
 
-def test_report(tmp_path: Path):
+def test_full_report(tmp_path: Path):
     df = gen_df()
     name = gen_name()
     description = gen_description()

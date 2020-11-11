@@ -259,9 +259,16 @@ class Resource:
         log.debug(f"Unnesting endpoint {endpoint}")
 
 
-def do_download_file(download_url: str, fn: t.Optional[NPath] = None) -> NPath:
+def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = None) -> NPath:
     """Download a file to `cwd`, using `fn` if provided, else Content-Disposition, else tmpfile"""
-    with requests.get(download_url, stream=True) as r:
+    if isinstance(download_url, str):
+        download_url: furl = furl(download_url)
+
+    if download_url.host is None:
+        # assume the url is relative to the dp server
+        download_url.origin = c.config.server
+
+    with requests.get(str(download_url.url), stream=True) as r:
         x = r.headers.get("Content-Disposition")
         if not fn:
             if x and "filename" in x:

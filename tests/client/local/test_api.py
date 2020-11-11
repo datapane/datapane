@@ -173,7 +173,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
     dt_asset = dp.DataTable(df=big_df, caption="Test DataTable")
 
     if single_file:
-        return dp.Report(dp.Group(blocks=[md_block, plot_asset]))
+        return dp.Report(dp.Group(blocks=[md_block, dt_asset]))
     else:
         return dp.Report(
             dp.Page(
