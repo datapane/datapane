@@ -42,7 +42,7 @@
     <script>
       const report = { document: `{{ report_doc }}` };
       const { React, ReactDOM, ReportComponent } = UMDModules;
-      const ReportFactory = React.createFactory(ReportComponent);
+      const ReportFactory = React.createElement.bind(null, ReportComponent);
       ReactDOM.render(
         ReportFactory({ report }),
         document.querySelector("#report-root")
