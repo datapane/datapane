@@ -57,40 +57,46 @@ def run_api(run_config: RunnerConfig) -> RunResult:
 
 # ensure we copy PYTHONPATH across
 ENV_ALLOWLIST = ("LANG", "PATH", "HOME", "PYTHON_VERSION", "PYTHONPATH")
-USER_USER = "usercode"
 
 
 def make_env(input_env: Mapping[str, str], allowed: Iterable[str] = ENV_ALLOWLIST) -> Dict[str, str]:
-
     return {k: input_env[k] for k in allowed if k in input_env}
 
 
-# TODO - do we still need this??
-def drop_privileges(uid_name="nobody", gid_name="nogroup"):
+def drop_privileges(out_dir: Path, uid_name: str = "nobody", gid_name: str = "nogroup") -> None:
+    """Drop to non-root user if required. TODO - do we still need this??"""
     import grp
+    import subprocess
 
     # from: https://stackoverflow.com/questions/2699907/dropping-root-permissions-in-python
     if os.getuid() != 0:
         return
 
-    # Get the uid/gid from the name
-    running_uid = pwd.getpwnam(uid_name).pw_uid
-    running_gid = grp.getgrnam(gid_name).gr_gid
+    try:
+        # Get the uid/gid from the name
+        running_uid = pwd.getpwnam(uid_name).pw_uid
+        running_gid = grp.getgrnam(gid_name).gr_gid
 
-    # Remove group privileges
-    os.setgroups([])
+        # chown the output dir
+        subprocess.run(["chown", "-R", f"{uid_name}:{gid_name}", str(out_dir)], check=True)
 
-    # Try setting the new uid/gid
-    os.setgid(running_gid)
-    os.setuid(running_uid)
+        # Remove group privileges
+        os.setgroups([])
 
-    # Ensure a very conservative umask
-    os.umask(0o77)
+        # Try setting the new uid/gid
+        os.setgid(running_gid)
+        os.setuid(running_uid)
+
+        # Ensure a very conservative umask
+        os.umask(0o77)
+    except Exception:
+        log.warning("Error dropping privileges to non-root user, continuing")
 
 
-def preexec():
-    # NOTE - do we still need this??
-    drop_privileges(USER_USER, USER_USER)
+def preexec(out_dir: Path):
+    # Currently disabled as unsure how will react with 3rd-party libs, e.g. boto, etc.
+    # drop_privileges(out_dir)
+    pass
 
 
 def parse_args(argv: Optional[List[str]] = None) -> Tuple[argparse.Namespace, List[str]]:
@@ -109,7 +115,7 @@ def main():
     args, unknown_args = parse_args()
 
     out_dir: Path = args.out_dir
-    preexec()
+    preexec(out_dir)
     retcode: int
 
     with (out_dir / "logs.txt").open("w") as stream_logs, (out_dir / "results.json").open("w") as results_stream:

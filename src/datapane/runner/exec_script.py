@@ -89,7 +89,7 @@ def script_env(env_dir: Path) -> t.ContextManager[None]:
     """
     Change the local dir and add to site-path so relative files and imports work
     TODO
-        - this is NOT thread-safe - unlikly we can run multiple concurrent scripts atm
+        - this is NOT thread-safe - unlikely we can run multiple concurrent scripts atm
         - this doesn't save env's as a call-stack directly - however handled implictly via Python stack anyway
     """
     cwd = os.getcwd()
@@ -139,9 +139,8 @@ def setup_script(s: api.Script, env_dir: Path):
     # install deps
     if s.requirements:
         pip_args = [sys.executable, "-m", "pip", "install"]
-        # # who are we?
-        if not in_venv() and os.getuid() != 0:
-            # we're a normal user
+        if os.getuid() != 0 and not in_venv():
+            # we're a normal/non-root user outside a venv
             pip_args.append("--user")
         pip_args.extend(s.requirements)
         log.debug(f"Calling pip as '{pip_args}'")
@@ -163,7 +162,7 @@ def exec_mod(script_path: Path, init_state: Optional[SDict] = None) -> SDict:
     globalscope.update(init_state)
 
     # we're using run_py rather than run_module to ensure same env as running on user's machine locally
-    # we have a script, not a module -must follow script semantics
+    # we have a script, not a module - must follow script semantics
     res_scope = runpy.run_path(str(script_path), init_globals=globalscope, run_name=RUN_NAME)
     return res_scope
 
