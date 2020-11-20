@@ -42,7 +42,7 @@ import typing as t
 from contextlib import contextmanager
 from pathlib import Path
 
-from flit_core.inifile import _check_glob_patterns
+from flit_core.config import _check_glob_patterns
 from flit_core.sdist import FilePatterns, SdistBuilder, clean_tarinfo
 
 from datapane.common.utils import log, temp_fname
@@ -72,10 +72,10 @@ def preprocess_src_dir(dp_config: DatapaneCfg) -> Path:
 # Flit sdist builder wrapper
 class Module:
     def __init__(self, file: Path):
-        self.file = str(file)
+        self.file = file.absolute()
 
     def iter_files(self):
-        yield self.file
+        yield str(self.file)
 
 
 DROP_DIRS_INIT = [".git", "__pycache__"]
@@ -83,18 +83,19 @@ DROP_DIRS = [f"{d}{osp.sep}" for d in DROP_DIRS_INIT]
 
 
 class Bundler(SdistBuilder):
-    def __init__(self, cfgdir: str, module: Module, include_patterns=(), exclude_patterns=()):
+    def __init__(self, cfgdir: Path, module: Module, include_patterns=(), exclude_patterns=()):
         self.cfgdir = cfgdir
         self.module = module
         self.extra_files = []
-        self.includes = FilePatterns(include_patterns, cfgdir)
-        self.excludes = FilePatterns(exclude_patterns, cfgdir)
+        self.includes = FilePatterns(include_patterns, str(cfgdir))
+        self.excludes = FilePatterns(exclude_patterns, str(cfgdir))
 
     # TODO - this should be handled by recursive globbing when added to flit
     def drop_unrequired_files(self, f: str) -> bool:
         return any((d in f for d in DROP_DIRS))
 
     def apply_includes_excludes(self, files) -> t.List[str]:
+        """Modify upstream to drop files from hardcoded drop filters"""
         files = super().apply_includes_excludes(files)
         reduced_files = {f for f in files if not self.drop_unrequired_files(f)}
 
@@ -105,9 +106,7 @@ class Bundler(SdistBuilder):
         return sorted(reduced_files)
 
     def build(self, target: Path):
-        with tarfile.TarFile.open(
-            target, mode="w:gz", compresslevel=6, format=tarfile.PAX_FORMAT
-        ) as tf:
+        with tarfile.TarFile.open(target, mode="w:gz", compresslevel=6, format=tarfile.PAX_FORMAT) as tf:
             files_to_add: t.List[str] = self.apply_includes_excludes(self.select_files())
 
             for relpath in files_to_add:
@@ -138,7 +137,7 @@ def build_bundle(dp_config: DatapaneCfg, use_git: bool = False) -> t.ContextMana
         sdist_file_p = Path(sdist_file)
         temp_mod = preprocess_src_dir(dp_config)
         try:
-            sb = Bundler(str(proj_dir), Module(dp_config.script), incs, excs)
+            sb = Bundler(proj_dir, Module(dp_config.script), incs, excs)
             sb.build(sdist_file_p)
         finally:
             if temp_mod:

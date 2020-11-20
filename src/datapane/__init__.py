@@ -13,7 +13,7 @@ except ImportError:
 
 __version__ = "0.8.5"
 
-TEST_ENV: bool = "DP_TEST_ENV" in os.environ
+TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
 
 # Other useful re-exports
 from .common.utils import log, _setup_dp_logging
