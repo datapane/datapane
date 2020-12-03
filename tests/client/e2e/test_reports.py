@@ -37,7 +37,7 @@ def test_report_simple_permissions():
         assert r.history[0].status_code == 302  # redirect to login
         assert r.status_code == 200
         # check we can't embed a private report
-        f = furl(origin=c.config.server, path="api/oembed", args=dict(url=report.web_url))
+        f = furl(origin=c.config.server, path="api/oembed/", args=dict(url=report.web_url))
         r = requests.get(url=str(f))
         assert r.status_code == 401
 
