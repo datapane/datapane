@@ -15,6 +15,7 @@ pytestmark = pytest.mark.usefixtures("dp_login")
 
 
 @pytest.mark.org
+@pytest.mark.timeout(5 * 60)  # allow 5m
 def test_script_basic(shared_datadir: Path, monkeypatch):
     """Deploying and running a basic report-generating script"""
     monkeypatch.chdir(shared_datadir)
@@ -63,6 +64,7 @@ def test_script_basic(shared_datadir: Path, monkeypatch):
 
 
 @pytest.mark.org
+@pytest.mark.timeout(5 * 60)  # allow 5m
 def test_script_complex(shared_datadir: Path, monkeypatch):
     """Deploy and run a complex script with no report and multiple params"""
     monkeypatch.chdir(shared_datadir)
@@ -99,6 +101,7 @@ def test_script_complex(shared_datadir: Path, monkeypatch):
 
 
 @pytest.mark.org
+@pytest.mark.timeout(5 * 60)  # allow 5m
 def test_script_complex_report(shared_datadir: Path, monkeypatch):
     """
     Deploy and run a complex script that generates a complex report
