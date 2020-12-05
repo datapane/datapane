@@ -43,6 +43,7 @@ pyarrow = "^2.0.0"
 # viz
 matplotlib = "^3.1.0"
 altair = "^4.0.0"
+# hardcoded to 2.0 atm due to parcel bundling bugs
 bokeh = "2.0.0"
 # we need to stick to 6.0.x until we drop py 3.6 support
 nbconvert = "6.0.*"
@@ -51,11 +52,11 @@ folium = "0.11.*"
 # ipython = "^7.7.0" # needed for nbconvert?
 
 # misc
-dacite = "^1.2.0"
+dacite = "^1.5.0"
 colorlog = "^4.1.0"
 munch = "^2.5.0"
 stringcase = "^1.2.0"
-PyYAML = "^5.1.0"
+PyYAML = "^5.3.0"
 packaging = "^20.3"
 
 # CLI
