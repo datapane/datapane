@@ -481,7 +481,7 @@ class Report(DPObjectRef):
             name: The report name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the report, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the report, e.g. a GitHub repo or a Colab report
-            visibility: one of `"PUBLIC"` _(default on Public)_, `"UNLISTED"`, `"ORG"` _(Teams only)_, or `"PRIVATE"` _(Teams only)_
+            visibility: one of `"PUBLIC"` _(default on Public)_, `"ORG"` _(Teams only)_, or `"PRIVATE"` _(limited on Public, unlimited on Teams)_
             open: Open the file in your browser after creating
             tags: A list of tags (as strings) used to categorise your report
             tweet: Open twitter to tweet your published report - can customise the tweet by passing the message in as this parameter
