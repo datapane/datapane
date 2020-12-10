@@ -28,11 +28,7 @@ from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import TEST_ENV, __version__
 from datapane.client import config as c
-from datapane.client.utils import (
-    IncompatibleVersionException,
-    UnsupportedResourceException,
-    failure_msg,
-)
+from datapane.client.utils import IncompatibleVersionError, UnsupportedResourceError, failure_msg
 from datapane.common import JSON, MIME, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
@@ -122,7 +118,7 @@ def check_pip_version() -> None:
         )
     else:  # no newer pip - perhaps local dev?
         error_msg = f"Your client is out-of-date (version {cli_version}) with the server and may be causing errors"
-    raise IncompatibleVersionException(error_msg)
+    raise IncompatibleVersionError(error_msg)
 
 
 def _process_res(r: Response, empty_ok: bool = False) -> JSON:
@@ -177,7 +173,7 @@ class Resource:
             and url_parts[0] == "api"
             and url_parts[1] not in public_endpoints
         ):
-            raise UnsupportedResourceException(f"{url_parts[1].title()} are part of Datapane for Teams.")
+            raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane for Teams.")
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()

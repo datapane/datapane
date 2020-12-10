@@ -25,6 +25,7 @@ from datapane.client.scripts import DatapaneCfg
 from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict
 from datapane.common.datafiles import df_ext_map
 
+from ..utils import DPError
 from .common import DPTmpFile, do_download_file
 from .dp_object import DPObjectRef, UploadableObjectMixin
 
@@ -128,7 +129,7 @@ class Blob(DPObjectRef, UploadableObjectMixin):
         def get_export_format() -> str:
             ext = fn.suffix
             if ext not in df_ext_map:
-                raise ValueError(
+                raise DPError(
                     f"Extension {ext} not valid for exporting table. Must be one of {', '.join(df_ext_map.keys())}"
                 )
             return df_ext_map[ext].enum

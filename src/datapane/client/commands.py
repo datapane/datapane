@@ -76,18 +76,18 @@ class GlobalCommandHandler(click.Group):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
-        except utils.IncompatibleVersionException as exc:
+        except utils.IncompatibleVersionError as e:
             if EXTRA_OUT:
-                log.exception(exc)
-            failure_msg(str(exc))
+                log.exception(e)
+            failure_msg(str(e))
         except HTTPError as e:
             if EXTRA_OUT:
                 log.exception(e)
-            failure_msg(str(e), do_exit=True)
+            failure_msg(utils.add_help_text(str(e)), do_exit=True)
         except Exception as e:
             if EXTRA_OUT:
                 log.exception(e)
-            failure_msg(str(e), do_exit=True)
+            failure_msg(utils.add_help_text(str(e)), do_exit=True)
 
 
 def recursive_help(cmd, parent=None):
@@ -254,7 +254,7 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], vi
     kwargs = {k: v for k, v in init_kwargs.items() if v is not None}
 
     # if not (script or config or sc.DatapaneCfg.exists()):
-    #     raise AssertationError(f"Not valid project dir")
+    #     raise DPError(f"Not valid project dir")
 
     dp_cfg = scripts.DatapaneCfg.create_initial(**kwargs)
     log.debug(f"Packaging and uploading Datapane project {dp_cfg.name}")

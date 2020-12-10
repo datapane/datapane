@@ -60,5 +60,7 @@ if get_dp_mode() == DPMode.LIBRARY:
     init()
     # parse any command0line params
     from .client.utils import parse_command_line
+    from .client.api.runtime import Params
 
-    parse_command_line()
+    config = parse_command_line()
+    Params.replace(config)

@@ -2,7 +2,7 @@ import pytest
 
 import datapane as dp
 import datapane.client.config as c
-from datapane.client.utils import InvalidToken
+from datapane.client.utils import InvalidTokenError
 
 from .conftest import TEST_SERVER, TEST_TOKEN
 
@@ -21,7 +21,7 @@ def test_auth():
         # check the config env file is default
         assert fp.read_text() == c.get_default_config()
 
-        with pytest.raises(InvalidToken):
+        with pytest.raises(InvalidTokenError):
             dp.ping()
 
         # login
@@ -33,7 +33,7 @@ def test_auth():
         # check we've reset the config env file back to default
         assert fp.read_text() == c.get_default_config()
 
-        with pytest.raises(InvalidToken):
+        with pytest.raises(InvalidTokenError):
             dp.ping()
     finally:
         if fp.exists():

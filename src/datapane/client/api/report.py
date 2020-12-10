@@ -18,7 +18,6 @@ from pathlib import Path
 
 import importlib_resources as ir
 import pandas as pd
-from furl import furl
 from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
 from lxml import etree
 from lxml.builder import ElementMaker
@@ -27,7 +26,7 @@ from lxml.etree import Element
 from datapane.common import NPath, guess_type, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from ..utils import DPException
+from ..utils import DPError
 from .common import DPTmpFile, Resource, do_download_file
 from .dp_object import DPObjectRef, UploadableObjectMixin
 from .runtime import _report
@@ -162,7 +161,7 @@ class ReportBlock(ABC):
 BlockOrStr = t.Union[ReportBlock, str]
 
 
-class BlockLayoutException(DPException):
+class BlockLayoutError(DPError):
     ...
 
 
@@ -202,11 +201,11 @@ class Blocks(ReportBlock):
 
         # set row/column handling
         if rows == 1 and columns == 1:
-            raise BlockLayoutException("Can't set both rows and columns to 1")
+            raise BlockLayoutError("Can't set both rows and columns to 1")
         if rows == 0 and columns == 0:
-            raise BlockLayoutException("Can't set both rows and columns to 0")
+            raise BlockLayoutError("Can't set both rows and columns to 0")
         if rows > 0 and columns > 0 and len(_blocks) > rows * columns:
-            raise BlockLayoutException("Too many blocks for given rows & columns")
+            raise BlockLayoutError("Too many blocks for given rows & columns")
         if rows > 0 and columns == 1:
             # if user has set rows and not changed columns, convert columns to auto-flow mode
             columns = 0
@@ -471,7 +470,6 @@ class Report(DPObjectRef):
         visibility: t.Optional[str] = None,
         open: bool = False,
         tags: t.List[str] = None,
-        tweet: t.Union[bool, str] = False,
         **kwargs,
     ) -> None:
         """
@@ -484,7 +482,6 @@ class Report(DPObjectRef):
             visibility: one of `"PUBLIC"` _(default on Public)_, `"ORG"` _(Teams only)_, or `"PRIVATE"` _(limited on Public, unlimited on Teams)_
             open: Open the file in your browser after creating
             tags: A list of tags (as strings) used to categorise your report
-            tweet: Open twitter to tweet your published report - can customise the tweet by passing the message in as this parameter
         """
 
         tags = tags or []
@@ -502,20 +499,6 @@ class Report(DPObjectRef):
         _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
-        if tweet:
-            if isinstance(tweet, str):
-                desc = tweet[:260]
-            elif description:
-                desc = description[:260]
-            else:
-                desc = f"Check out my new report - {name}"[:260]
-            tweet_url = (
-                furl(url="https://twitter.com/intent/tweet")
-                .add({"text": desc, "url": self.web_url, "hashtags": "datapane,python"})
-                .url
-            )
-            webbrowser.open_new_tab(tweet_url)
-
         print(f"Report successfully published at {self.web_url}")
 
     def save(self, path: str, open: bool = False, standalone: bool = False) -> None:

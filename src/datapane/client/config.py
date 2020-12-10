@@ -12,7 +12,7 @@ from ruamel.yaml import YAML
 
 from datapane import log
 
-from .utils import InvalidToken
+from .utils import InvalidTokenError
 
 APP_NAME = "datapane"
 APP_DIR = Path(click.get_app_dir(APP_NAME))
@@ -77,7 +77,7 @@ def check_get_config() -> Config:
             # still don't have a token set for the env, open up the browser
             f = furl(path="/home/", origin=config.server)
             webbrowser.open(url=str(f), new=2)
-            raise InvalidToken(
+            raise InvalidTokenError(
                 "Please sign-up and login - if you already have then please restart your Jupyter kernel/Python instance to initialize your new token"
             )
     return config

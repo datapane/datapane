@@ -18,6 +18,7 @@ import validators as v
 from munch import Munch
 
 from datapane import log
+from datapane.client import DPError
 from datapane.client.api import Resource
 from datapane.client.api.common import DPTmpFile, FileList
 from datapane.common import JSON, URL, ArrowFormat, SDict
@@ -71,7 +72,7 @@ class DPObjectRef:
             if not url.startswith("http"):
                 url = f"https://{url}"
             if not v.url(url):
-                raise AssertionError(f"{url} is not a valid object ref")
+                raise DPError(f"{url} is not a valid object ref")
             x: up.SplitResult = up.urlsplit(url)
             _id = list(filter(None, x.path.split("/")))[-1]
         else:

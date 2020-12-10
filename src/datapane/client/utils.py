@@ -8,25 +8,30 @@ import click
 
 from datapane.common import JDict
 
-from .api.runtime import Params
+
+def add_help_text(x: str) -> str:
+    return f"{x}\nPlease visit www.github.com/datapane/datapane to raise issue / discuss if error repeats"
 
 
-class DPException(Exception):
+class DPError(Exception):
+    def __str__(self):
+        # update the error message with help text
+        x = list(self.args)
+        x[0] = add_help_text(x[0])
+        self.args = tuple(x)
+
+        return super().__str__()
+
+
+class IncompatibleVersionError(DPError):
     ...
-    # def __str__(self):
-    #     print(self.args[0])
-    #     return super().__str__()
 
 
-class IncompatibleVersionException(DPException):
+class UnsupportedResourceError(DPError):
     ...
 
 
-class UnsupportedResourceException(DPException):
-    ...
-
-
-class InvalidToken(DPException):
+class InvalidTokenError(DPError):
     ...
 
 
@@ -74,11 +79,9 @@ def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
     return {k: convert_param_val(v) for (k, v) in split_param(params)}
 
 
-def parse_command_line() -> None:
+def parse_command_line() -> t.Dict[str, t.Any]:
     """Called in library mode to pull any parameters into dp.Config"""
-    parser = argparse.ArgumentParser(
-        description="Datapane additional args", conflict_handler="resolve", add_help=False
-    )
+    parser = argparse.ArgumentParser(description="Datapane additional args", conflict_handler="resolve", add_help=False)
     parser.add_argument(
         "--parameter",
         "-p",
@@ -94,6 +97,4 @@ def parse_command_line() -> None:
     sys.argv.append(exe_name)
     sys.argv.extend(remaining_args)
 
-    # update Params object
-    config = process_cmd_param_vals(dp_args.parameter)
-    Params.replace(config)
+    return process_cmd_param_vals(dp_args.parameter)

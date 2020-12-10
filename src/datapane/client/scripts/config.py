@@ -15,6 +15,7 @@ import stringcase
 import yaml
 from traitlets.config import Config as TConfig
 
+from datapane.client import DPError
 from datapane.common import SDict, log
 
 # app paths
@@ -43,7 +44,7 @@ def generate_name(postfix: str) -> str:
 # TODO(obsolete) - not really needed now, can remove in future
 def validate_name(x: str):
     if re_check_name.match(x) is None:
-        raise AssertionError(f"'{x}' is not a valid service name")
+        raise DPError(f"'{x}' is not a valid service name")
 
 
 @dc.dataclass
