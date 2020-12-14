@@ -77,23 +77,40 @@ def gen_report_nested_blocks() -> dp.Report:
 def gen_report_with_files(datadir: Path, single_file: bool = False) -> dp.Report:
     # Asset tests
     lis = [1, 2, 3]
-    df = gen_df(10000)
-    md_block = dp.Markdown(text="# Test markdown block <hello/> \n Test **content**")
+    small_df = gen_df()
+    big_df = gen_df(10000)
 
+    # text
+    md_block = dp.Markdown(text="# Test markdown block </hello> \n Test **content**")
+    html_block = dp.HTML(html="Hello World</hello>")
+    big_number = dp.BigNumber(heading="Tests written", value=1234)
+    big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
+
+    # assets
+    plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
     list_asset = dp.File(data=lis, name="List Asset", is_json=True)
-
     img_asset = dp.File(file=datadir / "datapane-logo.png")
 
-    plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
-
-    df_asset = dp.Table(df=df, caption="Test Dataframe Table")
-
-    pivot_asset = dp.Table(df=df, caption="Test Dataframe PivotTable", can_pivot=True)
+    # tables
+    table_asset = dp.Table(data=small_df, caption="Test Basic Table")
+    dt_asset = dp.DataTable(df=big_df, caption="Test DataTable")
+    dt_pivot_asset = dp.DataTable(df=big_df, caption="Test DataTable with Pivot", can_pivot=True)
 
     if single_file:
         return dp.Report(dp.Blocks(blocks=[md_block, plot_asset]))
     else:
-        return dp.Report(list_asset, img_asset, df_asset, md_block, plot_asset, pivot_asset)
+        return dp.Report(
+            md_block,
+            html_block,
+            big_number,
+            big_number_1,
+            plot_asset,
+            list_asset,
+            img_asset,
+            table_asset,
+            dt_asset,
+            dt_pivot_asset,
+        )
 
 
 def test_gen_report_simple():
@@ -142,7 +159,7 @@ def test_gen_report_with_files(datadir: Path):
     report_str, attachments = report._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # print(report_str)
-    assert len(attachments) == 5
+    assert len(attachments) == 6
     assert validate_report_doc(xml_str=report_str)
 
 

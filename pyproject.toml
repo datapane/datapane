@@ -77,6 +77,7 @@ importlib_resources = "^3.0.0"
 lxml = "^4.5.2"
 requests-toolbelt = "^0.9.1"
 furl = "^2.1.0"
+bleach = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"

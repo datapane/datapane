@@ -78,7 +78,7 @@ def test_report(tmp_path: Path):
     json_asset = dp.File(data=json_list, is_json=True)
     plot_asset = dp.Plot(data=plot)
     list_asset = dp.File(data=lis, is_json=True)
-    df_asset = dp.Table(df=df, caption="Our Dataframe")
+    df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     dp_report = api.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
     dp_report.publish(name=name, description=description, source_url=source_url)
 
@@ -171,10 +171,10 @@ def test_complex_df_report():
     df_desc = index_df.describe()
     df_desc_2 = df_desc.reset_index()
 
-    tz_t = dp.Table(tz_df)
-    index_t = dp.Table(index_df)
-    df_desc_t = dp.Table(df_desc)
-    df_desc_2_t = dp.Table(df_desc_2)
+    tz_t = dp.DataTable(tz_df)
+    index_t = dp.DataTable(index_df)
+    df_desc_t = dp.DataTable(df_desc)
+    df_desc_2_t = dp.DataTable(df_desc_2)
 
     with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
         dp_report.publish(name=gen_name())

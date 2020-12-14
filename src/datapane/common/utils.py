@@ -28,7 +28,7 @@ _double_ext_map = {
     ".bokeh.json": "application/vnd.bokeh.show+json",
     ".pl.json": "application/vnd.plotly.v1+json",
     ".tar.gz": "application/x-tgz",
-    ".fl.b64": "application/vnd.folium+base64",
+    ".tbl.html": "application/vnd.datapane.table+html",
 }
 double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.items()}
 
@@ -122,9 +122,7 @@ def create_temp_file(
 
 
 @contextmanager
-def temp_fname(
-    suffix: str, prefix: str = "datapane-temp-", keep: bool = False
-) -> t.ContextManager[str]:
+def temp_fname(suffix: str, prefix: str = "datapane-temp-", keep: bool = False) -> t.ContextManager[str]:
     """Wrapper to generate a temporary filename only that is deleted on leaving context"""
     # TODO - return Path
     (in_f, in_f_name) = mkstemp(suffix=suffix, prefix=prefix)
@@ -185,9 +183,7 @@ def temp_workdir() -> t.ContextManager[None]:
 
 
 @contextmanager
-def pushd(
-    directory: NPath, pre_create: bool = False, post_remove: bool = False
-) -> t.ContextManager[None]:
+def pushd(directory: NPath, pre_create: bool = False, post_remove: bool = False) -> t.ContextManager[None]:
     """Switch dir and push it onto the (call-)stack"""
     directory = Path(directory)
     cwd = os.getcwd()

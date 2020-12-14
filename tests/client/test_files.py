@@ -8,6 +8,7 @@ import pytest
 from bokeh.layouts import column
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
+from pandas.io.formats.style import Styler
 
 from datapane.client.files import save
 
@@ -74,4 +75,7 @@ def test_save_pdvega(tmp_path: Path):
 
 
 def test_save_table(tmp_path: Path):
+    # tests saving a DF directly to a html file
     save(data)
+    # save styled table
+    save(Styler(data))

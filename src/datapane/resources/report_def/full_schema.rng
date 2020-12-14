@@ -80,6 +80,9 @@
       <ref name="File"/>
       <ref name="Plot"/>
       <ref name="Table"/>
+      <ref name="DataTable"/>
+      <ref name="HTML"/>
+      <ref name="BigNumber"/>
       <element name="Blocks">
         <ref name="blocks_attributes"/>
         <oneOrMore>
@@ -95,6 +98,58 @@
       <data type="string">
         <param name="minLength">1</param>
       </data>
+    </element>
+  </define>
+  <define name="HTML">
+    <element name="HTML">
+      <ref name="block_id"/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
+  <define name="BigNumber">
+    <element name="BigNumber">
+      <ref name="block_id"/>
+      <attribute name="heading">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
+      </attribute>
+      <attribute name="value">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
+      </attribute>
+      <optional>
+        <!-- optional attributes -->
+        <attribute name="change">
+          <data type="string">
+            <param name="minLength">1</param>
+            <param name="maxLength">127</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="prev_value">
+          <data type="string">
+            <param name="minLength">1</param>
+            <param name="maxLength">127</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="is_positive_intent">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="is_upward_change">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <!-- Assets -->
@@ -157,6 +212,11 @@
   </define>
   <define name="Table">
     <element name="Table">
+      <ref name="assetAttributes"/>
+    </element>
+  </define>
+  <define name="DataTable">
+    <element name="DataTable">
       <group>
         <ref name="assetAttributes"/>
         <attribute name="rows">

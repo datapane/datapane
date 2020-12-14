@@ -20,9 +20,12 @@ from .common.utils import log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
+    BigNumber,
     Blocks,
     Blob,
+    DataTable,
     File,
+    HTML,
     Markdown,
     Params,
     Plot,

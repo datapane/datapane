@@ -69,14 +69,13 @@ Example
 """
 
 import abc
-import base64
 import json
 import pickle
 from functools import singledispatch
 from typing import IO, Any, BinaryIO, Generic, TextIO, TypeVar
 
+import bleach
 import matplotlib.pyplot as plt
-import pandas as pd
 from altair.utils import SchemaBase
 from bokeh.embed import json_item
 from bokeh.layouts import LayoutDOM as BLayout
@@ -84,13 +83,14 @@ from bokeh.plotting.figure import Figure as BFigure
 from folium import Map
 from matplotlib.figure import Axes, Figure
 from numpy import ndarray
+from pandas import DataFrame
+from pandas.io.formats.style import Styler
 from plotly.graph_objects import Figure as PFigure
-
-from datapane.common import log
 
 from .api.common import DPTmpFile
 
 T = TypeVar("T")
+U = TypeVar("U", DataFrame, Styler)
 
 
 class BasePlot(Generic[T], abc.ABC):
@@ -109,6 +109,7 @@ class BasePlot(Generic[T], abc.ABC):
         # NOTE - used to set mime-type as extended-file attrib using xttrs here
         return fn
 
+    # NOTE: not abstract by design
     def write_file(self, f: IO, x: T):
         pass
 
@@ -183,23 +184,66 @@ class MatplotNDArrayPlot(MatplotBasePlot):
         return super()._write_figure(f)
 
 
-# TODO - remove this and move Arrow/Dataframe/Table support here
-class TablePlot(BasePlot):
+class BaseTablePlot(BasePlot):
+    mimetype = "application/vnd.datapane.table+html"
+    ext = ".tbl.html"
+    TABLE_CELLS_LIMIT: int = 2000
+    fig_type: U
+    # TODO - move to own bleach class/module?
+    allowed_attrs = ["id", "class", "type", "style"]
+    allowed_tags = ["style", "table", "thead", "tbody", "tr", "td", "th"]
+    allowed_protocols = ["http", "https"]
+
+    def write_file(self, f: IO, x: U):
+        df = self.get_df(x)
+        # TODO - need to truncate the styler...
+        # df1 = truncate_dataframe(df, max_cells=2000)
+        n_cells = df.shape[0] * df.shape[1]
+        if n_cells > self.TABLE_CELLS_LIMIT:
+            raise ValueError(
+                f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead"
+            )
+
+        # sanitise the generated HTML
+        safe_html = bleach.clean(
+            self.render_html(x),
+            tags=self.allowed_tags,
+            attributes=self.allowed_attrs,
+            protocols=self.allowed_protocols,
+        )
+        f.write(safe_html)
+
+    @abc.abstractmethod
+    def get_df(self, obj: U) -> DataFrame:
+        ...
+
+    @abc.abstractmethod
+    def render_html(self, obj: U) -> str:
+        ...
+
+
+class StylerTablePlot(BaseTablePlot):
+    """Creates a styled html table from a pandas Styler object"""
+
+    fig_type = Styler
+
+    def get_df(self, obj: U) -> DataFrame:
+        return obj.data
+
+    def render_html(self, obj: U) -> str:
+        return obj.render()
+
+
+class DataFrameTablePlot(BaseTablePlot):
     """Creates an html table from the dataframe"""
 
-    mimetype = "application/vnd.nstack.table+html"
-    ext = ".html"
-    fig_type = pd.DataFrame
-    TABLE_CELLS_LIMIT: int = 2000
+    fig_type = DataFrame
 
-    def write_file(self, f: TextIO, dataframe: pd.DataFrame):
-        n_cells = dataframe.shape[0] * dataframe.shape[1]
-        if n_cells > self.TABLE_CELLS_LIMIT:
-            log.warning(f"Dataframe is has more than {self.TABLE_CELLS_LIMIT} cells. Omitting output.")
-            # TODO - this should truncate rather than replace
-            f.write(f"<table><tr><td>omitted as over {self.TABLE_CELLS_LIMIT} cells</td></tr></table>")
-        else:
-            dataframe.to_html(f)
+    def get_df(self, obj: U) -> DataFrame:
+        return obj
+
+    def render_html(self, obj: U) -> str:
+        return obj.to_html()
 
 
 class BokehBasePlot(BasePlot):
@@ -249,22 +293,19 @@ class PlotlyPlot(BasePlot):
 
 
 class FoliumPlot(BasePlot):
-    # mimetype = "application/base64"
-    # ext = ".b64"
-    mimetype = "application/vnd.folium+base64"
-    ext = ".fl.b64"
+    mimetype = "application/vnd.folium+html"
+    ext = ".fl"
     fig_type = Map
-    file_mode = "wb"
 
     def write_file(self, f: BinaryIO, m: Map):
         html: str = m.get_root().render()
-        html_b64: bytes = base64.b64encode(html.encode())
-        f.write(html_b64)
+        f.write(html)
 
 
 # register all the plot types
 plots = [
-    TablePlot,
+    StylerTablePlot,
+    DataFrameTablePlot,
     BokehPlot,
     BokehLayoutPlot,
     AltairPlot,

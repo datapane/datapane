@@ -31,12 +31,29 @@ blocks_attributes =
   attribute rows { xsd:nonNegativeInteger },
   attribute columns { xsd:nonNegativeInteger }
 
-Blocks = (Text | File | Plot | Table | element Blocks { blocks_attributes, Blocks+ })
+Blocks = (Text | File | Plot | Table | DataTable | HTML | BigNumber | element Blocks { blocks_attributes, Blocks+ })
 
 # Markdown Text
 Text = element Text {
   block_id,
   xsd:string { minLength = "1" }
+}
+
+HTML = element HTML {
+  block_id,
+  xsd:string { minLength = "1" }
+}
+
+BigNumber = element BigNumber {
+  block_id,
+  attribute heading { xsd:string { minLength = "1" maxLength = "127" } },
+  attribute value { xsd:string { minLength = "1" maxLength = "127" } },
+
+  # optional attributes
+  attribute change { xsd:string { minLength = "1" maxLength = "127" } }?,
+  attribute prev_value { xsd:string { minLength = "1" maxLength = "127" } }?,
+  attribute is_positive_intent { xsd:boolean }?,
+  attribute is_upward_change { xsd:boolean }?
 }
 
 # Assets
@@ -67,6 +84,10 @@ Plot = element Plot {
 }
 
 Table = element Table {
+  assetAttributes
+}
+
+DataTable = element DataTable {
   assetAttributes,
   attribute rows { xsd:positiveInteger },
   attribute columns { xsd:positiveInteger },

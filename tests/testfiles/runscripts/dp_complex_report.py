@@ -78,10 +78,10 @@ img_asset = dp.File(file=Path("./datapane-logo.png"))
 vega_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"))
 
 # Table
-df_asset = dp.Table(df, can_pivot=False)
+df_asset = dp.DataTable(df, can_pivot=False)
 
 # Pivot table
-pv_asset = dp.Table(gen_df(10), can_pivot=True)
+pv_asset = dp.DataTable(gen_df(10), can_pivot=True)
 
 # Matplotlib
 np.random.seed(19680801)

@@ -38,7 +38,7 @@ chart = alt.Chart(df).encode(
     y='Open'
 ).mark_line().interactive()
 
-r = dp.Report(dp.Table(df), dp.Plot(chart))
+r = dp.Report(dp.DataTable(df), dp.Plot(chart))
 r.save(path='report.html', open=True)
 ```
 

@@ -22,6 +22,7 @@ from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunct
 from lxml import etree
 from lxml.builder import ElementMaker
 from lxml.etree import Element
+from pandas.io.formats.style import Styler
 
 from datapane.common import NPath, guess_type, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
@@ -38,13 +39,13 @@ id_count = itertools.count(start=1)
 
 
 # only these types will be documented by default
-__all__ = ["ReportBlock", "Blocks", "Markdown", "File", "Plot", "Table", "Report"]
+__all__ = ["ReportBlock", "BigNumber", "Blocks", "DataTable", "File", "HTML", "Markdown", "Plot", "Report", "Table"]
 
 __pdoc__ = {
     "ReportBlock.attributes": False,
     "File.caption": False,
     "Plot.file": False,
-    "Table.file": False,
+    "DataTable.file": False,
     "Report.endpoint": False,
 }
 
@@ -128,9 +129,14 @@ class BuilderState:
 
 ################################################################################
 # API Blocks
-def _conv_attrib(v) -> str:
-    """Convert a value to a str for use as an ElementBuilder attribute"""
+def _conv_attrib(v: t.Any) -> t.Optional[str]:
+    """
+    Convert a value to a str for use as an ElementBuilder attribute
+    - also handles None to a string for optional field values
+    """
     # TODO - use a proper serialisation framework here / lxml features
+    if v is None:
+        return v
     v1 = str(v)
     return v1.lower() if isinstance(v, bool) else v1
 
@@ -151,7 +157,10 @@ class ReportBlock(ABC):
             id: A unique id to reference the block, used when querying blocks via XPath to aid embedding
         """
         self.id = str(id) if id else f"block-{next(id_count)}"
-        self.attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items()}
+        # convert attributes, dropping None values
+        # TODO - uncomment when 3.8+ only
+        # self.attributes = {str(k): v1 for (k, v) in kwargs.items() if (v1 := _conv_attrib(v)) is not None}
+        self.attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items() if _conv_attrib(v) is not None}
 
     @abstractmethod
     def _to_xml(self, s: BuilderState) -> BuilderState:
@@ -229,7 +238,7 @@ class Markdown(ReportBlock):
 
     ..note:: This object is also available as `dp.Text`, and any strings provided directly to the Report/Blocks object are converted automatically to Markdown blocks
 
-    ..tip:: You can insert a dataframe in a Markdown block as a table by using `df.to_markdown()`, or use dp.Table for larger data if you need sorting, filtering and more.
+    ..tip:: You can also insert a dataframe in a Markdown block as a table by using `df.to_markdown()`, or use dp.Table or dp.DataTable for dedicated dataframe tables.
     """
 
     text: str
@@ -247,6 +256,79 @@ class Markdown(ReportBlock):
     def _to_xml(self, s: BuilderState) -> BuilderState:
         # NOTE - do we use etree.CDATA wrapper?
         return s.add_element(self, E.Text(etree.CDATA(self.text)))
+
+
+NumberValue = t.Union[str, int, float]
+
+
+class BigNumber(ReportBlock):
+    """
+    BigNumber blocks display a numerical value with a heading, alongside optional contextual information about the previous value.
+    """
+
+    _tag = "BigNumber"
+
+    def __init__(
+        self,
+        heading: str,
+        value: NumberValue,
+        change: t.Optional[NumberValue] = None,
+        prev_value: t.Optional[NumberValue] = None,
+        is_positive_intent: t.Optional[bool] = None,
+        is_upward_change: t.Optional[bool] = None,
+        id: str = None,
+    ):
+        """
+        Args:
+            heading: A title that gives context to the displayed number
+            value: The value of the number
+            prev_value: The previous value to display as comparison (optional)
+            change: The amount changed between the value and previous value (optional)
+            is_positive_intent: Displays the change on a green background if `True`, and red otherwise. Follows `is_upward_change` if not set (optional)
+            is_upward_change: Whether the change is upward or downward (required when `change` is set)
+            id: A unique id for the block to aid querying (optional)
+        """
+        if change:
+            if is_upward_change is None:
+                # We can't reliably infer the direction of change from the change string
+                raise ValueError('Argument "is_upward_change" is required when "change" is set')
+            if is_positive_intent is None:
+                # Set the intent to be the direction of change if not specified (up = green, down = red)
+                is_positive_intent = is_upward_change
+
+        super().__init__(
+            heading=heading,
+            value=value,
+            change=change,
+            prev_value=prev_value,
+            is_positive_intent=is_positive_intent,
+            is_upward_change=is_upward_change,
+            id=id,
+        )
+
+    def _to_xml(self, s: BuilderState) -> BuilderState:
+        return s.add_element(self, E.BigNumber(**self.attributes))
+
+
+class HTML(ReportBlock):
+    """
+    HTML blocks can be used to embed an arbitrary HTML fragment in a report.
+    """
+
+    html: str
+    _tag = "HTML"
+
+    def __init__(self, html: str, id: str = None):
+        """
+        Args:
+            html: The HTML fragment to embed
+            id: A unique id for the block to aid querying (optional)
+        """
+        super().__init__(id=id)
+        self.html = html
+
+    def _to_xml(self, s: BuilderState) -> BuilderState:
+        return s.add_element(self, E.HTML(etree.CDATA(self.html)))
 
 
 class Asset(ReportBlock, UploadableObjectMixin):
@@ -342,7 +424,6 @@ class Plot(Asset):
 
     def __init__(self, data: t.Any, caption: t.Optional[str] = None, id: str = None):
         """
-
         Args:
             data: The `plot` object to attach
             caption: A caption to display below the plot (optional)
@@ -354,13 +435,32 @@ class Plot(Asset):
 
 class Table(Asset):
     """
-    Table blocks store a dataframe that can be viewed, sorted, filtered by users viewing your report,
-    and downloaded by them as a CSV or Excel file.
-
-    ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider embedding your dataframe in a Datapane Markdown block, e.g. `dp.Markdown(df.to_markdown())`
+    Table blocks store the contents of a dataframe as a HTML `table` whose style can be customised using
+    pandas' `Styler` API.
     """
 
     _tag = "Table"
+
+    def __init__(self, data: t.Union[pd.DataFrame, Styler], caption: t.Optional[str] = None, id: str = None):
+        """
+        Args:
+            data: The pandas `Styler` instance or dataframe to generate the table from
+            caption: A caption to display below the table (optional)
+            id: A unique id for the block to aid querying (optional)
+        """
+        out_fn = self._save_obj(data, as_json=False)
+        super().__init__(file=out_fn.file, caption=caption, id=id)
+
+
+class DataTable(Asset):
+    """
+    DataTable blocks store a dataframe that can be viewed, sorted, filtered by users viewing your report, similar to a spreadsheet,
+    and can be downloaded by them as a CSV or Excel file.
+
+    ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider using the `Table` block
+    """
+
+    _tag = "DataTable"
 
     def __init__(
         self,
@@ -377,7 +477,6 @@ class Table(Asset):
             id: A unique id for the block to aid querying (optional)
 
             ..hint:: `can_pivot` is currently unsupported and can be ignored
-
         """
         fn = self._save_df(df)
         (rows, columns) = df.shape
@@ -507,7 +606,7 @@ class Report(DPObjectRef):
         Args:
             path: location to save the HTML file
             open: Open the file in your browser after creating
-            standalone: Create a fully standalone HTML report with no external/network dependencies _(this can result in large files)_
+            standalone: Create a fully standalone HTML report with minimal external/network dependencies _(this can result in large files)_
         """
         self._last_saved = path
 
@@ -519,13 +618,14 @@ class Report(DPObjectRef):
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    def preview(self, width: int = 600, height: int = 500) -> None:
+    def preview(self, width: int = 600, height: int = 500, standalone: bool = False) -> None:
         """
         Preview the report inside your currently running Jupyter notebook
 
         Args:
             width: Width of the report preview in Jupyter (default: 600)
             height: Height of the report preview in Jupyter (default: 500)
+            standalone: Create a fully standalone HTML report with minimal external/network dependencies _(this can result in large files)
         """
         if is_jupyter():
             from IPython.display import IFrame
@@ -542,7 +642,7 @@ class Report(DPObjectRef):
                 shutil.copy(self._last_saved, tmpfile.name)
             else:
                 # Else save directly to tmp file
-                self.save(path=tmpfile.name)
+                self.save(path=tmpfile.name, standalone=standalone)
             self._tmp_report = tmpfile.file
 
             # NOTE - iframe must be relative path

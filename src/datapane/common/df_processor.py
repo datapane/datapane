@@ -174,3 +174,22 @@ def to_df(value: Any) -> pd.DataFrame:
         return out_df
 
     raise ValueError("Must return a primitive, pd.DataFrame, pd.Series or numpy array.")
+
+
+TRUNCATE_CELLS = 10000
+TRUNCATE_ROWS = 1000
+
+
+def truncate_dataframe(df: pd.DataFrame, max_rows=TRUNCATE_ROWS, max_cells=TRUNCATE_CELLS) -> pd.DataFrame:
+    """Truncate a pandas dataframe if needed"""
+    rows, cols = df.shape
+    # determine max rows to truncate df to based on max cells and df cols
+    cols = cols or 1  # handle empty df
+    max_rows = min(max_rows, int(max_cells / cols))
+    # return non-truncated preview if df smaller than max rows allowed
+    if rows <= max_rows:
+        return df
+    # truncate df to fit max cells
+    if not isinstance(df.index, pd.RangeIndex):
+        raise ValueError("Dataframe has unsupported index type")
+    return df.truncate(before=0, after=max_rows - 1, copy=False)

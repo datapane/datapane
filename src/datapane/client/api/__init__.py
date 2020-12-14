@@ -39,7 +39,7 @@ Additional API docs for teams and enterprise features are found in `datapane.cli
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .teams import Blob, Run, Schedule, Script, Variable
-from .report import Blocks, File, Markdown, Plot, Report, Table
+from .report import BigNumber, Blocks, DataTable, File, HTML, Markdown, Plot, Report, Table
 from .runtime import Params, Result, by_datapane, on_datapane, _reset_runtime, _report
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionError
