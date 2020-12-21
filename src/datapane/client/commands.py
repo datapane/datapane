@@ -174,11 +174,10 @@ def upload(file: str, name: str, visibility: str):
 @blob.command()
 @click.argument("name")
 @click.option("--owner")
-@click.option("--version")
 @click.argument("file", type=click.Path())
-def download(name: str, owner: str, version: str, file: str):
+def download(name: str, owner: str, file: str):
     """Download blob referenced by NAME to FILE"""
-    r = api.Blob.get(name, owner=owner, version=version)
+    r = api.Blob.get(name, owner=owner)
     r.download_file(file)
     success_msg(f"Downloaded {r.url} to {click.format_filename(file)}")
 
@@ -275,11 +274,10 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], vi
 
 @script.command()
 @click.argument("name")
-@click.option("--version")
 @click.option("--owner")
-def download(name: str, owner: str, version: str):
+def download(name: str, owner: str):
     """Download script referenced by NAME to FILE"""
-    s = api.Script.get(name, owner=owner, version=version)
+    s = api.Script.get(name, owner=owner)
     fn = s.download_pkg()
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
@@ -443,11 +441,10 @@ def variable_list():
 @variable.command()
 @click.argument("name", required=True)
 @click.option("--owner")
-@click.option("--version")
 @click.option("--show", is_flag=True, help="Print the variable value.")
-def get(name, owner, version, show):
+def get(name, owner, show):
     """Get variable value using variable name"""
-    res = api.Variable.get(name, owner=owner, version=version)
+    res = api.Variable.get(name, owner=owner)
     if show:
         print(str(res.value).strip())
     else:
@@ -477,9 +474,8 @@ def schedule():
 @click.option("--parameter", "-p", multiple=True)
 @click.argument("name", required=True)
 @click.argument("cron", required=True)
-@click.option("--version")
 @click.option("--owner")
-def create(name: str, cron: str, parameter: Tuple[str], owner: str, version: str):
+def create(name: str, cron: str, parameter: Tuple[str], owner: str):
     """
     Create a schedule
 
@@ -487,11 +483,10 @@ def create(name: str, cron: str, parameter: Tuple[str], owner: str, version: str
     CRON: crontab representing the schedule interval
     PARAMETERS: key/value list of parameters to use when running the script on schedule
     [OWNER]: Script owner
-    [VERSION]: Script version
     """
     params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
-    script_obj = api.Script.get(name, owner=owner, version=version)
+    script_obj = api.Script.get(name, owner=owner)
     schedule_obj = api.Schedule.create(script_obj, cron, params)
     success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
 

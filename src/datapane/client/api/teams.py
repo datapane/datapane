@@ -176,7 +176,7 @@ class Variable(DPObjectRef):
     """
 
     endpoint: str = "/uservariables/"
-    list_fields = ["name", "versions"]
+    list_fields = ["name"]
 
     @classmethod
     def create(cls, name: str, value: str, visibility: Optional[str] = "ORG") -> "Variable":

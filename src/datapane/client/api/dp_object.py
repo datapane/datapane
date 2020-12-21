@@ -39,7 +39,7 @@ class DPObjectRef:
     _url: URL = "<local resource>"
     _dto: t.Optional[Munch] = None
 
-    list_fields: t.List[str] = ["name", "web_url", "versions"]
+    list_fields: t.List[str] = ["name", "web_url"]
 
     @property
     def dto(self) -> t.Optional[Munch]:
@@ -99,7 +99,7 @@ class DPObjectRef:
             version: The version of the object (optional, defaults to latest)
 
         Returns:
-            The version of the object if found
+            The object if found
         """
         res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner, version=version)
         return cls(dto=res)
@@ -113,7 +113,7 @@ class DPObjectRef:
             id_or_url: The `id`, or full URL that represents the object
 
         Returns:
-            The version of the object if found
+            The object if found
         """
         x = cls()
         x.url = id_or_url

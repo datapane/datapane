@@ -498,6 +498,7 @@ class Report(DPObjectRef):
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
     full_width: bool = False
+    list_fields: t.List[str] = ["name", "web_url", "versions"]
     """When set, the report is full-width suitable for use in a dashboard"""
 
     def __init__(
