@@ -147,15 +147,9 @@ def build_demo_report() -> Report:
     vega_bar = _vega_bar()
 
     basics = """
-# Intro
-
 This page describes Datapane, an API for creating data-driven reports from Python.
-
-# Blocks
-
-Datapane reports are comprised of blocks, wihch can be collected together and laid-out to form multiple-pages reports.
-
-Some of the basic blocks include tables and plots,
+Datapane reports are comprised of blocks, which can be collected together and laid-out to form multiple-pages reports.
+Some of the basic blocks include tables and plots.
 
 ## Tables
 
@@ -182,7 +176,7 @@ dp.Plot(altair_plot, caption="A Plot")
 
 ## Other Blocks
 
-There are many other block types, including files, images, and bug numbers - see the Blocks page for more info.
+Datapane has many other block types, including files, images, and bug numbers - see the Blocks page for more info.
 
 Additionally layout blocks provide the ability nest blocks to create groups of columns and user selections - see the Layout page for more info.
 
@@ -200,7 +194,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     page_1 = b.Page(b.Text(basics).format(table=gen_table_df(), plot=vega_sine, other=other), label="Intro")
 
     layout = """
-Blocks on a page can be laid-out in using a flexible row and column system. furthermore, multiple blocks can be
+Blocks on a page can be laid-out in Datapane using a flexible row and column system. furthermore, multiple blocks can be
 nested into a single block where the user can select between which block, e.g. a plot, to view.
 See https://docs.datapane.com/reports/layout-and-customization for more info.
 
@@ -254,8 +248,6 @@ dp.Select(group1, df, type=dp.SelectType.DROPDOWN)
     )
 
     adv_blocks = """
-# Intro
-
 A list and demonstration of all the blocks supported by Datapane - see https://docs.datapane.com/reports/blocks for more info.
 
 ## Plot Blocks
@@ -276,7 +268,7 @@ dp.Group(dp.Plot(altair_plot, caption="Altair Plot"),
 ```python
 dp.Table(df)
 dp.Table(styled_df)
-dp.DataTable(df, caption="Interactive Table")
+dp.DataTable(df, caption="Interactive DataTable")
 ```
 
 {{tables}}
@@ -294,9 +286,9 @@ dp.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change
 
 ## Files
 
-Files and Python objects can be added to a datapane report, and be viewed (depending on browser support) and downloaded.
+Files and Python objects can be added to a Datapane report, and be viewed (depending on browser support) and downloaded.
 
-```
+```python
 dp.File(file="./logo.png")
 dp.File(data=[1,2,3], is_json=True)
 dp.File(data=[1,2,3], is_json=False)  # store as a pickle
@@ -317,7 +309,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     tables = b.Group(
         b.Table(df1, caption="Basic Table"),
         b.Table(styler1, caption="Styled Table"),
-        b.DataTable(df1, caption="Styled Table"),
+        b.DataTable(df1, caption="Interactive DataTable"),
     )
     text = b.Group(
         b.Text("Hello, __world__!"),

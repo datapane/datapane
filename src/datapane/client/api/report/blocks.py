@@ -52,7 +52,7 @@ __pdoc__ = {
     "BaseElement.id": False,
     "DataBlock.id": False,
     "File.caption": False,
-    "Table.file": False,
+    "File.file": False,
     "Plot.file": False,
     "DataTable.file": False,
 }
