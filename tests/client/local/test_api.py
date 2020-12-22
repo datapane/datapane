@@ -286,7 +286,7 @@ def test_gen_report_with_files(datadir: Path):
 # Templates
 def test_demo_report():
     report = dp.templates.build_demo_report()
-    assert_report(report, 22, 60)
+    assert_report(report, 23, 61)
 
 
 def test_add_code():

@@ -328,7 +328,7 @@ class PlotlyPlot(PlotAsset):
 
 class FoliumPlot(PlotAsset):
     mimetype = "application/vnd.folium+html"
-    ext = ".fl"
+    ext = ".fl.html"
     obj_type = Map
 
     def write_file(self, f: BinaryIO, m: Map):

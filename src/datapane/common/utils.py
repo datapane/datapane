@@ -27,8 +27,9 @@ _double_ext_map = {
     ".vl3.json": "application/vnd.vegalite.v3+json",
     ".bokeh.json": "application/vnd.bokeh.show+json",
     ".pl.json": "application/vnd.plotly.v1+json",
-    ".tar.gz": "application/x-tgz",
+    ".fl.html": "application/vnd.folium+html",
     ".tbl.html": "application/vnd.datapane.table+html",
+    ".tar.gz": "application/x-tgz",
 }
 double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.items()}
 

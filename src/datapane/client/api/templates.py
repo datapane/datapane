@@ -7,13 +7,9 @@ import random
 import typing as t
 from pathlib import Path
 
-import altair as alt
 import importlib_resources as ir
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
-from bokeh.plotting import figure
 
 from datapane.common import NPath
 
@@ -80,6 +76,12 @@ def build_demo_report() -> Report:
 
     """
 
+    import altair as alt  # noqa
+    import matplotlib.pyplot as plt  # noqa
+    import plotly.graph_objects as go  # noqa
+    from bokeh.plotting import figure  # noqa
+    import folium  # noqa
+
     def gen_df(dim: int = 4) -> pd.DataFrame:
         axis = [i for i in range(0, dim)]
         data = {"x": axis, "y": axis}
@@ -120,6 +122,9 @@ def build_demo_report() -> Report:
     def gen_table_df(rows: int = 4, alphabet: str = "ABCDEF") -> pd.DataFrame:
         data = [{x: random.randint(0, 1000) for x in alphabet} for _ in range(0, rows)]
         return pd.DataFrame.from_dict(data)
+
+    def gen_folium():
+        return folium.Map(location=[45.372, -121.6972], zoom_start=12, tiles="Stamen Terrain")
 
     df1 = gen_table_df(10)
     styler1 = df1.style.apply(color_large_vals, axis=1).hide_index()
@@ -260,6 +265,7 @@ dp.Group(dp.Plot(altair_plot, caption="Altair Plot"),
          dp.Plot(bokeh_plot, caption="Bokeh Plot"),
          dp.Plot(matplotlib_plot, caption="Matplotlib Plot"),
          dp.Plot(plotly_plot, caption="Plotly Plot"),
+         dp.Plot(folium_plot, caption="Folium Plot"),
          columns=2)
 ```
 
@@ -305,6 +311,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
         b.Plot(gen_bokeh(), caption="Bokeh Plot"),
         b.Plot(gen_matplotlib(), caption="Matplotlib Plot"),
         b.Plot(gen_plotly(), caption="Plotly Plot"),
+        b.Plot(gen_folium(), caption="Folium Plot"),
         columns=2,
     )
     tables = b.Group(
