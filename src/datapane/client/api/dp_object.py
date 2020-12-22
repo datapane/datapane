@@ -19,11 +19,12 @@ from munch import Munch
 
 from datapane import log
 from datapane.client import DPError
-from datapane.client.api import Resource
-from datapane.client.api.common import DPTmpFile, FileList
 from datapane.common import JSON, URL, ArrowFormat, SDict
 
-__all__ = ["DPObjectRef", "UploadableObjectMixin"]
+from . import Resource
+from .common import DPTmpFile, FileList
+
+__all__ = ["DPObjectRef"]
 
 from datapane.common.df_processor import process_df, to_df
 
@@ -192,21 +193,11 @@ class DPObjectRef:
 #    """Used by both Assets and Blobs to abstract over uploading/downloading and exporting"""
 
 
-class UploadableObjectMixin:
-    @classmethod
-    def _save_df(cls, df: pd.DataFrame) -> DPTmpFile:
-        fn = DPTmpFile(ArrowFormat.ext)
-        df = to_df(df)
-        process_df(df)
-        ArrowFormat.save_file(fn.name, df)
-        log.debug(f"Saved df to {fn} ({os.path.getsize(fn.file)} bytes)")
-        return fn
-
-    @classmethod
-    def _save_obj(cls, data: t.Any, as_json: bool) -> DPTmpFile:
-        # import here as a very slow module due to nested imports
-        from ..files import save
-
-        fn = save(data, default_to_json=as_json)
-        log.debug(f"Saved object to {fn} ({os.path.getsize(fn.file)} bytes)")
-        return fn
+def save_df(df: pd.DataFrame) -> DPTmpFile:
+    """Export a df for uploading"""
+    fn = DPTmpFile(ArrowFormat.ext)
+    df = to_df(df)
+    process_df(df)
+    ArrowFormat.save_file(fn.name, df)
+    log.debug(f"Saved df to {fn} ({os.path.getsize(fn.file)} bytes)")
+    return fn

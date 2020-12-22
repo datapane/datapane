@@ -20,28 +20,36 @@ from .common.utils import log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
-    BigNumber,
     Blocks,
     Blob,
+    BigNumber,
+    Code,
     DataTable,
+    Group,
     File,
     HTML,
+    Text,
     Markdown,
+    Page,
     Params,
     Plot,
     Report,
     Result,
     Run,
-    Script,
     Schedule,
+    Script,
+    Select,
+    SelectType,
     Table,
     Text,
     Variable,
+    Visibility,
     by_datapane,
     login,
     logout,
     on_datapane,
     ping,
+    templates,
 )
 from .client.config import init
 from .common.dp_types import DPMode, set_dp_mode, get_dp_mode
@@ -55,7 +63,6 @@ elif by_datapane or script_exe == "dp-runner":
     set_dp_mode(DPMode.FRAMEWORK)
 else:
     set_dp_mode(DPMode.LIBRARY)
-
 
 # TODO - do we want to init only in jupyter / interactive / etc.
 # only init fully in library-mode, as framework and app init explicitly

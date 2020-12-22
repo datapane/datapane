@@ -11,6 +11,6 @@ def render():
     """Render and return your datapane report components"""
     return [
         # api.Markdown("Dummy Markdown block - {parameters.val}"),
-        api.Markdown("Dummy Markdown block"),
+        api.Text("Dummy Markdown block"),
         api.Asset.upload_df(df),
     ]

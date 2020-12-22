@@ -24,6 +24,7 @@
     we extract these into the Report DB fields for quick lookup
   -->
   <define name="Meta">
+    <a:documentation/>
     <element name="Meta">
       <interleave>
         <element name="Author">
@@ -49,52 +50,120 @@
       </interleave>
     </element>
   </define>
+  <!-- Main Report Tree -->
   <define name="Main">
+    <a:documentation/>
     <element name="Main">
       <oneOrMore>
-        <ref name="Blocks"/>
+        <ref name="Page"/>
       </oneOrMore>
       <attribute name="full_width">
         <data type="boolean"/>
       </attribute>
     </element>
   </define>
-  <!-- TODO - we shuold only allow Blocks and Tabs at top-level, i.e. 2-level recursion -->
   <define name="block_id">
     <attribute name="id">
       <data type="ID"/>
     </attribute>
   </define>
-  <define name="blocks_attributes">
-    <ref name="block_id"/>
-    <attribute name="rows">
-      <data type="nonNegativeInteger"/>
-    </attribute>
-    <attribute name="columns">
-      <data type="nonNegativeInteger"/>
+  <define name="block_label">
+    <attribute name="label">
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
     </attribute>
   </define>
-  <define name="Blocks">
+  <define name="block_id_label">
+    <ref name="block_id"/>
+    <optional>
+      <ref name="block_label"/>
+    </optional>
+  </define>
+  <define name="Page">
+    <element name="Page">
+      <ref name="block_id_label"/>
+      <oneOrMore>
+        <ref name="LayoutBlock"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="LayoutBlock">
+    <choice>
+      <ref name="Group"/>
+      <ref name="Select"/>
+    </choice>
+  </define>
+  <define name="Select">
+    <element name="Select">
+      <group>
+        <ref name="block_id_label"/>
+        <optional>
+          <attribute name="type">
+            <choice>
+              <value type="string" datatypeLibrary="">dropdown</value>
+              <value type="string" datatypeLibrary="">tabs</value>
+            </choice>
+          </attribute>
+        </optional>
+        <ref name="Block"/>
+        <oneOrMore>
+          <ref name="Block"/>
+        </oneOrMore>
+      </group>
+      <!-- at least 2 block elements in a Select -->
+    </element>
+  </define>
+  <define name="Group">
+    <element name="Group">
+      <ref name="block_id_label"/>
+      <attribute name="rows">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+      <attribute name="columns">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+      <oneOrMore>
+        <ref name="Block"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="Block">
+    <choice>
+      <ref name="LayoutBlock"/>
+      <ref name="DataBlock"/>
+    </choice>
+  </define>
+  <define name="DataBlock">
+    <choice>
+      <ref name="EmbeddedTextBlock"/>
+      <ref name="AssetBlock"/>
+      <ref name="BigNumber"/>
+    </choice>
+  </define>
+  <define name="EmbeddedTextBlock">
     <choice>
       <ref name="Text"/>
+      <ref name="HTML"/>
+      <ref name="Code"/>
+    </choice>
+  </define>
+  <define name="AssetBlock">
+    <choice>
       <ref name="File"/>
       <ref name="Plot"/>
       <ref name="Table"/>
       <ref name="DataTable"/>
-      <ref name="HTML"/>
-      <ref name="BigNumber"/>
-      <element name="Blocks">
-        <ref name="blocks_attributes"/>
-        <oneOrMore>
-          <ref name="Blocks"/>
-        </oneOrMore>
-      </element>
     </choice>
   </define>
-  <!-- Markdown Text -->
+  <!--
+    EmbeddedTextBlocks
+    Markdown Text
+  -->
   <define name="Text">
+    <a:documentation/>
     <element name="Text">
-      <ref name="block_id"/>
+      <ref name="block_id_label"/>
       <data type="string">
         <param name="minLength">1</param>
       </data>
@@ -102,7 +171,21 @@
   </define>
   <define name="HTML">
     <element name="HTML">
-      <ref name="block_id"/>
+      <ref name="block_id_label"/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
+  <define name="Code">
+    <element name="Code">
+      <ref name="block_id_label"/>
+      <attribute name="language">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
+      </attribute>
       <data type="string">
         <param name="minLength">1</param>
       </data>
@@ -110,7 +193,7 @@
   </define>
   <define name="BigNumber">
     <element name="BigNumber">
-      <ref name="block_id"/>
+      <ref name="block_id_label"/>
       <attribute name="heading">
         <data type="string">
           <param name="minLength">1</param>
@@ -152,9 +235,10 @@
       </optional>
     </element>
   </define>
-  <!-- Assets -->
+  <!-- AssetBlocks -->
   <define name="assetAttributes">
-    <ref name="block_id"/>
+    <a:documentation/>
+    <ref name="block_id_label"/>
     <!-- TODO - should attachment be it's own attribute? -->
     <attribute name="src">
       <data type="anyURI">

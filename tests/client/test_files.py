@@ -10,7 +10,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
 from pandas.io.formats.style import Styler
 
-from datapane.client.files import save
+from datapane.client.api.files import save
 
 data = pd.DataFrame({"x": np.random.randn(20), "y": np.random.randn(20)})
 
@@ -42,14 +42,16 @@ def test_save_bokeh(tmp_path: Path):
     source = ColumnDataSource(data)
     p = figure()
     p.circle(x="x", y="y", source=source)
-    save(p)
+    f = save(p)
+    assert f.mime == "application/vnd.bokeh.show+json"
 
 
 def test_save_bokeh_layout(tmp_path: Path):
     source = ColumnDataSource(data)
     p = figure()
     p.circle(x="x", y="y", source=source)
-    save(column(p, p))
+    f = save(column(p, p))
+    assert f.mime == "application/vnd.bokeh.show+json"
 
 
 def test_save_altair(tmp_path: Path):

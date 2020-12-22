@@ -10,12 +10,20 @@ These objects are all available under the `datapane` module, via `import datapan
 
 The core reporting APIs are available on both the public and teams plans, these are found in `datapane.client.api.report`, including,
 
-  - `datapane.client.api.report.Report`
-  - `datapane.client.api.report.Blocks`
-    - `datapane.client.api.report.Plot`
-    - `datapane.client.api.report.Table`
-    - `datapane.client.api.report.Markdown`
-    - `datapane.client.api.report.File`
+  - `datapane.client.api.report.core.Report`
+  - Layout Blocks
+    - `datapane.client.api.report.blocks.Page`
+    - `datapane.client.api.report.blocks.Group`
+    - `datapane.client.api.report.blocks.Select`
+  - Data Blocks
+    - `datapane.client.api.report.blocks.Plot`
+    - `datapane.client.api.report.blocks.Table`
+    - `datapane.client.api.report.blocks.DataTable`
+    - `datapane.client.api.report.blocks.File`
+    - `datapane.client.api.report.blocks.BigNumber`
+    - `datapane.client.api.report.blocks.Text`
+    - `datapane.client.api.report.blocks.Code`
+    - `datapane.client.api.report.blocks.HTML`
 
 ### Datapane Teams
 
@@ -36,13 +44,44 @@ Additional API docs for teams and enterprise features are found in `datapane.cli
 
 # flake8: noqa F401
 # Internal API re-exports
+import warnings
+
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .teams import Blob, Run, Schedule, Script, Variable
-from .report import BigNumber, Blocks, DataTable, File, HTML, Markdown, Plot, Report, Table
+from .report.blocks import (
+    BigNumber,
+    Code,
+    Group,
+    DataTable,
+    File,
+    HTML,
+    Page,
+    Plot,
+    Select,
+    SelectType,
+    Text,
+    Table,
+)
+from .report.core import Report, Visibility
 from .runtime import Params, Result, by_datapane, on_datapane, _reset_runtime, _report
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionError
 from ..config import init
 
-Text = Markdown
+from . import templates
+
+
+################################################################################
+# deprecations
+# TODO - remove deprecation
+class Markdown(Text):
+    def __init__(self, *a, **kw):
+        warnings.warn("Deprecated, to be removed in next release, use dp.Text instead.")
+        super().__init__(*a, **kw)
+
+
+class Blocks(Group):
+    def __init__(self, *a, **kw):
+        warnings.warn("Deprecated, to be removed in next release, use dp.Group instead.")
+        super().__init__(*a, **kw)

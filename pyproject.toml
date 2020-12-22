@@ -78,6 +78,9 @@ lxml = "^4.5.2"
 requests-toolbelt = "^0.9.1"
 furl = "^2.1.0"
 bleach = "^3.2.1"
+glom = "^20.11.0"
+boltons = "^20.2.1"
+dominate = "^2.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"

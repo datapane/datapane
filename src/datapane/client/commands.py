@@ -394,14 +394,15 @@ def report_list():
     print_table(api.Report.list(), "Reports")
 
 
-@report.command()
-@click.argument("name")
-@click.option("--version")
-@click.option("--owner")
-@click.option("--filename", default="output.html", type=click.Path())
-def render(name: str, version: str, owner: str, filename: str):
-    """Render a report to a static file"""
-    api.Report.get(name, version=version, owner=owner).render()
+# NOTE - NYI - disabled
+# @report.command()
+# @click.argument("name")
+# @click.option("--version")
+# @click.option("--owner")
+# @click.option("--filename", default="output.html", type=click.Path())
+# def render(name: str, version: str, owner: str, filename: str):
+#     """Render a report to a static file"""
+#     api.Report.get(name, version=version, owner=owner).render()
 
 
 #############################################################################

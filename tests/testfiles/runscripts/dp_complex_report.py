@@ -63,7 +63,7 @@ fig.add_trace(
 plotly_asset = dp.Plot(data=fig)
 
 # Markdown
-md_block = dp.Markdown(text="# Test markdown block \n Test **content**")
+md_block = dp.Text(text="# Test markdown block \n Test **content**")
 
 # In-line JSON
 list_asset = dp.File(data=lis, is_json=True)

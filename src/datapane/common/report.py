@@ -13,9 +13,7 @@ dp_namespace: str = "https://datapane.com/schemas/report/1/"
 
 
 def validate_report_doc(
-    xml_str: t.Optional[str] = None,
-    xml_doc: t.Optional[etree.Element] = None,
-    raise_exception: bool = True,
+    xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, raise_exception: bool = True
 ) -> bool:
     """Validate the model against the schema"""
     # get the doc

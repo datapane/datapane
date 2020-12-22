@@ -12,6 +12,7 @@ start = element Report {
   Meta, Main
 }
 
+################################################################################
 # Metadata fields
 # we extract these into the Report DB fields for quick lookup
 Meta = element Meta {
@@ -21,31 +22,64 @@ Meta = element Meta {
   element Description { xsd:string { maxLength = "10240" } }
 }
 
-Main = element Main { Blocks+, attribute full_width { xsd:boolean } }
 
-# TODO - we shuold only allow Blocks and Tabs at top-level, i.e. 2-level recursion
+################################################################################
+# Main Report Tree
+Main = element Main { Page+, attribute full_width { xsd:boolean } }
+
 block_id = attribute id { xsd:ID }
+block_label = attribute label { xsd:string { minLength = "1" } }
+block_id_label = block_id, block_label?
 
-blocks_attributes =
-  block_id,
+Page = element Page {
+  block_id_label, LayoutBlock+
+}
+
+LayoutBlock = Group | Select
+
+Select = element Select {
+  block_id_label,
+  attribute type { string "dropdown" | string "tabs" }?,
+  Block, Block+  # at least 2 block elements in a Select
+}
+
+Group = element Group {
+  block_id_label,
   attribute rows { xsd:nonNegativeInteger },
-  attribute columns { xsd:nonNegativeInteger }
+  attribute columns { xsd:nonNegativeInteger },
+  Block+
+}
 
-Blocks = (Text | File | Plot | Table | DataTable | HTML | BigNumber | element Blocks { blocks_attributes, Blocks+ })
+Block = LayoutBlock | DataBlock
 
+DataBlock = EmbeddedTextBlock | AssetBlock | BigNumber
+
+EmbeddedTextBlock = Text | HTML | Code
+
+AssetBlock = File | Plot | Table | DataTable
+
+
+################################################################################
+# EmbeddedTextBlocks
 # Markdown Text
 Text = element Text {
-  block_id,
+  block_id_label,
   xsd:string { minLength = "1" }
 }
 
 HTML = element HTML {
-  block_id,
+  block_id_label,
+  xsd:string { minLength = "1" }
+}
+
+Code = element Code {
+  block_id_label,
+  attribute language { xsd:string { minLength = "1" maxLength = "127" } },
   xsd:string { minLength = "1" }
 }
 
 BigNumber = element BigNumber {
-  block_id,
+  block_id_label,
   attribute heading { xsd:string { minLength = "1" maxLength = "127" } },
   attribute value { xsd:string { minLength = "1" maxLength = "127" } },
 
@@ -56,9 +90,11 @@ BigNumber = element BigNumber {
   attribute is_upward_change { xsd:boolean }?
 }
 
-# Assets
+
+################################################################################
+# AssetBlocks
 assetAttributes =
-  block_id,
+  block_id_label,
   # TODO - should attachment be it's own attribute?
   attribute src { xsd:anyURI { pattern = "(http|https|cas|file|data|attachment):.+"} },
   attribute preview { xsd:anyURI { pattern = "(http|https|cas|file|data):.+"} }?,

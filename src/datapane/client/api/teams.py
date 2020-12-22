@@ -27,7 +27,7 @@ from datapane.common.datafiles import df_ext_map
 
 from ..utils import DPError
 from .common import DPTmpFile, do_download_file
-from .dp_object import DPObjectRef, UploadableObjectMixin
+from .dp_object import DPObjectRef, save_df
 
 __all__ = ["Blob", "Variable", "Script", "Schedule"]
 
@@ -45,7 +45,7 @@ __pdoc__ = {
 }
 
 
-class Blob(DPObjectRef, UploadableObjectMixin):
+class Blob(DPObjectRef):
     """
     Blobs are files that can be uploaded and downloaded for use in your scripts,
     for instance trained models, datasets, and (pickled) Python objects.
@@ -74,7 +74,7 @@ class Blob(DPObjectRef, UploadableObjectMixin):
         Returns:
             An instance of the created `Blob` object
         """
-        with cls._save_df(df) as fn:
+        with save_df(df) as fn:
             return cls.post_with_files(file=fn.file, **kwargs)
 
     @classmethod
@@ -103,8 +103,11 @@ class Blob(DPObjectRef, UploadableObjectMixin):
         Returns:
             An instance of the created `Blob` object
         """
-        with cls._save_obj(data, as_json) as fn:
-            return cls.post_with_files(file=fn.file, **kwargs)
+        # import here as a very slow module due to nested imports
+        from .files import save
+
+        fn = save(data, default_to_json=as_json)
+        return cls.post_with_files(file=fn.file, **kwargs)
 
     def download_df(self) -> pd.DataFrame:
         """

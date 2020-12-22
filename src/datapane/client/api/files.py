@@ -70,9 +70,11 @@ Example
 
 import abc
 import json
+import os
 import pickle
 from functools import singledispatch
-from typing import IO, Any, BinaryIO, Generic, TextIO, TypeVar
+from pathlib import Path
+from typing import IO, Any, BinaryIO, Generic, Optional, TextIO, Type, TypeVar
 
 import bleach
 import matplotlib.pyplot as plt
@@ -87,16 +89,24 @@ from pandas import DataFrame
 from pandas.io.formats.style import Styler
 from plotly.graph_objects import Figure as PFigure
 
-from .api.common import DPTmpFile
+from datapane.common import log
+
+from .. import DPError
+from .common import DPTmpFile
+from .report.blocks import DataBlock, DataTable, File, Plot, Table, Text
 
 T = TypeVar("T")
 U = TypeVar("U", DataFrame, Styler)
+# V = TypeVar("V", SingleBlock)
 
 
-class BasePlot(Generic[T], abc.ABC):
+################################################################################
+# Base Assets
+class BaseAsset(Generic[T], abc.ABC):
     mimetype: str
+    obj_type: T
+    block_type: Type[DataBlock]
     ext: str
-    fig_type: T
     file_mode: str = "w"
 
     def write(self, x: T) -> DPTmpFile:
@@ -111,94 +121,74 @@ class BasePlot(Generic[T], abc.ABC):
 
     # NOTE: not abstract by design
     def write_file(self, f: IO, x: T):
-        pass
+        raise NotImplementedError("")
+
+    def to_block(self, x: T) -> DataBlock:
+        return self.block_type(x)
 
 
-class PickleWriter(BasePlot):
-    """ Creates a pickle file from a pre-pickled object """
+class BasePickleWriter(BaseAsset):
+    """ Creates a pickle file from any object """
 
     mimetype = "application/vnd.pickle+binary"
-    fig_type = bytes
+    obj_type = Any
+    block_type = File
     ext = ".pkl"
     file_mode = "wb"
 
-    def write_file(self, f: BinaryIO, x: bytes):
-        f.write(x)
-
-
-class BasePickleWriter(PickleWriter):
-    """ Creates a pickle file from any object """
-
-    fig_type = Any
-
-    def write_file(self, f: TextIO, x: any):
+    def write_file(self, f: TextIO, x: Any):
         pickle.dump(x, f)
 
 
-class BaseJsonWriter(BasePlot):
+class BaseJsonWriter(BaseAsset):
     """ Creates a JSON file from any object """
 
     mimetype = "application/json"
-    fig_type = Any
+    obj_type = Any
+    block_type = File
     ext = ".json"
 
-    def write_file(self, f: TextIO, x: any):
-        if isinstance(x, str):
-            json.dump(json.loads(x), f)
-        else:
-            json.dump(x, f)
+    def write_file(self, f: TextIO, x: Any):
+        json.dump(x, f)
 
 
-class MatplotBasePlot(BasePlot):
-    ext = ".svg"
-    mimetype = "image/svg+xml"
+class StringWrapper(BaseAsset):
+    """Creates a Json for a string File, or Markdown for a Block"""
 
-    def _write_figure(self, x: Figure) -> DPTmpFile:
-        """Creates an SVG from figure"""
-        fn = DPTmpFile(self.ext)
-        x = x or plt.gcf()
-        x.savefig(str(fn))
-        return fn
+    mimetype = "application/json"
+    obj_type = str
+    block_type = Text
+    ext = ".json"
 
-
-class MatplotFigurePlot(MatplotBasePlot):
-    fig_type = Figure
-
-    def write(self, x: Figure) -> DPTmpFile:
-        return super()._write_figure(x)
+    def write_file(self, f: TextIO, x: Any):
+        json.dump(json.loads(x), f)
 
 
-class MatplotAxesPlot(MatplotBasePlot):
-    fig_type = Axes
+class PathWrapper(BaseAsset):
+    """Creates a File block around Path objects"""
 
-    def write(self, x: Axes) -> DPTmpFile:
-        f: Figure = x.get_figure()
-        return super()._write_figure(f)
+    obj_type = Path
+    block_type = File
 
-
-class MatplotNDArrayPlot(MatplotBasePlot):
-    fig_type = ndarray
-
-    def write(self, x: ndarray) -> DPTmpFile:
-        f: Figure = x.flatten()[0].get_figure()
-        return super()._write_figure(f)
+    def to_block(self, x: T) -> DataBlock:
+        return File(file=x)
 
 
-class BaseTablePlot(BasePlot):
+################################################################################
+# Table Assets
+class BaseTable(BaseAsset):
     mimetype = "application/vnd.datapane.table+html"
     ext = ".tbl.html"
     TABLE_CELLS_LIMIT: int = 2000
-    fig_type: U
+    obj_type: U
+    block_type = Table
     # TODO - move to own bleach class/module?
     allowed_attrs = ["id", "class", "type", "style"]
     allowed_tags = ["style", "table", "thead", "tbody", "tr", "td", "th"]
     allowed_protocols = ["http", "https"]
 
     def write_file(self, f: IO, x: U):
-        df = self.get_df(x)
-        # TODO - need to truncate the styler...
-        # df1 = truncate_dataframe(df, max_cells=2000)
-        n_cells = df.shape[0] * df.shape[1]
+        n_cells = self._get_cells(x)
         if n_cells > self.TABLE_CELLS_LIMIT:
             raise ValueError(
                 f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead"
@@ -213,8 +203,17 @@ class BaseTablePlot(BasePlot):
         )
         f.write(safe_html)
 
+    def to_block(self, x: T) -> DataBlock:
+        return Table(x) if self._get_cells(x) <= self.TABLE_CELLS_LIMIT else DataTable(x)
+
+    def _get_cells(self, x: U) -> int:
+        df = self._get_df(x)
+        # TODO - need to truncate the styler...
+        # df1 = truncate_dataframe(df, max_cells=2000)
+        return df.shape[0] * df.shape[1]
+
     @abc.abstractmethod
-    def get_df(self, obj: U) -> DataFrame:
+    def _get_df(self, obj: U) -> DataFrame:
         ...
 
     @abc.abstractmethod
@@ -222,111 +221,162 @@ class BaseTablePlot(BasePlot):
         ...
 
 
-class StylerTablePlot(BaseTablePlot):
+class StylerTable(BaseTable):
     """Creates a styled html table from a pandas Styler object"""
 
-    fig_type = Styler
+    obj_type = Styler
 
-    def get_df(self, obj: U) -> DataFrame:
+    def _get_df(self, obj: U) -> DataFrame:
         return obj.data
 
     def render_html(self, obj: U) -> str:
         return obj.render()
 
 
-class DataFrameTablePlot(BaseTablePlot):
+class DataFrameTable(BaseTable):
     """Creates an html table from the dataframe"""
 
-    fig_type = DataFrame
+    obj_type = DataFrame
 
-    def get_df(self, obj: U) -> DataFrame:
+    def _get_df(self, obj: U) -> DataFrame:
         return obj
 
     def render_html(self, obj: U) -> str:
         return obj.to_html()
 
 
-class BokehBasePlot(BasePlot):
+################################################################################
+# Plot Assets
+class PlotAsset(BaseAsset):
+    block_type = Plot
+
+
+class MatplotBasePlot(PlotAsset):
+    ext = ".svg"
+    mimetype = "image/svg+xml"
+
+    def _write_figure(self, x: Figure) -> DPTmpFile:
+        """Creates an SVG from figure"""
+        fn = DPTmpFile(self.ext)
+        x = x or plt.gcf()
+        x.savefig(str(fn))
+        return fn
+
+
+class MatplotFigurePlot(MatplotBasePlot):
+    obj_type = Figure
+
+    def write(self, x: Figure) -> DPTmpFile:
+        return super()._write_figure(x)
+
+
+class MatplotAxesPlot(MatplotBasePlot):
+    obj_type = Axes
+
+    def write(self, x: Axes) -> DPTmpFile:
+        f: Figure = x.get_figure()
+        return super()._write_figure(f)
+
+
+class MatplotNDArrayPlot(MatplotBasePlot):
+    obj_type = ndarray
+
+    def write(self, x: ndarray) -> DPTmpFile:
+        f: Figure = x.flatten()[0].get_figure()
+        return super()._write_figure(f)
+
+
+class BokehBasePlot(PlotAsset):
     """Returns an interactive Bokeh application, supports both basic plots and layout plots via subclasses"""
 
     mimetype = "application/vnd.bokeh.show+json"
     ext = ".bokeh.json"
 
-    def _write_file(self, f: TextIO, app: any) -> DPTmpFile:
+    def write_file(self, f: TextIO, app):
         json.dump(json_item(app), f)
 
 
 class BokehPlot(BokehBasePlot):
-    fig_type = BFigure
-
-    def write_file(self, f: TextIO, app: BFigure) -> DPTmpFile:
-        super()._write_file(f, app)
+    obj_type = BFigure
 
 
 class BokehLayoutPlot(BokehBasePlot):
-    fig_type = BLayout
-
-    def write_file(self, f: TextIO, app: BLayout) -> DPTmpFile:
-        super()._write_file(f, app)
+    obj_type = BLayout
 
 
-class AltairPlot(BasePlot):
+class AltairPlot(PlotAsset):
     """Creates a vega-light chart from Altair Chart / pdvega Axes object."""
 
     mimetype = "application/vnd.vegalite.v3+json"
     ext = ".vl.json"
-    fig_type = SchemaBase
+    obj_type = SchemaBase
 
     def write_file(self, f: TextIO, chart: SchemaBase):
         json.dump(chart.to_dict(), f)
 
 
-class PlotlyPlot(BasePlot):
+class PlotlyPlot(PlotAsset):
     """Creates a plotly graph from a figure object"""
 
     mimetype = "application/vnd.plotly.v1+json"
     ext = ".pl.json"
-    fig_type = PFigure
+    obj_type = PFigure
 
     def write_file(self, f: TextIO, chart: PFigure):
         json.dump(chart.to_json(), f)
 
 
-class FoliumPlot(BasePlot):
+class FoliumPlot(PlotAsset):
     mimetype = "application/vnd.folium+html"
     ext = ".fl"
-    fig_type = Map
+    obj_type = Map
 
     def write_file(self, f: BinaryIO, m: Map):
         html: str = m.get_root().render()
         f.write(html)
 
 
+################################################################################
 # register all the plot types
 plots = [
-    StylerTablePlot,
-    DataFrameTablePlot,
+    StringWrapper,
+    PathWrapper,
+    # dataframes / tables
+    StylerTable,
+    DataFrameTable,
+    # plots
     BokehPlot,
     BokehLayoutPlot,
     AltairPlot,
     PlotlyPlot,
-    FoliumPlot,
     MatplotFigurePlot,
     MatplotAxesPlot,
     MatplotNDArrayPlot,
-    PickleWriter,
+    FoliumPlot,
 ]
 
 
 @singledispatch
-def get_plotter(figure: Any, default_to_json: bool) -> BasePlot:
+def get_wrapper(x: Any, default_to_json: bool, error_msg: Optional[str] = None) -> BaseAsset:
+    if error_msg:
+        raise DPError(error_msg)
+
     # The base writer is either a pickle writer or JSON writer.
     return BaseJsonWriter() if default_to_json else BasePickleWriter()
 
 
 for p in plots:
-    get_plotter.register(p.fig_type, lambda _, p=p, default_to_json=False: p())
+    get_wrapper.register(p.obj_type, lambda _, default_to_json, error_msg, p=p: p())
 
 
-def save(figure: Any, default_to_json: bool = False) -> DPTmpFile:
-    return get_plotter(figure, default_to_json=default_to_json).write(figure)
+# Entry Points
+def save(obj: Any, default_to_json: bool = False) -> DPTmpFile:
+    fn = get_wrapper(obj, default_to_json=default_to_json, error_msg=None).write(obj)
+    log.debug(f"Saved object to {fn} ({os.path.getsize(fn.file)} bytes)")
+    return fn
+
+
+def convert(obj: Any) -> "DataBlock":
+    """Attempt to convert/wrap a 'primitive' Python object into a Datapane 'boxed' object"""
+    error_msg = f"{type(obj)} not supported directly, please pass into in the appropriate dp object (including dp.File if want to upload as a pickle)"
+    return get_wrapper(obj, default_to_json=False, error_msg=error_msg).to_block(obj)
