@@ -20,6 +20,7 @@ from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunct
 from lxml import etree
 from lxml.etree import Element
 
+from datapane import __version__
 from datapane.client.api.common import DPTmpFile, Resource, do_download_file
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
@@ -97,7 +98,7 @@ class ReportFileWriter:
             report_doc=report_doc_esc,
             full_width=full_width,
             standalone=standalone,
-            cdn_base="https://datapane.com",
+            cdn_base=f"https://storage.googleapis.com/datapane-public/report-assets/{__version__}",
         )
         Path(path).write_text(r, encoding="utf-8")
 
