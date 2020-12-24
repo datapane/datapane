@@ -282,7 +282,7 @@ class Report(DPObjectRef):
             self._tmp_report = tmpfile.file
 
             # NOTE - iframe must be relative path
-            iframe_src = self._tmp_report.relative_to(Path("..").absolute())
+            iframe_src = self._tmp_report.relative_to(Path(".").absolute())
             return IFrame(src=str(iframe_src), width=width, height=height)
         else:
             log.warning("Can't preview - are you running in Jupyter?")
