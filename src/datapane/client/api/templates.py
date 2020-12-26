@@ -205,7 +205,7 @@ Group blocks allow you to take a list of blocks, and lay-them out over a number 
 ```python
 dp.Group(plot1, plot2, columns=2)
 cells = [dp.Text(f"### Cell {x}") for x in range(6)]
-dp.Group(*cells, rows=2)
+dp.Group(*cells, rows=2, columns=0)  # 0 implies auto
 ```
 
 {{group1}}
@@ -230,7 +230,7 @@ Both Group and Select blocks can be nested within one another, in any order to c
 
 ```python
 group1 = dp.Group(plot1, plot2, columns=2)
-dp.Select(group1, df, type=dp.SelectType.DROPDOWN)
+dp.Select(group1, df)
 ```
 
 {{nested}}
@@ -277,7 +277,7 @@ dp.DataTable(df, caption="Interactive DataTable")
 
 ```python
 dp.Text("Hello, __world__!")
-dp.Code("print('Hello, world!'")
+dp.Code("print('Hello, world!')")
 dp.HTML("<h1>Hello World</h1>")
 dp.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True)
 ```

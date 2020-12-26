@@ -80,7 +80,7 @@ furl = "^2.1.0"
 bleach = "^3.2.1"
 glom = "^20.11.0"
 boltons = "^20.2.1"
-dominate = "^2.6.0"
+dominate = "^2.4.0"  # latest on conda
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"
