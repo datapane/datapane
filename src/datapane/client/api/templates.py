@@ -176,7 +176,7 @@ dp.Plot(altair_plot, caption="A Plot")
 
 ## Other Blocks
 
-Datapane has many other block types, including files, images, and bug numbers - see the Blocks page for more info.
+Datapane has many other block types, including files, embeds, images, and big numbers - see the Blocks page for more info.
 
 Additionally layout blocks provide the ability nest blocks to create groups of columns and user selections - see the Layout page for more info.
 
@@ -266,8 +266,8 @@ dp.Group(dp.Plot(altair_plot, caption="Altair Plot"),
 ## Table Blocks
 
 ```python
-dp.Table(df)
-dp.Table(styled_df)
+dp.Table(df, caption="Basic Table")
+dp.Table(styled_df, caption="Styled Table")
 dp.DataTable(df, caption="Interactive DataTable")
 ```
 
@@ -283,6 +283,15 @@ dp.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change
 ```
 
 {{text}}
+
+## Embedding
+
+You can embed any URLs that spport the OEmbed protocol, including YouTube and Twitter.
+
+```python
+dp.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA")
+dp.Embed("https://twitter.com/datapaneapp/status/1300831345413890050")
+```
 
 ## Files
 
@@ -319,6 +328,10 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
         rows=1,
         columns=0,
     )
+    embed = b.Group(
+        b.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA"),
+        b.Embed("https://twitter.com/datapaneapp/status/1300831345413890050"),
+    )
     files = b.Group(
         b.File(file=logo),
         b.File(data=[1, 2, 3], is_json=True),
@@ -327,6 +340,8 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
         columns=0,
     )
 
-    page_3 = b.Page(b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, files=files), label="Blocks")
+    page_3 = b.Page(
+        b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, files=files), label="Blocks"
+    )
 
     return Report(page_1, page_2, page_3)
