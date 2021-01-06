@@ -138,6 +138,13 @@ def gen_report_complex_no_files() -> dp.Report:
             ],
             label="Page Duo",
         ),
+        dp.Page(
+            blocks=[
+                dp.Group(group, group, columns=2),
+                dp.Select(blocks=[select, select], type=dp.SelectType.TABS),
+            ],
+            label="Page Tres",
+        ),
     )
 
 
@@ -274,7 +281,7 @@ def test_gen_report_nested_blocks():
 def test_gen_report_complex_no_files():
     report = gen_report_complex_no_files()
     assert_report(report, 0)
-    assert len(report.pages) == 2
+    assert len(report.pages) == 3
 
 
 def test_gen_report_with_files(datadir: Path):
