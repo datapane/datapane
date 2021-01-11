@@ -25,6 +25,7 @@ from .client.api import (
     BigNumber,
     Code,
     DataTable,
+    Embed,
     Group,
     File,
     HTML,

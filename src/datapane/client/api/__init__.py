@@ -54,6 +54,7 @@ from .report.blocks import (
     Code,
     Group,
     DataTable,
+    Embed,
     File,
     HTML,
     Page,

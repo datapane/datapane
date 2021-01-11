@@ -146,6 +146,7 @@
       <ref name="Text"/>
       <ref name="HTML"/>
       <ref name="Code"/>
+      <ref name="Embed"/>
     </choice>
   </define>
   <define name="AssetBlock">
@@ -181,6 +182,29 @@
     <element name="Code">
       <ref name="block_id_label"/>
       <attribute name="language">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
+      </attribute>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
+  <define name="Embed">
+    <element name="Embed">
+      <ref name="block_id_label"/>
+      <attribute name="url">
+        <data type="anyURI"/>
+      </attribute>
+      <attribute name="title">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
+      </attribute>
+      <attribute name="provider_name">
         <data type="string">
           <param name="minLength">1</param>
           <param name="maxLength">127</param>

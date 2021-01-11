@@ -16,6 +16,7 @@ from functools import reduce
 from pathlib import Path
 
 import pandas as pd
+import requests
 from dominate.dom_tag import dom_tag
 from glom import glom
 from lxml import etree
@@ -433,6 +434,30 @@ class HTML(EmbeddedTextBlock):
         """
         super().__init__(id=id, label=label)
         self.content = str(html)
+
+
+class Embed(EmbeddedTextBlock):
+    """
+    Embed blocks allow HTML from OEmbed providers (e.g. Youtube, Twitter, Vimeo) to be embedded in a report.
+    """
+
+    _tag = "Embed"
+
+    def __init__(self, url: str, id: str = None, label: str = None):
+        """
+        Args:
+            url: The URL of the resource to be embedded
+            id: A unique id for the block to aid querying (optional)
+        """
+        r = requests.get(url=f"https://noembed.com/embed?url={url}")
+        r.raise_for_status()
+        r_json: t.Dict = r.json()
+        if r_json.get("error"):
+            raise DPError(f"No embed provider found for URL '{url}'")
+        super().__init__(
+            id=id, label=label, url=url, title=r_json.get("title"), provider_name=r_json.get("provider_name")
+        )
+        self.content = r_json.get("html")
 
 
 NumberValue = t.Union[str, int, float]
