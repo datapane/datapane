@@ -131,6 +131,7 @@ class BaseElement(ABC):
 Block = t.Union["Group", "Select", "DataBlock"]
 BlockOrPrimitive = t.Union[Block, t.Any]  # TODO - expand
 PageOrPrimitive = t.Union["Page", BlockOrPrimitive]
+BlockList = t.List[Block]
 
 
 class SelectType(enum.Enum):
@@ -159,7 +160,7 @@ class LayoutBlock(BaseElement):
      - represents a subtree in the document
     """
 
-    blocks: t.List[Block] = None
+    blocks: BlockList = None
 
     def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
         self.blocks = blocks or list(arg_blocks)
@@ -297,8 +298,6 @@ class Group(LayoutBlock):
           `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`
         """
         super().__init__(*arg_blocks, blocks=blocks, id=id, label=label)
-        # wrap str in Markdown block
-        self.blocks = [(Text(b) if isinstance(b, str) else b) for b in self.blocks]
 
         # set row/column handling
         if rows == 1 and columns == 1:

@@ -5,6 +5,7 @@ Datapane helper functions to make creating your reports a bit simpler and reduce
 """
 import random
 import typing as t
+from copy import deepcopy
 from pathlib import Path
 
 import importlib_resources as ir
@@ -16,7 +17,20 @@ from datapane.common import NPath
 from .report import blocks as b
 from .report.core import Report
 
-__all__ = ["add_code", "build_md_report", "build_demo_report"]
+__all__ = ["add_code", "add_header", "add_footer", "build_md_report", "build_demo_report"]
+
+
+def _map_page_blocks(page: b.Page, f: t.Callable[[b.BlockList], b.BlockList]) -> b.Page:
+    page.blocks = f(page.blocks)
+    return page
+
+
+def _map_report_pages(r: Report, f: t.Callable[[b.Page], b.Page], all_pages: bool = True) -> Report:
+    def g(i: int, page: b.Page) -> b.Page:
+        return f(page) if all_pages or i == 0 else page
+
+    r.pages = [g(*x) for x in enumerate(r.pages)]
+    return r
 
 
 def add_code(block: b.BlockOrPrimitive, code: str, language: str = "python") -> b.Select:
@@ -65,6 +79,47 @@ def build_md_report(
 
     group = b_text.format(*args, **kwargs)
     return Report(b.Page(group))
+
+
+def add_header(report: Report, header: b.BlockOrPrimitive, all_pages: bool = True) -> Report:
+    """
+    Add a header to the report, returning a modified version of the same report
+
+    Args:
+        report: The report to add the header to
+        header: The header block - this can be any dp Block, e.g a File, Plot, Logo, or anything
+        all_pages: Apply the header to all pages or just the first page only
+
+    Returns:
+        A modified report with the header applied
+
+    ..note: The header can be any Block object but must not have an assigned id currently
+    """
+
+    report = deepcopy(report)
+    return _map_report_pages(
+        report, lambda p: _map_page_blocks(p, lambda blocks: [b.Group(blocks=[header] + p.blocks)]), all_pages=all_pages
+    )
+
+
+def add_footer(report: Report, footer: b.BlockOrPrimitive, all_pages: bool = True) -> Report:
+    """
+    Add a footer to the report, returning a modified version of the same report
+
+    Args:
+        report: The report to add the header to
+        footer: The footer block - this can be any dp Block, e.g a File, Plot, Logo, or anything
+        all_pages: Apply the header to all pages or just the first page only
+
+    Returns:
+        A modified report with the footer applied
+
+    ..note: The header can be any Block object but must not have an assigned id currently
+    """
+    report = deepcopy(report)
+    return _map_report_pages(
+        report, lambda p: _map_page_blocks(p, lambda blocks: [b.Group(blocks=p.blocks + [footer])]), all_pages=all_pages
+    )
 
 
 def build_demo_report() -> Report:

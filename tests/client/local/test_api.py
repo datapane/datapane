@@ -316,6 +316,34 @@ def test_build_md_report():
     assert_report(report, 2, 5)
 
 
+def test_add_header():
+    text = "HEADER"
+
+    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
+
+    r1 = dp.templates.add_header(r, header=text, all_pages=True)
+    assert_report(r1, 0, 18)
+    assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, text, text]
+
+    r1 = dp.templates.add_header(r, header=text, all_pages=False)
+    assert_report(r1, 0, 14)
+    assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, md_block.content, md_block.content]
+
+
+def test_add_footer():
+    text = "FOOTER"
+
+    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
+
+    r1 = dp.templates.add_footer(r, footer=text, all_pages=True)
+    assert_report(r1, 0, 18)
+    assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, text, text]
+
+    r1 = dp.templates.add_footer(r, footer=text, all_pages=False)
+    assert_report(r1, 0, 14)
+    assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, md_block.content, md_block.content]
+
+
 ################################################################################
 # Local saving
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
