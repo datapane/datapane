@@ -28,7 +28,12 @@ from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import TEST_ENV, __version__
 from datapane.client import config as c
-from datapane.client.utils import IncompatibleVersionError, UnsupportedResourceError, failure_msg
+from datapane.client.utils import (
+    IncompatibleVersionError,
+    ReportTooLargeError,
+    UnsupportedResourceError,
+    failure_msg,
+)
 from datapane.common import JSON, MIME, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
@@ -199,7 +204,11 @@ class Resource:
 
         e = MultipartEncoder(fields=fields)
         extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
-        if e.len > 1e6:  # 1 MB
+        if e.len > 25 * 1e6:  # 25 MB
+            raise ReportTooLargeError(
+                "Report and attachments over 25MB after compression - please reduce the size of your charts/plots"
+            )
+        elif e.len > 1e6:  # 1 MB
             log.debug("Using upload monitor")
             fill_char = click.style("=", fg="yellow")
             with click.progressbar(

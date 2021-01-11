@@ -30,8 +30,6 @@ def is_version_compatible(
     log.debug(f"Provider spec {provider_spec}, Consumer version {consumer_v}")
     if consumer_v not in provider_spec:
         if raise_exception:
-            raise VersionMismatch(
-                f"Consumer ({consumer_v}) and Provider ({provider_spec}) API versions not compatible"
-            )
+            raise VersionMismatch(f"Consumer ({consumer_v}) and Provider ({provider_spec}) API versions not compatible")
         return False
     return True

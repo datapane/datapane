@@ -31,6 +31,10 @@ class UnsupportedResourceError(DPError):
     ...
 
 
+class ReportTooLargeError(DPError):
+    ...
+
+
 class InvalidTokenError(DPError):
     ...
 
