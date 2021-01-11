@@ -93,7 +93,7 @@ def add_header(report: Report, header: b.BlockOrPrimitive, all_pages: bool = Tru
     Returns:
         A modified report with the header applied
 
-    ..note: The header can be any Block object but must not have an assigned id currently
+    ..note:: The header can be any Block object but must not have an assigned id currently
     """
 
     report = deepcopy(report)
@@ -114,7 +114,7 @@ def add_footer(report: Report, footer: b.BlockOrPrimitive, all_pages: bool = Tru
     Returns:
         A modified report with the footer applied
 
-    ..note: The header can be any Block object but must not have an assigned id currently
+    ..note:: The header can be any Block object but must not have an assigned id currently
     """
     report = deepcopy(report)
     return _map_report_pages(
