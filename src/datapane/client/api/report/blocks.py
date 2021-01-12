@@ -16,11 +16,11 @@ from functools import reduce
 from pathlib import Path
 
 import pandas as pd
-import requests
 from dominate.dom_tag import dom_tag
 from glom import glom
 from lxml import etree
 from lxml.builder import ElementMaker
+from micawber import ProviderException, bootstrap_basic, cache
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
@@ -441,6 +441,7 @@ class Embed(EmbeddedTextBlock):
     """
 
     _tag = "Embed"
+    providers = bootstrap_basic(cache=cache.Cache())
 
     def __init__(self, url: str, id: str = None, label: str = None):
         """
@@ -448,15 +449,22 @@ class Embed(EmbeddedTextBlock):
             url: The URL of the resource to be embedded
             id: A unique id for the block to aid querying (optional)
         """
-        r = requests.get(url=f"https://noembed.com/embed?url={url}")
-        r.raise_for_status()
-        r_json: t.Dict = r.json()
-        if r_json.get("error"):
+
+        try:
+            result = self.providers.request(url)
+        except ProviderException:
             raise DPError(f"No embed provider found for URL '{url}'")
         super().__init__(
-            id=id, label=label, url=url, title=r_json.get("title"), provider_name=r_json.get("provider_name")
+            id=id,
+            label=label,
+            url=url,
+            title=result.get("title", "Title"),
+            provider_name=result.get("provider_name", "Embedding"),
         )
-        self.content = r_json.get("html")
+
+        # if "html" not in result:
+        #     raise DPError(f"Can't embed result from provider for URL '{url}'")
+        self.content = result["html"]
 
 
 NumberValue = t.Union[str, int, float]

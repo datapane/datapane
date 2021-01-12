@@ -81,6 +81,7 @@ bleach = "^3.2.1"
 glom = "^20.11.0"
 boltons = "^20.2.1"
 dominate = "^2.4.0"  # latest on conda
+micawber = "^0.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"

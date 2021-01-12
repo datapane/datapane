@@ -161,6 +161,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
     code_block = dp.Code(code="print('hello')", language="python")
     big_number = dp.BigNumber(heading="Tests written", value=1234)
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
+    embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
 
     # assets
     plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
@@ -177,7 +178,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
     else:
         return dp.Report(
             dp.Page(
-                dp.Select(md_block, html_block, html_block_1, code_block, type=dp.SelectType.TABS),
+                dp.Select(md_block, html_block, html_block_1, code_block, embed_block, type=dp.SelectType.TABS),
                 dp.Group(big_number, big_number_1, columns=2),
             ),
             dp.Page(
@@ -286,7 +287,7 @@ def test_gen_report_complex_no_files():
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    assert_report(report, 6, 17)
+    assert_report(report, 6, 18)
 
 
 ################################################################################

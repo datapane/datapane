@@ -28,9 +28,9 @@ Meta = element Meta {
 # Main Report Tree
 Main = element Main { Page+, attribute full_width { xsd:boolean } }
 
-block_id = attribute id { xsd:ID }
+block_id = attribute id { xsd:string { minLength = "1" maxLength = "64" } }
 block_label = attribute label { xsd:string { minLength = "1" } }
-block_id_label = block_id, block_label?
+block_id_label = block_id?, block_label?
 
 Page = element Page {
   block_id_label, LayoutBlock+
@@ -82,7 +82,7 @@ Code = element Code {
 Embed = element Embed {
   block_id_label,
   attribute url { xsd:anyURI },
-  attribute title { xsd:string { minLength = "1" maxLength = "127" } },
+  attribute title { xsd:string { minLength = "1" maxLength = "256" } },
   attribute provider_name { xsd:string { minLength = "1" maxLength = "127" } },
   xsd:string { minLength = "1" }
 }
