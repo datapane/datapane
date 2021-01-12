@@ -49,12 +49,9 @@ def test_blob_df():
 
 
 @pytest.mark.org
-def test_blob_csv(tmp_path: Path):
-    # upload a csv file
-    # TODO - use df_processor?
-    fn = tmp_path / "initial.csv"
-    df.to_csv(fn, index=False)
-    b1 = dp.Blob.upload_file(fn, name=gen_name())
+def test_blob_csv_export(tmp_path: Path):
+    # upload a df file
+    b1 = dp.Blob.upload_df(df, visibility=visibility, name=gen_name())
 
     with deletable(b1):
         # export back to a csv and compare
@@ -81,6 +78,18 @@ def test_blob_file(tmp_path: Path):
         b1.download_file(fn1)
         code1 = Path(fn1).read_text()
         assert code1 == code
+
+    # upload binary
+    bin_code = code.encode()
+    fn = tmp_path / "initial.bin"
+    fn.write_bytes(bin_code)
+    b1 = dp.Blob.upload_file(fn, name=gen_name())
+    with deletable(b1):
+        # download as a file and compare
+        fn1 = tmp_path / "exported.bin"
+        b1.download_file(fn1)
+        bin_code1 = Path(fn1).read_bytes()
+        assert bin_code1 == bin_code
 
 
 @pytest.mark.org
