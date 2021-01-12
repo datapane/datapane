@@ -20,13 +20,12 @@ from munch import Munch
 from datapane import log
 from datapane.client import DPError
 from datapane.common import JSON, URL, ArrowFormat, SDict
+from datapane.common.df_processor import to_df
 
 from . import Resource
 from .common import DPTmpFile, FileList
 
 __all__ = ["DPObjectRef"]
-
-from datapane.common.df_processor import process_df, to_df
 
 U = t.TypeVar("U", bound="DPObjectRef")
 
@@ -196,8 +195,10 @@ class DPObjectRef:
 def save_df(df: pd.DataFrame) -> DPTmpFile:
     """Export a df for uploading"""
     fn = DPTmpFile(ArrowFormat.ext)
+    # create a copy of the df to process
     df = to_df(df)
-    process_df(df)
+    # process_df called in Arrow.save_file
+    # process_df(df)
     ArrowFormat.save_file(fn.name, df)
     log.debug(f"Saved df to {fn} ({os.path.getsize(fn.file)} bytes)")
     return fn

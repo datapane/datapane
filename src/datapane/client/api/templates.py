@@ -242,7 +242,10 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
         rows=1,
         columns=0,
     )
-    page_1 = b.Page(b.Text(basics).format(table=gen_table_df(), plot=vega_sine, other=other), label="Intro")
+    page_1 = b.Page(
+        b.Text(basics).format(table=b.Table(gen_table_df(), caption="A table"), plot=vega_sine, other=other),
+        label="Intro",
+    )
 
     layout = """
 Blocks on a page can be laid-out in Datapane using a flexible row and column system. furthermore, multiple blocks can be

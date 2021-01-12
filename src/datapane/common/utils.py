@@ -22,9 +22,10 @@ mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
 # TODO - hardcode as temporary fix until mimetypes double extension issue is sorted
 _double_ext_map = {
-    ".vl.json": "application/vnd.vegalite.v3+json",
+    ".vl.json": "application/vnd.vegalite.v4+json",
     ".vl2.json": "application/vnd.vegalite.v2+json",
     ".vl3.json": "application/vnd.vegalite.v3+json",
+    ".vl4.json": "application/vnd.vegalite.v4+json",
     ".bokeh.json": "application/vnd.bokeh.show+json",
     ".pl.json": "application/vnd.plotly.v1+json",
     ".fl.html": "application/vnd.folium+html",

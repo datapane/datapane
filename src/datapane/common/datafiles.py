@@ -2,8 +2,7 @@ import abc
 import enum
 import os
 from dataclasses import dataclass
-from pathlib import Path
-from typing import BinaryIO, Dict, Optional, TextIO, Type, Union
+from typing import BinaryIO, Dict, Type, Union
 
 import pandas as pd
 import pyarrow as pa
@@ -15,8 +14,6 @@ from .df_processor import process_df
 from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME, Hash
 from .utils import guess_encoding
 
-# TODO - cleanup and refactor functions
-
 
 @dataclass
 class ImportFileResp:
@@ -25,26 +22,6 @@ class ImportFileResp:
     file_size: int
     num_rows: int
     num_columns: int
-
-
-def convert_df_table(df: pd.DataFrame) -> pa.Table:
-    process_df(df)
-    # NOTE - can pass expected schema and columns for output df here
-    table: pa.Table = pa.Table.from_pandas(df, preserve_index=False)
-    return table
-
-
-def convert_csv_table(
-    _input: Union[str, TextIO],
-    output: Optional[Union[str, BinaryIO]] = None,
-    ext: str = ".csv",
-) -> pa.Table:
-    """Convert & return csv/excel file to an arrow table via pandas, optionally writing it disk"""
-    df = df_ext_map[ext].load_file(fn=_input)
-    table = convert_df_table(df)
-    if output is not None:
-        write_table(table, output)
-    return table
 
 
 def import_arrow_file(table: pa.Table, arrow_f_name: str, cas_ref: str = None) -> ImportFileResp:
@@ -59,23 +36,6 @@ def import_arrow_file(table: pa.Table, arrow_f_name: str, cas_ref: str = None) -
         num_rows=table.num_rows,
         num_columns=table.num_columns,
     )
-
-
-def import_from_csv(in_f_path: Path, arrow_f_name: str) -> pa.Table:
-    """
-    Import a local file to a local arrow file,
-    we use filenames rather than open files as pyarrow docs mention it's more performant
-    """
-    # ext: str = "".join(in_f_path.suffixes)
-    # pull imported file and read into an arrow table
-    table = convert_csv_table(str(in_f_path), arrow_f_name, ext=in_f_path.suffix)
-    log.debug(f"Imported CSV file of size {table.shape} with following schema: \n{table.schema}")
-    return table
-
-
-def import_local_file_from_disk(in_f_path: Path, arrow_f_name: str) -> ImportFileResp:
-    table = import_from_csv(in_f_path, arrow_f_name)
-    return import_arrow_file(table, arrow_f_name)
 
 
 def write_table(table: pa.Table, sink: Union[str, BinaryIO]):
@@ -116,7 +76,9 @@ class ArrowFormat(DFFormatter):
         return pa.ipc.open_file(fn).read_pandas()
 
     def save_file(fn: str, df: pd.DataFrame):
-        table = convert_df_table(df)
+        process_df(df)
+        # NOTE - can pass expected schema and columns for output df here
+        table: pa.Table = pa.Table.from_pandas(df, preserve_index=False)
         write_table(table, fn)
 
 

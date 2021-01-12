@@ -5,11 +5,11 @@ import altair as alt
 import pandas as pd
 import pytest
 import requests
+from common._test_df_processor_3 import convert_csv_pd
 from furl import furl
 
 import datapane as dp
 from datapane.client import config as c
-from datapane.common.df_processor import convert_csv_pd
 
 from ..local.test_api import gen_report_complex_with_files, gen_report_simple
 from .common import check_name, deletable, gen_description, gen_df, gen_name

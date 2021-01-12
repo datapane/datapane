@@ -307,7 +307,7 @@ class BokehLayoutPlot(BokehBasePlot):
 class AltairPlot(PlotAsset):
     """Creates a vega-light chart from Altair Chart / pdvega Axes object."""
 
-    mimetype = "application/vnd.vegalite.v3+json"
+    mimetype = "application/vnd.vegalite.v4+json"
     ext = ".vl.json"
     obj_type = SchemaBase
 

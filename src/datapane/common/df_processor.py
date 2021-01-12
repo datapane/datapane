@@ -1,14 +1,9 @@
 import datetime
-import textwrap
-from io import StringIO
 from numbers import Number
-from typing import Any, List, TextIO
+from typing import Any
 
 import numpy as np
 import pandas as pd
-from pandas.errors import ParserError
-
-from .utils import log
 
 
 def convert_indices(df: pd.DataFrame):
@@ -16,46 +11,56 @@ def convert_indices(df: pd.DataFrame):
     extract all indices to columns if all are not numerical
     and don't clash with existing column names
     """
-    col_names: List[str] = df.columns.values.tolist()
-    if (
-        all([df.index.get_level_values(x).dtype != np.dtype("int64") for x in range(df.index.nlevels)])
-        and len(set(df.index.names)) == len(df.index.names)
-        and not any([x in col_names for x in df.index.names])
-    ):
+    if df.index.nlevels > 1:
+        # always reset multi-index
         df.reset_index(inplace=True)
+    elif df.index.dtype == np.dtype("int64"):
+        # Int64Index -> RangeIndex if possible
+        df.reset_index(inplace=True, drop=True)
+
+    # col_names: List[str] = df.columns.values.tolist()
+    # if (
+    #     all([df.index.get_level_values(x).dtype != np.dtype("int64") for x in range(df.index.nlevels)])
+    #     and len(set(df.index.names)) == len(df.index.names)
+    #     and not any([x in col_names for x in df.index.names])
+    # ):
+    #     df.reset_index(inplace=True)
 
 
-def parse_dates(data: pd.DataFrame, force_utc: bool = False):
-    """Tries to convert strings to dates, ignores existing panda datetimes"""
-    potential_dates = data.select_dtypes(["object", "category"])
+def downcast_numbers(data: pd.DataFrame):
+    """Downcast numerics"""
 
-    # TODO - we should convert all naive datatypes to user's timezone first and set utc to True
-    def try_to_datetime(ser: pd.Series) -> datetime.datetime:
-        return pd.to_datetime(ser, infer_datetime_format=True, errors="ignore", utc=force_utc)
+    def downcast(ser: pd.Series) -> pd.Series:
+        try:
+            ser = pd.to_numeric(ser, downcast="signed")
+            ser = pd.to_numeric(ser, downcast="unsigned")
+        except Exception:
+            pass  # catch failure on Int64Dtype
+        return ser
 
-    data[potential_dates.columns] = potential_dates.apply(try_to_datetime)
+    # A result of downcast(timedelta64[ns]) is int <ns> and hard to understand.
+    # e.g.) 0 days 00:54:38.777572 -> 3278777572000 [ns]
+    df_num = data.select_dtypes("number", exclude=["timedelta"])  # , pd.Int64Dtype])
+    data[df_num.columns] = df_num.apply(downcast)
 
 
-def parse_timedelta(data: pd.DataFrame):
-    """Tries to convert strings to timedelta, ignores existing panda timedelta"""
-
-    # if timedelta is not parsed, it might be interpreted as categories or strings
-    potential_timedeltas = data.select_dtypes(object)
-
-    def try_to_timedelta(ser: pd.Series) -> pd.Series:
-        return pd.to_timedelta(ser, errors="ignore")
-
-    data[potential_timedeltas.columns] = potential_timedeltas.apply(try_to_timedelta)
+def timedelta_to_str(df: pd.DataFrame):
+    """
+    convert timedelta to str - NOTE - only until arrow.js supports Duration type
+    """
+    df_td = df.select_dtypes("timedelta")
+    # df[df_timedelta.columns] = df_timedelta.astype("string")
+    df[df_td.columns] = np.where(pd.isnull(df_td), pd.NA, df_td.astype("string"))
 
 
 def parse_categories(data: pd.DataFrame):
     """Detect and converts categories"""
-    potential_cats = data.select_dtypes(object)
 
     def criteria(ser: pd.Series) -> bool:
         """Decides whether to convert into categorical"""
         nunique: int = ser.nunique()
-        if nunique <= 20:
+
+        if nunique <= 20 and (nunique != ser.size):
             # few unique values => make it a category regardless of the proportion
             return True
 
@@ -70,67 +75,52 @@ def parse_categories(data: pd.DataFrame):
     def try_to_category(ser: pd.Series) -> pd.Series:
         return ser.astype("category") if criteria(ser) else ser
 
+    potential_cats = data.select_dtypes(["string", "object"])
     data[potential_cats.columns] = potential_cats.apply(try_to_category)
 
 
-def downcast_numbers(data: pd.DataFrame):
-    """Downcast numerics"""
-
-    def downcast(ser: pd.Series) -> pd.Series:
-        ser = pd.to_numeric(ser, downcast="signed")
-        ser = pd.to_numeric(ser, downcast="unsigned")
-        return ser
-
-    # A result of downcast(timedelta64[ns]) is int <ns> and hard to understand.
-    # e.g.) 0 days 00:54:38.777572 -> 3278777572000 [ns]
-    df_num = data.select_dtypes("number", exclude="timedelta")
-    data[df_num.columns] = df_num.apply(downcast)
-
-
-def to_str(df: pd.DataFrame):
+def obj_to_str(df: pd.DataFrame):
     """Converts remaining objects columns to str"""
+    # convert objects to str / NA
     df_str = df.select_dtypes("object")
-    df[df_str.columns] = df_str.astype(str)
-    # timedelta (duration in pyarrow) is not supported in parquet,
-    # so that converts it to str
-    # See https://issues.apache.org/jira/browse/ARROW-6780
-    df_timedelta = df.select_dtypes("timedelta")
-    df[df_timedelta.columns] = df_timedelta.astype(str)
-    df_cat = df.select_dtypes("category")
+    # df[df_str.columns] = np.where(pd.isnull(df_str), pd.NA, df_str.astype("string"))
+    df[df_str.columns] = df_str.astype("string")
 
+    # convert categorical values (as strings if object)
     def to_str_cat_vals(x: pd.Series) -> pd.Series:
-        if x.cat.categories.dtype == np.dtype("O"):
-            x.cat.categories = x.cat.categories.astype(str)
+        if x.cat.categories.dtype == np.dtype("object"):
+            # x.cat.categories = x.cat.categories.astype(str)
+            # x.cat.categories = np.where(pd.isnull(x.cat.categories), pd.NA, x.cat.categories.astype("string"))
+            x.cat.categories = x.cat.categories.astype("string")
         return x
 
-    # make sure categorical values are strings for serialisation
+    df_cat = df.select_dtypes("category")
     df[df_cat.columns] = df_cat.apply(to_str_cat_vals)
 
 
-def process_df(df: pd.DataFrame) -> None:
+def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     """
     Processing steps needed before writing / after reading
-    NOTE - this mutates the dataframe
+    We only modify the dataframe to optimise size,
+    rather than convert/infer types, e.g. no longer parsing dates from strings
+
+    NOTE - this mutates the dataframe by default
     """
+    if copy:
+        df = df.copy(deep=True)
+
     convert_indices(df)
-    parse_dates(df)
-    parse_timedelta(df)
-    parse_categories(df)
+
+    # convert timedelta
+    timedelta_to_str(df)
+
     downcast_numbers(df)
-    to_str(df)
-
-
-def convert_csv_pd(string: str) -> pd.DataFrame:
-    """Helper function to convert a well-formatted csv into a DataFrame"""
-    buf: TextIO = StringIO(textwrap.dedent(string).strip())
-
-    try:
-        df = pd.read_csv(buf, engine="c", sep=",")
-    except ParserError as e:
-        log.warning(f"Error parsing CSV file ({e}), trying python fallback")
-        df = pd.read_csv(buf, engine="python", sep=None)
-
-    process_df(df)
+    # save timedeltas cols (unneeded whilst timedelta_to_str used)
+    # td_col = df.select_dtypes("timedelta")
+    df = df.convert_dtypes()
+    # df[td_col.columns] = td_col
+    obj_to_str(df)
+    parse_categories(df)
     return df
 
 

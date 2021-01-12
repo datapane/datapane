@@ -49,6 +49,7 @@ def run(script: api.Script, user_config: SDict) -> SDict:
             raise CodeRaisedError.from_exception(partial(filter_frame_by_filename, "<module>"))
 
 
+# OBSOLETE
 # def run(run_config: RunnerConfig) -> List[api.ReportBlock]:
 #     """Snippet - run a python function embedded within in the snippet config field"""
 #     code = run_config.code
