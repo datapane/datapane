@@ -24,21 +24,9 @@
       <script src="{{ cdn_base }}/base.js"></script>
       <script src="{{ cdn_base }}/report-base.js"></script>
     {% endif %}
-    <style>
-      body {
-        background-color: #f4f5f7;
-      }
-
-    </style>
   </head>
   <body>
-    <div class="{% if full_width %}max-w-full{% else %}max-w-screen-xl{% endif %} mx-auto pb-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        <div class="shadow-lg">
-          <div id="report-root"></div>
-        </div>
-      </div>
-    </div>
+    <div id="report-root" class="w-full"></div>
     <script>
       const report = { document: `{{ report_doc }}` };
       const { React, ReactDOM, ReportComponent } = UMDModules;

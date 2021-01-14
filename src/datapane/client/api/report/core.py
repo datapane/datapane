@@ -9,7 +9,7 @@ import typing as t
 import uuid
 import warnings
 import webbrowser
-from enum import IntEnum
+from enum import Enum, IntEnum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
@@ -27,16 +27,7 @@ from datapane.client.api.runtime import _report
 from datapane.common import log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from .blocks import (
-    BlockOrPrimitive,
-    BuilderState,
-    E,
-    Group,
-    Page,
-    PageOrPrimitive,
-    Select,
-    _conv_attrib,
-)
+from .blocks import BlockOrPrimitive, BuilderState, E, Group, Page, PageOrPrimitive, Select
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
@@ -64,6 +55,22 @@ def is_jupyter() -> bool:
         return False
 
 
+class Visibility(IntEnum):
+    """The report visibility type"""
+
+    PRIVATE = 0  # private to owner
+    ORG = 1  # visible to all users in the org
+    PUBLIC = 2  # anon/unauthed access
+
+
+class ReportType(Enum):
+    """The report type"""
+
+    DASHBOARD = "dashboard"
+    REPORT = "report"
+    ARTICLE = "article"
+
+
 class ReportFileWriter:
     """ Collects data needed to display a local report, and generates the local HTML """
 
@@ -87,7 +94,7 @@ class ReportFileWriter:
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template("template.html")
 
-    def write(self, report_doc: str, path: str, full_width: bool, standalone: bool):
+    def write(self, report_doc: str, path: str, report_type: ReportType, standalone: bool):
         # create template on demand
         if not self.template:
             self._setup_template()
@@ -96,19 +103,11 @@ class ReportFileWriter:
         report_doc_esc = report_doc.replace("`", r"\`")
         r = self.template.render(
             report_doc=report_doc_esc,
-            full_width=full_width,
+            report_type=report_type,
             standalone=standalone,
             cdn_base=f"https://storage.googleapis.com/datapane-public/report-assets/{__version__}",
         )
         Path(path).write_text(r, encoding="utf-8")
-
-
-class Visibility(IntEnum):
-    """The report visibility type"""
-
-    PRIVATE = 0  # private to owner
-    ORG = 1  # visible to all users in the org
-    PUBLIC = 2  # anon/unauthed access
 
 
 ################################################################################
@@ -125,18 +124,22 @@ class Report(DPObjectRef):
     _last_saved: t.Optional[str] = None  # Path to local report
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
-    full_width: bool = False
+    report_type: ReportType = ReportType.REPORT
     list_fields: t.List[str] = ["name", "web_url", "versions"]
     """When set, the report is full-width suitable for use in a dashboard"""
 
     def __init__(
-        self, *arg_blocks: PageOrPrimitive, blocks: t.List[PageOrPrimitive] = None, full_width: bool = False, **kwargs
+        self,
+        *arg_blocks: PageOrPrimitive,
+        blocks: t.List[PageOrPrimitive] = None,
+        type: ReportType = ReportType.REPORT,
+        **kwargs,
     ):
         """
         Args:
             *arg_blocks: Group to add to report
             blocks: Allows providing the report blocks as a single list
-            full_width: Set to `True` to increase the report width, for instance when creating a dashboard
+            type: Set the Report type, this will affect the formatting and layout of the report
 
         Returns:
             A `Report` object that can be published, saved, etc.
@@ -145,7 +148,7 @@ class Report(DPObjectRef):
           `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
         """
         super().__init__(**kwargs)
-        self.full_width = full_width
+        self.report_type = type
         self._preprocess_pages(blocks or list(arg_blocks))
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
@@ -174,7 +177,7 @@ class Report(DPObjectRef):
                 E.Title(title),
                 E.Description(description),
             ),
-            E.Main(*_s.elements, full_width=_conv_attrib(self.full_width)),
+            E.Main(*_s.elements, type=self.report_type.value),
             version="1",
         )
         report_doc.set("{http://www.w3.org/XML/1998/namespace}id", f"_{uuid.uuid4().hex}")
@@ -248,7 +251,7 @@ class Report(DPObjectRef):
 
         local_doc, _ = self._gen_report(embedded=True, title="Local Report", description="Description")
 
-        self._local_writer.write(local_doc, path, self.full_width, standalone)
+        self._local_writer.write(local_doc, path, self.report_type, standalone)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"

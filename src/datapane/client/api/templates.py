@@ -347,6 +347,8 @@ dp.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA")
 dp.Embed("https://twitter.com/datapaneapp/status/1300831345413890050")
 ```
 
+{{embed}}
+
 ## Files
 
 Files and Python objects can be added to a Datapane report, and be viewed (depending on browser support) and downloaded.
@@ -385,6 +387,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     embed = b.Group(
         b.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA"),
         b.Embed("https://twitter.com/datapaneapp/status/1300831345413890050"),
+        columns=2,
     )
     files = b.Group(
         b.File(file=logo),

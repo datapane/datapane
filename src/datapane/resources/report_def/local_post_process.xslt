@@ -3,7 +3,7 @@
                 xmlns:fn="urn:local:dp-report-functions"
                 exclude-result-prefixes="fn" extension-element-prefixes="fn">
   <xsl:output omit-xml-declaration="no" indent="no" encoding="utf-8"
-              method='xml' cdata-section-elements="Text HTML Code Description"/>
+              method='xml' cdata-section-elements="Text HTML Code Embed Description"/>
   <xsl:strip-space elements="*"/>
   <xsl:param name="embedded"/>
 

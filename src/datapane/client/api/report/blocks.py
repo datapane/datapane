@@ -413,6 +413,7 @@ class Code(EmbeddedTextBlock):
             code: The source code
             language: The language of the code, most common languages are supported (optional - defaults to Python)
             id: A unique id for the block to aid querying (optional)
+            label: A label used when displaying the block (optional)
         """
         super().__init__(id=id, label=label, language=language)
         self.content = code
@@ -430,6 +431,7 @@ class HTML(EmbeddedTextBlock):
         Args:
             html: The HTML fragment to embed - can be a string or a [dominate](https://github.com/Knio/dominate/) tag
             id: A unique id for the block to aid querying (optional)
+            label: A label used when displaying the block (optional)
         """
         super().__init__(id=id, label=label)
         self.content = str(html)
@@ -443,15 +445,18 @@ class Embed(EmbeddedTextBlock):
     _tag = "Embed"
     providers = bootstrap_basic(cache=cache.Cache())
 
-    def __init__(self, url: str, id: str = None, label: str = None):
+    def __init__(self, url: str, width: int = 640, height: int = 480, id: str = None, label: str = None):
         """
         Args:
             url: The URL of the resource to be embedded
+            width: The width of the embedded object (optional)
+            height: The height of the embedded object (optional)
             id: A unique id for the block to aid querying (optional)
+            label: A label used when displaying the block (optional)
         """
 
         try:
-            result = self.providers.request(url)
+            result = self.providers.request(url, maxwidth=width, maxheight=height)
         except ProviderException:
             raise DPError(f"No embed provider found for URL '{url}'")
         super().__init__(

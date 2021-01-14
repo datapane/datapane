@@ -26,7 +26,11 @@ Meta = element Meta {
 
 ################################################################################
 # Main Report Tree
-Main = element Main { Page+, attribute full_width { xsd:boolean } }
+Main = element Main {
+  Page+,
+  attribute type { string "dashboard" | string "report" | string "article" }
+  # attribute full_width { xsd:boolean },
+}
 
 block_id = attribute id { xsd:string { minLength = "1" maxLength = "64" } }
 block_label = attribute label { xsd:string { minLength = "1" } }

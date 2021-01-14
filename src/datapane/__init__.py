@@ -35,6 +35,7 @@ from .client.api import (
     Params,
     Plot,
     Report,
+    ReportType,
     Result,
     Run,
     Schedule,

@@ -55,12 +55,19 @@
   <define name="Main">
     <a:documentation/>
     <element name="Main">
-      <oneOrMore>
-        <ref name="Page"/>
-      </oneOrMore>
-      <attribute name="full_width">
-        <data type="boolean"/>
-      </attribute>
+      <group>
+        <oneOrMore>
+          <ref name="Page"/>
+        </oneOrMore>
+        <attribute name="type">
+          <choice>
+            <value type="string" datatypeLibrary="">dashboard</value>
+            <value type="string" datatypeLibrary="">report</value>
+            <value type="string" datatypeLibrary="">article</value>
+          </choice>
+        </attribute>
+      </group>
+      <!-- attribute full_width { xsd:boolean }, -->
     </element>
   </define>
   <define name="block_id">
