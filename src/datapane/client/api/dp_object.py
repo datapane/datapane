@@ -121,7 +121,7 @@ class DPObjectRef:
         return x
 
     @classmethod
-    def post_with_files(cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, **kwargs) -> U:
+    def post_with_files(cls: Type[U], files: t.Optional[FileList] = None, file: t.Optional[Path] = None, **kwargs) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList

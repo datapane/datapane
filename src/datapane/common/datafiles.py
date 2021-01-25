@@ -2,7 +2,7 @@ import abc
 import enum
 import os
 from dataclasses import dataclass
-from typing import BinaryIO, Dict, Type, Union
+from typing import BinaryIO, Dict, Optional, Type, Union
 
 import pandas as pd
 import pyarrow as pa
@@ -24,7 +24,7 @@ class ImportFileResp:
     num_columns: int
 
 
-def import_arrow_file(table: pa.Table, arrow_f_name: str, cas_ref: str = None) -> ImportFileResp:
+def import_arrow_file(table: pa.Table, arrow_f_name: str, cas_ref: Optional[str] = None) -> ImportFileResp:
     file_size = os.path.getsize(arrow_f_name)
     # schema unused atm
     _: pa.Schema = table.schema

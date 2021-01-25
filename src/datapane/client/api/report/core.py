@@ -131,7 +131,7 @@ class Report(DPObjectRef):
     def __init__(
         self,
         *arg_blocks: PageOrPrimitive,
-        blocks: t.List[PageOrPrimitive] = None,
+        blocks: t.Optional[t.List[PageOrPrimitive]] = None,
         type: ReportType = ReportType.REPORT,
         **kwargs,
     ):
@@ -199,7 +199,7 @@ class Report(DPObjectRef):
         source_url: str = "",
         visibility: t.Optional[Visibility] = None,
         open: bool = False,
-        tags: t.List[str] = None,
+        tags: t.Optional[t.List[str]] = None,
         **kwargs,
     ) -> None:
         """
