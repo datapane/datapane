@@ -267,5 +267,5 @@ class Schedule(DPObjectRef):
     def create(cls, script: Script, cron: str, parameters: SDict) -> "Schedule":
         return cls.post(script=script.url, cron=cron, parameter_vals=parameters)
 
-    def update(self, cron: str = None, parameters: SDict = None) -> None:
+    def update(self, cron: t.Optional[str] = None, parameters: t.Optional[SDict] = None) -> None:
         super().update(cron=cron, parameter_vals=parameters)

@@ -19,7 +19,7 @@ from .exceptions import ModelRunError
 from .typedefs import ErrorResult, RunResult
 
 
-def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: TextIO = None):
+def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: Optional[TextIO] = None):
     """Init the Datapane API for automated use"""
     # login, ping, and create the default env file for CMD usage
     api.login(token=dp_token, server=dp_host, cli_login=False)

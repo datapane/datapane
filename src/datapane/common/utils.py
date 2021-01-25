@@ -47,7 +47,7 @@ if log.level == logging.NOTSET:
 _have_setup_logging: bool = False
 
 
-def _setup_dp_logging(verbosity: int = 0, logs_stream: t.TextIO = None) -> None:
+def _setup_dp_logging(verbosity: int = 0, logs_stream: t.Optional[t.TextIO] = None) -> None:
     global _have_setup_logging
 
     log_level = "WARNING"

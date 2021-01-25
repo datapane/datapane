@@ -107,7 +107,7 @@ class BaseElement(ABC):
     _tag: str
     id: t.Optional[str] = None
 
-    def __init__(self, id: str = None, **kwargs):
+    def __init__(self, id: t.Optional[str] = None, **kwargs):
         """
         Args:
             id: A unique id to reference the block, used when querying blocks via XPath to aid embedding
@@ -160,9 +160,9 @@ class LayoutBlock(BaseElement):
      - represents a subtree in the document
     """
 
-    blocks: BlockList = None
+    blocks: t.Optional[BlockList] = None
 
-    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
+    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.Optional[t.List[BlockOrPrimitive]] = None, **kwargs):
         self.blocks = blocks or list(arg_blocks)
         if len(self.blocks) == 0:
             raise DPError("Can't create container with 0 objects")
@@ -200,7 +200,11 @@ class Page(LayoutBlock):
     _tag = "Page"
 
     def __init__(
-        self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, id: str = None, label: str = None
+        self,
+        *arg_blocks: BlockOrPrimitive,
+        blocks: t.Optional[t.List[BlockOrPrimitive]] = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:
@@ -241,10 +245,10 @@ class Select(LayoutBlock):
     def __init__(
         self,
         *arg_blocks: BlockOrPrimitive,
-        blocks: t.List[BlockOrPrimitive] = None,
+        blocks: t.Optional[t.List[BlockOrPrimitive]] = None,
         type: t.Optional[SelectType] = None,
-        id: str = None,
-        label: str = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:
@@ -279,9 +283,9 @@ class Group(LayoutBlock):
     def __init__(
         self,
         *arg_blocks: BlockOrPrimitive,
-        blocks: t.List[BlockOrPrimitive] = None,
-        id: str = None,
-        label: str = None,
+        blocks: t.Optional[t.List[BlockOrPrimitive]] = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
         rows: int = 0,
         columns: int = 1,
     ):
@@ -349,7 +353,13 @@ class Text(EmbeddedTextBlock):
 
     _tag = "Text"
 
-    def __init__(self, text: str = None, file: NPath = None, id: str = None, label: str = None):
+    def __init__(
+        self,
+        text: t.Optional[str] = None,
+        file: t.Optional[NPath] = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
+    ):
         """
         Args:
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
@@ -407,7 +417,7 @@ class Code(EmbeddedTextBlock):
 
     _tag = "Code"
 
-    def __init__(self, code: str, language: str = "python", id: str = None, label: str = None):
+    def __init__(self, code: str, language: str = "python", id: t.Optional[str] = None, label: t.Optional[str] = None):
         """
         Args:
             code: The source code
@@ -426,7 +436,7 @@ class HTML(EmbeddedTextBlock):
 
     _tag = "HTML"
 
-    def __init__(self, html: t.Union[str, dom_tag], id: str = None, label: str = None):
+    def __init__(self, html: t.Union[str, dom_tag], id: t.Optional[str] = None, label: t.Optional[str] = None):
         """
         Args:
             html: The HTML fragment to embed - can be a string or a [dominate](https://github.com/Knio/dominate/) tag
@@ -445,7 +455,9 @@ class Embed(EmbeddedTextBlock):
     _tag = "Embed"
     providers = bootstrap_basic(cache=cache.Cache())
 
-    def __init__(self, url: str, width: int = 640, height: int = 480, id: str = None, label: str = None):
+    def __init__(
+        self, url: str, width: int = 640, height: int = 480, id: t.Optional[str] = None, label: t.Optional[str] = None
+    ):
         """
         Args:
             url: The URL of the resource to be embedded
@@ -490,8 +502,8 @@ class BigNumber(DataBlock):
         prev_value: t.Optional[NumberValue] = None,
         is_positive_intent: t.Optional[bool] = None,
         is_upward_change: t.Optional[bool] = None,
-        id: str = None,
-        label: str = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:
@@ -532,10 +544,17 @@ class AssetBlock(DataBlock):
     AssetBlock objects form basis of all File-related blocks (abstract class, not exported)
     """
 
-    file: Path = None
+    file: t.Optional[Path] = None
     caption: t.Optional[str] = None
 
-    def __init__(self, file: Path, caption: str = None, id: str = None, label: str = None, **kwargs):
+    def __init__(
+        self,
+        file: Path,
+        caption: t.Optional[str] = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
+        **kwargs,
+    ):
         # storing objects for delayed upload
         super().__init__(id=id, label=label, **kwargs)
         self.file = Path(file)
@@ -593,8 +612,8 @@ class File(AssetBlock):
         is_json: bool = False,
         can_download: bool = True,
         name: t.Optional[str] = None,
-        id: str = None,
-        label: str = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:
@@ -625,7 +644,9 @@ class Plot(AssetBlock):
 
     _tag = "Plot"
 
-    def __init__(self, data: t.Any, caption: t.Optional[str] = None, id: str = None, label: str = None):
+    def __init__(
+        self, data: t.Any, caption: t.Optional[str] = None, id: t.Optional[str] = None, label: t.Optional[str] = None
+    ):
         """
         Args:
             data: The `plot` object to attach
@@ -649,7 +670,11 @@ class Table(AssetBlock):
     _tag = "Table"
 
     def __init__(
-        self, data: t.Union[pd.DataFrame, Styler], caption: t.Optional[str] = None, id: str = None, label: str = None
+        self,
+        data: t.Union[pd.DataFrame, Styler],
+        caption: t.Optional[str] = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:
@@ -677,8 +702,8 @@ class DataTable(AssetBlock):
         df: pd.DataFrame,
         caption: t.Optional[str] = None,
         can_pivot: bool = True,
-        id: str = None,
-        label: str = None,
+        id: t.Optional[str] = None,
+        label: t.Optional[str] = None,
     ):
         """
         Args:

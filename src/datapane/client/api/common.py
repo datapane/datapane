@@ -175,7 +175,7 @@ class Resource:
         ):
             raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane for Teams.")
 
-    def post(self, params: t.Dict = None, **data: JSON) -> JSON:
+    def post(self, params: t.Optional[t.Dict] = None, **data: JSON) -> JSON:
         params = params or dict()
         r = self.session.post(self.url, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
@@ -231,7 +231,7 @@ class Resource:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
         return _process_res(r)
 
-    def patch(self, params: t.Dict = None, **data: JSON) -> JSON:
+    def patch(self, params: t.Optional[t.Dict] = None, **data: JSON) -> JSON:
         params = params or dict()
         r = self.session.patch(self.url, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
