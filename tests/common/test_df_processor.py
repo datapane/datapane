@@ -57,6 +57,23 @@ def test_parse_categories_large():
     _check_categories_parsed(data, ["str2"])
 
 
+def test_parse_categories_roundtrip(tmp_path: Path):
+    # initial df
+    df = pd.DataFrame(
+        dict(
+            str1=[str(x) for x in range(10000)],
+            str2=[str(x % 25) for x in range(10000)],
+        )
+    )
+    # process it
+    df1 = process_df(df, copy=True)
+    # arrow converted
+    df2 = save_load_arrow(tmp_path, df)
+
+    _check_categories_parsed(df2, ["str2"])
+    pd.testing.assert_frame_equal(df1, df2)
+
+
 def test_downcast_numbers():
     data = pd.DataFrame(
         [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0], [100, 1000, 100000000000, -100, -1000, -100000000000]],
@@ -103,8 +120,7 @@ def test_to_str():
 def test_col_order(tmp_path: Path):
     def _test_order(df: pd.DataFrame):
         # process and compare
-        df1 = df.copy(deep=True)
-        process_df(df1)
+        df1 = process_df(df, copy=True)
         assert list(df.columns) == list(df1.columns)
 
         # convert to arrow and back
@@ -132,7 +148,7 @@ def test_col_order(tmp_path: Path):
 
 
 def test_e2e_df_processing(tmp_path: Path):
-    def _test_df(df: pd.DataFrame):
+    def _test_df(df: pd.DataFrame, expected_types: List[str]):
         df_conv = df.convert_dtypes()
         df_proc = process_df(df, copy=True)
 
@@ -143,6 +159,7 @@ def test_e2e_df_processing(tmp_path: Path):
         # check we can save and load processed file
         df2 = save_load_arrow(tmp_path, df_proc)
         pd.testing.assert_frame_equal(df_proc, df2)
+        assert [str(x) for x in df2.dtypes] == expected_types
 
     df = pd.DataFrame(
         dict(
@@ -150,13 +167,14 @@ def test_e2e_df_processing(tmp_path: Path):
             cat_col=["a" for x in range(30)],
             int_col=[x for x in range(30)],
             float_col=[(x + 0.1) for x in range(30)],
-            time_col=[timedelta(seconds=1) for x in range(30)],
+            # store time as duration
+            time_col=[timedelta(seconds=x) for x in range(30)],
             date_col=[datetime.utcnow() for x in range(30)],
             obj_col=[(str(x), str(x)) for x in range(30)],
             cat_obj_col=[("a", "b") for x in range(30)],
         )
     )
-    _test_df(df)
+    _test_df(df, ["string", "category", "UInt8", "float64", "string", "datetime64[ns]", "string", "category"])
 
     df = pd.DataFrame(
         dict(
@@ -165,8 +183,8 @@ def test_e2e_df_processing(tmp_path: Path):
             # int_col= [x for x in range(30)] + [pd.NA, pd.NA],
             int_na_col=[x for x in range(30)] + [np.nan, np.nan],
             float_col=[(x + 0.1) for x in range(30)] + [np.nan, np.nan],
-            time_col=[timedelta(seconds=1) for x in range(30)] + [pd.NaT, pd.NaT],
+            time_col=[timedelta(seconds=x) for x in range(30)] + [pd.NaT, pd.NaT],
             date_col=[datetime.utcnow() for x in range(30)] + [pd.NaT, pd.NaT],
         )
     )
-    _test_df(df)
+    _test_df(df, ["string", "category", "Int64", "float64", "string", "datetime64[ns]"])

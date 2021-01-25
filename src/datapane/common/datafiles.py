@@ -76,7 +76,7 @@ class ArrowFormat(DFFormatter):
         return pa.ipc.open_file(fn).read_pandas()
 
     def save_file(fn: str, df: pd.DataFrame):
-        process_df(df)
+        df = process_df(df)
         # NOTE - can pass expected schema and columns for output df here
         table: pa.Table = pa.Table.from_pandas(df, preserve_index=False)
         write_table(table, fn)

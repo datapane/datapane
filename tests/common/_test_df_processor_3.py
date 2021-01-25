@@ -23,7 +23,7 @@ def convert_csv_pd(string: str, process: bool = False) -> pd.DataFrame:
         df = pd.read_csv(buf, engine="python", sep=None)
 
     if process:
-        process_df(df)
+        df = process_df(df)
     return df
 
 
@@ -137,7 +137,7 @@ def test_parse_timedelta_explicit_convert():
         buf = StringIO(textwrap.dedent(string).strip())
         df = pd.read_csv(buf, engine="c", sep=",")
         df["timedelta_col1"] = pd.to_timedelta(df["timedelta_col1"])
-        process_df(df)
+        df = process_df(df)
         return df
 
     # timedelta_col1 is parsed by `parse_dates` unless it is converted explicitly
