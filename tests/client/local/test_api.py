@@ -171,7 +171,6 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
     # tables
     table_asset = dp.Table(data=small_df, caption="Test Basic Table")
     dt_asset = dp.DataTable(df=big_df, caption="Test DataTable")
-    dt_pivot_asset = dp.DataTable(df=big_df, caption="Test DataTable with Pivot", can_pivot=True)
 
     if single_file:
         return dp.Report(dp.Group(blocks=[md_block, plot_asset]))
@@ -187,7 +186,6 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
                 img_asset,
                 table_asset,
                 dt_asset,
-                dt_pivot_asset,
             ),
         )
 
@@ -287,7 +285,7 @@ def test_gen_report_complex_no_files():
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    assert_report(report, 6, 18)
+    assert_report(report, 5, 17)
 
 
 ################################################################################

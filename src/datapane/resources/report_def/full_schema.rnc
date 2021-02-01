@@ -141,8 +141,5 @@ DataTable = element DataTable {
   attribute rows { xsd:positiveInteger },
   attribute columns { xsd:positiveInteger },
 
-  [ a:defaultValue = "true" ]
-  attribute can_pivot { xsd:boolean }
-
   # attribute cells { xsd:positiveInteger }
 }

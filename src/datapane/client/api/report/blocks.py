@@ -676,7 +676,6 @@ class DataTable(AssetBlock):
         self,
         df: pd.DataFrame,
         caption: t.Optional[str] = None,
-        can_pivot: bool = True,
         id: str = None,
         label: str = None,
     ):
@@ -684,14 +683,9 @@ class DataTable(AssetBlock):
         Args:
             df: The pandas dataframe to attach to the report
             caption: A caption to display below the plot (optional)
-            can_pivot: Is the table pivotable (not yet supported)
             id: A unique id for the block to aid querying (optional)
             label: A label used when displaying the block (optional)
-
-            ..hint:: `can_pivot` is currently unsupported and can be ignored
         """
         fn = save_df(df)
         (rows, columns) = df.shape
-        super().__init__(
-            file=fn.file, caption=caption, rows=rows, columns=columns, can_pivot=can_pivot, id=id, label=label
-        )
+        super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, id=id, label=label)

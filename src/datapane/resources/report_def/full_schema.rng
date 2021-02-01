@@ -346,9 +346,6 @@
         <attribute name="columns">
           <data type="positiveInteger"/>
         </attribute>
-        <attribute name="can_pivot" a:defaultValue="true">
-          <data type="boolean"/>
-        </attribute>
       </group>
       <!-- attribute cells { xsd:positiveInteger } -->
     </element>
