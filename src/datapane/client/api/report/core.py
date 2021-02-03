@@ -44,7 +44,10 @@ __pdoc__ = {
 def include_raw(ctx, name):
     """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
     env = ctx.environment
-    return Markup(env.loader.get_source(env, name)[0])
+    # Escape </script> to prevent 3rd party JS terminating the local report bundle.
+    # Note there's an extra "\" because it needs to be escaped at both the python and JS level
+    src = env.loader.get_source(env, name)[0].replace("</script>", "<\\\/script>")
+    return Markup(src)
 
 
 def is_jupyter() -> bool:
