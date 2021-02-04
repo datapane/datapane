@@ -62,7 +62,6 @@ class Visibility(IntEnum):
     """The report visibility type"""
 
     PRIVATE = 0  # private to owner
-    ORG = 1  # visible to all users in the org
     PUBLIC = 2  # anon/unauthed access
 
 
@@ -128,7 +127,7 @@ class Report(DPObjectRef):
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
     report_type: ReportType = ReportType.REPORT
-    list_fields: t.List[str] = ["name", "web_url", "versions"]
+    list_fields: t.List[str] = ["name", "web_url", "versions", "group"]
     """When set, the report is full-width suitable for use in a dashboard"""
 
     def __init__(
@@ -203,6 +202,7 @@ class Report(DPObjectRef):
         visibility: t.Optional[Visibility] = None,
         open: bool = False,
         tags: t.List[str] = None,
+        group: t.Optional[str] = None,
         **kwargs,
     ) -> None:
         """
@@ -212,7 +212,7 @@ class Report(DPObjectRef):
             name: The report name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the report, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the report, e.g. a GitHub repo or a Colab notebook
-            visibility: one of `"PUBLIC"` _(default on Public)_, `"ORG"` _(Teams only)_, or `"PRIVATE"` _(limited on Public, unlimited on Teams)_
+            visibility: one of `"PUBLIC"` _(default on Public)_, or `"PRIVATE"` _(limited on Public, unlimited on Teams)_
             open: Open the file in your browser after creating
             tags: A list of tags (as strings) used to categorise your report
         """
@@ -227,7 +227,9 @@ class Report(DPObjectRef):
             warnings.warn("Passing visibility as a string is deprecated, use dp.Visibility enum instead.")
         else:
             visibility_str = glom(visibility, "name", default=None)
-        kwargs.update(name=name, description=description, tags=tags, source_url=source_url, visibility=visibility_str)
+        kwargs.update(
+            name=name, description=description, tags=tags, source_url=source_url, visibility=visibility_str, group=group
+        )
 
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
         res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)

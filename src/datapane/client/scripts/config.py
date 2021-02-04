@@ -68,6 +68,7 @@ class DatapaneCfg:
     description: str = "Datapane Script"
     source_url: str = ""
     visibility: Optional[str] = None
+    group: Optional[str] = None
 
     # build options
     include: List[str] = dc.field(default_factory=list)

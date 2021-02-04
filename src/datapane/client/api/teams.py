@@ -180,19 +180,22 @@ class Variable(DPObjectRef):
     list_fields = ["name"]
 
     @classmethod
-    def create(cls, name: str, value: str, visibility: Optional[str] = "ORG") -> "Variable":
+    def create(
+        cls, name: str, value: str, group: Optional[str] = None, visibility: Optional[str] = "PRIVATE"
+    ) -> "Variable":
         """
         Create a shareable Datapane User Variable with provided `name` and `value`
 
         Args:
             name: Name of the variable
             value: Value of the variable
-            visibility: one of `"PUBLIC"`, `"ORG"`, or `"PRIVATE"` (optional)
+            group: Group name (optional and only applicable for organisations)
+            visibility: one of `"PUBLIC"`, or `"PRIVATE"` (optional)
 
         Returns:
             An instance of the created `Variable` object
         """
-        return cls.post(name=name, value=value, visibility=visibility)
+        return cls.post(name=name, value=value, group=group, visibility=visibility)
 
 
 class Script(DPObjectRef):

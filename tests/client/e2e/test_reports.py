@@ -31,7 +31,7 @@ def test_report_simple_permissions():
     with deletable(report):
         # check we can't access api & web urls
         r = requests.get(url=report.url)
-        assert r.status_code == 401
+        assert r.status_code == 403
         r = requests.get(url=report.web_url)
         assert r.history[0].status_code == 302  # redirect to login
         assert r.status_code == 200
@@ -183,3 +183,19 @@ def test_complex_df_report():
         # check_df_equal(index_df, index_t.download_df())
         # check_df_equal(df_desc, df_desc_t.download_df())
         # check_df_equal(df_desc_2, df_desc_2_t.download_df())
+
+
+@pytest.mark.org
+def test_report_group():
+    report = gen_report_simple()
+    report.publish(name="test_report_group")
+    # check if the group name is default
+    with deletable(report):
+        assert report.group == "default"
+
+    # test adding report to a group that doesn't exist
+    report2 = gen_report_simple()
+    try:
+        report2.publish(name="test_wrong_group", group="wrong-group")
+    except requests.HTTPError as e:
+        assert e.response.status_code == 400

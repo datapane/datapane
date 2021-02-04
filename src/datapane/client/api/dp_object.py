@@ -39,7 +39,7 @@ class DPObjectRef:
     _url: URL = "<local resource>"
     _dto: t.Optional[Munch] = None
 
-    list_fields: t.List[str] = ["name", "web_url"]
+    list_fields: t.List[str] = ["name", "web_url", "group"]
 
     @property
     def dto(self) -> t.Optional[Munch]:

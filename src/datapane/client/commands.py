@@ -163,11 +163,12 @@ def blob():
 @blob.command()
 @click.argument("name")
 @click.argument("file", type=click.Path(exists=True))
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
-def upload(file: str, name: str, visibility: str):
+@click.option("--group")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "PRIVATE"]))
+def upload(file: str, name: str, group: str, visibility: str):
     """Upload a csv or Excel file as a Datapane Blob"""
     log.info(f"Uploading {file}")
-    r = api.Blob.upload_file(file, name=name, visibility=visibility)
+    r = api.Blob.upload_file(file, name=name, group=group, visibility=visibility)
     success_msg(f"Uploaded {click.format_filename(file)} to {r.url}")
 
 
@@ -244,12 +245,13 @@ def script_init(name: str):
 @click.option("--config", type=click.Path(exists=True))
 @click.option("--script", type=click.Path(exists=True))
 @click.option("--name")
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
-def deploy(name: Optional[str], script: Optional[str], config: Optional[str], visibility: str):
+@click.option("--visibility", type=click.Choice(["PUBLIC", "PRIVATE"]))
+@click.option("--group")
+def deploy(name: Optional[str], script: Optional[str], config: Optional[str], visibility: str, group: str):
     """Package and deploy a Python script or Jupyter notebook as a Datapane Script bundle"""
     script = script and Path(script)
     config = config and Path(config)
-    init_kwargs = dict(visibility=visibility, name=name, script=script, config_file=config)
+    init_kwargs = dict(visibility=visibility, name=name, script=script, config_file=config, group=group)
     kwargs = {k: v for k, v in init_kwargs.items() if v is not None}
 
     # if not (script or config or sc.DatapaneCfg.exists()):
@@ -350,7 +352,7 @@ def report():
 # @report.command()
 # @click.argument("name")
 # @click.argument("files", type=click.Path(), nargs=-1, required=True)
-# @click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
+# @click.option("--visibility", type=click.Choice(["PUBLIC", "PRIVATE"]))
 # def create(files: Tuple[str], name: str, visibility: str):
 #     """Create a Report from the provided FILES"""
 #     blocks = [api.Asset.upload_file(file=Path(f)) for f in files]
@@ -416,20 +418,21 @@ def variable():
 @variable.command()
 @click.argument("name", required=True)
 @click.argument("value", required=True)
-@click.option("--visibility", type=click.Choice(["PUBLIC", "ORG", "PRIVATE"]))
-def create(name: str, value: str, visibility: str):
+@click.option("--group")
+@click.option("--visibility", type=click.Choice(["PUBLIC", "PRIVATE"]))
+def create(name: str, value: str, group: str, visibility: str):
     """
     Create a variable
 
     NAME: name of variable
     VALUE: value of variable
+    group: Group name (optional and only applicable for organistations)
 
     --visibility:
     PUBLIC: visible to everyone,
-    ORG: visible to all authenticated users in an organization (note: this option is only for organizations),
     PRIVATE: only visible to you
     """
-    api.Variable.create(name, value, visibility)
+    api.Variable.create(name, value, group, visibility)
     success_msg(f"Created variable: {name}")
 
 
