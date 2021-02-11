@@ -53,9 +53,8 @@ jobs:
           restore-keys: datapane-pip-${{ runner.os }}-
       - name: Run Tests
         run: |
-          pip install "poetry>=1.0.0,<1.1.0"
+          pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
-          poetry run pip install --upgrade pip setuptools
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install
           # run CLI tests (junit tests not captured yet)

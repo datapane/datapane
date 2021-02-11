@@ -20,10 +20,10 @@ from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunct
 from lxml import etree
 from lxml.etree import Element
 
-from datapane import __version__
-from datapane.client.api.common import DPTmpFile, Resource, do_download_file
+from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
+from datapane.client.utils import DPError
 from datapane.common import log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
@@ -33,29 +33,11 @@ local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
 # only these types will be documented by default
-__all__ = ["Report", "Visibility"]
+__all__ = ["Report", "Visibility", "ReportType"]
 
 __pdoc__ = {
     "Report.endpoint": False,
 }
-
-
-@contextfunction
-def include_raw(ctx, name):
-    """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
-    env = ctx.environment
-    # Escape </script> to prevent 3rd party JS terminating the local report bundle.
-    # Note there's an extra "\" because it needs to be escaped at both the python and JS level
-    src = env.loader.get_source(env, name)[0].replace("</script>", "<\\\/script>")
-    return Markup(src)
-
-
-def is_jupyter() -> bool:
-    """Checks if inside ipython shell inside browser"""
-    try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
-    except Exception:
-        return False
 
 
 class Visibility(IntEnum):
@@ -73,41 +55,80 @@ class ReportType(Enum):
     ARTICLE = "article"
 
 
+SKIP_DISPLAY_MSG = False
+
+
+def is_jupyter() -> bool:
+    """Checks if inside ipython shell inside browser"""
+    try:
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
+    except Exception:
+        return False
+
+
+@contextfunction
+def include_raw(ctx, name):
+    """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
+    env = ctx.environment
+    # Escape </script> to prevent 3rd party JS terminating the local report bundle.
+    # Note there's an extra "\" because it needs to be escaped at both the python and JS level
+    src = env.loader.get_source(env, name)[0].replace("</script>", "<\\\/script>")
+    return Markup(src)
+
+
 class ReportFileWriter:
     """ Collects data needed to display a local report, and generates the local HTML """
 
     template: t.Optional[Template] = None
     assets: Path
-    asset_url = "https://datapane.com/static"
-    asset_js = "local-report-base.css"
-    asset_css = "local-report-base.js"
+    dev_mode: bool = False
 
-    def _setup_template(self) -> Template:
+    def _setup_template(self):
         """ Jinja template setup for local rendering """
         # check we have the files, download if not
         self.assets = ir.files("datapane.resources.local_report")
-        if not (self.assets / self.asset_js).exists():
-            log.warning("Can't find report assets, downloading")
-            do_download_file(f"{self.asset_url}/{self.asset_js}", self.assets / self.asset_js)
-            do_download_file(f"{self.asset_url}/{self.asset_css}", self.assets / self.asset_css)
+        if not (self.assets / "local-report-base.css").exists():
+            raise DPError("Can't find local FE bundle - report.save not available, please install release version")
 
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template("template.html")
 
-    def write(self, report_doc: str, path: str, report_type: ReportType, standalone: bool):
+    def _display_msg(self):
+        global SKIP_DISPLAY_MSG
+
+        if SKIP_DISPLAY_MSG:
+            return None
+        else:
+            SKIP_DISPLAY_MSG = False
+
+        if is_jupyter():
+            from IPython.display import Markdown, display
+
+            display(
+                Markdown(
+                    "Thanks for using **Datapane**, to automate and securely share reports in your organization see [Datapane Enterprise](https://datapane.com/enterprise/)"
+                )
+            )
+        else:
+            print(
+                "Thanks for using Datapane, to automate and securely share reports in your organization see Datapane Enterprise - https://datapane.com/enterprise/"
+            )
+
+    def write(self, report_doc: str, path: str, report_type: ReportType):
+
         # create template on demand
         if not self.template:
             self._setup_template()
+
+        self._display_msg()
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
         r = self.template.render(
             report_doc=report_doc_esc,
             report_type=report_type,
-            standalone=standalone,
-            cdn_base=f"https://storage.googleapis.com/datapane-public/report-assets/{__version__}",
         )
         Path(path).write_text(r, encoding="utf-8")
 
@@ -244,19 +265,18 @@ class Report(DPObjectRef):
             webbrowser.open_new_tab(self.web_url)
         print(f"Report successfully published at {self.web_url}")
 
-    def save(self, path: str, open: bool = False, standalone: bool = False) -> None:
+    def save(self, path: str, open: bool = False) -> None:
         """Save the report to a local HTML file
 
         Args:
             path: location to save the HTML file
             open: Open the file in your browser after creating
-            standalone: Create a fully standalone HTML report with minimal external/network dependencies _(this can result in large files)_
         """
         self._last_saved = path
 
         local_doc, _ = self._gen_report(embedded=True, title="Local Report", description="Description")
 
-        self._local_writer.write(local_doc, path, self.report_type, standalone)
+        self._local_writer.write(local_doc, path, self.report_type)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"

@@ -6,7 +6,9 @@
 <p align="center">
     <a href="https://datapane.com">Datapane.com</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
-    <a href="https://twitter.com/datapaneapp">Twitter</a>
+    <a href="https://twitter.com/datapaneapp">Twitter</a> |
+    <a href="https://communityinviter.com/apps/datapane-public/datapane-community">Slack</a> |
+    <a href="https://datapane.com/enterprise">Enterprise</a>
     <br /><br />
     <a href="https://pypi.org/project/datapane/">
         <img src="https://img.shields.io/pypi/dm/datapane?label=pip%20downloads" alt="Pip Downloads" />
@@ -15,9 +17,8 @@
         <img src="https://img.shields.io/pypi/v/datapane?color=blue" alt="Latest release" />
     </a>
     <a href="https://anaconda.org/conda-forge/datapane">
-        <img src="https://anaconda.org/conda-forge/datapane/badges/version.svg" alt="Latest release" />
+        <img alt="Conda (channel only)" src="https://img.shields.io/conda/vn/conda-forge/datapane">
     </a>
-    <img src="https://github.com/datapane/datapane-hosted/workflows/Test%20%5BDP%20CLI%5D/badge.svg" alt="Latest release" />
 </p>
 
 Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown.
@@ -42,34 +43,48 @@ r = dp.Report(dp.DataTable(df), dp.Plot(chart))
 r.save(path='report.html', open=True)
 ```
 
-This would package a standalone HTML report such as the following, with an searchable Table and Plot component.
+This would package a standalone HTML report such as the following, with a searchable DataTable and Plot component.
 
 ![Report Example](https://i.imgur.com/RGp7RzM.png)
 
 # Getting Started
 
 - [Read the documentation](https://docs.datapane.com)
-- [View samples and demos](https://github.com/datapane/datapane-demos/)
+- [Browse samples and demos](https://github.com/datapane/datapane-demos/)
+- [View featured reports](https://datapane.com/explore/?tab=featured)
 
-# Components
+# Datapane Public
 
-Datapane currently contains the following components. Need something different? Open an issue (or make a PR!)
+In addition to saving reports locally, [Datapane](datapane.com) provides a free hosted platform at https://datapane.com where you to publish your reports online.
 
-| Component | Description                                                                    | Supported Formats                                  | Example                      |
-| --------- | ------------------------------------------------------------------------------ | -------------------------------------------------- | ---------------------------- |
-| Table     | A searchable, sortable table component for datasets. Supports up to 10m cells. | Pandas DataFrames, JSON documents, Local CSV files | `Table(df)`                  |
-| Plot      | A wrapper for plots from Python visualisation libraries.                       | Altair, Bokeh, Matplotlib, SVG                     | `Plot(altair_chart)`         |
-| Markdown  | A simple Markdown component to document your report.                           | Markdown, Text                                     | `Markdown("# My fun title")` |
+Published reports can be:
 
-# Datapane.com
+- shared publicly and become a part of our community,
+- embedded within your blogs, CMSs, and elsewhere (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms)),
+- shared private reports you can share within a close-knit audience,
+- include explorations and integrations, e.g. additional DataTable analysis features and [GitHub action](https://github.com/datapane/build-action) integration.
 
-In addition to the this local library, Datapane.com provides an API and hosted platform which allows you to:
+It's super simple, just login (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `publish` function on your report,
 
-1. Upload Jupyter Notebooks and Python scripts, so that other people can run them in their browser with parameters to generate reports dynamically
-1. Share and embed reports online -- either publicly, or privately within your team
+```python
+r = dp.Report(dp.DataTable(df), dp.Plot(chart))
+r.publish(name="2020 Stock Portfolio", open=True)
+```
+
+# Enterprise
+
+[Datapane Enterprise](https://datapane.com/enterprise/) provides automation and secure sharing of reports within in your organization.
+
+- Private report sharing within your organization and within groups, including external clients
+- Deploy Notebooks and scripts as automated, parameterised reports that can be run by your team interactively
+- Schedule reports to be generated and shared
+- Runs managed or on-prem
+- [and more](<(https://datapane.com/enterprise/)>)
 
 # Joining the community
 
-Looking to get answers to questions or engage with us and the wider community? Our community is most active on our Discourse Forum. Submit requests, issues, and bug reports on this GitHub repo, or join us by contributing on some good first issues on this repo.
+Looking to get answers to questions or engage with us and the wider community? Join our [Slack](https://communityinviter.com/apps/datapane-public/datapane-community) and view our [GitHub Discussions](https://github.com/datapane/datapane/discussions) board.
+
+Submit requests, issues, and bug reports on this GitHub repo.
 
 We look forward to building an amazing open source community with you!

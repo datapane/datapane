@@ -1,8 +1,11 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
-  - name: Datapane Discussions
+  - name: GitHub Discussions Board
     url: https://github.com/datapane/datapane/discussions
-    about: Ask and answer questions with the open-source community.
+    about: Suggest ideas, ask for support, and discuss with the open-source community.
+  - name: Slack
+    url: https://communityinviter.com/apps/datapane-public/datapane-community
+    about: Join our Datapane community and chat directly in real-time.
 #  - name: Datapane Community Support
 #    url: https://discuss.datapane.com/
 #    about: Ask and answer questions with the wider DS community.

@@ -27,7 +27,7 @@ classifiers = [
 #]
 
 # extra files (allows overriding gitignore)
-include = ["NOTICE"] #"README.md", "LICENSE"]
+include = ["NOTICE", "src/**/local-report-base.*"] #"README.md", "LICENSE"]
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
@@ -108,5 +108,5 @@ target-version = ['py38']
 
 # FOR PEP-517/518
 [build-system]
-requires = ["poetry>=1.0.0,<1.1.0"]
+requires = ["poetry>=1.1.0,<1.2.0"]
 build-backend = "poetry.masonry.api"

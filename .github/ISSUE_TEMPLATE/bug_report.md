@@ -1,40 +1,29 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report any bugs and issues you've encountered
 title: ""
-labels: ""
-assignees: ""
+labels: "triage"
+assignees: "mands"
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+<!--
+**NOTE** Please use this template to open issues, bugs, etc., only.
+See our [GitHub Discussions Board](https://github.com/datapane/datapane/discussions) and [Slack](https://communityinviter.com/apps/datapane-public/datapane-community) to discuss feature requests, general support, ideas, and to chat with the community.
+-->
 
-**To Reproduce**
-Steps to reproduce the behavior:
+### System Information
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+<!-- Please fill this out to help us understand the bug/issue -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+- OS:
+- Python version:
+- Python environment: pip / conda
+- Datapane version:
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+### Bug / Issue
 
-**Desktop (please complete the following information):**
+<!--
+A clear and concise description of the issue.
 
-- OS: [e.g. iOS]
-- Browser [e.g. chrome, safari]
-- Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
-
-- Device: [e.g. iPhone6]
-- OS: [e.g. iOS8.1]
-- Browser [e.g. stock browser, safari]
-- Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+Add as much info as needed, including steps to reproduce, expected behaviour, and even screenshots if helps.
+-->

@@ -11,19 +11,12 @@
     <script>
       window.dpLocal = true;
     </script>
-    {% if standalone %}
-      <style>
-        {% include "local-report-base.css" %}
-      </style>
-      <script>
-        {{ include_raw("local-report-base.js") }}
-      </script>
-    {% else %}
-      <link href="{{ cdn_base }}/base.css" rel="stylesheet"/>
-      <link href="{{ cdn_base }}/report-base.css" rel="stylesheet"/>
-      <script src="{{ cdn_base }}/base.js"></script>
-      <script src="{{ cdn_base }}/report-base.js"></script>
-    {% endif %}
+    <style>
+      {% include "local-report-base.css" %}
+    </style>
+    <script>
+      {{ include_raw("local-report-base.js") }}
+    </script>
   </head>
   <body>
     <div id="report-root" class="w-full"></div>
