@@ -399,12 +399,11 @@ def report_list():
 # NOTE - NYI - disabled
 # @report.command()
 # @click.argument("name")
-# @click.option("--version")
 # @click.option("--owner")
 # @click.option("--filename", default="output.html", type=click.Path())
-# def render(name: str, version: str, owner: str, filename: str):
+# def render(name: str, owner: str, filename: str):
 #     """Render a report to a static file"""
-#     api.Report.get(name, version=version, owner=owner).render()
+#     api.Report.get(name, owner=owner).render()
 
 
 #############################################################################

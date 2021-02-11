@@ -89,19 +89,18 @@ class DPObjectRef:
             self.url = dto.id
 
     @classmethod
-    def get(cls: Type[U], name: str, owner: Optional[str] = None, version: Optional[str] = None) -> U:
+    def get(cls: Type[U], name: str, owner: Optional[str] = None) -> U:
         """
         Lookup and retrieve an object from the Datapane Server by its name
 
         Args:
             name: The name of the object, e.g. `my-blob 3`
             owner: The owner of the object, e.g. `fred`
-            version: The version of the object (optional, defaults to latest)
 
         Returns:
             The object if found
         """
-        res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner, version=version)
+        res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner)
         return cls(dto=res)
 
     @classmethod
