@@ -625,11 +625,14 @@ class Plot(AssetBlock):
 
     _tag = "Plot"
 
-    def __init__(self, data: t.Any, caption: t.Optional[str] = None, id: str = None, label: str = None):
+    def __init__(
+        self, data: t.Any, caption: t.Optional[str] = None, responsive: bool = True, id: str = None, label: str = None
+    ):
         """
         Args:
             data: The `plot` object to attach
             caption: A caption to display below the plot (optional)
+            responsive: Whether the plot should fit to its container dimensions (optional, default: True)
             id: A unique id for the block to aid querying (optional)
             label: A label used when displaying the block (optional)
         """
@@ -637,7 +640,9 @@ class Plot(AssetBlock):
         if out_fn.mime == PKL_MIMETYPE:
             raise DPError("Can't embed object as a plot")
 
-        super().__init__(file=out_fn.file, caption=caption, width=640, height=480, id=id, label=label)
+        super().__init__(
+            file=out_fn.file, caption=caption, width=640, height=480, id=id, label=label, responsive=responsive
+        )
 
 
 class Table(AssetBlock):

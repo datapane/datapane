@@ -322,6 +322,9 @@
       <attribute name="height">
         <data type="positiveInteger"/>
       </attribute>
+      <attribute name="responsive" a:defaultValue="true">
+        <data type="boolean"/>
+      </attribute>
     </element>
   </define>
   <define name="Table">

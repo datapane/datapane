@@ -128,7 +128,10 @@ File = element File {
 Plot = element Plot {
   assetAttributes,
   attribute width { xsd:positiveInteger },
-  attribute height { xsd:positiveInteger }
+  attribute height { xsd:positiveInteger },
+
+  [ a:defaultValue = "true" ]
+  attribute responsive { xsd:boolean}
 }
 
 Table = element Table {
