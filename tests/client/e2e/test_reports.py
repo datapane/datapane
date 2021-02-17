@@ -1,11 +1,11 @@
 import json
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import altair as alt
 import pandas as pd
 import pytest
 import requests
-from common._test_df_processor_3 import convert_csv_pd
 from furl import furl
 
 import datapane as dp
@@ -151,12 +151,13 @@ def test_full_report(tmp_path: Path):
 
 def test_complex_df_report():
     """Test our dataframe importing with types of DFs user's upload"""
-    tz_df = convert_csv_pd(
-        """
-        date,datetime,datetime_tz
-        2017-01-10,2017-01-21T23:10:24,2020-03-23T00:00:00.000Z
-        2017-01-11,2017-01-23T23:01:24,2020-04-23T00:00:00.000Z
-    """
+    tz_df = pd.DataFrame(
+        dict(
+            duration_col=[timedelta(seconds=x) for x in range(30)],
+            date_col=[date.today() for _ in range(30)],
+            datetime_col=[datetime.utcnow() for _ in range(30)],
+            datetimez_col=[datetime.now(timezone.utc) for _ in range(30)],
+        )
     )
 
     raw_data = {

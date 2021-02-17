@@ -18,6 +18,7 @@ See our [GitHub Discussions Board](https://github.com/datapane/datapane/discussi
 - OS:
 - Python version:
 - Python environment: pip / conda
+- Using jupyter: true / false
 - Datapane version:
 
 ### Bug / Issue

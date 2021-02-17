@@ -49,6 +49,13 @@ This would package a standalone HTML report such as the following, with a search
 
 # Getting Started
 
+## Install
+
+- `pip3 install datapane` OR
+- `conda install -c conda-forge "datapane>=0.9.0"`
+
+## Next Steps
+
 - [Read the documentation](https://docs.datapane.com)
 - [Browse samples and demos](https://github.com/datapane/datapane-demos/)
 - [View featured reports](https://datapane.com/explore/?tab=featured)
