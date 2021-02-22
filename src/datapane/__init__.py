@@ -11,7 +11,7 @@ except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
 
-__version__ = "0.9.2"
+__version__ = "0.10.0"
 
 TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
 
