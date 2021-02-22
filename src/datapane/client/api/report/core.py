@@ -98,22 +98,23 @@ class ReportFileWriter:
     def _display_msg(self):
         global SKIP_DISPLAY_MSG
 
+        # only display once per session, else skip
         if SKIP_DISPLAY_MSG:
             return None
         else:
-            SKIP_DISPLAY_MSG = False
+            SKIP_DISPLAY_MSG = True
 
         if is_jupyter():
             from IPython.display import Markdown, display
 
             display(
                 Markdown(
-                    "Thanks for using **Datapane**, to automate and securely share reports in your organization see [Datapane Enterprise](https://datapane.com/enterprise/)"
+                    "Thanks for using **Datapane**, to automate and securely share reports in your organization please visit [Datapane Enterprise](https://datapane.com/enterprise/)"
                 )
             )
         else:
             print(
-                "Thanks for using Datapane, to automate and securely share reports in your organization see Datapane Enterprise - https://datapane.com/enterprise/"
+                "Thanks for using Datapane, to automate and securely share reports in your organization please visit Datapane Enterprise - https://datapane.com/enterprise/"
             )
 
     def write(self, report_doc: str, path: str, report_type: ReportType):

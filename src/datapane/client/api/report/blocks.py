@@ -632,7 +632,7 @@ class Plot(AssetBlock):
         Args:
             data: The `plot` object to attach
             caption: A caption to display below the plot (optional)
-            responsive: Whether the plot should fit to its container dimensions (optional, default: True)
+            responsive: Whether the plot should automatically be resized to fit, set to False if your plot looks odd (optional, default: True)
             id: A unique id for the block to aid querying (optional)
             label: A label used when displaying the block (optional)
         """
