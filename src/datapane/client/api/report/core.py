@@ -283,14 +283,13 @@ class Report(DPObjectRef):
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    def preview(self, width: int = 600, height: int = 500, standalone: bool = False) -> None:
+    def preview(self, width: int = 600, height: int = 500) -> None:
         """
         Preview the report inside your currently running Jupyter notebook
 
         Args:
             width: Width of the report preview in Jupyter (default: 600)
             height: Height of the report preview in Jupyter (default: 500)
-            standalone: Create a fully standalone HTML report with minimal external/network dependencies _(this can result in large files)
         """
         if is_jupyter():
             from IPython.display import IFrame
@@ -307,7 +306,7 @@ class Report(DPObjectRef):
                 shutil.copy(self._last_saved, tmpfile.name)
             else:
                 # Else save directly to tmp file
-                self.save(path=tmpfile.name, standalone=standalone)
+                self.save(path=tmpfile.name)
             self._tmp_report = tmpfile.file
 
             # NOTE - iframe must be relative path
