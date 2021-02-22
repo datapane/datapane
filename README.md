@@ -52,7 +52,7 @@ This would package a standalone HTML report such as the following, with a search
 ## Install
 
 - `pip3 install datapane` OR
-- `conda install -c conda-forge "datapane>=0.9.0"`
+- `conda install -c conda-forge "datapane>=0.10.0"`
 
 ## Next Steps
 
