@@ -351,7 +351,7 @@ class Text(EmbeddedTextBlock):
 
     def __init__(self, text: str = None, file: NPath = None, id: str = None, label: str = None):
         """
-        Args:
+        Args:te
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
             file: Path to a file containing markdown text
             id: A unique id for the block to aid querying (optional)
