@@ -251,7 +251,7 @@ def test_gen_failing_reports():
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # empty text block
-    with pytest.raises((DocumentInvalid, DPError)):
+    with pytest.raises((AssertionError, DocumentInvalid, DPError)):
         r = dp.Report(dp.Text(" "))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 

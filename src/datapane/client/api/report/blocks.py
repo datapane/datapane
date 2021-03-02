@@ -358,7 +358,9 @@ class Text(EmbeddedTextBlock):
         """
         super().__init__(id=id, label=label)
 
-        assert text.strip() or file
+        if text:
+            text = text.strip()
+        assert text or file
         self.content = text if text else Path(file).read_text()
 
     def format(self, *args: BlockOrPrimitive, **kwargs: BlockOrPrimitive) -> Group:
