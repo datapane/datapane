@@ -213,7 +213,7 @@ class Report(DPObjectRef):
         # convert to string
         report_str = etree.tounicode(processed_report_doc, pretty_print=True)
         log.debug("Built Report")
-        log.info(report_str)
+        log.debug(report_str)
         return (report_str, _s.attachments)
 
     def publish(

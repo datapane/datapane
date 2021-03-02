@@ -353,11 +353,12 @@ class Text(EmbeddedTextBlock):
         """
         Args:
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
+            file: Path to a file containing markdown text
             id: A unique id for the block to aid querying (optional)
         """
         super().__init__(id=id, label=label)
 
-        assert text or file
+        assert text.strip() or file
         self.content = text if text else Path(file).read_text()
 
     def format(self, *args: BlockOrPrimitive, **kwargs: BlockOrPrimitive) -> Group:

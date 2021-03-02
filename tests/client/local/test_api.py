@@ -250,6 +250,11 @@ def test_gen_failing_reports():
         r = dp.Report(dp.Page(dp.Select(blocks=[md_block])))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
+    # empty text block
+    with pytest.raises((DocumentInvalid, DPError)):
+        r = dp.Report(dp.Text(" "))
+        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+
 
 def test_gen_report_nested_blocks():
     s = "# Test markdown block <hello/> \n Test **content**"

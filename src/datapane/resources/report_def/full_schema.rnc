@@ -69,7 +69,7 @@ AssetBlock = File | Plot | Table | DataTable
 # Markdown Text
 Text = element Text {
   block_id_label,
-  xsd:string { minLength = "1" }
+  xsd:string { minLength = "1" pattern = "(.|\s)*\S(.|\s)*" }
 }
 
 HTML = element HTML {

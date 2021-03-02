@@ -180,6 +180,7 @@
       <ref name="block_id_label"/>
       <data type="string">
         <param name="minLength">1</param>
+        <param name="pattern">(.|\s)*\S(.|\s)*</param>
       </data>
     </element>
   </define>
