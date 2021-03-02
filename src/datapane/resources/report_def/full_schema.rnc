@@ -110,8 +110,8 @@ assetAttributes =
   block_id_label,
   # TODO - should attachment be it's own attribute?
   attribute src { xsd:anyURI { pattern = "((http|https|cas|file|data|attachment):|/).+"} },
-  # TODO - do we validate export_url protocol?
-  attribute export_url { xsd:anyURI }?,
+  attribute cas_ref { xsd:string { pattern = "[0-9a-f]{64}" } } ?,
+
   attribute type { xsd:string { pattern = '\w+/[\w.+\-]+' } },
   attribute size { xsd:positiveInteger },
   element Caption { text }?

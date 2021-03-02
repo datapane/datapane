@@ -18,12 +18,11 @@ from typing import Optional
 
 # TODO - import only during type checking and import future.annotations when dropping py 3.6
 import pandas as pd
-from furl import furl
 
 from datapane import __version__
 from datapane.client.scripts import DatapaneCfg
 from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict
-from datapane.common.datafiles import df_ext_map
+from datapane.common.datafiles import DFFormatterCls, df_ext_map
 
 from ..utils import DPError
 from .common import DPTmpFile, do_download_file
@@ -129,22 +128,22 @@ class Blob(DPObjectRef):
         """
         fn = Path(fn)
 
-        def get_export_format() -> str:
+        def get_export_format() -> DFFormatterCls:
             ext = fn.suffix
             if ext not in df_ext_map:
                 raise DPError(
                     f"Extension {ext} not valid for exporting table. Must be one of {', '.join(df_ext_map.keys())}"
                 )
-            return df_ext_map[ext].enum
+            return df_ext_map[ext]
 
-        # If file is of arrow type, export it. Otherwise use the gcs url directly.
+        # If file is of arrow type, export it. Otherwise download the url directly.
         if self.content_type == ArrowFormat.content_type:
-            download_url = furl(self.export_url)
-            download_url.args["export_format"] = get_export_format()
+            # download as a arrow->df, then export on the client
+            df = self.download_df()
+            fmt = get_export_format()
+            fmt.save_file(fn.name, df)
         else:
-            download_url = furl(self.data_url)
-
-        do_download_file(download_url, fn)
+            do_download_file(self.data_url, fn)
 
     def download_obj(self) -> t.Any:
         """

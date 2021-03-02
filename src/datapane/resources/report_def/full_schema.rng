@@ -283,9 +283,10 @@
       </data>
     </attribute>
     <optional>
-      <!-- TODO - do we validate export_url protocol? -->
-      <attribute name="export_url">
-        <data type="anyURI"/>
+      <attribute name="cas_ref">
+        <data type="string">
+          <param name="pattern">[0-9a-f]{64}</param>
+        </data>
       </attribute>
     </optional>
     <attribute name="type">
