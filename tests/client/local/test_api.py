@@ -232,6 +232,11 @@ def test_gen_report_primitives(datadir: Path):
 
 
 def test_gen_failing_reports():
+    # local reports with unsupported elements
+    with pytest.raises(DPError):
+        r = dp.Report(dp.DataTable(gen_df()))
+        r._gen_report(embedded=True, title="TITLE", description="DESCRIPTION")
+
     # nested pages
     with pytest.raises((DocumentInvalid, DPError)):
         r = dp.Report(dp.Page(dp.Page(md_block)))

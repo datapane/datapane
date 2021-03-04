@@ -39,6 +39,10 @@ class InvalidTokenError(DPError):
     ...
 
 
+class UnsupportedFeature(DPError):
+    ...
+
+
 def success_msg(msg: str):
     click.secho(msg, fg="green")
 

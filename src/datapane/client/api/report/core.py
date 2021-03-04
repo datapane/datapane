@@ -23,7 +23,7 @@ from lxml.etree import Element
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError
+from datapane.client.utils import DPError, UnsupportedFeature
 from datapane.common import log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
@@ -209,6 +209,15 @@ class Report(DPObjectRef):
         # post_process and validate
         processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
         validate_report_doc(xml_doc=processed_report_doc)
+
+        # check for any unsupported local features, e.g. DataTable
+        # NOTE - we could eventually have different validators for local and published reports
+        if embedded:
+            uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
+            if uses_datatable:
+                raise UnsupportedFeature(
+                    "DataTable component not supported when saving locally, please publish to a Datapane Server or use dp.Table"
+                )
 
         # convert to string
         report_str = etree.tounicode(processed_report_doc, pretty_print=True)
