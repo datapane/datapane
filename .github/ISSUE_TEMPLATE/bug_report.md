@@ -8,7 +8,7 @@ assignees: "mands"
 
 <!--
 **NOTE** Please use this template to open issues, bugs, etc., only.
-See our [GitHub Discussions Board](https://github.com/datapane/datapane/discussions) and [Slack](https://communityinviter.com/apps/datapane-public/datapane-community) to discuss feature requests, general support, ideas, and to chat with the community.
+See our [GitHub Discussions Board](https://github.com/datapane/datapane/discussions) to discuss feature requests, general support, ideas, and to chat with the community.
 -->
 
 ### System Information

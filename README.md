@@ -7,7 +7,6 @@
     <a href="https://datapane.com">Datapane.com</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
-    <a href="https://communityinviter.com/apps/datapane-public/datapane-community">Slack</a> |
     <a href="https://datapane.com/enterprise">Enterprise</a>
     <br /><br />
     <a href="https://pypi.org/project/datapane/">
@@ -90,7 +89,7 @@ r.publish(name="2020 Stock Portfolio", open=True)
 
 # Joining the community
 
-Looking to get answers to questions or engage with us and the wider community? Join our [Slack](https://communityinviter.com/apps/datapane-public/datapane-community) and view our [GitHub Discussions](https://github.com/datapane/datapane/discussions) board.
+Looking to get answers to questions or engage with us and the wider community? Check out our [GitHub Discussions](https://github.com/datapane/datapane/discussions) board.
 
 Submit requests, issues, and bug reports on this GitHub repo.
 
