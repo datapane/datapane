@@ -148,7 +148,7 @@ def gen_report_complex_no_files() -> dp.Report:
     )
 
 
-def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> dp.Report:
+def gen_report_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.Report:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -170,7 +170,8 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False) -> d
 
     # tables
     table_asset = dp.Table(data=small_df, caption="Test Basic Table")
-    dt_asset = dp.DataTable(df=big_df, caption="Test DataTable")
+    # local reports don't support DataTable
+    dt_asset = table_asset if local_report else dp.DataTable(df=big_df, caption="Test DataTable")
 
     if single_file:
         return dp.Report(dp.Group(blocks=[md_block, dt_asset]))
@@ -359,11 +360,11 @@ def test_add_footer():
 def test_local_report_simple(datadir: Path, monkeypatch):
     monkeypatch.chdir(datadir)
     report = gen_report_simple()
-    report.save(path="test_out.html")
+    report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
 
 
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
 def test_local_report_with_files(datadir: Path, monkeypatch):
     monkeypatch.chdir(datadir)
-    report = gen_report_complex_with_files(datadir)
-    report.save(path="test_out.html")
+    report = gen_report_complex_with_files(datadir, local_report=True)
+    report.save(path="test_out.html", name="Even better report")

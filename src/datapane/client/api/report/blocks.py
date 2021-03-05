@@ -676,6 +676,8 @@ class DataTable(AssetBlock):
     and can be downloaded by them as a CSV or Excel file.
 
     ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider using the `Table` block
+    ..note:: The DataTable component requires a server and is not supported when saving locally, please publish such reports to a Datapane Server or use dp.Table
+
     """
 
     _tag = "DataTable"

@@ -9,6 +9,7 @@ import typing as t
 import uuid
 import warnings
 import webbrowser
+from base64 import b64encode
 from enum import Enum, IntEnum
 from functools import reduce
 from os import path as osp
@@ -81,14 +82,19 @@ class ReportFileWriter:
 
     template: t.Optional[Template] = None
     assets: Path
+    logo: str
     dev_mode: bool = False
 
     def _setup_template(self):
         """ Jinja template setup for local rendering """
-        # check we have the files, download if not
+        # check we have the FE files, abort if not
         self.assets = ir.files("datapane.resources.local_report")
         if not (self.assets / "local-report-base.css").exists():
             raise DPError("Can't find local FE bundle - report.save not available, please install release version")
+
+        # load the logo
+        logo_img = (self.assets / "datapane-logo-dark.png").read_bytes()
+        self.logo = f"data:image/png;base64,{b64encode(logo_img).decode()}"
 
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
@@ -117,7 +123,7 @@ class ReportFileWriter:
                 "Thanks for using Datapane, to automate and securely share reports in your organization please visit Datapane Enterprise - https://datapane.com/enterprise/"
             )
 
-    def write(self, report_doc: str, path: str, report_type: ReportType):
+    def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):
 
         # create template on demand
         if not self.template:
@@ -130,6 +136,10 @@ class ReportFileWriter:
         r = self.template.render(
             report_doc=report_doc_esc,
             report_type=report_type,
+            report_name=name,
+            report_author=author,
+            report_date=timestamp(),
+            dp_logo=self.logo,
         )
         Path(path).write_text(r, encoding="utf-8")
 
@@ -187,7 +197,9 @@ class Report(DPObjectRef):
             # add additional top-level Group element to group mixed elements
             self.pages = [Page(blocks=[Group(blocks=pages)])]
 
-    def _gen_report(self, embedded: bool, title: str, description: str) -> t.Tuple[str, t.List[Path]]:
+    def _gen_report(
+        self, embedded: bool, title: str, description: str = "Description", author: str = "Anonymous"
+    ) -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Pages to XML
         s = BuilderState(embedded)
@@ -196,7 +208,7 @@ class Report(DPObjectRef):
         # add main structure and Meta
         report_doc: Element = E.Report(
             E.Meta(
-                E.Author("Anonymous"),  # TODO - get username from config?
+                E.Author(author),  # TODO - get username from config?
                 E.CreatedOn(timestamp()),
                 E.Title(title),
                 E.Description(description),
@@ -275,24 +287,29 @@ class Report(DPObjectRef):
             webbrowser.open_new_tab(self.web_url)
         print(f"Report successfully published at {self.web_url}")
 
-    def save(self, path: str, open: bool = False) -> None:
+    def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
         """Save the report to a local HTML file
 
         Args:
-            path: location to save the HTML file
-            open: Open the file in your browser after creating
+            path: File path to store the report
+            open: Open the file in your browser after creating (default: False)
+            name: Name of the report (optional: uses path if not provided)
+            author: The report author / email / etc.
         """
         self._last_saved = path
 
-        local_doc, _ = self._gen_report(embedded=True, title="Local Report", description="Description")
+        if not name:
+            name = Path(path).stem
 
-        self._local_writer.write(local_doc, path, self.report_type)
+        local_doc, _ = self._gen_report(embedded=True, title=name, author=author or "Anonymous")
+
+        self._local_writer.write(local_doc, path, self.report_type, name=name, author=author)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    def preview(self, width: int = 600, height: int = 500) -> None:
+    def preview(self, width: int = 960, height: int = 700):
         """
         Preview the report inside your currently running Jupyter notebook
 
