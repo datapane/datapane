@@ -141,7 +141,7 @@ class Blob(DPObjectRef):
             # download as a arrow->df, then export on the client
             df = self.download_df()
             fmt = get_export_format()
-            fmt.save_file(fn.name, df)
+            fmt.save_file(str(fn), df)
         else:
             do_download_file(self.data_url, fn)
 

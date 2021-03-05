@@ -42,7 +42,7 @@ def test_report_simple_permissions():
 
 
 def test_report_with_single_file(datadir: Path):
-    report = gen_report_complex_with_files(datadir, single_file=True)
+    report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
     # Test we can save then publish
     report.save(str(datadir / "test_report.html"))
     report.publish(name="TEST", description="DESCRIPTION")

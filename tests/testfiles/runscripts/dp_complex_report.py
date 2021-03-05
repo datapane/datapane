@@ -18,7 +18,6 @@ def gen_df(dim: int = 4) -> pd.DataFrame:
 
 
 lis = [1, 2, 3]
-df = gen_df(10000)
 
 # Bokeh
 p = figure(title="simple line example", x_axis_label='x', y_axis_label='y')
@@ -78,7 +77,8 @@ img_asset = dp.File(file=Path("./datapane-logo.png"))
 vega_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"))
 
 # Table
-df_asset = dp.DataTable(df)
+df_table_asset = dp.Table(gen_df())
+df_datatable_asset = dp.DataTable(gen_df(10000))
 
 # Matplotlib
 np.random.seed(19680801)
@@ -109,9 +109,9 @@ ax.set_title('line plot with data points')
 mpl_asset = dp.Plot(mpl_fig)
 
 # Report
-report = dp.Report(
+blocks = [
     list_asset,
-    df_asset,
+    df_table_asset,
     md_block,
     vega_asset,
     img_asset,
@@ -120,7 +120,9 @@ report = dp.Report(
     plotly_asset,
     folium_asset,
     mpl_asset
-)
+]
 
-report.save(path="local_xml_report.html")
-report.publish(name="xml_report")
+dp.Report(blocks=blocks).save(path="local_xml_report.html")
+# add datatable
+blocks.append(df_datatable_asset)
+dp.Report(blocks=blocks).publish(name="xml_report")
