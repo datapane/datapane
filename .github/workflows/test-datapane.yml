@@ -5,9 +5,11 @@ on:
   push:
     branches: [ master ]
   pull_request:
+    types: [review_requested, ready_for_review]
 
 jobs:
   datapane-multi-env:
+    if: github.event.pull_request.draft == false
     defaults:
       run:
         shell: bash
