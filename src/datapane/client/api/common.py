@@ -269,6 +269,7 @@ def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = N
         download_url.origin = c.config.server
 
     with requests.get(str(download_url.url), stream=True) as r:
+        r.raise_for_status()
         x = r.headers.get("Content-Disposition")
         if not fn:
             if x and "filename" in x:
