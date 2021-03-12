@@ -16,7 +16,7 @@ __version__ = "0.10.2"
 TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
 
 # Other useful re-exports
-from .common.utils import log, _setup_dp_logging
+from .common.utils import enable_logging, log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (

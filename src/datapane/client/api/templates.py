@@ -61,15 +61,15 @@ def build_md_report(
     Any additional context can be passed in and will be inserted into the Markdown template.
 
     Args:
-        text_or_file: The markdown text, or path to a markdown file, using {} for templating
+        text_or_file: The markdown text, or path to a markdown file, using {{}} for templating
         *args: positional template context arguments
         **kwargs: keyword template context arguments
 
     Returns:
         A datapane Report object for saving or publishing
 
-    ..tip:: either text or file is required
-    ..tip:: Either Python objects, e.g. dataframes, and plots, or Datapane blocks as context
+    ..tip:: Either text or file is required as input
+    ..tip:: Context, via args/kwargs can be plain Python objects, e.g. dataframes, and plots, or Datapane blocks, e.g. dp.Plot, etc.
 
     """
     try:

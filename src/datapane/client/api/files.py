@@ -179,7 +179,7 @@ class PathWrapper(BaseAsset):
 class BaseTable(BaseAsset):
     mimetype = "application/vnd.datapane.table+html"
     ext = ".tbl.html"
-    TABLE_CELLS_LIMIT: int = 2000
+    TABLE_CELLS_LIMIT: int = 5000
     obj_type: U
     block_type = Table
     # TODO - move to own bleach class/module?
@@ -191,7 +191,7 @@ class BaseTable(BaseAsset):
         n_cells = self._get_cells(x)
         if n_cells > self.TABLE_CELLS_LIMIT:
             raise ValueError(
-                f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead"
+                f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead or aggregating the df first"
             )
 
         # sanitise the generated HTML

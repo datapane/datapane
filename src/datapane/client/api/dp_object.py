@@ -194,8 +194,12 @@ class DPObjectRef:
 def save_df(df: pd.DataFrame) -> DPTmpFile:
     """Export a df for uploading"""
     fn = DPTmpFile(ArrowFormat.ext)
+
     # create a copy of the df to process
     df = to_df(df)
+    if df.size == 0:
+        raise DPError("Empty DataFrame provided")
+
     # process_df called in Arrow.save_file
     # process_df(df)
     ArrowFormat.save_file(fn.name, df)

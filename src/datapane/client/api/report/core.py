@@ -228,13 +228,14 @@ class Report(DPObjectRef):
             uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
             if uses_datatable:
                 raise UnsupportedFeature(
-                    "DataTable component not supported when saving locally, please publish to a Datapane Server or use dp.Table"
+                    "DataTable component contains advanced analysis features that are not supported when saving or previewing locally,"
+                    + " please either publish your report to a Datapane Server or use the dp.Table component instead"
                 )
 
         # convert to string
         report_str = etree.tounicode(processed_report_doc, pretty_print=True)
-        log.debug("Built Report")
-        log.debug(report_str)
+        log.debug("Successfully Built Report")
+        # log.debug(report_str)
         return (report_str, _s.attachments)
 
     def publish(
@@ -314,8 +315,8 @@ class Report(DPObjectRef):
         Preview the report inside your currently running Jupyter notebook
 
         Args:
-            width: Width of the report preview in Jupyter (default: 600)
-            height: Height of the report preview in Jupyter (default: 500)
+            width: Width of the report preview in Jupyter (default: 960)
+            height: Height of the report preview in Jupyter (default: 700)
         """
         if is_jupyter():
             from IPython.display import IFrame

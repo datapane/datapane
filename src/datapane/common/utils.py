@@ -103,6 +103,11 @@ def _setup_dp_logging(verbosity: int = 0, logs_stream: t.TextIO = None) -> None:
     logging.config.dictConfig(log_config)
 
 
+def enable_logging():
+    """Enable logging for debug purposes"""
+    _setup_dp_logging(verbosity=2)
+
+
 @contextmanager
 def log_command(command: str) -> t.ContextManager[None]:
     """Log an internal process"""

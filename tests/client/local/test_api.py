@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import altair as alt
+import pandas as pd
 import pytest
 from dominate.tags import h2
 from glom import glom
@@ -259,6 +260,11 @@ def test_gen_failing_reports():
     # empty text block
     with pytest.raises((AssertionError, DocumentInvalid, DPError)):
         r = dp.Report(dp.Text(" "))
+        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+
+    # empty df
+    with pytest.raises((AssertionError, DocumentInvalid, DPError)):
+        r = dp.Report(dp.DataTable(pd.DataFrame()))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
 

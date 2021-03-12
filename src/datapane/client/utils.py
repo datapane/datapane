@@ -10,7 +10,7 @@ from datapane.common import JDict
 
 
 def add_help_text(x: str) -> str:
-    return f"{x}\nPlease visit www.github.com/datapane/datapane to raise issue / discuss if error repeats"
+    return f"{x}\nPlease visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
 
 
 class DPError(Exception):
