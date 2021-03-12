@@ -5,10 +5,11 @@
 </p>
 <p align="center">
     <a href="https://datapane.com">Datapane.com</a> |
+    <a href="https://datapane.com/enterprise">Datapane Enterprise</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
+    <a href="https://datapane.github.io/datapane/">API Docs</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
-    <a href="https://blog.datapane.com">Blog</a> |
-    <a href="https://datapane.com/enterprise">Enterprise</a>
+    <a href="https://blog.datapane.com">Blog</a>
     <br /><br />
     <a href="https://pypi.org/project/datapane/">
         <img src="https://img.shields.io/pypi/dm/datapane?label=pip%20downloads" alt="Pip Downloads" />
@@ -65,6 +66,7 @@ This would package a standalone HTML report such as the following, with a search
 ## Next Steps
 
 - [Read the documentation](https://docs.datapane.com)
+- [Browse the API docs](https://datapane.github.io/datapane/)
 - [Browse samples and demos](https://github.com/datapane/gallery/)
 - [View featured reports](https://datapane.com/explore/?tab=featured)
 
