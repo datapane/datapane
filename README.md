@@ -7,6 +7,7 @@
     <a href="https://datapane.com">Datapane.com</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
+    <a href="https://blog.datapane.com">Blog</a> |
     <a href="https://datapane.com/enterprise">Enterprise</a>
     <br /><br />
     <a href="https://pypi.org/project/datapane/">
@@ -31,20 +32,28 @@ import pandas as pd
 import altair as alt
 import datapane as dp
 
-df = pd.read_csv('https://query1.finance.yahoo.com/v7/finance/download/GOOG?period2=1585222905&interval=1mo&events=history')
+df = pd.read_csv('https://covid.ourworldindata.org/data/vaccinations/vaccinations-by-manufacturer.csv', parse_dates=['date'])
+df = df.groupby(['vaccine', 'date'])['total_vaccinations'].sum().reset_index()
 
-chart = alt.Chart(df).encode(
-    x='Date:T',
-    y='Open'
-).mark_line().interactive()
+plot = alt.Chart(df).mark_area(opacity=0.4, stroke='black').encode(
+    x='date:T',
+    y=alt.Y('total_vaccinations:Q'),
+    color=alt.Color('vaccine:N', scale=alt.Scale(scheme='set1')),
+    tooltip='vaccine:N'
+).interactive().properties(width='container')
 
-r = dp.Report(dp.DataTable(df), dp.Plot(chart))
-r.save(path='report.html', open=True)
+total_df = df[df["date"] == df["date"].max()].sort_values("total_vaccinations", ascending=False).reset_index(drop=True)
+total_styled = total_df.style.bar(subset=["total_vaccinations"], color='#5fba7d', vmax=total_df["total_vaccinations"].sum())
+
+dp.Report("## Vaccination Report",
+    dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
+    dp.Table(total_styled, caption="Current vaccination totals by manufacturer")
+).save(path='report.html', open=True)
 ```
 
 This would package a standalone HTML report such as the following, with a searchable DataTable and Plot component.
 
-![Report Example](https://i.imgur.com/RGp7RzM.png)
+![Report Example](https://imgur.com/PTiSCM0.png)
 
 # Getting Started
 
@@ -56,19 +65,17 @@ This would package a standalone HTML report such as the following, with a search
 ## Next Steps
 
 - [Read the documentation](https://docs.datapane.com)
-- [Browse samples and demos](https://github.com/datapane/datapane-demos/)
+- [Browse samples and demos](https://github.com/datapane/gallery/)
 - [View featured reports](https://datapane.com/explore/?tab=featured)
 
-# Datapane Public
+# Datapane.com
 
-In addition to saving reports locally, [Datapane](datapane.com) provides a free hosted platform at https://datapane.com where you to publish your reports online.
+In addition to saving reports locally, [Datapane](datapane.com) provides a free hosted platform and social network at https://datapane.com, including the following features:
 
-Published reports can be:
-
-- shared publicly and become a part of our community,
-- embedded within your blogs, CMSs, and elsewhere (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms)),
-- shared private reports you can share within a close-knit audience,
-- include explorations and integrations, e.g. additional DataTable analysis features and [GitHub action](https://github.com/datapane/build-action) integration.
+- published reports can kept private and securely shared,
+- reports can be shared publicly and become a part of the wider data stories community,
+- report embedding within your blogs, CMSs, and elsewhere (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms)),
+- explorations and integrations, e.g. additional DataTable analysis features and [GitHub action](https://github.com/datapane/build-action) integration.
 
 It's super simple, just login (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `publish` function on your report,
 
