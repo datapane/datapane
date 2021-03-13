@@ -119,7 +119,7 @@ def check_pip_version() -> None:
     if pip_version > cli_version:
         error_msg = (
             f"Your client is out-of-date (version {cli_version}) and may be causing errors, "
-            + f"please upgrade to version {pip_version}"
+            + f"please upgrade to version {pip_version} - see https://docs.datapane.com/tut-getting-started#upgrading"
         )
     else:  # no newer pip - perhaps local dev?
         error_msg = f"Your client is out-of-date (version {cli_version}) with the server and may be causing errors"
@@ -169,16 +169,16 @@ class Resource:
         self.session.headers.update(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
 
     def _check_endpoint(self, url: str):
-        # raise exception if unavailable object is being accessed on the public datapane
-        public_endpoints = ["files", "oembed", "reports", "settings", "users"]
+        # raise exception if unavailable object is being accessed on the basic instance
+        basic_endpoints = ["files", "oembed", "reports", "settings", "users"]
         url = furl(url)
         url_parts = url.path.segments
         if (
             url.host in ["datapane.com"]  # , "localhost"] - we want to access OrgSolo locally
             and url_parts[0] == "api"
-            and url_parts[1] not in public_endpoints
+            and url_parts[1] not in basic_endpoints
         ):
-            raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane for Teams.")
+            raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane Enterprise.")
 
     def post(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()

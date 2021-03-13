@@ -256,7 +256,7 @@ class Report(DPObjectRef):
             name: The report name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the report, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the report, e.g. a GitHub repo or a Colab notebook
-            visibility: one of `"PUBLIC"` _(default on Public)_, or `"PRIVATE"` _(limited on Public, unlimited on Teams)_
+            visibility: one of `"PUBLIC"` _(default on Datapane.com)_, or `"PRIVATE"` _(limited on Datapame.com, unlimited on Datapane Enterprise)_
             open: Open the file in your browser after creating
             tags: A list of tags (as strings) used to categorise your report
         """

@@ -2,7 +2,7 @@
 
 Runtime API used when running a Datapane Script
 
-..note:: The objects in this module are available on the Teams Plan
+..note:: The objects in this module are available on the Enterprise Plan
 """
 import dataclasses as dc
 import os

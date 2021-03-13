@@ -1,6 +1,6 @@
 """# API docs for Datapane Client
 
-These docs describe the Python API for building Datapane Reports, along with additional information on the Datapane Teams API.
+These docs describe the Python API for building Datapane Reports, along with additional information on the Datapane Enterprise API.
 
 Usage docs for Datapane can be found at https://docs.datapane.com
 
@@ -8,7 +8,7 @@ These objects are all available under the `datapane` module, via `import datapan
 
 ### Datapane Reports API
 
-The core reporting APIs are available on both the public and teams plans, these are found in `datapane.client.api.report`, including,
+The core reporting APIs are available on the default datapane.com instance and on Datapane Enterprise instances, these are found in `datapane.client.api.report`, including,
 
   - `datapane.client.api.report.core.Report`
   - Layout Blocks
@@ -25,14 +25,14 @@ The core reporting APIs are available on both the public and teams plans, these 
     - `datapane.client.api.report.blocks.Code`
     - `datapane.client.api.report.blocks.HTML`
 
-### Datapane Teams
+### Datapane Enterprise
 
-Additional API docs for teams and enterprise features are found in `datapane.client.api.teams` that provide automation and sharing of data analytics workflows
+Additional API docs for enterprise features are found in `datapane.client.api.enterprise` that provide automation and sharing of data analytics workflows
 
-  - `datapane.client.api.teams.Blob`
-  - `datapane.client.api.teams.Variable`
-  - `datapane.client.api.teams.Script`
-  - `datapane.client.api.teams.Schedule`
+  - `datapane.client.api.enterprise.Blob`
+  - `datapane.client.api.enterprise.Variable`
+  - `datapane.client.api.enterprise.Script`
+  - `datapane.client.api.enterprise.Schedule`
 
 
 .. note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
@@ -48,7 +48,7 @@ import warnings
 
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
-from .teams import Blob, Run, Schedule, Script, Variable
+from .enterprise import Blob, Run, Schedule, Script, Variable
 from .report.blocks import (
     BigNumber,
     Code,

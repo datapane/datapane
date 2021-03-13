@@ -1,13 +1,13 @@
 """
-## Datapane Teams API
+## Datapane Enterprise API
 
-Datapane Teams includes features to automate your Python workflows and easily build and share data-driven apps and results with your teams.
+Datapane Enterprise includes features to automate your Python workflows and easily build and share data-driven apps and results with your teams.
 
 Generally objects are created on the server via the static methods (rather than the constructor),
 and the instance methods and fields are used to access values (e.g. `.name`) and behaviour (e.g. `delete()`) on already existing object.
 Objects can be looked up by name using `.get()` and by id using `.by_id()`.
 
-..note:: The objects in this module are available on the Teams Plan
+..note:: The objects in this module are available on the Enterprise Plan
 """
 
 import json
