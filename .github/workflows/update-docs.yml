@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: set pip cache dir
         run: python -c 'from pip._internal.locations import USER_CACHE_DIR; print(f"PIP_DIR={USER_CACHE_DIR}")' >> ${GITHUB_ENV}
       - name: set python version
