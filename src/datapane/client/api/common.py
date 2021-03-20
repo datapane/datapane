@@ -92,8 +92,8 @@ class DPTmpFile:
     def mime(self) -> MIME:
         return guess_type(self.file)
 
-    def __str__(self):
-        return str(self.file)
+    def __str__(self) -> str:
+        return self.name
 
 
 @atexit.register
