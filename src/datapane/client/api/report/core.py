@@ -67,6 +67,16 @@ def is_jupyter() -> bool:
         return False
 
 
+def display_msg(text: str, md: str = None):
+    if is_jupyter():
+        from IPython.display import Markdown, display
+
+        msg = md or text
+        display(Markdown(msg))
+    else:
+        print(text)
+
+
 @contextfunction
 def include_raw(ctx, name):
     """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
@@ -110,18 +120,10 @@ class ReportFileWriter:
         else:
             SKIP_DISPLAY_MSG = True
 
-        if is_jupyter():
-            from IPython.display import Markdown, display
-
-            display(
-                Markdown(
-                    "Thanks for using **Datapane**, to automate and securely share reports in your organization please visit [Datapane Enterprise](https://datapane.com/enterprise/)"
-                )
-            )
-        else:
-            print(
-                "Thanks for using Datapane, to automate and securely share reports in your organization please visit Datapane Enterprise - https://datapane.com/enterprise/"
-            )
+        display_msg(
+            text="Thanks for using Datapane, to automate and securely share reports in your organization please see Datapane Cloud - https://datapane.com/enterprise/",
+            md="Thanks for using **Datapane**, to automate and securely share reports in your organization please see [Datapane Cloud](https://datapane.com/enterprise/)",
+        )
 
     def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):
 
@@ -261,7 +263,7 @@ class Report(DPObjectRef):
             tags: A list of tags (as strings) used to categorise your report
         """
 
-        print("Publishing report and associated data - please wait..")
+        display_msg("Publishing report and associated data - please wait..")
 
         # process params
         tags = tags or []
@@ -286,7 +288,8 @@ class Report(DPObjectRef):
         _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
-        print(f"Report successfully published at {self.web_url}")
+
+        display_msg(text=f"Report successfully published at {self.web_url}")
 
     def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
         """Save the report to a local HTML file

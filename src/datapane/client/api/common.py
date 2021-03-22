@@ -26,7 +26,7 @@ from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
-from datapane import TEST_ENV, __version__
+from datapane import _TEST_ENV, __version__
 from datapane.client import config as c
 from datapane.client.utils import (
     IncompatibleVersionError,
@@ -158,7 +158,7 @@ class Resource:
     # keep session as classvar to share across all DP accesses - however will be
     # tied to current instance config
     session = requests.Session()
-    timeout = None if TEST_ENV else (6.10, 54)
+    timeout = None if _TEST_ENV else (6.10, 54)
 
     def __init__(self, endpoint: str):
         self.endpoint = endpoint.split("/api", maxsplit=1)[-1]

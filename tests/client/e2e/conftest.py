@@ -12,7 +12,7 @@ TEST_TOKEN = os.environ.get("DP_TEST_TOKEN", "")
 @pytest.fixture(scope="module")
 def dp_login():
     print("dp_login")
-    c.set_config(c.Config(server=TEST_SERVER, token=TEST_TOKEN, analytics=True))
+    c.set_config(c.Config(server=TEST_SERVER, token=TEST_TOKEN))
     yield
     c.set_config(None)
     print("closing dp_login")

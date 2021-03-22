@@ -26,7 +26,7 @@ from .common import _process_res
 __all__ = ["login", "logout"]
 
 
-def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True) -> None:
+def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True) -> str:
     """
     Login to the specified Datapane Server, storing the token within a config-file called `env` for future use
 
@@ -36,15 +36,20 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
         env: The environment profile to store these login details to (default: `default`)
         cli_login: Toggle if this login is occuring via the CLI (optional)
 
+    Returns:
+        the username for the logged in user
+
     ..note:: Can also be ran via CLI as `"datapane login"`
     """
     config = c.Config(server=server, token=token)
-    ping(config=config, cli_login=cli_login)
+    username = ping(config=config, cli_login=cli_login)
 
     # update config with valid values
     with c.update_config(env) as x:
         x["server"] = server
         x["token"] = token
+        x["username"] = username
+    return username
 
 
 def logout(env: str = c.DEFAULT_ENV) -> None:
@@ -56,15 +61,12 @@ def logout(env: str = c.DEFAULT_ENV) -> None:
 
     ..note:: Can also be ran via CLI as `"datapane logout"`
     """
-
-    with c.update_config(env) as x:
-        server = x["server"]
-        x["server"] = c.DEFAULT_SERVER
-        x["token"] = c.DEFAULT_TOKEN
-    success_msg(f"Logged out from {server}")
+    success_msg(f"Logged out from {c.config.server}")
+    c.get_config_file(env=env, reset=True)
+    c.init(config_env=env)
 
 
-def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> None:
+def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:
     """Ping the Datapane Server to check login credentials"""
     # hardcode ping check as used for login/logout logic independent of main API requests
     config = config or c.check_get_config()
@@ -73,5 +75,6 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> None:
     headers = dict(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
     r = requests.get(str(f), headers=headers, params=dict(cli_login=cli_login))
 
-    res = _process_res(r)
-    success_msg(f"Connected successfully to {config.server} as {res.username}")
+    username = _process_res(r).username
+    success_msg(f"Connected successfully to {config.server} as {username}")
+    return username

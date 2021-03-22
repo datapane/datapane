@@ -13,7 +13,8 @@ except ImportError:
 
 __version__ = "0.10.2"
 
-TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
+_TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
+_IN_PYTEST = "pytest" in sys.modules
 
 # Other useful re-exports
 from .common.utils import enable_logging, log, _setup_dp_logging

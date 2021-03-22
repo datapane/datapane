@@ -7,10 +7,10 @@ from typing import ContextManager, Dict, Optional
 
 import click
 import dacite
+import yaml
 from furl import furl
-from ruamel.yaml import YAML
 
-from datapane import log
+from datapane import _IN_PYTEST, log
 
 from .utils import InvalidTokenError
 
@@ -23,19 +23,17 @@ DEFAULT_TOKEN = "TOKEN_HERE"
 
 
 def get_default_config() -> str:
+    """The default structure for the config file"""
     return f"""\
-# server API address
 server: {DEFAULT_SERVER}
-# API token - copy and paste from https://server/settings/
 token: {DEFAULT_TOKEN}
-# analytics - set to true to send usage and error reporting
-analytics: false
+username: unknown
 """
 
 
-def get_config_file(env: str = DEFAULT_ENV) -> Path:
+def get_config_file(env: str = DEFAULT_ENV, reset: bool = False) -> Path:
     config_f = APP_DIR / f"{env}.yaml"
-    if not config_f.exists():
+    if reset or not config_f.exists():
         config_f.write_text(get_default_config())
         log.debug(f"Creating default config file at {config_f}")
     return config_f
@@ -48,7 +46,7 @@ class Config:
     # TODO - hardcode to datapane.com for now
     server: str
     token: str
-    analytics: bool = False
+    username: str = "unknown"
 
 
 # TODO - wrap into a singleton object that includes callable?
@@ -75,8 +73,9 @@ def check_get_config() -> Config:
         init(last_config_env)
         if config.token == DEFAULT_TOKEN:
             # still don't have a token set for the env, open up the browser
-            f = furl(path="/home/", origin=config.server)
-            webbrowser.open(url=str(f), new=2)
+            if not _IN_PYTEST:
+                f = furl(path="/home/", origin=config.server)
+                webbrowser.open(url=str(f), new=2)
             raise InvalidTokenError(
                 "Please sign-up and login - if you already have then please restart your Jupyter kernel/Python instance to initialize your new token"
             )
@@ -85,17 +84,16 @@ def check_get_config() -> Config:
 
 @contextmanager
 def update_config(config_env: str) -> ContextManager[Dict]:
-    """Update config file without losing comments and reinit in-memory config"""
+    """Update config file and reinit in-memory config"""
     config_f = get_config_file(config_env)
-    yaml = YAML()
 
     with config_f.open("r") as f:
-        code = yaml.load(f)
+        code = yaml.safe_load(f)
 
     yield code
 
     with config_f.open("w") as f:
-        yaml.dump(code, f)
+        yaml.safe_dump(code, f)
 
     # reinit if already in process
     init(config_env=config_env)
@@ -107,10 +105,9 @@ def load_from_envfile(config_env: str) -> Path:
     last_config_env = config_env
 
     config_f = get_config_file(config_env)
-    yaml = YAML()
 
     with config_f.open("r") as f:
-        c_yaml = yaml.load(f)
+        c_yaml = yaml.safe_load(f)
 
     # load config obj from file
     c_obj = dacite.from_dict(Config, c_yaml)

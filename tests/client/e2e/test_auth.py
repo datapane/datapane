@@ -11,9 +11,7 @@ def test_auth():
     """Test API-based auth"""
     TEST_ENV = "test_env"
 
-    fp = c.get_config_file(TEST_ENV)
-    if fp.exists():
-        fp.unlink()
+    fp = c.get_config_file(TEST_ENV, reset=True)
 
     try:
         dp.init(config_env=TEST_ENV)
@@ -26,7 +24,7 @@ def test_auth():
 
         # login
         dp.login(token=TEST_TOKEN, server=TEST_SERVER, env=TEST_ENV, cli_login=False)
-        dp.ping()
+        assert "datapane-test" == dp.ping()
         # logout
         dp.logout(env=TEST_ENV)
 
