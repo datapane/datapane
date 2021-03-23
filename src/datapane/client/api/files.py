@@ -1,73 +1,3 @@
-"""
-Creating charts.
----------------
-
-We recommend using Altair/pdvega for generating interactive charts: use the supplied `save`
-function.
-
-Example
--------
-
-altair_pandas::
-  # uses the default pandas plotting API
-  from datapane.files import save
-
-  import numpy as np
-
-  pd.set_option('plotting.backend', 'altair')  # Installing altair_pandas registers this.
-
-  data = pd.DataFrame({'x': np.random.randn(200),
-                       'y': np.random.randn(200)})
-
-  plot = data.plot.scatter('x', 'y')
-  save(plot, "scatter")
-
-pdvega::
-
-  from datapane.files import save
-
-  import numpy as np
-  import pdvega
-
-  data = pd.DataFrame({'x': np.random.randn(200),
-                       'y': np.random.randn(200)})
-
-  plot = data.vgplot.scatter('x', 'y')
-  save(plot, "scatter")
-
-altair::
-
-  from datapane.files import save
-
-  import altair as alt
-  import numpy as np
-
-  data = pd.DataFrame({'x': np.random.randn(20),
-                      'y': np.random.randn(20)})
-  plot = alt.Chart(data).mark_bar().encode(
-      y='y',
-      x='x'
-  )
-
-  save(plot, "bars")
-
-Also for your convenience the `save` function is compatible with matplotlib figures, Bokeh Figures, and pandas dataframes (it saves a table in this instance).
-
-Example
--------
-
-::
-
-  from datapane.files import save
-
-  import matplotlib.pyplot as plt
-
-  fig, ax = plt.subplots()
-  ax.plot([1, 2, 3, 4], [1, 4, 9, 16])
-  save(figure, "line.svg")
-  out_df = in_df
-"""
-
 import abc
 import json
 import os
@@ -79,20 +9,15 @@ from typing import IO, Any, BinaryIO, Generic, Optional, TextIO, Type, TypeVar
 import bleach
 import matplotlib.pyplot as plt
 from altair.utils import SchemaBase
-from bokeh.embed import json_item
-from bokeh.layouts import LayoutDOM as BLayout
-from bokeh.plotting.figure import Figure as BFigure
-from folium import Map
-from matplotlib.figure import Axes, Figure
 from numpy import ndarray
 from pandas import DataFrame
 from pandas.io.formats.style import Styler
-from plotly.graph_objects import Figure as PFigure
 
 from datapane.common import log
 
 from .. import DPError
 from .common import DPTmpFile
+from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, json_item
 from .report.blocks import DataBlock, DataTable, File, Plot, Table, Text
 
 T = TypeVar("T")
