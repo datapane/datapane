@@ -21,6 +21,7 @@ from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunct
 from lxml import etree
 from lxml.etree import Element
 
+from datapane.client import config as c
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
@@ -199,9 +200,7 @@ class Report(DPObjectRef):
             # add additional top-level Group element to group mixed elements
             self.pages = [Page(blocks=[Group(blocks=pages)])]
 
-    def _gen_report(
-        self, embedded: bool, title: str, description: str = "Description", author: str = "Anonymous"
-    ) -> t.Tuple[str, t.List[Path]]:
+    def _gen_report(self, embedded: bool, title: str, description: str = "Description") -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Pages to XML
         s = BuilderState(embedded)
@@ -210,7 +209,7 @@ class Report(DPObjectRef):
         # add main structure and Meta
         report_doc: Element = E.Report(
             E.Meta(
-                E.Author(author),  # TODO - get username from config?
+                E.Author(c.config.username or "anonymous"),
                 E.CreatedOn(timestamp()),
                 E.Title(title),
                 E.Description(description),
@@ -305,9 +304,8 @@ class Report(DPObjectRef):
         if not name:
             name = Path(path).stem
 
-        local_doc, _ = self._gen_report(embedded=True, title=name, author=author or "Anonymous")
-
-        self._local_writer.write(local_doc, path, self.report_type, name=name, author=author)
+        local_doc, _ = self._gen_report(embedded=True, title=name)
+        self._local_writer.write(local_doc, path, self.report_type, name=name, author=author or c.config.username)
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"

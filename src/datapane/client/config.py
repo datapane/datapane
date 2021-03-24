@@ -22,12 +22,13 @@ DEFAULT_SERVER = "https://datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
 
 
+# TODO - don't create configfile until user logs in, and delete rather than reset on logout
 def get_default_config() -> str:
     """The default structure for the config file"""
     return f"""\
 server: {DEFAULT_SERVER}
 token: {DEFAULT_TOKEN}
-username: unknown
+username: ''
 """
 
 
@@ -46,7 +47,7 @@ class Config:
     # TODO - hardcode to datapane.com for now
     server: str
     token: str
-    username: str = "unknown"
+    username: str = ""
 
 
 # TODO - wrap into a singleton object that includes callable?
