@@ -27,30 +27,34 @@ classifiers = [
 #]
 
 # extra files (allows overriding gitignore)
-include = ["NOTICE", "src/**/local-report-base.*"] #"README.md", "LICENSE"]
+include = ["NOTICE", "src/**/local-report-base.*"]  # "README.md", "LICENSE"]
 
 [tool.poetry.dependencies]
 python = "^3.7.0"
 
 # DS
-numpy = "^1.16.5"
+# numpy = "^1.16.5"
 pandas = "^1.0.1"
 pyarrow = "^3.0.0"
 
-# viz
+# viz - only altair is required
 altair = "^4.0.0"
 matplotlib = { version = "^3.0.0", optional = true }
 plotly = { version = "^4.0.0", optional = true }
 bokeh = { version = "~2.2.0", optional = true }  # stuck on 2.2 on JS side for now
 folium = { version = "0.12.*", optional = true }
 # ipython = "^7.7.0" # needed for nbconvert?
-nbconvert = "^6.0.0"
+
+# app support
+nbconvert = { version = "^6.0.0", optional = true }
+flit-core = { version = "~3.0.0", optional = true }
+jsonschema = "^3.0.0"
+stringcase = "^1.2.0"
 
 # misc
 dacite = "^1.0.2"
 colorlog = "^4.0.2"
 munch = "^2.3.0"
-stringcase = "^1.2.0"
 PyYAML = "^5.1.0"
 packaging = "^20.0.0"
 
@@ -61,12 +65,10 @@ click-spinner = "^0.1.8"
 requests = "^2.19.0"
 validators = ">=0.17.1"
 jinja2 = "^2.10.0"
-jsonschema = "^3.0.0"
 tabulate = "^0.8.0"
 # TODO - check for appdir releases
 # appdirs = "^1.4.3"
 toolz = "^0.11.0"
-flit-core = "~3.0.0"
 importlib_resources = "^5.0.0"
 lxml = "^4.0.0"
 requests-toolbelt = "^0.9.1"
@@ -79,6 +81,7 @@ micawber = ">=0.5.0"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium"]
+cloud = ["nbconvert", "flit-core"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.0"

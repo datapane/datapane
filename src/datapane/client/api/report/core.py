@@ -25,7 +25,7 @@ from datapane.client import config as c
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError, UnsupportedFeature
+from datapane.client.utils import DPError, UnsupportedFeatureError
 from datapane.common import log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
@@ -228,7 +228,7 @@ class Report(DPObjectRef):
         if embedded:
             uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
             if uses_datatable:
-                raise UnsupportedFeature(
+                raise UnsupportedFeatureError(
                     "DataTable component contains advanced analysis features that are not supported when saving or previewing locally,"
                     + " please either publish your report to a Datapane Server or use the dp.Table component instead"
                 )

@@ -31,7 +31,6 @@ except ImportError:
 # Bokeh
 try:
     import bokeh
-    from bokeh.embed import json_item  # noqa: F401
     from bokeh.layouts import LayoutDOM as BLayout
     from bokeh.plotting.figure import Figure as BFigure
 

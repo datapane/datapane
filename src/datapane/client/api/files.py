@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import IO, Any, BinaryIO, Generic, Optional, TextIO, Type, TypeVar
 
 import bleach
-import matplotlib.pyplot as plt
 from altair.utils import SchemaBase
 from numpy import ndarray
 from pandas import DataFrame
@@ -17,7 +16,7 @@ from datapane.common import log
 
 from .. import DPError
 from .common import DPTmpFile
-from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, json_item
+from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure
 from .report.blocks import DataBlock, DataTable, File, Plot, Table, Text
 
 T = TypeVar("T")
@@ -182,6 +181,8 @@ class MatplotBasePlot(PlotAsset):
 
     def _write_figure(self, x: Figure) -> DPTmpFile:
         """Creates an SVG from figure"""
+        import matplotlib.pyplot as plt
+
         fn = DPTmpFile(self.ext)
         x = x or plt.gcf()
         x.savefig(str(fn))
@@ -218,6 +219,8 @@ class BokehBasePlot(PlotAsset):
     ext = ".bokeh.json"
 
     def write_file(self, f: TextIO, app):
+        from bokeh.embed import json_item
+
         json.dump(json_item(app), f)
 
 

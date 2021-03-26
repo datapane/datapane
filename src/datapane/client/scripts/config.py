@@ -9,13 +9,11 @@ from typing import ClassVar, List, Optional
 import dacite
 import importlib_resources as ir
 import jsonschema
-import nbconvert
-import nbformat
 import stringcase
 import yaml
-from traitlets.config import Config as TConfig
 
 from datapane.client import DPError
+from datapane.client.utils import MissingCloudPackagesError
 from datapane.common import SDict, log
 
 # app paths
@@ -159,6 +157,13 @@ class DatapaneCfg:
 
 def extract_py_notebook(in_file: Path) -> str:
     """Extract the python code from a given notebook"""
+    try:
+        import nbconvert
+        import nbformat
+        from traitlets.config import Config as TConfig
+    except ImportError:
+        raise MissingCloudPackagesError()
+
     # we use config for importing
     c = TConfig()
     # c.PythonExporter.preprocessors = []

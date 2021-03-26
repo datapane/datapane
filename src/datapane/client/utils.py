@@ -39,8 +39,16 @@ class InvalidTokenError(DPError):
     ...
 
 
-class UnsupportedFeature(DPError):
+class UnsupportedFeatureError(DPError):
     ...
+
+
+class MissingCloudPackagesError(DPError):
+    def __init__(self, *a, **kw):
+        # quick hack until we setup a conda meta-package for cloud
+        self.args = (
+            "Cloud packages not found, please run `pip install datapane[cloud]` or `conda install -c conda-forge nbconvert flit-core`",
+        )
 
 
 def success_msg(msg: str):

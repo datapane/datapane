@@ -41,13 +41,18 @@ import tarfile
 import typing as t
 from contextlib import contextmanager
 from pathlib import Path
+from unittest.mock import Mock
 
-from flit_core.config import _check_glob_patterns
-from flit_core.sdist import FilePatterns, SdistBuilder, clean_tarinfo
-
+from datapane.client.utils import MissingCloudPackagesError
 from datapane.common.utils import log, temp_fname
 
 from .config import DatapaneCfg, extract_py_notebook
+
+try:
+    from flit_core.config import _check_glob_patterns
+    from flit_core.sdist import FilePatterns, SdistBuilder, clean_tarinfo
+except ImportError:
+    SdistBuilder = Mock
 
 
 def preprocess_src_dir(dp_config: DatapaneCfg) -> Path:
@@ -128,6 +133,11 @@ def build_bundle(dp_config: DatapaneCfg, use_git: bool = False) -> t.ContextMana
     Build a local sdist-bundle on the client for uploading
     currently requires version and docstring
     """
+    try:
+        import flit_core  # noqa
+    except ImportError:
+        raise MissingCloudPackagesError()
+
     proj_dir = dp_config.proj_dir
     # TODO - add git support
     incs = _check_glob_patterns(dp_config.include, "include")
