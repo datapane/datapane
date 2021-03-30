@@ -11,7 +11,7 @@ except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
 
-__version__ = "0.10.4"
+__version__ = "0.10.5"
 
 _TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
 _IN_PYTEST = "pytest" in sys.modules
