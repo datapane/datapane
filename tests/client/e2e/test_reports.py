@@ -38,7 +38,7 @@ def test_report_simple_permissions():
         # check we can't embed a private report
         f = furl(origin=c.config.server, path="api/oembed/", args=dict(url=report.web_url))
         r = requests.get(url=str(f))
-        assert r.status_code in [400, 401]
+        assert r.status_code in [400, 401, 403]
 
 
 def test_report_with_single_file(datadir: Path):
