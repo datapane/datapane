@@ -65,7 +65,7 @@ class DatapaneCfg:
     # metadata
     description: str = "Datapane Script"
     source_url: str = ""
-    visibility: Optional[str] = None
+    visibility: Optional[str] = "PRIVATE"
     group: Optional[str] = None
 
     # build options

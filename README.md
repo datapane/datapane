@@ -4,8 +4,7 @@
   </a>
 </p>
 <p align="center">
-    <a href="https://datapane.com">Datapane.com</a> |
-    <a href="https://datapane.com/enterprise">Datapane Enterprise</a> |
+    <a href="https://datapane.com">Datapane Cloud</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
     <a href="https://datapane.github.io/datapane/">API Docs</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
@@ -22,11 +21,11 @@
     </a>
 </p>
 
-Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown.
+Datapane is a Python library which makes it simple to build documents from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown.
 
 Reports can be exported as standalone HTML documents, with rich components which allow data to be explored and visualisations to be used interactively.
 
-For example, if you wanted to create a report with a table viewer and an interactive plot:
+For example, if you wanted to create a document with a table viewer and an interactive plot:
 
 ```python
 import pandas as pd
@@ -52,7 +51,7 @@ dp.Report("## Vaccination Report",
 ).save(path='report.html', open=True)
 ```
 
-This would package a standalone HTML report such as the following, with a searchable DataTable and Plot component.
+This would package a standalone HTML report document such as the following, with a searchable DataTable and Plot component.
 
 ![Report Example](https://imgur.com/PTiSCM0.png)
 
@@ -68,16 +67,16 @@ This would package a standalone HTML report such as the following, with a search
 - [Read the documentation](https://docs.datapane.com)
 - [Browse the API docs](https://datapane.github.io/datapane/)
 - [Browse samples and demos](https://github.com/datapane/gallery/)
-- [View featured reports](https://datapane.com/explore/?tab=featured)
+- [View featured documents](https://datapane.com/explore/?tab=featured)
 
-# Datapane.com
+# Datapane Community
 
-In addition to saving reports locally, [Datapane](datapane.com) provides a free hosted platform and social network at https://datapane.com, including the following features:
+In addition to saving documents locally, [Datapane Community](datapane.com) is a free hosted platform and social network, including the following features:
 
-- published reports can kept private and securely shared,
-- reports can be shared publicly and become a part of the wider data stories community,
-- report embedding within your blogs, CMSs, and elsewhere (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms)),
-- explorations and integrations, e.g. additional DataTable analysis features and [GitHub action](https://github.com/datapane/build-action) integration.
+- published documents can kept private and securely shared,
+- documents can be shared publicly and become a part of the wider data stories community,
+- document embedding within your blogs, CMSs, and elsewhere (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms)),
+- explorations and integrations, e.g. additional DataTable analysis features and [GitHub actions](https://github.com/datapane/build-action) integration.
 
 It's super simple, just login (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `publish` function on your report,
 
@@ -86,15 +85,15 @@ r = dp.Report(dp.DataTable(df), dp.Plot(chart))
 r.publish(name="2020 Stock Portfolio", open=True)
 ```
 
-# Enterprise
+# Datapane Cloud
 
-[Datapane Enterprise](https://datapane.com/enterprise/) provides automation and secure sharing of reports within in your organization.
+[Datapane Cloud](https://datapane.com/) provides automation and secure sharing of documents within in your organization.
 
-- Private report sharing within your organization and within groups, including external clients
-- Deploy Notebooks and scripts as automated, parameterised reports that can be run by your team interactively
-- Schedule reports to be generated and shared
+- Private document sharing within your organization and within groups, including external clients
+- Convert notebooks and scripts into apps, with inputs that can be run by your team interactively
+- Schedule documents to be generated and shared
 - Runs managed or on-prem
-- [and more](<(https://datapane.com/enterprise/)>)
+- [and more](<(https://datapane.com/)>)
 
 # Joining the community
 

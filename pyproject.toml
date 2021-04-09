@@ -45,7 +45,7 @@ bokeh = { version = "~2.2.0", optional = true }  # stuck on 2.2 on JS side for n
 folium = { version = "0.12.*", optional = true }
 # ipython = "^7.7.0" # needed for nbconvert?
 
-# app support
+# cloud support
 nbconvert = { version = "^6.0.0", optional = true }
 flit-core = { version = "~3.0.0", optional = true }
 jsonschema = "^3.0.0"

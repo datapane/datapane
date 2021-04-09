@@ -1,23 +1,21 @@
 """
-## Datapane Enterprise API
+## Datapane Cloud API
 
-Datapane Enterprise includes features to automate your Python workflows and easily build and share data-driven apps and results with your teams.
+Datapane Cloud includes features to automate your Python workflows and easily build and share data-driven apps and results with your teams.
 
 Generally objects are created on the server via the static methods (rather than the constructor),
 and the instance methods and fields are used to access values (e.g. `.name`) and behaviour (e.g. `delete()`) on already existing object.
 Objects can be looked up by name using `.get()` and by id using `.by_id()`.
 
-..note:: The objects in this module are available on the Enterprise Plan
+..note:: The objects in this module are available on the Starter and Pro Cloud Plans
 """
+from __future__ import annotations
 
 import json
 import pickle
 import typing as t
 from pathlib import Path
 from typing import Optional
-
-# TODO - import only during type checking and import future.annotations when dropping py 3.6
-import pandas as pd
 
 from datapane import __version__
 from datapane.client.scripts import DatapaneCfg
@@ -27,6 +25,9 @@ from datapane.common.datafiles import DFFormatterCls, df_ext_map
 from ..utils import DPError
 from .common import DPTmpFile, do_download_file
 from .dp_object import DPObjectRef, save_df
+
+if t.TYPE_CHECKING:
+    import pandas as pd
 
 __all__ = ["Blob", "Variable", "Script", "Schedule"]
 
@@ -63,7 +64,7 @@ class Blob(DPObjectRef):
     endpoint: str = "/blobs/"
 
     @classmethod
-    def upload_df(cls, df: pd.DataFrame, **kwargs) -> "Blob":
+    def upload_df(cls, df: pd.DataFrame, **kwargs) -> Blob:
         """
         Create a blob containing the dataframe provided
 
@@ -77,7 +78,7 @@ class Blob(DPObjectRef):
             return cls.post_with_files(file=fn.file, **kwargs)
 
     @classmethod
-    def upload_file(cls, fn: NPath, **kwargs) -> "Blob":
+    def upload_file(cls, fn: NPath, **kwargs) -> Blob:
         """
         Create a blob containing the contents of the file provided
 
@@ -90,7 +91,7 @@ class Blob(DPObjectRef):
         return cls.post_with_files(file=Path(fn), **kwargs)
 
     @classmethod
-    def upload_obj(cls, data: t.Any, as_json: bool = False, **kwargs: JSON) -> "Blob":
+    def upload_obj(cls, data: t.Any, as_json: bool = False, **kwargs: JSON) -> Blob:
         """
         Create a blob containing the contents of the Python object provided,
         the object may be pickled or converted to JSON before storing.
@@ -181,7 +182,7 @@ class Variable(DPObjectRef):
     @classmethod
     def create(
         cls, name: str, value: str, group: Optional[str] = None, visibility: Optional[str] = "PRIVATE"
-    ) -> "Variable":
+    ) -> Variable:
         """
         Create a shareable Datapane User Variable with provided `name` and `value`
 
@@ -189,7 +190,7 @@ class Variable(DPObjectRef):
             name: Name of the variable
             value: Value of the variable
             group: Group name (optional and only applicable for organisations)
-            visibility: one of `"PUBLIC"`, or `"PRIVATE"` (optional)
+            visibility: one of `"PRIVATE"` (default) or `"PUBLIC"` (optional)
 
         Returns:
             An instance of the created `Variable` object
@@ -208,7 +209,7 @@ class Script(DPObjectRef):
     endpoint: str = "/scripts/"
 
     @classmethod
-    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> "Script":
+    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> Script:
         # TODO - use DPTmpFile
         # merge all the params for the API-call
         kwargs["api_version"] = __version__
@@ -228,12 +229,12 @@ class Script(DPObjectRef):
 
         run(self, params)
 
-    def run(self, parameters=None, cache=True) -> "Run":
+    def run(self, parameters=None, cache=True) -> Run:
         """(remote) run the given app (cloning if needed?)"""
         parameters = parameters or dict()
         return Run.post(script=self.url, parameter_vals=parameters, cache=cache)
 
-    def local_run(self, parameters=None) -> "Run":
+    def local_run(self, parameters=None) -> Run:
         """(local) run the given script"""
         # NOTE -is there a use-case for this?
         raise NotImplementedError()
@@ -264,7 +265,7 @@ class Schedule(DPObjectRef):
     list_fields = ["id", "script", "cron", "parameter_vals"]
 
     @classmethod
-    def create(cls, script: Script, cron: str, parameters: SDict) -> "Schedule":
+    def create(cls, script: Script, cron: str, parameters: SDict) -> Schedule:
         return cls.post(script=script.url, cron=cron, parameter_vals=parameters)
 
     def update(self, cron: str = None, parameters: SDict = None) -> None:

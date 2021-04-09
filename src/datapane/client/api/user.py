@@ -32,7 +32,7 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
 
     Args:
         token: Token to use when logging in
-        server: Datapane Server to connect to (default: Datapane at https://datapane.com/)
+        server: Datapane Server to connect to (default: Datapane Community at https://datapane.com/)
         env: The environment profile to store these login details to (default: `default`)
         cli_login: Toggle if this login is occuring via the CLI (optional)
 

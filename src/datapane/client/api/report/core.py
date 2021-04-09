@@ -7,7 +7,6 @@ Describes the `Report` object and included APIs for saving and publishing them.
 import shutil
 import typing as t
 import uuid
-import warnings
 import webbrowser
 from base64 import b64encode
 from enum import Enum, IntEnum
@@ -16,7 +15,6 @@ from os import path as osp
 from pathlib import Path
 
 import importlib_resources as ir
-from glom import glom
 from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
 from lxml import etree
 from lxml.etree import Element
@@ -50,7 +48,7 @@ class Visibility(IntEnum):
 
 
 class ReportType(Enum):
-    """The report type"""
+    """The document type"""
 
     DASHBOARD = "dashboard"
     REPORT = "report"
@@ -89,7 +87,7 @@ def include_raw(ctx, name):
 
 
 class ReportFileWriter:
-    """ Collects data needed to display a local report, and generates the local HTML """
+    """ Collects data needed to display a local report document, and generates the local HTML """
 
     template: t.Optional[Template] = None
     assets: Path
@@ -122,8 +120,8 @@ class ReportFileWriter:
             SKIP_DISPLAY_MSG = True
 
         display_msg(
-            text="Thanks for using Datapane, to automate and securely share reports in your organization please see Datapane Cloud - https://datapane.com/enterprise/",
-            md="Thanks for using **Datapane**, to automate and securely share reports in your organization please see [Datapane Cloud](https://datapane.com/enterprise/)",
+            text="Thanks for using Datapane, to automate and securely share documents in your organization please see Datapane Cloud - https://datapane.com/",
+            md="Thanks for using **Datapane**, to automate and securely share documents in your organization please see [Datapane Cloud](https://datapane.com/)",
         )
 
     def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):
@@ -151,9 +149,8 @@ class ReportFileWriter:
 # Report DPObject
 class Report(DPObjectRef):
     """
-    Reports collate plots, text, tables, and files into an interactive report that
+    Report documents collate plots, text, tables, and files into an interactive document that
     can be analysed and shared by users in their Browser
-
     """
 
     endpoint: str = "/reports/"
@@ -174,12 +171,12 @@ class Report(DPObjectRef):
     ):
         """
         Args:
-            *arg_blocks: Group to add to report
-            blocks: Allows providing the report blocks as a single list
-            type: Set the Report type, this will affect the formatting and layout of the report
+            *arg_blocks: Group to add to document
+            blocks: Allows providing the document blocks as a single list
+            type: Set the Report type, this will affect the formatting and layout of the document
 
         Returns:
-            A `Report` object that can be published, saved, etc.
+            A `Report` document object that can be published, saved, etc.
 
         .. tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
@@ -261,38 +258,36 @@ class Report(DPObjectRef):
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: t.Optional[Visibility] = None,
+        visibility: Visibility = Visibility.PRIVATE,
         open: bool = False,
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         **kwargs,
     ) -> None:
         """
-        Publish the report, including its attached assets, to the logged-in Datapane Server.
+        Publish the report document, including its attached assets, to the logged-in Datapane Server.
 
         Args:
-            name: The report name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
-            description: A high-level description for the report, this is displayed in searches and thumbnails
-            source_url: A URL pointing to the source code for the report, e.g. a GitHub repo or a Colab notebook
-            visibility: one of `"PUBLIC"` _(default on Datapane.com)_, or `"PRIVATE"` _(limited on Datapame.com, unlimited on Datapane Enterprise)_
+            name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
+            description: A high-level description for the document, this is displayed in searches and thumbnails
+            source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
+            visibility: "PRIVATE"` (default) or `"PUBLIC"``
             open: Open the file in your browser after creating
-            tags: A list of tags (as strings) used to categorise your report
+            tags: A list of tags (as strings) used to categorise your document
         """
 
-        display_msg("Publishing report and associated data - please wait..")
+        display_msg("Publishing document and associated data - *please wait...*")
 
         # process params
         tags = tags or []
-        # TODO - remove deprecation
-        if isinstance(visibility, str):
-            visibility_str = visibility
-            warnings.warn("Passing visibility as a string is deprecated, use dp.Visibility enum instead.")
-        else:
-            visibility_str = glom(visibility, "name", default=None)
         kwargs.update(
-            name=name, description=description, tags=tags, source_url=source_url, visibility=visibility_str, group=group
+            name=name,
+            description=description,
+            tags=tags,
+            source_url=source_url,
+            visibility=visibility.name,
+            group=group,
         )
-
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
         res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)
 
@@ -310,13 +305,13 @@ class Report(DPObjectRef):
         )
 
     def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
-        """Save the report to a local HTML file
+        """Save the report document to a local HTML file
 
         Args:
-            path: File path to store the report
-            open: Open the file in your browser after creating (default: False)
-            name: Name of the report (optional: uses path if not provided)
-            author: The report author / email / etc.
+            path: File path to store the document
+            open: Open in your browser after creating (default: False)
+            name: Name of the document (optional: uses path if not provided)
+            author: The report author / email / etc. (optional)
         """
         self._last_saved = path
 
@@ -332,11 +327,11 @@ class Report(DPObjectRef):
 
     def preview(self, width: int = 960, height: int = 700):
         """
-        Preview the report inside your currently running Jupyter notebook
+        Preview the document inside your currently running Jupyter notebook
 
         Args:
-            width: Width of the report preview in Jupyter (default: 960)
-            height: Height of the report preview in Jupyter (default: 700)
+            width: Width of the preview in Jupyter (default: 960)
+            height: Height of the preview in Jupyter (default: 700)
         """
         if is_jupyter():
             from IPython.display import IFrame

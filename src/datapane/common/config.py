@@ -1,5 +1,4 @@
-# TODO - import only during type checking and import future.annotations when dropping py 3.6
-# from __future__ import annotations
+from __future__ import annotations
 
 import base64
 import dataclasses as dc
@@ -56,7 +55,7 @@ class RunnerConfig:
         return conf
 
     @classmethod
-    def create(cls, config: Dict) -> "RunnerConfig":
+    def create(cls, config: Dict) -> RunnerConfig:
         _config = config
         return dacite.from_dict(cls, data=_config)
 
