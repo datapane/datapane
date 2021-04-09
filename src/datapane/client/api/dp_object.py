@@ -16,6 +16,7 @@ from urllib import parse as up
 import pandas as pd
 import validators as v
 from munch import Munch
+from requests import HTTPError
 
 from datapane import log
 from datapane.client import DPError
@@ -94,13 +95,23 @@ class DPObjectRef:
         Lookup and retrieve an object from the Datapane Server by its name
 
         Args:
-            name: The name of the object, e.g. `my-blob 3`
-            owner: The owner of the object, e.g. `fred`
+            name: The name of the object, e.g. 'my-blob-3` or `fred/my-blob-3`
+            owner: The owner of the object, e.g. `fred` (can be provided with the name as shown above)
 
         Returns:
             The object if found
         """
-        res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner)
+        lookup_value = name.split("/", maxsplit=1)
+        if len(lookup_value) == 2:
+            owner, name = lookup_value
+        try:
+            res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner)
+        except HTTPError as e:
+            lookup_str = f"{owner}/{name}" if owner else name
+            log.error(
+                f"Couldn't find '{lookup_str}', are you sure it exists? If error occurs within a script please try updating the code to include the script's owner in name - e.g. 'owner/{name}'."
+            )
+            raise e
         return cls(dto=res)
 
     @classmethod

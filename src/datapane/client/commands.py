@@ -452,7 +452,7 @@ def get(name, owner, show):
         print(str(res.value).strip())
     else:
         print_table(
-            [{"name": name, "value": res.value, "visibility": res.visibility}],
+            [{"name": res.name, "value": res.value, "visibility": res.visibility}],
             "Variable",
         )
 
