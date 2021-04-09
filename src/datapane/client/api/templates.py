@@ -292,7 +292,7 @@ dp.Select(group1, df)
 
     group1 = b.Group(vega_bar, vega_sine, columns=2)
     group2 = b.Group(*[f"### Cell {x}" for x in range(6)], rows=2, columns=0)
-    select1 = b.Select(vega_bar, vega_sine, type=b.SelectType.TABS)
+    select1 = b.Select(vega_bar, vega_sine, type=b.SelectType.TABS, name="vega_select")
     select2 = b.Select(vega_bar, vega_sine, type=b.SelectType.DROPDOWN)
 
     nested = b.Select(group1, b.Table(gen_table_df()))
@@ -364,33 +364,34 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     """
 
     plots = b.Group(
-        b.Plot(vega_sine, caption="Altair Plot"),
-        b.Plot(gen_bokeh(), caption="Bokeh Plot"),
-        b.Plot(gen_matplotlib(), caption="Matplotlib Plot"),
-        b.Plot(gen_plotly(), caption="Plotly Plot"),
-        b.Plot(gen_folium(), caption="Folium Plot"),
+        b.Plot(vega_sine, name="vega", caption="Altair Plot"),
+        b.Plot(gen_bokeh(), name="bokeh", caption="Bokeh Plot"),
+        b.Plot(gen_matplotlib(), name="matplotlib", caption="Matplotlib Plot"),
+        b.Plot(gen_plotly(), name="plotly", caption="Plotly Plot"),
+        b.Plot(gen_folium(), name="folium", caption="Folium Plot"),
+        name="plots_group",
         columns=2,
     )
     tables = b.Group(
-        b.Table(df1, caption="Basic Table"),
-        b.Table(styler1, caption="Styled Table"),
-        b.DataTable(df1, caption="Interactive DataTable"),
+        b.Table(df1, name="table1", caption="Basic Table"),
+        b.Table(styler1, name="styled-table", caption="Styled Table"),
+        b.DataTable(gen_table_df(1000000), name="data_table", caption="Interactive DataTable"),
     )
     text = b.Group(
-        b.Text("Hello, __world__!"),
-        b.Code("print('Hello, world!'"),
-        b.HTML("<h1>Hello World</h1>"),
-        b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
+        b.Text("Hello, __world__!", name="markdown"),
+        b.Code("print('Hello, world!'", name="code"),
+        b.HTML("<h1>Hello World</h1>", name="HTML"),
+        b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True, name="big_num"),
         rows=1,
         columns=0,
     )
     embed = b.Group(
-        b.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA"),
+        b.Embed("https://www.youtube.com/watch?v=JDe14ulcfLA", name="youtube_embed"),
         b.Embed("https://twitter.com/datapaneapp/status/1300831345413890050"),
         columns=2,
     )
     files = b.Group(
-        b.File(file=logo),
+        b.File(file=logo, name="logo_img"),
         b.File(data=[1, 2, 3], is_json=True),
         b.File(data=[1, 2, 3], is_json=False),
         rows=1,

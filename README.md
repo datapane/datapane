@@ -100,6 +100,14 @@ r.publish(name="2020 Stock Portfolio", open=True)
 
 Looking to get answers to questions or engage with us and the wider community? Check out our [GitHub Discussions](https://github.com/datapane/datapane/discussions) board.
 
-Submit requests, issues, and bug reports on this GitHub repo.
+Submit feature requests, issues, and bug reports on this GitHub repo.
 
 We look forward to building an amazing open source community with you!
+
+### Open-source, not open-contribution
+
+We apologise for having to do this, but Datapane is **closed to code contributions** (at this time).
+
+The Datapane team is too small to be accepting and maintaining third party patches for now. Small contributions typically require hours of time to properly test and validate.
+
+**However**, we are tremendously grateful to the community for any feature requests, ideas, discussions, bug reports, and general involvement!

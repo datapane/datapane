@@ -18,7 +18,7 @@ from datapane.common.report import validate_report_doc
 
 from ..e2e.common import gen_df
 
-md_block_id = dp.Text(text="# Test markdown block <hello/> \n Test **content**", id="test-id-1")
+md_block_id = dp.Text(text="# Test markdown block <hello/> \n Test **content**", name="test-id-1")
 md_block = dp.Text(text="# Test markdown block <hello/> \n Test **content**")
 str_md_block = "Simple string Markdown"
 
@@ -166,7 +166,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 
     # assets
     plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
-    list_asset = dp.File(data=lis, name="List Asset", is_json=True)
+    list_asset = dp.File(data=lis, filename="List Asset", is_json=True)
     img_asset = dp.File(file=datadir / "datapane-logo.png")
 
     # tables
@@ -198,7 +198,7 @@ def test_gen_report_simple():
     # TODO - replace accessors here with glom / boltons / toolz
     assert len(report.pages[0].blocks[0].blocks) == 2
     assert isinstance(report.pages[0].blocks[0].blocks[1], dp.Text)
-    assert report.pages[0].blocks[0].blocks[0].id == "test-id-1"
+    assert report.pages[0].blocks[0].blocks[0].name == "test-id-1"
 
 
 def test_gen_report_nested_mixed():
@@ -215,7 +215,7 @@ def test_gen_report_nested_mixed():
     assert isinstance(glom(report, "pages.0.blocks.0"), dp.Group)
     assert isinstance(report.pages[0].blocks[0].blocks[0], dp.Group)
     assert isinstance(report.pages[0].blocks[0].blocks[1], dp.Text)
-    assert report.pages[0].blocks[0].blocks[0].blocks[0].id == "test-id-1"
+    assert report.pages[0].blocks[0].blocks[0].blocks[0].name == "test-id-1"
 
 
 def test_gen_report_primitives(datadir: Path):
@@ -267,15 +267,23 @@ def test_gen_failing_reports():
         r = dp.Report(dp.DataTable(pd.DataFrame()))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
+    # invalid names
+    with pytest.raises(DocumentInvalid):
+        r = dp.Report(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
+        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+
+    with pytest.raises(DPError):
+        dp.Report(dp.Text("a", name="3-invalid-name"))
+
 
 def test_gen_report_nested_blocks():
     s = "# Test markdown block <hello/> \n Test **content**"
     report = dp.Report(
         blocks=[
-            dp.Group(dp.Text(s, id="test-id-1"), "Simple string Markdown", label="test-group-label"),
+            dp.Group(dp.Text(s, name="test-id-1"), "Simple string Markdown", label="test-group-label"),
             dp.Select(
                 blocks=[
-                    dp.Text(s, id="test-id-2", label="test-block-label"),
+                    dp.Text(s, name="test-id-2", label="test-block-label"),
                     "Simple string Markdown",
                 ],
                 label="test-select-label",
@@ -289,7 +297,7 @@ def test_gen_report_nested_blocks():
     assert isinstance(report.pages[0].blocks[1], dp.Select)
     assert isinstance(report.pages[0].blocks[1].blocks[1], dp.Text)
     assert glom(report, ("pages.0.blocks", ["_attributes.label"])) == ["test-group-label", "test-select-label"]
-    assert glom(report, "pages.0.blocks.0.blocks.0.id") == "test-id-1"
+    assert glom(report, "pages.0.blocks.0.blocks.0.name") == "test-id-1"
     assert glom(report, "pages.0.blocks.1.blocks.0._attributes.label") == "test-block-label"
     assert_report(report, 0)
 

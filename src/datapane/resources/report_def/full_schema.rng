@@ -70,12 +70,10 @@
       <!-- attribute full_width { xsd:boolean }, -->
     </element>
   </define>
-  <define name="block_id">
-    <attribute name="id">
-      <data type="string">
-        <param name="minLength">1</param>
-        <param name="maxLength">64</param>
-      </data>
+  <!-- name always present, can be user-defined but auto-generated if not - used for exporting and asset lookup -->
+  <define name="block_name">
+    <attribute name="name">
+      <data type="ID"/>
     </attribute>
   </define>
   <define name="block_label">
@@ -85,17 +83,18 @@
       </data>
     </attribute>
   </define>
-  <define name="block_id_label">
-    <optional>
-      <ref name="block_id"/>
-    </optional>
+  <define name="block_label_name">
+    <ref name="block_name"/>
     <optional>
       <ref name="block_label"/>
     </optional>
   </define>
+  <!-- Pages don't have id's or name's - as can't be extracted to be displayed elsewhere -->
   <define name="Page">
     <element name="Page">
-      <ref name="block_id_label"/>
+      <optional>
+        <ref name="block_label"/>
+      </optional>
       <oneOrMore>
         <ref name="LayoutBlock"/>
       </oneOrMore>
@@ -110,7 +109,7 @@
   <define name="Select">
     <element name="Select">
       <group>
-        <ref name="block_id_label"/>
+        <ref name="block_label_name"/>
         <optional>
           <attribute name="type">
             <choice>
@@ -129,7 +128,7 @@
   </define>
   <define name="Group">
     <element name="Group">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <attribute name="rows">
         <data type="nonNegativeInteger"/>
       </attribute>
@@ -177,7 +176,7 @@
   <define name="Text">
     <a:documentation/>
     <element name="Text">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <data type="string">
         <param name="minLength">1</param>
         <param name="pattern">(.|\s)*\S(.|\s)*</param>
@@ -186,7 +185,7 @@
   </define>
   <define name="HTML">
     <element name="HTML">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <data type="string">
         <param name="minLength">1</param>
       </data>
@@ -194,7 +193,7 @@
   </define>
   <define name="Code">
     <element name="Code">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <attribute name="language">
         <data type="string">
           <param name="minLength">1</param>
@@ -208,14 +207,14 @@
   </define>
   <define name="Embed">
     <element name="Embed">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <attribute name="url">
         <data type="anyURI"/>
       </attribute>
       <attribute name="title">
         <data type="string">
           <param name="minLength">1</param>
-          <param name="maxLength">256</param>
+          <param name="maxLength">255</param>
         </data>
       </attribute>
       <attribute name="provider_name">
@@ -231,7 +230,7 @@
   </define>
   <define name="BigNumber">
     <element name="BigNumber">
-      <ref name="block_id_label"/>
+      <ref name="block_label_name"/>
       <attribute name="heading">
         <data type="string">
           <param name="minLength">1</param>
@@ -276,7 +275,7 @@
   <!-- AssetBlocks -->
   <define name="assetAttributes">
     <a:documentation/>
-    <ref name="block_id_label"/>
+    <ref name="block_label_name"/>
     <!-- TODO - should attachment be it's own attribute? -->
     <attribute name="src">
       <data type="anyURI">
@@ -307,11 +306,11 @@
   <define name="File">
     <element name="File">
       <ref name="assetAttributes"/>
-      <attribute name="can_download" a:defaultValue="true">
-        <data type="boolean"/>
-      </attribute>
-      <attribute name="name">
-        <data type="string"/>
+      <attribute name="filename">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">127</param>
+        </data>
       </attribute>
     </element>
   </define>

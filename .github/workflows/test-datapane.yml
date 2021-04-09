@@ -56,6 +56,6 @@ jobs:
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
-          poetry install
+          poetry install -E plotting -E cloud
           # run CLI tests (junit tests not captured yet)
           poetry run python -m pytest --ignore=tests/client/e2e/ . --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml

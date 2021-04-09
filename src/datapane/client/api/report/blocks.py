@@ -25,6 +25,7 @@ from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
 from datapane.common import PKL_MIMETYPE, NPath, guess_type
+from datapane.common.report import is_valid_id
 
 from ..common import DPTmpFile
 from ..dp_object import save_df
@@ -50,8 +51,6 @@ __all__ = [
 ]
 
 __pdoc__ = {
-    "BaseElement.id": False,
-    "DataBlock.id": False,
     "File.caption": False,
     "File.file": False,
     "Plot.file": False,
@@ -72,9 +71,10 @@ class BuilderState:
     id_count: t.Iterator[int] = dc.field(default_factory=lambda: itertools.count(start=1))
 
     def add_element(self, block: "BaseElement", e: etree.Element, f: t.Optional[Path] = None) -> "BuilderState":
-        # set fresh id's if not set
-        _id = str(block.id) if block.id else f"block-{next(self.id_count)}"
-        e.set("id", _id)
+        if not isinstance(block, Page):
+            # set fresh name if not set
+            _name = block.name if block.name else f"{block._block_name}-{next(self.id_count)}"
+            e.set("name", _name)
 
         self.elements.append(e)
         if f and not self.embedded:
@@ -105,16 +105,23 @@ class BaseElement(ABC):
 
     _attributes: t.Dict[str, str]
     _tag: str
-    id: t.Optional[str] = None
+    _block_name: str
+    name: t.Optional[str] = None
 
-    def __init__(self, id: str = None, **kwargs):
+    def __init__(self, name: str = None, **kwargs):
         """
         Args:
-            id: A unique id to reference the block, used when querying blocks via XPath to aid embedding
+            name: A unique name to reference the block, used when referencing blocks via the report editor and when embedding
         """
-        self.id = id
-        self._attributes = {}
+        self._block_name = self._tag.lower()
+        self._attributes = dict()
         self._add_attributes(**kwargs)
+
+        if name:
+            # validate name
+            if not is_valid_id(name):
+                raise DPError(f"Invalid name '{name}' for block")
+            self.name = name
 
     def _add_attributes(self, **kwargs):
         # convert attributes, dropping None values
@@ -199,20 +206,17 @@ class Page(LayoutBlock):
     # NOTE - technically a higher-level layoutblock but we keep here to maximise reuse
     _tag = "Page"
 
-    def __init__(
-        self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, id: str = None, label: str = None
-    ):
+    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, label: str = None):
         """
         Args:
             *arg_blocks: Page to add to report
             blocks: Allows providing the report blocks as a single list
-            id: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
 
         ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
         """
-        super().__init__(*arg_blocks, blocks=blocks, id=id, label=label)
+        super().__init__(*arg_blocks, blocks=blocks, label=label)
         self._wrap_blocks()
 
     def _wrap_blocks(self) -> None:
@@ -243,7 +247,7 @@ class Select(LayoutBlock):
         *arg_blocks: BlockOrPrimitive,
         blocks: t.List[BlockOrPrimitive] = None,
         type: t.Optional[SelectType] = None,
-        id: str = None,
+        name: str = None,
         label: str = None,
     ):
         """
@@ -251,14 +255,14 @@ class Select(LayoutBlock):
             *arg_blocks: Page to add to report
             blocks: Allows providing the report blocks as a single list
             type: An instance of SelectType that indicates if the select should use tabs or a dropdown
-            id: A unique id for the blocks to aid querying (optional)
+            name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
 
         ..tip:: Select can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Select(table, plot, type=dp.SelectType.TABS)` or `dp.Group(blocks=[table, plot])`
         """
         _type = glom(type, "value", default=None)
-        super().__init__(*arg_blocks, blocks=blocks, id=id, label=label, type=_type)
+        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=_type)
         if len(self.blocks) < 2:
             raise DPError("Can't create Select with less than 2 objects")
 
@@ -280,7 +284,7 @@ class Group(LayoutBlock):
         self,
         *arg_blocks: BlockOrPrimitive,
         blocks: t.List[BlockOrPrimitive] = None,
-        id: str = None,
+        name: str = None,
         label: str = None,
         rows: int = 0,
         columns: int = 1,
@@ -289,7 +293,7 @@ class Group(LayoutBlock):
         Args:
             *arg_blocks: Group to add to report
             blocks: Allows providing the report blocks as a single list
-            id: A unique id for the blocks to aid querying (optional)
+            name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
             rows: Display the contained blocks, e.g. Plots, using _n_ rows (set to 0 to autofill)
             columns: Display the contained blocks, e.g. Plots, using _n_ columns (set to 0 to autofill)
@@ -297,7 +301,7 @@ class Group(LayoutBlock):
         .. tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`
         """
-        super().__init__(*arg_blocks, blocks=blocks, id=id, label=label)
+        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label)
 
         # set row/column handling
         if rows == 1 and columns == 1:
@@ -349,14 +353,14 @@ class Text(EmbeddedTextBlock):
 
     _tag = "Text"
 
-    def __init__(self, text: str = None, file: NPath = None, id: str = None, label: str = None):
+    def __init__(self, text: str = None, file: NPath = None, name: str = None, label: str = None):
         """
         Args:te
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
             file: Path to a file containing markdown text
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
         """
-        super().__init__(id=id, label=label)
+        super().__init__(name=name, label=label)
 
         if text:
             text = text.strip()
@@ -410,15 +414,15 @@ class Code(EmbeddedTextBlock):
 
     _tag = "Code"
 
-    def __init__(self, code: str, language: str = "python", id: str = None, label: str = None):
+    def __init__(self, code: str, language: str = "python", name: str = None, label: str = None):
         """
         Args:
             code: The source code
             language: The language of the code, most common languages are supported (optional - defaults to Python)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        super().__init__(id=id, label=label, language=language)
+        super().__init__(name=name, label=label, language=language)
         self.content = code
 
 
@@ -429,14 +433,14 @@ class HTML(EmbeddedTextBlock):
 
     _tag = "HTML"
 
-    def __init__(self, html: t.Union[str, dom_tag], id: str = None, label: str = None):
+    def __init__(self, html: t.Union[str, dom_tag], name: str = None, label: str = None):
         """
         Args:
             html: The HTML fragment to embed - can be a string or a [dominate](https://github.com/Knio/dominate/) tag
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        super().__init__(id=id, label=label)
+        super().__init__(name=name, label=label)
         self.content = str(html)
 
 
@@ -448,13 +452,13 @@ class Embed(EmbeddedTextBlock):
     _tag = "Embed"
     providers = bootstrap_basic(cache=cache.Cache())
 
-    def __init__(self, url: str, width: int = 640, height: int = 480, id: str = None, label: str = None):
+    def __init__(self, url: str, width: int = 640, height: int = 480, name: str = None, label: str = None):
         """
         Args:
             url: The URL of the resource to be embedded
             width: The width of the embedded object (optional)
             height: The height of the embedded object (optional)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
 
@@ -463,7 +467,7 @@ class Embed(EmbeddedTextBlock):
         except ProviderException:
             raise DPError(f"No embed provider found for URL '{url}'")
         super().__init__(
-            id=id,
+            name=name,
             label=label,
             url=url,
             title=result.get("title", "Title"),
@@ -493,7 +497,7 @@ class BigNumber(DataBlock):
         prev_value: t.Optional[NumberValue] = None,
         is_positive_intent: t.Optional[bool] = None,
         is_upward_change: t.Optional[bool] = None,
-        id: str = None,
+        name: str = None,
         label: str = None,
     ):
         """
@@ -504,7 +508,7 @@ class BigNumber(DataBlock):
             change: The amount changed between the value and previous value (optional)
             is_positive_intent: Displays the change on a green background if `True`, and red otherwise. Follows `is_upward_change` if not set (optional)
             is_upward_change: Whether the change is upward or downward (required when `change` is set)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
         if change:
@@ -522,7 +526,7 @@ class BigNumber(DataBlock):
             prev_value=prev_value,
             is_positive_intent=is_positive_intent,
             is_upward_change=is_upward_change,
-            id=id,
+            name=name,
             label=label,
         )
 
@@ -538,9 +542,9 @@ class AssetBlock(DataBlock):
     file: Path = None
     caption: t.Optional[str] = None
 
-    def __init__(self, file: Path, caption: str = None, id: str = None, label: str = None, **kwargs):
+    def __init__(self, file: Path, caption: str = None, name: str = None, label: str = None, **kwargs):
         # storing objects for delayed upload
-        super().__init__(id=id, label=label, **kwargs)
+        super().__init__(name=name, label=label, **kwargs)
         self.file = Path(file)
         self.caption = caption or ""
 
@@ -594,9 +598,8 @@ class File(AssetBlock):
         data: t.Optional[t.Any] = None,
         file: t.Optional[NPath] = None,
         is_json: bool = False,
-        can_download: bool = True,
-        name: t.Optional[str] = None,
-        id: str = None,
+        filename: t.Optional[str] = None,
+        name: str = None,
         label: str = None,
     ):
         """
@@ -604,9 +607,8 @@ class File(AssetBlock):
             data: A python object to attach to the report (e.g. a dictionary)
             file: Path to a file to attach to the report (e.g. a JPEG image)
             is_json: If `True`, treat the `data` as JSON data already
-            can_download: Allow users to download the file when viewing the report
-            name: Name to be used when downloading the file
-            id: A unique id for the block to aid querying (optional)
+            filename: Name to be used when downloading the file
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
         ..note:: either `data` or `file` must be provided
@@ -617,7 +619,7 @@ class File(AssetBlock):
             out_fn = self._save_obj(data, as_json=is_json)
             file = out_fn.file
 
-        super().__init__(file=file, name=name or file.name, can_download=can_download, id=id, label=label)
+        super().__init__(file=file, filename=filename or file.name, name=name, label=label)
 
 
 class Plot(AssetBlock):
@@ -629,14 +631,14 @@ class Plot(AssetBlock):
     _tag = "Plot"
 
     def __init__(
-        self, data: t.Any, caption: t.Optional[str] = None, responsive: bool = True, id: str = None, label: str = None
+        self, data: t.Any, caption: t.Optional[str] = None, responsive: bool = True, name: str = None, label: str = None
     ):
         """
         Args:
             data: The `plot` object to attach
             caption: A caption to display below the plot (optional)
             responsive: Whether the plot should automatically be resized to fit, set to False if your plot looks odd (optional, default: True)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
         out_fn = self._save_obj(data, as_json=False)
@@ -644,7 +646,7 @@ class Plot(AssetBlock):
             raise DPError("Can't embed object as a plot")
 
         super().__init__(
-            file=out_fn.file, caption=caption, width=640, height=480, id=id, label=label, responsive=responsive
+            file=out_fn.file, caption=caption, width=640, height=480, name=name, label=label, responsive=responsive
         )
 
 
@@ -660,17 +662,17 @@ class Table(AssetBlock):
     _tag = "Table"
 
     def __init__(
-        self, data: t.Union[pd.DataFrame, Styler], caption: t.Optional[str] = None, id: str = None, label: str = None
+        self, data: t.Union[pd.DataFrame, Styler], caption: t.Optional[str] = None, name: str = None, label: str = None
     ):
         """
         Args:
             data: The pandas `Styler` instance or dataframe to generate the table from
             caption: A caption to display below the table (optional)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
         out_fn = self._save_obj(data, as_json=False)
-        super().__init__(file=out_fn.file, caption=caption, id=id, label=label)
+        super().__init__(file=out_fn.file, caption=caption, name=name, label=label)
 
 
 class DataTable(AssetBlock):
@@ -689,16 +691,16 @@ class DataTable(AssetBlock):
         self,
         df: pd.DataFrame,
         caption: t.Optional[str] = None,
-        id: str = None,
+        name: str = None,
         label: str = None,
     ):
         """
         Args:
             df: The pandas dataframe to attach to the report
             caption: A caption to display below the plot (optional)
-            id: A unique id for the block to aid querying (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
         fn = save_df(df)
         (rows, columns) = df.shape
-        super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, id=id, label=label)
+        super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, name=name, label=label)

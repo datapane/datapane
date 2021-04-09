@@ -12,8 +12,10 @@ rng_validator = etree.RelaxNG(file=str(local_report_def / "full_schema.rng"))
 
 dp_namespace: str = "https://datapane.com/schemas/report/1/"
 
-# regex to check for a xsd:ID name
-re_xml_id = re.compile(r"^[a-zA-Z_][\w.-]*$")
+
+def is_valid_id(id: str) -> bool:
+    """(cached) regex to check for a xsd:ID name"""
+    return re.fullmatch(r"^[a-zA-Z_][\w.-]*$", id) is not None
 
 
 def validate_report_doc(

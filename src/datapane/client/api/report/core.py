@@ -200,7 +200,33 @@ class Report(DPObjectRef):
             # add additional top-level Group element to group mixed elements
             self.pages = [Page(blocks=[Group(blocks=pages)])]
 
-    def _gen_report(self, embedded: bool, title: str, description: str = "Description") -> t.Tuple[str, t.List[Path]]:
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
+        # check for any unsupported local features, e.g. DataTable
+        # NOTE - we could eventually have different validators for local and published reports
+        if embedded:
+            uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
+            if uses_datatable:
+                raise UnsupportedFeatureError(
+                    "DataTable component contains advanced analysis features that are not supported when saving or previewing locally,"
+                    + " please either publish your report to a Datapane Server or use the dp.Table component instead"
+                )
+        else:
+            # TODO - remove this eventually
+            has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
+            if not has_text:
+                display_msg(
+                    "Your report doesn't contain any text - did you know you can add text to your report once published?"
+                )
+
+            single_block = processed_report_doc.xpath("count(/Report/Main//*[not(self::Caption)])") < 4
+            if single_block:
+                display_msg(
+                    "Your report only contains a single element - did you know you can add multiple plots and tables to a report, add text to it and export directly to Medium once published?"
+                )
+
+    def _gen_report(
+        self, embedded: bool, title: str, description: str = "Description", author: str = "Anonymous"
+    ) -> t.Tuple[str, t.List[Path]]:
         """Build XML report document"""
         # convert Pages to XML
         s = BuilderState(embedded)
@@ -222,16 +248,7 @@ class Report(DPObjectRef):
         # post_process and validate
         processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
         validate_report_doc(xml_doc=processed_report_doc)
-
-        # check for any unsupported local features, e.g. DataTable
-        # NOTE - we could eventually have different validators for local and published reports
-        if embedded:
-            uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
-            if uses_datatable:
-                raise UnsupportedFeatureError(
-                    "DataTable component contains advanced analysis features that are not supported when saving or previewing locally,"
-                    + " please either publish your report to a Datapane Server or use the dp.Table component instead"
-                )
+        self._report_status_checks(processed_report_doc, embedded)
 
         # convert to string
         report_str = etree.tounicode(processed_report_doc, pretty_print=True)
@@ -288,7 +305,9 @@ class Report(DPObjectRef):
         if open:
             webbrowser.open_new_tab(self.web_url)
 
-        display_msg(text=f"Report successfully published at {self.web_url}")
+        display_msg(
+            text=f"Report successfully published at {self.web_url} - you can edit and add additional text from the link"
+        )
 
     def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
         """Save the report to a local HTML file
@@ -302,7 +321,7 @@ class Report(DPObjectRef):
         self._last_saved = path
 
         if not name:
-            name = Path(path).stem
+            name = Path(path).stem[:127]
 
         local_doc, _ = self._gen_report(embedded=True, title=name)
         self._local_writer.write(local_doc, path, self.report_type, name=name, author=author or c.config.username)

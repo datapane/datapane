@@ -32,24 +32,27 @@ Main = element Main {
   # attribute full_width { xsd:boolean },
 }
 
-block_id = attribute id { xsd:string { minLength = "1" maxLength = "64" } }
+# name always present, can be user-defined but auto-generated if not - used for exporting and asset lookup
+block_name = attribute name { xsd:ID }
 block_label = attribute label { xsd:string { minLength = "1" } }
-block_id_label = block_id?, block_label?
+block_label_name = block_name, block_label?
 
+
+# Pages don't have id's or name's - as can't be extracted to be displayed elsewhere
 Page = element Page {
-  block_id_label, LayoutBlock+
+  block_label?, LayoutBlock+
 }
 
 LayoutBlock = Group | Select
 
 Select = element Select {
-  block_id_label,
+  block_label_name,
   attribute type { string "dropdown" | string "tabs" }?,
   Block, Block+  # at least 2 block elements in a Select
 }
 
 Group = element Group {
-  block_id_label,
+  block_label_name,
   attribute rows { xsd:nonNegativeInteger },
   attribute columns { xsd:nonNegativeInteger },
   Block+
@@ -68,31 +71,31 @@ AssetBlock = File | Plot | Table | DataTable
 # EmbeddedTextBlocks
 # Markdown Text
 Text = element Text {
-  block_id_label,
+  block_label_name,
   xsd:string { minLength = "1" pattern = "(.|\s)*\S(.|\s)*" }
 }
 
 HTML = element HTML {
-  block_id_label,
+  block_label_name,
   xsd:string { minLength = "1" }
 }
 
 Code = element Code {
-  block_id_label,
+  block_label_name,
   attribute language { xsd:string { minLength = "1" maxLength = "127" } },
   xsd:string { minLength = "1" }
 }
 
 Embed = element Embed {
-  block_id_label,
+  block_label_name,
   attribute url { xsd:anyURI },
-  attribute title { xsd:string { minLength = "1" maxLength = "256" } },
+  attribute title { xsd:string { minLength = "1" maxLength = "255" } },
   attribute provider_name { xsd:string { minLength = "1" maxLength = "127" } },
   xsd:string { minLength = "1" }
 }
 
 BigNumber = element BigNumber {
-  block_id_label,
+  block_label_name,
   attribute heading { xsd:string { minLength = "1" maxLength = "127" } },
   attribute value { xsd:string { minLength = "1" maxLength = "127" } },
 
@@ -107,7 +110,7 @@ BigNumber = element BigNumber {
 ################################################################################
 # AssetBlocks
 assetAttributes =
-  block_id_label,
+  block_label_name,
   # TODO - should attachment be it's own attribute?
   attribute src { xsd:anyURI { pattern = "((http|https|cas|file|data|attachment):|/).+"} },
   attribute cas_ref { xsd:string { pattern = "[0-9a-f]{64}" } } ?,
@@ -119,10 +122,7 @@ assetAttributes =
 File = element File {
   assetAttributes,
 
-  [ a:defaultValue = "true" ]
-  attribute can_download { xsd:boolean },
-
-  attribute name { xsd:string }
+  attribute filename { xsd:string { minLength = "1" maxLength = "127" } }
   }
 
 Plot = element Plot {
