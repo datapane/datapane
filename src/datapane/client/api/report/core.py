@@ -215,7 +215,7 @@ class Report(DPObjectRef):
                     "Your report doesn't contain any text - did you know you can add text to your report once published?"
                 )
 
-            single_block = processed_report_doc.xpath("count(/Report/Main//*[not(self::Caption)])") < 4
+            single_block = processed_report_doc.xpath("count(/Report/Main//*)") < 4
             if single_block:
                 display_msg(
                     "Your report only contains a single element - did you know you can add multiple plots and tables to a report, add text to it and export directly to Medium once published?"

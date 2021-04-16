@@ -159,6 +159,7 @@
       <ref name="HTML"/>
       <ref name="Code"/>
       <ref name="Embed"/>
+      <ref name="Formula"/>
     </choice>
   </define>
   <define name="AssetBlock">
@@ -168,6 +169,18 @@
       <ref name="Table"/>
       <ref name="DataTable"/>
     </choice>
+  </define>
+  <!-- misc -->
+  <define name="opt_caption">
+    <a:documentation/>
+    <optional>
+      <attribute name="caption">
+        <data type="string">
+          <param name="minLength">1</param>
+          <param name="maxLength">512</param>
+        </data>
+      </attribute>
+    </optional>
   </define>
   <!--
     EmbeddedTextBlocks
@@ -200,6 +213,7 @@
           <param name="maxLength">127</param>
         </data>
       </attribute>
+      <ref name="opt_caption"/>
       <data type="string">
         <param name="minLength">1</param>
       </data>
@@ -272,6 +286,15 @@
       </optional>
     </element>
   </define>
+  <define name="Formula">
+    <element name="Formula">
+      <ref name="block_label_name"/>
+      <ref name="opt_caption"/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
   <!-- AssetBlocks -->
   <define name="assetAttributes">
     <a:documentation/>
@@ -297,11 +320,7 @@
     <attribute name="size">
       <data type="positiveInteger"/>
     </attribute>
-    <optional>
-      <element name="Caption">
-        <text/>
-      </element>
-    </optional>
+    <ref name="opt_caption"/>
   </define>
   <define name="File">
     <element name="File">

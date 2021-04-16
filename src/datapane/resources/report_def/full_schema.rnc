@@ -62,9 +62,14 @@ Block = LayoutBlock | DataBlock
 
 DataBlock = EmbeddedTextBlock | AssetBlock | BigNumber
 
-EmbeddedTextBlock = Text | HTML | Code | Embed
+EmbeddedTextBlock = Text | HTML | Code | Embed | Formula
 
 AssetBlock = File | Plot | Table | DataTable
+
+
+################################################################################
+# misc
+opt_caption = attribute caption { xsd:string { minLength = "1" maxLength = "512" } }?
 
 
 ################################################################################
@@ -83,6 +88,7 @@ HTML = element HTML {
 Code = element Code {
   block_label_name,
   attribute language { xsd:string { minLength = "1" maxLength = "127" } },
+  opt_caption,
   xsd:string { minLength = "1" }
 }
 
@@ -106,6 +112,11 @@ BigNumber = element BigNumber {
   attribute is_upward_change { xsd:boolean }?
 }
 
+Formula = element Formula {
+  block_label_name,
+  opt_caption,
+  xsd:string { minLength = "1" }
+}
 
 ################################################################################
 # AssetBlocks
@@ -117,7 +128,7 @@ assetAttributes =
 
   attribute type { xsd:string { pattern = '\w+/[\w.+\-]+' } },
   attribute size { xsd:positiveInteger },
-  element Caption { text }?
+  opt_caption
 
 File = element File {
   assetAttributes,

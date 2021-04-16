@@ -6,6 +6,7 @@ from .dp_types import (
     ARROW_EXT,
     ARROW_MIMETYPE,
     DPMode,
+    HTML,
     JSON,
     MIME,
     PKL_MIMETYPE,

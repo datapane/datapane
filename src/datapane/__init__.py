@@ -29,6 +29,7 @@ from .client.api import (
     Embed,
     Group,
     File,
+    Formula,
     HTML,
     Text,
     Markdown,

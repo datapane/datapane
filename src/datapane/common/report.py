@@ -1,9 +1,14 @@
+import dataclasses as dc
 import re
 import typing as t
 
 import importlib_resources as ir
 from lxml import etree
 from lxml.etree import DocumentInvalid
+from micawber import ProviderException, bootstrap_basic, cache
+
+from datapane.client import DPError
+from datapane.common import HTML
 
 from .utils import log
 
@@ -35,3 +40,41 @@ def validate_report_doc(
         if not quiet:
             log.error(f"Error validating report document:\n\n{xml_str}")
         raise
+
+
+def conv_attrib(v: t.Any) -> t.Optional[str]:
+    """
+    Convert a value to a str for use as an ElementBuilder attribute
+    - also handles None to a string for optional field values
+    """
+    # TODO - use a proper serialisation framework here / lxml features
+    if v is None:
+        return v
+    v1 = str(v)
+    return v1.lower() if isinstance(v, bool) else v1
+
+
+def conv_attribs(**attribs: t.Any) -> t.Dict[str, str]:
+    # convert attributes, dropping None values
+    # TODO - uncomment when 3.8+ only
+    # self.attributes = {str(k): v1 for (k, v) in kwargs.items() if (v1 := _conv_attrib(v)) is not None}
+    return {str(k): conv_attrib(v) for (k, v) in attribs.items() if conv_attrib(v) is not None}
+
+
+providers = bootstrap_basic(cache=cache.Cache())
+
+
+@dc.dataclass(frozen=True)
+class Embedded:
+    html: HTML
+    title: str
+    provider: str
+
+
+def get_embed_url(url: str, width: int = 960, height: int = 540) -> Embedded:
+    """Return html for an embeddable URL"""
+    try:
+        r = providers.request(url, maxwidth=width, maxheight=height)
+        return Embedded(html=r["html"], title=r.get("title", "Title"), provider=r.get("provider_name", "Embedding"))
+    except ProviderException:
+        raise DPError(f"No embed provider found for URL '{url}'")

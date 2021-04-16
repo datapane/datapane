@@ -13,6 +13,7 @@ JDict = SDict  # should be JSON
 JList = t.List[JSON]
 MIME = t.NewType("MIME", str)
 URL = t.NewType("URL", str)
+HTML = t.NewType("HTML", str)
 NPath = t.Union[Path, PathLike, str]
 Hash = t.NewType("Hash", str)
 EnumType = int  # alias for enum values

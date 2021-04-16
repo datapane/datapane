@@ -29,7 +29,7 @@ def element_to_str(e: BaseElement) -> str:
 
 
 def num_blocks(report_str: str) -> int:
-    x = "count(/Report/Main//*[not(self::Caption)])"
+    x = "count(/Report/Main//*)"
     return int(etree.fromstring(report_str).xpath(x))
 
 
@@ -130,21 +130,21 @@ def gen_report_complex_no_files() -> dp.Report:
                 dp.Group(md_block, md_block, columns=2),
                 dp.Select(blocks=[md_block, group], type=dp.SelectType.DROPDOWN),
             ],
-            label="Page Uno",
+            title="Page Uno",
         ),
         dp.Page(
             blocks=[
                 dp.Group(select, select, columns=2),
                 dp.Select(blocks=[md_block, md_block, md_block], type=dp.SelectType.TABS),
             ],
-            label="Page Duo",
+            title="Page Duo",
         ),
         dp.Page(
             blocks=[
                 dp.Group(group, group, columns=2),
                 dp.Select(blocks=[select, select], type=dp.SelectType.TABS),
             ],
-            label="Page Tres",
+            title="Page Tres",
         ),
     )
 
@@ -160,6 +160,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     html_block = dp.HTML(html="<h1>Hello World</h1>")
     html_block_1 = dp.HTML(html=h2("Hello World"))
     code_block = dp.Code(code="print('hello')", language="python")
+    formula_block = dp.Formula(formula=r"\frac{1}{\sqrt{x^2 + 1}}")
     big_number = dp.BigNumber(heading="Tests written", value=1234)
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
@@ -179,7 +180,9 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     else:
         return dp.Report(
             dp.Page(
-                dp.Select(md_block, html_block, html_block_1, code_block, embed_block, type=dp.SelectType.TABS),
+                dp.Select(
+                    md_block, html_block, html_block_1, code_block, formula_block, embed_block, type=dp.SelectType.TABS
+                ),
                 dp.Group(big_number, big_number_1, columns=2),
             ),
             dp.Page(
@@ -310,7 +313,7 @@ def test_gen_report_complex_no_files():
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    assert_report(report, 5, 17)
+    assert_report(report, 5, 18)
 
 
 ################################################################################

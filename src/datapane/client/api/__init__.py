@@ -20,6 +20,7 @@ The core document APIs are available for both Datapane Community and Datapane Cl
     - `datapane.client.api.report.blocks.Table`
     - `datapane.client.api.report.blocks.DataTable`
     - `datapane.client.api.report.blocks.File`
+    - `datapane.client.api.report.blocks.Formula`
     - `datapane.client.api.report.blocks.BigNumber`
     - `datapane.client.api.report.blocks.Text`
     - `datapane.client.api.report.blocks.Code`
@@ -56,6 +57,7 @@ from .report.blocks import (
     DataTable,
     Embed,
     File,
+    Formula,
     HTML,
     Page,
     Plot,

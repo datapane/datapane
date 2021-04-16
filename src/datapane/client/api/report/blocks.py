@@ -20,12 +20,12 @@ from dominate.dom_tag import dom_tag
 from glom import glom
 from lxml import etree
 from lxml.builder import ElementMaker
-from micawber import ProviderException, bootstrap_basic, cache
+from lxml.etree import Element
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
 from datapane.common import PKL_MIMETYPE, NPath, guess_type
-from datapane.common.report import is_valid_id
+from datapane.common.report import conv_attribs, get_embed_url, is_valid_id
 
 from ..common import DPTmpFile
 from ..dp_object import save_df
@@ -48,6 +48,7 @@ __all__ = [
     "Code",
     "HTML",
     "File",
+    "Formula",
 ]
 
 __pdoc__ = {
@@ -85,18 +86,6 @@ class BuilderState:
         return self
 
 
-def _conv_attrib(v: t.Any) -> t.Optional[str]:
-    """
-    Convert a value to a str for use as an ElementBuilder attribute
-    - also handles None to a string for optional field values
-    """
-    # TODO - use a proper serialisation framework here / lxml features
-    if v is None:
-        return v
-    v1 = str(v)
-    return v1.lower() if isinstance(v, bool) else v1
-
-
 class BaseElement(ABC):
     """Base Block class - subclassed by all Block types
 
@@ -124,11 +113,7 @@ class BaseElement(ABC):
             self.name = name
 
     def _add_attributes(self, **kwargs):
-        # convert attributes, dropping None values
-        # TODO - uncomment when 3.8+ only
-        # self.attributes = {str(k): v1 for (k, v) in kwargs.items() if (v1 := _conv_attrib(v)) is not None}
-        new_attributes = {str(k): _conv_attrib(v) for (k, v) in kwargs.items() if _conv_attrib(v) is not None}
-        self._attributes.update(new_attributes)
+        self._attributes.update(conv_attribs(**kwargs))
 
     @abstractmethod
     def _to_xml(self, s: BuilderState) -> BuilderState:
@@ -206,17 +191,17 @@ class Page(LayoutBlock):
     # NOTE - technically a higher-level layoutblock but we keep here to maximise reuse
     _tag = "Page"
 
-    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, label: str = None):
+    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, title: str = None):
         """
         Args:
-            *arg_blocks: Page to add to report
+            *arg_blocks: Blocks to add to Page
             blocks: Allows providing the report blocks as a single list
-            label: A label used when displaying the block (optional)
+            title: The page title (optional)
 
         ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
         """
-        super().__init__(*arg_blocks, blocks=blocks, label=label)
+        super().__init__(*arg_blocks, blocks=blocks, label=title)
         self._wrap_blocks()
 
     def _wrap_blocks(self) -> None:
@@ -414,15 +399,16 @@ class Code(EmbeddedTextBlock):
 
     _tag = "Code"
 
-    def __init__(self, code: str, language: str = "python", name: str = None, label: str = None):
+    def __init__(self, code: str, language: str = "python", caption: str = None, name: str = None, label: str = None):
         """
         Args:
             code: The source code
             language: The language of the code, most common languages are supported (optional - defaults to Python)
+            caption: A caption to display below the Code (optional)
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        super().__init__(name=name, label=label, language=language)
+        super().__init__(language=language, caption=caption, name=name, label=label)
         self.content = code
 
 
@@ -444,15 +430,32 @@ class HTML(EmbeddedTextBlock):
         self.content = str(html)
 
 
+class Formula(EmbeddedTextBlock):
+    """
+    Formula blocks can be used to embed LaTeX in a report.
+    """
+
+    _tag = "Formula"
+
+    def __init__(self, formula: str, caption: str = None, name: str = None, label: str = None):
+        """
+        Args:
+            formula: The formula to embed, using LaTeX format
+            caption: A caption to display below the Formula (optional)
+            name: A unique name for the block to reference when adding text or embedding (optional)
+            label: A label used when displaying the block (optional)"""
+        super().__init__(caption=caption, name=name, label=label)
+        self.content = formula
+
+
 class Embed(EmbeddedTextBlock):
     """
     Embed blocks allow HTML from OEmbed providers (e.g. Youtube, Twitter, Vimeo) to be embedded in a report.
     """
 
     _tag = "Embed"
-    providers = bootstrap_basic(cache=cache.Cache())
 
-    def __init__(self, url: str, width: int = 640, height: int = 480, name: str = None, label: str = None):
+    def __init__(self, url: str, width: int = 960, height: int = 540, name: str = None, label: str = None):
         """
         Args:
             url: The URL of the resource to be embedded
@@ -462,21 +465,12 @@ class Embed(EmbeddedTextBlock):
             label: A label used when displaying the block (optional)
         """
 
-        try:
-            result = self.providers.request(url, maxwidth=width, maxheight=height)
-        except ProviderException:
-            raise DPError(f"No embed provider found for URL '{url}'")
-        super().__init__(
-            name=name,
-            label=label,
-            url=url,
-            title=result.get("title", "Title"),
-            provider_name=result.get("provider_name", "Embedding"),
-        )
+        result = get_embed_url(url, width=width, height=height)
+        super().__init__(name=name, label=label, url=url, title=result.title, provider_name=result.provider)
 
         # if "html" not in result:
         #     raise DPError(f"Can't embed result from provider for URL '{url}'")
-        self.content = result["html"]
+        self.content = result.html
 
 
 NumberValue = t.Union[str, int, float]
@@ -553,6 +547,7 @@ class AssetBlock(DataBlock):
 
         content_type = guess_type(self.file)
         file_size = str(self.file.stat().st_size)
+        e: Element
 
         if s.embedded:
             # load the file and embed into a data-uri
@@ -574,7 +569,7 @@ class AssetBlock(DataBlock):
             )
 
         if self.caption:
-            e.append(E.Caption(self.caption))
+            e.set("caption", self.caption)
         return s.add_element(self, e, self.file)
 
     def _save_obj(cls, data: t.Any, as_json: bool) -> DPTmpFile:

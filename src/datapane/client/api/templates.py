@@ -244,7 +244,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     )
     page_1 = b.Page(
         b.Text(basics).format(table=b.Table(gen_table_df(), caption="A table"), plot=vega_sine, other=other),
-        label="Intro",
+        title="Intro",
     )
 
     layout = """
@@ -298,7 +298,7 @@ dp.Select(group1, df)
     nested = b.Select(group1, b.Table(gen_table_df()))
     page_2 = b.Page(
         b.Text(layout).format(group1=group1, group2=group2, select1=select1, select2=select2, nested=nested),
-        label="Layout",
+        title="Layout",
     )
 
     adv_blocks = """
@@ -399,7 +399,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     )
 
     page_3 = b.Page(
-        b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, files=files), label="Blocks"
+        b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, files=files), title="Blocks"
     )
 
     return Report(page_1, page_2, page_3)
