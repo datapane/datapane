@@ -287,6 +287,7 @@ class Report(DPObjectRef):
             source_url=source_url,
             visibility=visibility.name,
             group=group,
+            type=self.report_type.value,  # set the type of report using type argument passed to the constructor
         )
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
         res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)
