@@ -107,7 +107,8 @@ class BaseElement(ABC):
         self._add_attributes(**kwargs)
 
         if "caption" in kwargs:
-            if len(kwargs["caption"]) > 512:
+            _caption = kwargs["caption"]
+            if _caption and len(_caption) > 512:
                 raise DPError("Caption must be less than 512 characters")
 
         if name:
