@@ -375,7 +375,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     tables = b.Group(
         b.Table(df1, name="table1", caption="Basic Table"),
         b.Table(styler1, name="styled-table", caption="Styled Table"),
-        b.DataTable(gen_table_df(1000000), name="data_table", caption="Interactive DataTable"),
+        b.DataTable(gen_table_df(1000), name="data_table", caption="Interactive DataTable"),
     )
     text = b.Group(
         b.Text("Hello, __world__!", name="markdown"),
