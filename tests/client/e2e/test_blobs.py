@@ -23,14 +23,13 @@ def test_blob_df():
     name = gen_name()
 
     # upload the blob
-    with deletable(dp.Blob.upload_df(df=df, visibility=visibility, name=name)) as b1:
+    with deletable(dp.Blob.upload_df(df=df, name=name)) as b1:
         # are fields added?
         check_name(b1, name)
         # was the import as expected?
         assert b1.num_rows == 4
         assert b1.num_columns == 2
         assert b1.cells == 8
-        assert b1.visibility == "PUBLIC"
 
         # download
         df1 = b1.download_df()
@@ -51,7 +50,7 @@ def test_blob_df():
 @pytest.mark.org
 def test_blob_csv_export(tmp_path: Path):
     # upload a df file
-    b1 = dp.Blob.upload_df(df, visibility=visibility, name=gen_name())
+    b1 = dp.Blob.upload_df(df, name=gen_name())
 
     with deletable(b1):
         # export back to a csv and compare
@@ -119,6 +118,6 @@ def test_blob_plot(tmp_path: Path, monkeypatch):
     plot_s = 1 + np.sin(2 * np.pi * plot_t)
     fig, ax = plt.subplots()
     ax.plot(plot_t, plot_s)
-    b1 = dp.Blob.upload_obj(data=fig, visibility=visibility, name=gen_name())
+    b1 = dp.Blob.upload_obj(data=fig, name=gen_name())
     with deletable(b1):
         pass
