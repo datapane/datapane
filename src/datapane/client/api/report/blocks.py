@@ -106,6 +106,10 @@ class BaseElement(ABC):
         self._attributes = dict()
         self._add_attributes(**kwargs)
 
+        if "caption" in kwargs:
+            if len(kwargs["caption"]) > 512:
+                raise DPError("Caption must be less than 512 characters")
+
         if name:
             # validate name
             if not is_valid_id(name):
