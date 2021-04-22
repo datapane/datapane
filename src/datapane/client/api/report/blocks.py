@@ -518,8 +518,8 @@ class BigNumber(DataBlock):
             value=value,
             change=change,
             prev_value=prev_value,
-            is_positive_intent=is_positive_intent,
-            is_upward_change=is_upward_change,
+            is_positive_intent=bool(is_positive_intent),
+            is_upward_change=bool(is_upward_change),
             name=name,
             label=label,
         )
