@@ -9,6 +9,7 @@ import enum
 import itertools
 import re
 import typing as t
+import warnings
 from abc import ABC, abstractmethod
 from base64 import b64encode
 from collections import deque
@@ -196,17 +197,27 @@ class Page(LayoutBlock):
     # NOTE - technically a higher-level layoutblock but we keep here to maximise reuse
     _tag = "Page"
 
-    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, title: str = None):
+    def __init__(
+        self,
+        *arg_blocks: BlockOrPrimitive,
+        blocks: t.List[BlockOrPrimitive] = None,
+        title: str = None,
+        label: str = None,
+    ):
         """
         Args:
             *arg_blocks: Blocks to add to Page
             blocks: Allows providing the report blocks as a single list
             title: The page title (optional)
+            label: A label used when displaying the page (optional, deprecated)
 
         ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
         """
-        super().__init__(*arg_blocks, blocks=blocks, label=title)
+        if label:
+            warnings.warn("dp.Page label= argument is deprecated, to be removed in next release, use title= instead.")
+        label = label or title
+        super().__init__(*arg_blocks, blocks=blocks, label=label)
         self._wrap_blocks()
 
     def _wrap_blocks(self) -> None:

@@ -298,7 +298,7 @@ dp.Select(group1, df)
     nested = b.Select(group1, b.Table(gen_table_df()))
     page_2 = b.Page(
         b.Text(layout).format(group1=group1, group2=group2, select1=select1, select2=select2, nested=nested),
-        title="Layout",
+        label="Layout",
     )
 
     adv_blocks = """
