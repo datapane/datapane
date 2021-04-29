@@ -7,6 +7,7 @@ from pathlib import Path
 # Typedefs
 # A JSON-serialisable config object
 SDict = t.Dict[str, t.Any]
+SSDict = t.Dict[str, str]
 SList = t.List[str]
 JSON = t.Union[str, int, float, bool, None, t.Mapping[str, "JSON"], t.List["JSON"]]
 JDict = SDict  # should be JSON

@@ -21,6 +21,7 @@ from .dp_types import (
     JList,
     NPath,
     SDict,
+    SSDict,
     SList,
     get_dp_mode,
     set_dp_mode,

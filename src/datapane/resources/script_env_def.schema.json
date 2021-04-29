@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "varNode": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "Name of the env variable",
+          "type": "string"
+        },
+          "variable": {
+              "type":"string"
+          },
+          "value": {
+              "type":"string"
+          }
+      },
+        "required": ["name"],
+        "oneOf": [
+            {"required": ["name", "value"]},
+            {"required": ["name", "variable"]}
+
+        ]
+    }
+
+  },
+  "title": "Env var field",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/varNode"
+  }
+}

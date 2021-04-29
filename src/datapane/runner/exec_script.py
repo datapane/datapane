@@ -9,14 +9,14 @@ import subprocess
 import sys
 import tarfile
 import typing as t
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from functools import partial
 from pathlib import Path
 from types import FrameType
 from typing import List, Optional
 
 import datapane.client.api as api
-from datapane.common import SDict, log
+from datapane.common import SDict, SSDict, log
 
 from .exceptions import CodeError, CodeRaisedError, CodeSyntaxError
 
@@ -27,15 +27,14 @@ ENVIRON_CONFIG = {
 RUN_NAME = "__datapane__"  # <datapane> ??
 
 
-def run(script: api.Script, user_config: SDict) -> SDict:
+def run(script: api.Script, user_config: SDict, env: SSDict) -> SDict:
     """Run a datapane python script/module"""
     api._reset_runtime(params=user_config)
-
     # use the script id for unique, isolated dir per script
     env_dir = Path(script.id)
     setup_script(script, env_dir)
 
-    with script_env(env_dir):
+    with script_env(env_dir, env):
         # script_name = str(script.script) ## <module> ?
         try:
             # run script in unpacked dir wrapped around pre/post-commands
@@ -86,7 +85,7 @@ def in_venv() -> bool:
 
 
 @contextmanager
-def script_env(env_dir: Path) -> t.ContextManager[None]:
+def script_env(env_dir: Path, env: SSDict) -> t.ContextManager[None]:
     """
     Change the local dir and add to site-path so relative files and imports work
     TODO
@@ -101,14 +100,19 @@ def script_env(env_dir: Path) -> t.ContextManager[None]:
     full_env_dir = str(env_dir.resolve())
     sys.path.insert(0, full_env_dir)
     os.chdir(full_env_dir)
+    os.environ.update(env)
     try:
         yield
     finally:
+        for env_key in env.keys():
+            with suppress(KeyError):
+                os.environ.pop(env_key)
         try:
             sys.path.remove(full_env_dir)
         except ValueError as e:
             raise CodeError("sys.path not as expected - was it modified?") from e
         os.chdir(cwd)
+
         log.debug(f"[cd] {cwd} <- {env_dir}")
         # shutil.rmtree(env_dir, ignore_errors=True)
 

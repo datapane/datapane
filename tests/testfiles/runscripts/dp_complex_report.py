@@ -1,4 +1,5 @@
 """datapane script"""
+import os
 import altair as alt
 import pandas as pd
 import datapane as dp
@@ -62,7 +63,7 @@ fig.add_trace(
 plotly_asset = dp.Plot(data=fig)
 
 # Markdown
-md_block = dp.Text(text="# Test markdown block \n Test **content**")
+md_block = dp.Text(text=f"# Test markdown block with env var: {os.environ['ENV_VAR']} \n Test **content**")
 
 # In-line JSON
 list_asset = dp.File(data=lis, is_json=True)

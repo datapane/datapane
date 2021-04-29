@@ -19,7 +19,7 @@ from typing import Optional
 
 from datapane import __version__
 from datapane.client.scripts import DatapaneCfg
-from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict
+from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict, SSDict
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
 
 from ..utils import DPError
@@ -222,14 +222,14 @@ class Script(DPObjectRef):
         fn = do_download_file(self.data_url)
         return Path(fn)
 
-    def call(self, **params):
+    def call(self, env: SSDict, **params):
         """Download, install, and call the script with the provided params"""
         # NOTE - use __call__??
         # TODO - move exec_script here?
         # TODO - call should handle param defaults
         from datapane.runner.exec_script import run
 
-        run(self, params)
+        run(self, params, env)
 
     def run(self, parameters=None, cache=True) -> Run:
         """(remote) run the given app (cloning if needed?)"""

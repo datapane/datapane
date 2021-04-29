@@ -14,7 +14,7 @@ import yaml
 
 from datapane.client import DPError
 from datapane.client.utils import MissingCloudPackagesError
-from datapane.common import SDict, log
+from datapane.common import SDict, SSDict, log
 
 # app paths
 DATAPANE_YAML = Path("datapane.yaml")
@@ -62,6 +62,8 @@ class DatapaneCfg:
     pre_commands: List[str] = dc.field(default_factory=list)
     post_commands: List[str] = dc.field(default_factory=list)
 
+    # environment variables
+    env: List[SSDict] = dc.field(default_factory=list)
     # metadata
     description: str = "Datapane Script"
     source_url: str = ""

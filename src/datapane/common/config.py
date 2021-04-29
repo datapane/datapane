@@ -9,7 +9,7 @@ from typing import Any, Dict
 
 import dacite
 
-from .dp_types import JDict, JList
+from .dp_types import JDict, JList, SSDict
 from .utils import log
 
 
@@ -24,6 +24,7 @@ class RunnerConfig:
 
     script_id: str = ""
     config: JDict = dc.field(default_factory=dict)
+    env: SSDict = dc.field(default_factory=dict)
     formats: JDict = dc.field(default_factory=dict)
 
     def _format(self, format: str, v: Any) -> Any:

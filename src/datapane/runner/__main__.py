@@ -40,7 +40,7 @@ def run_api(run_config: RunnerConfig) -> RunResult:
         )
 
     # TODO - we should pull param defaults from script and add in the call
-    script.call(**run_config.format())
+    script.call(run_config.env, **run_config.format())
 
     # create the RunResult
     script_result = str(api.Result.get()) if api.Result.exists() else None

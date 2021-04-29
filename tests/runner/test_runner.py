@@ -14,7 +14,7 @@ import datapane as dp
 from datapane.client.api.runtime import _report
 from datapane.client.scripts import build_bundle, DatapaneCfg
 from datapane.common.config import RunnerConfig
-from datapane.common import SDict
+from datapane.common import SDict, SSDict
 from datapane.runner import __main__ as m
 from datapane.runner.exec_script import exec_mod
 from datapane.runner.typedefs import RunResult
@@ -82,7 +82,7 @@ def mock_report_publish(self, **kwargs):
 
 
 @mock.patch("datapane.client.api.Script", new=MockScript)
-def _runner(params: SDict, script: Path, sdist: Path = Path(".")) -> RunResult:
+def _runner(params: SDict, env: SSDict, script: Path, sdist: Path = Path(".")) -> RunResult:
     with mock.patch.object(MockScript, "script", new_callable=mock.PropertyMock) as ep, mock.patch.object(
         MockScript, "download_pkg"
     ) as dp:
@@ -91,7 +91,7 @@ def _runner(params: SDict, script: Path, sdist: Path = Path(".")) -> RunResult:
         dp.return_value = sdist
 
         # main fn
-        x = RunnerConfig(script_id="ZBAmDk1", config=params)
+        x = RunnerConfig(script_id="ZBAmDk1", config=params, env=env)
         res = m.run_api(x)
         return res
 
@@ -106,11 +106,12 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
     monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")
     monkeypatch.setenv("DATAPANE_BY_DATAPANE", "true")
+    monkeypatch.setenv("ENV_VAR", "env value")
 
     @mock.patch("datapane.runner.exec_script.script_env", autospec=True)
     def f(val: str, script_env):
         # test twice to ensure stateful params are handled correctly
-        res = _runner({"p1": val}, Path("dp_script.py"))
+        res = _runner({"p1": val}, {"ENV_VAR": "env_value"}, Path("dp_script.py"))
         # (out, err) = capsys.readouterr()
         (out, err) = capfd.readouterr()
         assert "on datapane" not in out
@@ -122,7 +123,7 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
         _r: dp.Report = rc_args[0]
         _blocks = _r.pages[0].blocks[0].blocks
         assert isinstance(_blocks, list)
-        assert len(_blocks) == 2
+        assert len(_blocks) == 3
         assert val in _blocks[0].content
         assert res.report_id == "ABC"
         # pre/post commands
@@ -145,7 +146,9 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
         # whl_file = build_bundle(dp_config, sdist, shared_datadir, username="test", version=1)
         try:
             # NOTE - need to pass in all params as we're not setting defaults via dp-server
-            res = _runner({"p1": "VAL", "p2": "xyz", "p3": True}, dp_config.script, sdist=sdist)
+            res = _runner(
+                {"p1": "VAL", "p2": "xyz", "p3": True}, {"ENV_VAR": "env_value"}, dp_config.script, sdist=sdist
+            )
         finally:
             subprocess.run([sys.executable, "-m", "pip", "uninstall", "--yes", "pytil"], check=True)
     # asserts

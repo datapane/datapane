@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 # import system datapane, not local file
@@ -16,7 +17,7 @@ except ImportError:
 
 print("ran script")
 print(f"p2={dp.Params['p2']}")
-
+print(f"{os.environ['ENV_VAR']}")
 # data bundling, using __file__ and cwd lookup
 c_txt = (Path(__file__).parent / "c.json").read_text()
 c_txt_rel = Path("c.json").read_text()
