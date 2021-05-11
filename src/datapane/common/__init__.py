@@ -12,6 +12,7 @@ from .dp_types import (
     PKL_MIMETYPE,
     SECS_1_HOUR,
     SECS_1_WEEK,
+    SIZE_1_MB,
     TD_1_DAY,
     TD_1_HOUR,
     URL,

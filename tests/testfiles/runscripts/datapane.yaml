@@ -2,3 +2,6 @@ name: dp Test Script
 script: dp_script.py
 parameters:
   - {"name":"p1", "type": "string"}
+env:
+  - name: ENV_VAR
+    value: env_value

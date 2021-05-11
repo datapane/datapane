@@ -67,6 +67,10 @@ def default_analytics_state(server: str, old_state: bool = True) -> bool:
     f = furl(server)
     return "datapane" == f.host.split(".")[-2]
 
+    @property
+    def is_public(self) -> bool:
+        return self.server == DEFAULT_SERVER
+
 
 # TODO - wrap into a singleton object that includes callable?
 config: Optional[Config] = None

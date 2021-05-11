@@ -115,7 +115,7 @@ class ReportFileWriter:
         global SKIP_DISPLAY_MSG
 
         # only display once per session, else skip
-        if SKIP_DISPLAY_MSG:
+        if SKIP_DISPLAY_MSG or not c.config.is_public:
             return None
         else:
             SKIP_DISPLAY_MSG = True

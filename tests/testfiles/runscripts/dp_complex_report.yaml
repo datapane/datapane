@@ -2,7 +2,6 @@ name: DP Complex Report
 script: dp_complex_report.py
 include:
   - datapane-logo.png
-
 env:
   - name: ENV_VAR
     value: env_value
