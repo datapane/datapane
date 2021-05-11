@@ -1,5 +1,6 @@
 import dataclasses as dc
 import typing as t
+import uuid
 import webbrowser
 from contextlib import contextmanager
 from pathlib import Path
@@ -29,6 +30,9 @@ def get_default_config() -> str:
 server: {DEFAULT_SERVER}
 token: {DEFAULT_TOKEN}
 username: ''
+session_id: {uuid.uuid4().hex}
+# set to false to not send analytics data
+analytics: true
 """
 
 
@@ -48,6 +52,20 @@ class Config:
     server: str
     token: str
     username: str = ""
+    session_id: str = ""
+    analytics: bool = True
+
+
+def default_analytics_state(server: str, old_state: bool = True) -> bool:
+    from .api import by_datapane
+
+    if old_state is False or by_datapane:
+        return False
+    # Temp: Remove this after testing
+    if "localhost" in server:
+        return True
+    f = furl(server)
+    return "datapane" == f.host.split(".")[-2]
 
 
 # TODO - wrap into a singleton object that includes callable?
@@ -104,12 +122,10 @@ def load_from_envfile(config_env: str) -> Path:
     """Init the cmd-line env"""
     global last_config_env
     last_config_env = config_env
-
     config_f = get_config_file(config_env)
 
     with config_f.open("r") as f:
         c_yaml = yaml.safe_load(f)
-
     # load config obj from file
     c_obj = dacite.from_dict(Config, c_yaml)
     # log.debug(f"Read config as {c_obj}")
@@ -118,8 +134,25 @@ def load_from_envfile(config_env: str) -> Path:
     return config_f
 
 
+def update_config_with_analytics():
+    from .api import ping
+
+    config = get_config()
+    # if the config is old(i,e: does not have session_id), update it.
+    if config.session_id == "":
+        with update_config(last_config_env) as x:
+            x["session_id"] = uuid.uuid4().hex
+            x["analytics"] = default_analytics_state(config.server)
+
+        # If the user was already logged in call ping to generate alias on the server
+        if config.username:
+            ping(cli_login=True)
+
+
 def init(config_env: str = "default", config: t.Optional[Config] = None):
     """Init an API config - this MUST handle being called multiple times"""
+    from .analytics import capture_init
+
     if get_config() is not None:
         log.debug("Reinitialising client config")
 
@@ -128,3 +161,6 @@ def init(config_env: str = "default", config: t.Optional[Config] = None):
     else:
         config_f = load_from_envfile(config_env)
         log.debug(f"Loaded client environment from {config_f}")
+    # TODO: find a better place for this
+    update_config_with_analytics()
+    capture_init()

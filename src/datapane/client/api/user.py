@@ -13,6 +13,7 @@ $ datapane logout
 """
 
 import typing as t
+import uuid
 
 import requests
 from furl import furl
@@ -20,12 +21,14 @@ from furl import furl
 from datapane import __version__
 
 from .. import config as c
+from ..analytics import capture_event
 from ..utils import success_msg
 from .common import _process_res
 
 __all__ = ["login", "logout"]
 
 
+@capture_event("CLI Login")
 def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True) -> str:
     """
     Login to the specified Datapane Server, storing the token within a config-file called `env` for future use
@@ -41,7 +44,10 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
 
     ..note:: Can also be ran via CLI as `"datapane login"`
     """
-    config = c.Config(server=server, token=token)
+    old_config = c.get_config()
+    session_id = old_config.session_id if token == old_config.token else uuid.uuid4().hex
+    config = c.Config(server=server, token=token, session_id=session_id)
+
     username = ping(config=config, cli_login=cli_login)
 
     # update config with valid values
@@ -49,6 +55,10 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
         x["server"] = server
         x["token"] = token
         x["username"] = username
+        x["session_id"] = session_id
+
+        # disable analytics(if enabled) on non datapane servers
+        x["analytics"] = c.default_analytics_state(server, old_config.analytics)
     return username
 
 
@@ -73,8 +83,10 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:
     endpoint = "/api/settings/details/"
     f = furl(path=endpoint, origin=config.server)
     headers = dict(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
-    r = requests.get(str(f), headers=headers, params=dict(cli_login=cli_login))
-
+    q_params = dict(cli_id=config.session_id) if cli_login else {}
+    r = requests.get(str(f), headers=headers, params=q_params)
     username = _process_res(r).username
+
     success_msg(f"Connected successfully to {config.server} as {username}")
+
     return username

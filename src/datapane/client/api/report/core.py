@@ -20,6 +20,7 @@ from lxml import etree
 from lxml.etree import Element
 
 from datapane.client import config as c
+from datapane.client.analytics import capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
@@ -300,11 +301,11 @@ class Report(DPObjectRef):
         _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
-
         display_msg(
             text=f"Report successfully published at {self.web_url} - you can edit and add additional text from the link"
         )
 
+    @capture_event("Report Save")
     def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
         """Save the report document to a local HTML file
 
@@ -326,6 +327,7 @@ class Report(DPObjectRef):
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
+    @capture_event("Report Preview")
     def preview(self, width: int = 960, height: int = 700):
         """
         Preview the document inside your currently running Jupyter notebook

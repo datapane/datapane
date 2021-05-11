@@ -18,7 +18,7 @@ from tabulate import tabulate
 from datapane import __rev__, __version__
 from datapane.common import SDict, _setup_dp_logging, log
 
-from . import api
+from . import analytics, api
 from . import config as c
 from . import scripts, utils
 from .scripts import config as sc
@@ -77,14 +77,17 @@ class GlobalCommandHandler(click.Group):
         try:
             return self.main(*args, **kwargs)
         except utils.IncompatibleVersionError as e:
+            analytics.capture("CLI Error", dict(msg=str(e)))
             if EXTRA_OUT:
                 log.exception(e)
             failure_msg(str(e))
         except HTTPError as e:
+            analytics.capture("CLI Error", dict(msg=str(e)))
             if EXTRA_OUT:
                 log.exception(e)
             failure_msg(utils.add_help_text(str(e)), do_exit=True)
         except Exception as e:
+            analytics.capture("CLI Error", dict(msg=str(e)))
             if EXTRA_OUT:
                 log.exception(e)
             failure_msg(utils.add_help_text(str(e)), do_exit=True)

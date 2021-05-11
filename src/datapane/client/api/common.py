@@ -21,7 +21,7 @@ from urllib import parse as up
 import click
 import requests
 from furl import furl
-from munch import munchify
+from munch import Munch, munchify
 from packaging.version import Version
 from requests import HTTPError, Response  # noqa: F401
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
@@ -126,7 +126,7 @@ def check_pip_version() -> None:
     raise IncompatibleVersionError(error_msg)
 
 
-def _process_res(r: Response, empty_ok: bool = False) -> JSON:
+def _process_res(r: Response, empty_ok: bool = False) -> t.Union[Munch, JSON]:
     if not r.ok:
         # check if upgrade is required
         if r.status_code == 426:
