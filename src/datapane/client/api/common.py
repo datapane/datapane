@@ -166,7 +166,7 @@ class Resource:
         self.url = up.urljoin(config.server, f"api{self.endpoint}")
         # check if access to the resource is allowed
         self._check_endpoint(self.url)
-        self.session.headers.update(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
+        self.session.headers.update({"Authorization": f"Token {config.token}", "Datapane-API-Version": __version__})
 
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the basic instance

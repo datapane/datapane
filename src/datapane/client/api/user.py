@@ -82,7 +82,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:
     config = config or c.check_get_config()
     endpoint = "/api/settings/details/"
     f = furl(path=endpoint, origin=config.server)
-    headers = dict(Authorization=f"Token {config.token}", Datapane_API_Version=__version__)
+    headers = {"Authorization": f"Token {config.token}", "Datapane-API-Version": __version__}
     q_params = dict(cli_id=config.session_id) if cli_login else {}
     r = requests.get(str(f), headers=headers, params=q_params)
     username = _process_res(r).username
