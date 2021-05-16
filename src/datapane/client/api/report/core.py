@@ -213,7 +213,7 @@ class Report(DPObjectRef):
             has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
             if not has_text:
                 display_msg(
-                    "Your report doesn't contain any text - did you know you can add text to your report once published?"
+                    "Your report doesn't contain any text - did you know you can add text to your report from your browser once published?"
                 )
 
             single_block = processed_report_doc.xpath("count(/Report/Main//*)") < 4

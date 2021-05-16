@@ -17,7 +17,7 @@ from datapane.common import NPath
 from .report import blocks as b
 from .report.core import Report
 
-__all__ = ["add_code", "add_header", "add_footer", "build_md_report", "build_demo_report"]
+__all__ = ["add_code", "add_header", "add_footer", "build_md_report", "build_demo_report", "gen_df", "gen_table_df"]
 
 
 def _map_page_blocks(page: b.Page, f: t.Callable[[b.BlockList], b.BlockList]) -> b.Page:
@@ -118,6 +118,19 @@ def add_footer(report: Report, footer: b.BlockOrPrimitive, all_pages: bool = Tru
     )
 
 
+def gen_df(dim: int = 4) -> pd.DataFrame:
+    """Return a test simple df"""
+    axis = [i for i in range(0, dim)]
+    data = {"x": axis, "y": axis}
+    return pd.DataFrame.from_dict(data)
+
+
+def gen_table_df(rows: int = 4, alphabet: str = "ABCDEF") -> pd.DataFrame:
+    """Return a test complex df for adding to a DataTable"""
+    data = [{x: random.randint(0, 1000) for x in alphabet} for _ in range(0, rows)]
+    return pd.DataFrame.from_dict(data)
+
+
 def build_demo_report() -> Report:
     """
     Generate a sample demo report
@@ -132,11 +145,6 @@ def build_demo_report() -> Report:
     import plotly.graph_objects as go  # noqa
     from bokeh.plotting import figure  # noqa
     import folium  # noqa
-
-    def gen_df(dim: int = 4) -> pd.DataFrame:
-        axis = [i for i in range(0, dim)]
-        data = {"x": axis, "y": axis}
-        return pd.DataFrame.from_dict(data)
 
     def gen_bokeh(**kw):
         p = figure(title="simple line example", x_axis_label="x", y_axis_label="y", **kw)
@@ -169,10 +177,6 @@ def build_demo_report() -> Report:
 
     def color_large_vals(s):
         return ["background-color: rgba(255, 0, 0, 0.3)" if val > 800 else "" for val in s]
-
-    def gen_table_df(rows: int = 4, alphabet: str = "ABCDEF") -> pd.DataFrame:
-        data = [{x: random.randint(0, 1000) for x in alphabet} for _ in range(0, rows)]
-        return pd.DataFrame.from_dict(data)
 
     def gen_folium():
         return folium.Map(location=[45.372, -121.6972], zoom_start=12, tiles="Stamen Terrain")

@@ -4,23 +4,16 @@ import uuid
 from contextlib import contextmanager
 from typing import ContextManager
 
-import pandas as pd
 import pytest
 import stringcase
 
 from datapane.client.api import HTTPError
 from datapane.client.api.dp_object import U
+from datapane.client.api.templates import gen_df  # noqa
 
 code: str = """
 print("hello world")
 """
-
-
-def gen_df(n: int = 4) -> pd.DataFrame:
-    """Build a (reproducible) df of 2 cols and n rows"""
-    axis = [i for i in range(0, n)]
-    data = {"x": axis, "y": axis}
-    return pd.DataFrame.from_dict(data)
 
 
 def gen_name(n=10):

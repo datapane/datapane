@@ -1,8 +1,8 @@
 """datapane script"""
 import os
 import altair as alt
-import pandas as pd
 import datapane as dp
+from datapane.client.api.templates import gen_df
 from bokeh.plotting import figure
 from pathlib import Path
 import folium
@@ -10,12 +10,6 @@ import plotly.graph_objects as go
 from matplotlib.collections import EventCollection
 import matplotlib.pyplot as plt
 import numpy as np
-
-
-def gen_df(dim: int = 4) -> pd.DataFrame:
-    axis = [i for i in range(0, dim)]
-    data = {"x": axis, "y": axis}
-    return pd.DataFrame.from_dict(data)
 
 
 lis = [1, 2, 3]
