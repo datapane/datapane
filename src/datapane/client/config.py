@@ -87,6 +87,10 @@ def get_config() -> Config:
     return config
 
 
+def is_public() -> bool:
+    return get_config().server == DEFAULT_SERVER
+
+
 def check_get_config() -> Config:
     """Attempt to get a config object, reloading if necessary"""
     global config

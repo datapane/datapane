@@ -35,6 +35,7 @@ from datapane.client.utils import (
     failure_msg,
 )
 from datapane.common import JSON, MIME, NPath, guess_type
+from datapane.common.dp_types import MB_1
 from datapane.common.utils import compress_file, log
 
 __all__ = []
@@ -204,11 +205,13 @@ class Resource:
 
         e = MultipartEncoder(fields=fields)
         extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
-        if e.len > 25 * 1e6:  # 25 MB
+
+        max_size = 25 if c.is_public() else 100
+        if e.len > max_size * MB_1:
             raise ReportTooLargeError(
-                "Report and attachments over 25MB after compression - please reduce the size of your charts/plots"
+                f"Report and attachments over f{max_size} MB after compression (~{e.len/MB_1:.1f} MB) - please reduce the size of your charts/plots"
             )
-        elif e.len > 1e6:  # 1 MB
+        elif e.len > MB_1:
             log.debug("Using upload monitor")
             fill_char = click.style("=", fg="yellow")
             with click.progressbar(
