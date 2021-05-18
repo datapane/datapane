@@ -456,10 +456,15 @@ class Formula(EmbeddedTextBlock):
     def __init__(self, formula: str, caption: str = None, name: str = None, label: str = None):
         """
         Args:
-            formula: The formula to embed, using LaTeX format
+            formula: The formula to embed, using LaTeX format (use raw strings)
             caption: A caption to display below the Formula (optional)
             name: A unique name for the block to reference when adding text or embedding (optional)
-            label: A label used when displaying the block (optional)"""
+            label: A label used when displaying the block (optional)
+
+            ..note:: LaTeX commonly uses special characters, hence prefix your formulas with `r` to make them
+            raw strings, e.g. r"\frac{1}{\sqrt{x^2 + 1}}"
+        """
+
         super().__init__(caption=caption, name=name, label=label)
         self.content = formula
 

@@ -119,17 +119,23 @@ class Config:
                 ping(config=self, cli_login=True)
 
     @staticmethod
-    def default_analytics_state(server: str, old_state: bool = True) -> bool:
+    def default_analytics_state(server: str, prev_val: bool = True) -> bool:
         """Determine the initial state for analytics if not already set"""
         from .api import by_datapane
 
-        if old_state is False or by_datapane or _IN_PYTEST or _IN_DPSERVER:
+        # disable is prev disabled or in certain envs
+        if prev_val is False or by_datapane or _IN_PYTEST or _IN_DPSERVER:
             return False
-        # Temp: Remove this after testing
-        if "localhost" in server:
-            return True
+
         f = furl(server)
-        return "datapane" == f.host.split(".")[-2]
+        # disable for localhost
+        if f.host == "localhost":
+            return False
+        # disable for non-managed
+        if f.host.split(".")[-2] != "datapane":
+            return False
+
+        return True
 
 
 # TODO - create a ConfigMgr singleton object?
