@@ -231,7 +231,7 @@ dp.Plot(altair_plot, caption="A Plot")
 
 ## Other Blocks
 
-Datapane has many other block types, including files, embeds, images, and big numbers - see the Blocks page for more info.
+Datapane has many other block types, including formulas, files, embeds, images, and big numbers - see the Blocks page for more info.
 
 Additionally layout blocks provide the ability nest blocks to create groups of columns and user selections - see the Layout page for more info.
 
@@ -243,6 +243,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     other = b.Group(
         b.File(file=logo),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
+        b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}"),
         rows=1,
         columns=0,
     )
@@ -336,6 +337,7 @@ dp.DataTable(df, caption="Interactive DataTable")
 ```python
 dp.Text("Hello, __world__!")
 dp.Code("print('Hello, world!')")
+dp.Formula(r"\\frac{1}{\sqrt{x^2 + 1}}")
 dp.HTML("<h1>Hello World</h1>")
 dp.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True)
 ```
@@ -384,6 +386,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
     text = b.Group(
         b.Text("Hello, __world__!", name="markdown"),
         b.Code("print('Hello, world!'", name="code"),
+        b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}"),
         b.HTML("<h1>Hello World</h1>", name="HTML"),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True, name="big_num"),
         rows=1,
