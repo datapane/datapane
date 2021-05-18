@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Optional
+
 import pytest
 
 import datapane as dp
@@ -11,28 +14,27 @@ def test_auth():
     """Test API-based auth"""
     TEST_ENV = "test_env"
 
-    fp = c.get_config_file(TEST_ENV, reset=True)
-
+    fp: Optional[Path] = None
     try:
         dp.init(config_env=TEST_ENV)
 
-        # check the config env file is default
-        assert fp.read_text() == c.get_default_config()
+        config = c.get_config()
+        fp = config._path
 
+        # check the config env file can't login and is the default
+        assert config.token == c.DEFAULT_TOKEN
         with pytest.raises(InvalidTokenError):
             dp.ping()
 
         # login
-        dp.login(token=TEST_TOKEN, server=TEST_SERVER, env=TEST_ENV, cli_login=False)
-        assert "datapane-test" == dp.ping()
+        username = dp.login(token=TEST_TOKEN, server=TEST_SERVER, env=TEST_ENV, cli_login=False)
+        assert username == "datapane-test"
         # logout
         dp.logout(env=TEST_ENV)
 
-        # check we've reset the config env file back to default
-        assert fp.read_text() == c.get_default_config()
+        # check we've remove the config env file
+        assert not fp.exists()
 
-        with pytest.raises(InvalidTokenError):
-            dp.ping()
     finally:
-        if fp.exists():
+        if fp and fp.exists():
             fp.unlink()

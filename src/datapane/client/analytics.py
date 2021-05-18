@@ -22,27 +22,22 @@ def capture(event: str, properties: Optional[dict] = None):
     config = c.get_config()
     if not config.analytics:
         return None
-    t_user_id = config.session_id
     with suppress(Exception):
-        posthog.capture(t_user_id, event, properties)
+        posthog.capture(config.session_id, event, properties)
 
 
-def _identify(distinct_id: str, properties: Optional[dict] = None):
+def identify(session_id: str, properties: Optional[dict] = None):
     properties = properties or {}
     properties.update(os=platform.system(), python_version=platform.python_version(), dp_version=datapane.__version__)
     with suppress(Exception):
-        posthog.identify(distinct_id, properties)
+        posthog.identify(session_id, properties)
 
 
-def capture_init():
+def capture_init(config: c.Config):
     # Generates an identify event on init
-
-    config = c.get_config()
     if not config.analytics:
         return
-
-    distinct_id = config.session_id
-    _identify(distinct_id)
+    identify(config.session_id)
 
 
 def capture_event(name: str):
@@ -50,8 +45,10 @@ def capture_event(name: str):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            capture(name)
-            f(*args, **kwargs)
+            try:
+                return f(*args, **kwargs)
+            finally:
+                capture(name)
 
         return wrapper
 

@@ -13,7 +13,6 @@ $ datapane logout
 """
 
 import typing as t
-import uuid
 
 import requests
 from furl import furl
@@ -25,7 +24,7 @@ from ..analytics import capture_event
 from ..utils import success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout"]
+__all__ = ["login", "logout", "ping"]
 
 
 @capture_event("CLI Login")
@@ -44,21 +43,13 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
 
     ..note:: Can also be ran via CLI as `"datapane login"`
     """
-    old_config = c.get_config()
-    session_id = old_config.session_id if token == old_config.token else uuid.uuid4().hex
-    config = c.Config(server=server, token=token, session_id=session_id)
-
+    config = c.Config(server=server, token=token)
     username = ping(config=config, cli_login=cli_login)
 
     # update config with valid values
-    with c.update_config(env) as x:
-        x["server"] = server
-        x["token"] = token
-        x["username"] = username
-        x["session_id"] = session_id
-
-        # disable analytics(if enabled) on non datapane servers
-        x["analytics"] = c.default_analytics_state(server, old_config.analytics)
+    config.username = username
+    config.save(env=env)
+    c.init(config=config)
     return username
 
 
@@ -72,8 +63,11 @@ def logout(env: str = c.DEFAULT_ENV) -> None:
     ..note:: Can also be ran via CLI as `"datapane logout"`
     """
     success_msg(f"Logged out from {c.config.server}")
-    c.get_config_file(env=env, reset=True)
-    c.init(config_env=env)
+    # TODO - remove this assert
+    assert c.config._env == env
+    c.config.remove()
+    c.set_config(None)  # ??
+    c.init(config_env=c.DEFAULT_ENV)
 
 
 def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:

@@ -34,8 +34,7 @@ from datapane.client.utils import (
     UnsupportedResourceError,
     failure_msg,
 )
-from datapane.common import JSON, MIME, NPath, guess_type
-from datapane.common.dp_types import MB_1
+from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
 __all__ = []
@@ -206,12 +205,12 @@ class Resource:
         e = MultipartEncoder(fields=fields)
         extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
 
-        max_size = 25 if c.is_public() else 100
-        if e.len > max_size * MB_1:
+        max_size = 25 if c.config.is_public else 100
+        if e.len > max_size * SIZE_1_MB:
             raise ReportTooLargeError(
-                f"Report and attachments over f{max_size} MB after compression (~{e.len/MB_1:.1f} MB) - please reduce the size of your charts/plots"
+                f"Report and attachments over f{max_size} MB after compression (~{e.len/SIZE_1_MB:.1f} MB) - please reduce the size of your charts/plots"
             )
-        elif e.len > MB_1:
+        elif e.len > SIZE_1_MB:
             log.debug("Using upload monitor")
             fill_char = click.style("=", fg="yellow")
             with click.progressbar(

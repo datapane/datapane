@@ -29,15 +29,14 @@ TD_1_DAY = timedelta(days=1)
 SECS_1_HOUR: int = int(TD_1_HOUR.total_seconds())
 SECS_1_WEEK: int = int(timedelta(weeks=1).total_seconds())
 SIZE_1_MB: int = 1024 * 1024
-MB_1 = 1e6
 
 
 class DPMode(enum.Enum):
     """DP can operate in multiple modes as specified by this Enum"""
 
-    APP = enum.auto()
-    LIBRARY = enum.auto()
-    FRAMEWORK = enum.auto()
+    APP = enum.auto()  # run from the cmd-line
+    LIBRARY = enum.auto()  # imported into a process
+    FRAMEWORK = enum.auto()  # running dp-runner
 
 
 # default in Library mode
