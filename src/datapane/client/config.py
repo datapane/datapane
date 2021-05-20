@@ -7,6 +7,7 @@ import dataclasses as dc
 import typing as t
 import uuid
 import webbrowser
+from contextlib import suppress
 from pathlib import Path
 from typing import Optional
 
@@ -15,7 +16,7 @@ import dacite
 import yaml
 from furl import furl
 
-from datapane import _IN_DPSERVER, _IN_PYTEST, log
+from datapane import _IN_PYTEST, log
 
 from .utils import InvalidTokenError
 
@@ -36,23 +37,17 @@ class Config:
     token: str = DEFAULT_TOKEN
     username: str = ""
     session_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
-    analytics: bool = True
     version: int = 1
 
     _env: t.ClassVar[Optional[str]]
     _path: t.ClassVar[Optional[Path]]
 
     def __post_init__(self):
-        # NOTE - could make env an optional initvar
-        self.analytics = self.default_analytics_state(self.server, self.analytics)
+        self.server = self.server.rstrip("/")  # server should be a valid origin
 
     @property
     def is_public(self) -> bool:
         return self.server == DEFAULT_SERVER
-
-    def disable_analytics(self):
-        self.analytics = False
-        self.save()
 
     # MANAGER functions
     @classmethod
@@ -86,7 +81,7 @@ class Config:
         # create default file
         _config = Config()
         _config.save(env)
-        log.debug(f"Creating default config file at {config_f}")
+        log.info(f"Created config file at {config_f}")
         capture_init(_config)
 
     def save(self, env: t.Optional[str] = None):
@@ -107,35 +102,20 @@ class Config:
     def upgrade_config_format(self):
         """Handles updating the older config format"""
         # migrate older config files
-        if self.version == 1:  # self.session_id == "":
-            self.analytics = self.default_analytics_state(self.server)
-            self.version = 2
-            self.save()
+        if self.version == 1:
+            from .analytics import capture_init
 
-            # If the user was already logged in call ping to generate alias on the server
-            if self.username:
+            self.version = 2
+
+            # If token exists check still valid and can login
+            if self.token and self.token != DEFAULT_TOKEN:
                 from .api import ping
 
-                ping(config=self, cli_login=True)
+                with suppress(Exception):
+                    self.username = ping(config=self, cli_login=True, verbose=False)
 
-    @staticmethod
-    def default_analytics_state(server: str, prev_val: bool = True) -> bool:
-        """Determine the initial state for analytics if not already set"""
-        from .api import by_datapane
-
-        # disable is prev disabled or in certain envs
-        if prev_val is False or by_datapane or _IN_PYTEST or _IN_DPSERVER:
-            return False
-
-        f = furl(server)
-        # disable for localhost
-        if f.host == "localhost":
-            return False
-        # disable for non-managed
-        if f.host.split(".")[-2] != "datapane":
-            return False
-
-        return True
+            capture_init(self)
+            self.save()
 
 
 # TODO - create a ConfigMgr singleton object?

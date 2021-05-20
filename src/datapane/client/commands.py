@@ -76,21 +76,14 @@ class GlobalCommandHandler(click.Group):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
-        except utils.IncompatibleVersionError as e:
-            analytics.capture("CLI Error", dict(msg=str(e)))
-            if EXTRA_OUT:
-                log.exception(e)
-            failure_msg(str(e))
-        except HTTPError as e:
-            analytics.capture("CLI Error", dict(msg=str(e)))
-            if EXTRA_OUT:
-                log.exception(e)
-            failure_msg(utils.add_help_text(str(e)), do_exit=True)
         except Exception as e:
-            analytics.capture("CLI Error", dict(msg=str(e)))
+            analytics.capture("CLI Error", dict(msg=str(e), type=str(type(e))))
             if EXTRA_OUT:
                 log.exception(e)
-            failure_msg(utils.add_help_text(str(e)), do_exit=True)
+            if isinstance(e, utils.DPError):
+                failure_msg(str(e))
+            else:
+                failure_msg(utils.add_help_text(str(e)), do_exit=True)
 
 
 def recursive_help(cmd, parent=None):

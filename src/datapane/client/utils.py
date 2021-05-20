@@ -10,17 +10,13 @@ from datapane.common import JDict
 
 
 def add_help_text(x: str) -> str:
-    return f"{x}\nPlease run with `dp.enable_logging()`, or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
+    return f"{x}\nPlease run with `dp.enable_logging()`, restart your Jupyter kernel/Python instance, and/or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
 
 
 class DPError(Exception):
     def __str__(self):
         # update the error message with help text
-        x = list(self.args)
-        x[0] = add_help_text(x[0])
-        self.args = tuple(x)
-
-        return super().__str__()
+        return add_help_text(super().__str__())
 
 
 class IncompatibleVersionError(DPError):

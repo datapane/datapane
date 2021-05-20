@@ -16,6 +16,9 @@ __version__ = "0.11.3"
 _TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
 _IN_PYTEST = "pytest" in sys.modules
 _IN_DPSERVER = "dp" in sys.modules
+# we're running on datapane platform
+ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
+
 
 # Other useful re-exports
 from .common.utils import enable_logging, log, _setup_dp_logging
@@ -52,7 +55,6 @@ from .client.api import (
     by_datapane,
     login,
     logout,
-    on_datapane,
     ping,
     templates,
 )

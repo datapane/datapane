@@ -161,6 +161,8 @@ class Resource:
     timeout = None if _TEST_ENV else (6.10, 54)
 
     def __init__(self, endpoint: str):
+        # drop /api if exists
+        # TODO - use furl for paths here
         self.endpoint = endpoint.split("/api", maxsplit=1)[-1]
         config = c.check_get_config()
         self.url = up.urljoin(config.server, f"api{self.endpoint}")

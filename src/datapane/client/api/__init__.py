@@ -67,7 +67,7 @@ from .report.blocks import (
     Table,
 )
 from .report.core import Report, ReportType, Visibility
-from .runtime import Params, Result, by_datapane, on_datapane, _reset_runtime, _report
+from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionError
 from ..config import init

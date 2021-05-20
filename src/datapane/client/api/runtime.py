@@ -10,6 +10,7 @@ import typing as t
 from collections import deque
 from pathlib import Path
 
+from datapane import ON_DATAPANE
 from datapane.client.scripts import DATAPANE_YAML, DatapaneCfg
 from datapane.common import NPath, SDict, log
 
@@ -24,10 +25,9 @@ if t.TYPE_CHECKING:
 __all__ = []
 
 
-# we're running on datapane platform
-on_datapane: bool = "DATAPANE_ON_DATAPANE" in os.environ
 # we're running the datapane runner (also checked by __name__ == "__datapane__" in user script)
-by_datapane: bool = on_datapane or "DATAPANE_BY_DATAPANE" in os.environ
+# NOTE - is this materially different to ON_DATAPANE?
+by_datapane: bool = ON_DATAPANE or "DATAPANE_BY_DATAPANE" in os.environ
 
 _report: t.Deque["Report"] = deque(maxlen=1)
 

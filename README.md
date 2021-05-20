@@ -131,7 +131,30 @@ Datapane Cloud is offered as both a managed SaaS service and an on-prem install.
 
 # Analytics
 
-By default, the Datapane Python library collects error reports and usage telemetry. This is used by us to make the product better and fix bugs. If you would like to disable this, add `analytics: false` to your Datapane config file.
+By default, the Datapane Python library collects error reports and usage telemetry.
+This is used by us to help make the product better and to fix bugs.
+If you would like to disable this, simply create a file called `no_analytics` in your `datapane` config directory, e.g.
+
+### Linux
+
+```bash
+$ mkdir -p ~/.config/datapane && touch ~/.config/datapane/no_analytics
+```
+
+### macOS
+
+```bash
+$ mkdir -p ~/Library/Application\ Data/datapane && touch ~/Library/Application\ Data/no_analytics
+```
+
+### Windows (PowerShell)
+
+```powershell
+PS> mkdir ~/AppData/Roaming/datapane -ea 0
+PS> ni ~/AppData/Roaming/datapane/no_analytics -ea 0
+```
+
+You may need to try `~/AppData/Local` instead of `~/AppData/Roaming` on certain Windows configurations depending on the type of your user-account.
 
 # Joining the community
 

@@ -70,7 +70,7 @@ def logout(env: str = c.DEFAULT_ENV) -> None:
     c.init(config_env=c.DEFAULT_ENV)
 
 
-def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:
+def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: bool = True) -> str:
     """Ping the Datapane Server to check login credentials"""
     # hardcode ping check as used for login/logout logic independent of main API requests
     config = config or c.check_get_config()
@@ -81,6 +81,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False) -> str:
     r = requests.get(str(f), headers=headers, params=q_params)
     username = _process_res(r).username
 
-    success_msg(f"Connected successfully to {config.server} as {username}")
+    if verbose:
+        success_msg(f"Connected successfully to {config.server} as {username}")
 
     return username
