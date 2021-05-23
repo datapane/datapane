@@ -243,7 +243,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     other = b.Group(
         b.File(file=logo),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
-        b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}"),
+        b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}", caption="Simple formula"),
         rows=1,
         columns=0,
     )
@@ -303,10 +303,10 @@ dp.Select(group1, df)
     nested = b.Select(group1, b.Table(gen_table_df()))
     page_2 = b.Page(
         b.Text(layout).format(group1=group1, group2=group2, select1=select1, select2=select2, nested=nested),
-        label="Layout",
+        title="Layout",
     )
 
-    adv_blocks = """
+    adv_blocks = r"""
 A list and demonstration of all the blocks supported by Datapane - see https://docs.datapane.com/reports/blocks for more info.
 
 ## Plot Blocks
@@ -337,7 +337,7 @@ dp.DataTable(df, caption="Interactive DataTable")
 ```python
 dp.Text("Hello, __world__!")
 dp.Code("print('Hello, world!')")
-dp.Formula(r"\\frac{1}{\sqrt{x^2 + 1}}")
+dp.Formula(r"\frac{1}{\sqrt{x^2 + 1}}")
 dp.HTML("<h1>Hello World</h1>")
 dp.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True)
 ```
@@ -366,8 +366,7 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
 ```
 
 {{files}}
-
-    """
+"""
 
     plots = b.Group(
         b.Plot(vega_sine, name="vega", caption="Altair Plot"),

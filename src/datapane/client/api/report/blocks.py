@@ -454,7 +454,7 @@ class Formula(EmbeddedTextBlock):
     _tag = "Formula"
 
     def __init__(self, formula: str, caption: str = None, name: str = None, label: str = None):
-        """
+        r"""
         Args:
             formula: The formula to embed, using LaTeX format (use raw strings)
             caption: A caption to display below the Formula (optional)

@@ -83,7 +83,7 @@ def include_raw(ctx, name):
     env = ctx.environment
     # Escape </script> to prevent 3rd party JS terminating the local report bundle.
     # Note there's an extra "\" because it needs to be escaped at both the python and JS level
-    src = env.loader.get_source(env, name)[0].replace("</script>", "<\\\/script>")
+    src = env.loader.get_source(env, name)[0].replace("</script>", r"<\\/script>")
     return Markup(src)
 
 
@@ -302,7 +302,7 @@ class Report(DPObjectRef):
         if open:
             webbrowser.open_new_tab(self.web_url)
         display_msg(
-            text=f"Report successfully published at {self.web_url} - you can edit and add additional text from the link"
+            text=f"Report successfully published at {self.web_url} - you can edit and add additional text online"
         )
 
     @capture_event("Report Save")
