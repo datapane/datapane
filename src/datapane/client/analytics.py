@@ -33,6 +33,8 @@ def capture(event: str, properties: Optional[dict] = None) -> None:
     if _NO_ANALYTICS:
         return None
     config = c.get_config()
+    properties = properties or {}
+    properties.update(source="cli")
     with suppress(Exception):
         posthog.capture(config.session_id, event, properties)
 
