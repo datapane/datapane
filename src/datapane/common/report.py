@@ -77,4 +77,4 @@ def get_embed_url(url: str, width: int = 960, height: int = 540) -> Embedded:
         r = providers.request(url, maxwidth=width, maxheight=height)
         return Embedded(html=r["html"], title=r.get("title", "Title"), provider=r.get("provider_name", "Embedding"))
     except ProviderException:
-        raise DPError(f"No embed provider found for URL '{url}'")
+        raise DPError(f"No embed provider found for URL '{url}' - is there an active internet connection?")
