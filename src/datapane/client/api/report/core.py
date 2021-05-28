@@ -121,8 +121,8 @@ class ReportFileWriter:
             SKIP_DISPLAY_MSG = True
 
         display_msg(
-            text="Thanks for using Datapane, to automate and securely share documents in your organization please see Datapane Cloud - https://datapane.com/",
-            md="Thanks for using **Datapane**, to automate and securely share documents in your organization please see [Datapane Cloud](https://datapane.com/)",
+            text="Thanks for using Datapane, to automate and securely share documents in your organization please see Datapane Teams - https://datapane.com/",
+            md="Thanks for using **Datapane**, to automate and securely share documents in your organization please see [Datapane Teams](https://datapane.com/)",
         )
 
     def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):

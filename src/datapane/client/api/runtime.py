@@ -2,7 +2,7 @@
 
 Runtime API used when running a Datapane Script
 
-..note:: The objects in this module are available on Datapane Cloud
+..note:: The objects in this module are available on Datapane Teams
 """
 import dataclasses as dc
 import os

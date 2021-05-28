@@ -1,6 +1,6 @@
 """# API docs for Datapane Client
 
-These docs describe the Python API for building Datapane documents, along with additional information on the Datapane Cloud API.
+These docs describe the Python API for building Datapane documents, along with additional information on the Datapane Teams API.
 
 Usage docs for Datapane can be found at https://docs.datapane.com
 
@@ -8,7 +8,7 @@ These objects are all available under the `datapane` module, via `import datapan
 
 ### Datapane Reports API
 
-The core document APIs are available for both Datapane Community and Datapane Cloud, these are found in `datapane.client.api.report`, including,
+The core document APIs are available for both Datapane Community and Datapane Teams, these are found in `datapane.client.api.report`, including,
 
   - `datapane.client.api.report.core.Report`
   - Layout Blocks
@@ -26,7 +26,7 @@ The core document APIs are available for both Datapane Community and Datapane Cl
     - `datapane.client.api.report.blocks.Code`
     - `datapane.client.api.report.blocks.HTML`
 
-### Datapane Cloud
+### Datapane Teams
 
 Additional API docs are found in `datapane.client.api.cloud` that provide building, deployment, and sharing of data analytics apps and workflows
 

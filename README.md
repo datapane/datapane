@@ -4,7 +4,7 @@
   </a>
 </p>
 <p align="center">
-    <a href="https://datapane.com">Datapane Cloud</a> |
+    <a href="https://datapane.com">Datapane Teams</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
     <a href="https://datapane.github.io/datapane/">API Docs</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
@@ -121,13 +121,13 @@ r.publish(name="2020 Stock Portfolio", open=True)
 
 ## Private sharing
 
-If you need private report sharing, [Datapane Cloud](https://docs.datapane.com/datapane-enterprise/) allows secure sharing of reports and the ability to deploy your Jupyter Notebooks or Python scripts as interactive apps.
+If you need private report sharing, [Datapane Teams](https://docs.datapane.com/datapane-enterprise/) allows secure sharing of reports and the ability to deploy your Jupyter Notebooks or Python scripts as interactive apps.
 
 - Share reports privately with your company or external clients
 - Deploy Jupyter Notebooks and scripts as apps, with inputs that can be run by your team interactively to dynamically create results
 - Schedule reports to automatically update
 
-Datapane Cloud is offered as both a managed SaaS service and an on-prem install. For more information, see [the documentation](https://docs.datapane.com/datapane-enterprise/tut-deploying-a-script). You can find pricing [here](https://datapane.com/pricing).
+Datapane Teams is offered as both a managed SaaS service and an on-prem install. For more information, see [the documentation](https://docs.datapane.com/datapane-enterprise/tut-deploying-a-script). You can find pricing [here](https://datapane.com/pricing).
 
 # Analytics
 
