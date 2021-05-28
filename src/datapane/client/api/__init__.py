@@ -28,12 +28,12 @@ The core document APIs are available for both Datapane Community and Datapane Te
 
 ### Datapane Teams
 
-Additional API docs are found in `datapane.client.api.cloud` that provide building, deployment, and sharing of data analytics apps and workflows
+Additional API docs are found in `datapane.client.api.teams` that provide building, deployment, and sharing of data analytics apps and workflows
 
-  - `datapane.client.api.cloud.Blob`
-  - `datapane.client.api.cloud.Variable`
-  - `datapane.client.api.cloud.Script`
-  - `datapane.client.api.cloud.Schedule`
+  - `datapane.client.api.teams.Blob`
+  - `datapane.client.api.teams.Variable`
+  - `datapane.client.api.teams.Script`
+  - `datapane.client.api.teams.Schedule`
 
 
 .. note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
@@ -49,7 +49,6 @@ import warnings
 
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
-from .cloud import Blob, Run, Schedule, Script, Variable
 from .report.blocks import (
     BigNumber,
     Code,
@@ -68,6 +67,7 @@ from .report.blocks import (
 )
 from .report.core import Report, ReportType, Visibility
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
+from .teams import Blob, Run, Schedule, Script, Variable
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionError
 from ..config import init
