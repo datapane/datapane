@@ -24,7 +24,7 @@ from datapane.client.analytics import capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError, UnsupportedFeatureError
+from datapane.client.utils import DPError
 from datapane.common import log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
@@ -202,12 +202,7 @@ class Report(DPObjectRef):
         # check for any unsupported local features, e.g. DataTable
         # NOTE - we could eventually have different validators for local and published reports
         if embedded:
-            uses_datatable: bool = processed_report_doc.xpath("boolean(/Report/Main//DataTable)")
-            if uses_datatable:
-                raise UnsupportedFeatureError(
-                    "DataTable component contains advanced analysis features that are not supported when saving or previewing locally,"
-                    + " please either publish your report to a Datapane Server or use the dp.Table component instead"
-                )
+            pass
         else:
             # TODO - remove this eventually
             has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
