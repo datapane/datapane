@@ -9,20 +9,21 @@
 <grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <element name="Report">
-      <attribute name="xml:id">
-        <data type="ID"/>
-      </attribute>
       <!-- unsignedByte ? -->
       <attribute name="version">
         <data type="positiveInteger"/>
       </attribute>
-      <ref name="Meta"/>
+      <optional>
+        <ref name="Meta"/>
+      </optional>
+      <ref name="Internal"/>
       <ref name="Main"/>
     </element>
   </start>
   <!--
     Metadata fields
-    we extract these into the Report DB fields for quick lookup
+    These are optional and only used with local reports
+    extract these into the Report DB fields on dp-server for ease-of-use/modification
   -->
   <define name="Meta">
     <a:documentation/>
@@ -48,26 +49,34 @@
             <param name="maxLength">10240</param>
           </data>
         </element>
+        <element name="Type">
+          <choice>
+            <value type="string" datatypeLibrary="">dashboard</value>
+            <value type="string" datatypeLibrary="">report</value>
+            <value type="string" datatypeLibrary="">article</value>
+          </choice>
+        </element>
       </interleave>
+    </element>
+  </define>
+  <!-- Internal fields, used when modifying the internal report structure -->
+  <define name="Internal">
+    <a:documentation/>
+    <element name="Internal">
+      <empty/>
+      <!--
+        id_count used to track free variables count
+        attribute id_count { xsd:nonNegativeInteger }
+      -->
     </element>
   </define>
   <!-- Main Report Tree -->
   <define name="Main">
     <a:documentation/>
     <element name="Main">
-      <group>
-        <oneOrMore>
-          <ref name="Page"/>
-        </oneOrMore>
-        <attribute name="type">
-          <choice>
-            <value type="string" datatypeLibrary="">dashboard</value>
-            <value type="string" datatypeLibrary="">report</value>
-            <value type="string" datatypeLibrary="">article</value>
-          </choice>
-        </attribute>
-      </group>
-      <!-- attribute full_width { xsd:boolean }, -->
+      <oneOrMore>
+        <ref name="Page"/>
+      </oneOrMore>
     </element>
   </define>
   <!-- name always present, can be user-defined but auto-generated if not - used for exporting and asset lookup -->
@@ -135,9 +144,9 @@
       <attribute name="columns">
         <data type="nonNegativeInteger"/>
       </attribute>
-      <oneOrMore>
+      <zeroOrMore>
         <ref name="Block"/>
-      </oneOrMore>
+      </zeroOrMore>
     </element>
   </define>
   <define name="Block">
@@ -151,6 +160,7 @@
       <ref name="EmbeddedTextBlock"/>
       <ref name="AssetBlock"/>
       <ref name="BigNumber"/>
+      <ref name="AssetRef"/>
     </choice>
   </define>
   <define name="EmbeddedTextBlock">
@@ -242,6 +252,15 @@
       </data>
     </element>
   </define>
+  <define name="Formula">
+    <element name="Formula">
+      <ref name="block_label_name"/>
+      <ref name="opt_caption"/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </element>
+  </define>
   <define name="BigNumber">
     <element name="BigNumber">
       <ref name="block_label_name"/>
@@ -286,13 +305,15 @@
       </optional>
     </element>
   </define>
-  <define name="Formula">
-    <element name="Formula">
+  <define name="AssetRef">
+    <element name="AssetRef">
       <ref name="block_label_name"/>
       <ref name="opt_caption"/>
-      <data type="string">
-        <param name="minLength">1</param>
-      </data>
+      <attribute name="ref">
+        <data type="string">
+          <param name="minLength">1</param>
+        </data>
+      </attribute>
     </element>
   </define>
   <!-- AssetBlocks -->

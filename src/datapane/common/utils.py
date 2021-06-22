@@ -244,3 +244,11 @@ def guess_encoding(fn: str) -> str:
 def timestamp(x: t.Optional[datetime.datetime] = None) -> str:
     x = x or datetime.datetime.utcnow()
     return f'{x.isoformat(timespec="seconds")}{"" if x.tzinfo else "Z"}'
+
+
+def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
+    """Return a new dict with the empty/falsey values removed"""
+    if none_only:
+        return {k: v for (k, v) in xs.items() if v is not None}
+    else:
+        return {k: v for (k, v) in xs.items() if v}

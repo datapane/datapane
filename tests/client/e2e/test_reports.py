@@ -1,25 +1,26 @@
 import json
+from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-import altair as alt
 import pandas as pd
 import pytest
 import requests
 from furl import furl
+from lxml import etree
 
 import datapane as dp
 from datapane.client import config as c
 
-from ..local.test_api import gen_report_complex_with_files, gen_report_simple
-from .common import check_name, deletable, gen_description, gen_df, gen_name
+from ..local.api.test_reports import gen_report_complex_with_files, gen_report_simple
+from .common import check_name, deletable, gen_description, gen_df, gen_name, gen_plot
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
 def test_report_simple():
     report = gen_report_simple()
-    report.publish(name="TEST", description="DESCRIPTION")
+    report.upload(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
@@ -27,7 +28,7 @@ def test_report_simple():
 @pytest.mark.org
 def test_report_simple_permissions():
     report = gen_report_simple()
-    report.publish(name="TEST", description="DESCRIPTION", visibility=dp.Visibility.PRIVATE)
+    report.upload(name="TEST", description="DESCRIPTION", visibility=dp.Visibility.PRIVATE)
     with deletable(report):
         # check we can't access api & web urls
         r = requests.get(url=report.url)
@@ -41,18 +42,70 @@ def test_report_simple_permissions():
         assert r.status_code in [400, 401, 403]
 
 
+def test_report_update_metadata():
+    report = gen_report_simple()
+    name = "TEST-META"
+    props = dict(
+        description="TEST-DESCRIPTION",
+        source_url="https://www.github.com/datapane",
+        visibility="PUBLIC",
+        tags=["a", "b"],
+    )
+
+    same_props = (
+        "url",
+        "id",
+        "owner",
+        "username",
+        "web_url",
+        "embed_url",
+        "created_date",
+        "type",
+        "files",
+        "num_blocks",
+    )
+
+    report.upload(name, **props)
+
+    def check(x, y):
+        assert x == y or sorted(x) == sorted(y)
+
+    with deletable(report):
+        assert report.visibility == "PUBLIC"
+        for (k, v) in props.items():
+            check(report.dto[k], v)
+        orig_dto = deepcopy(report.dto)
+
+        # upload again, using defaults
+        report.upload(name)
+        # check props haven't changed
+        for (k, v) in props.items():
+            check(report.dto[k], v)
+
+        # check other elements haven't changed?
+        for x in same_props:
+            check(report.dto[x], orig_dto[x])
+
+
 def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
-    # Test we can save then publish
+    # Test we can save then upload
     report.save(str(datadir / "test_report.html"))
-    report.publish(name="TEST", description="DESCRIPTION")
+    report.upload(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    report.publish(name="TEST", description="DESCRIPTION")
+    report.upload(name="TEST", description="DESCRIPTION")
+    with deletable(report):
+        ...
+
+
+def test_demo_report():
+    report = dp.templates.build_demo_report()
+    report.upload(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
 
@@ -68,7 +121,7 @@ def test_full_report(tmp_path: Path):
     # Asset tests
     lis = [1, 2, 3]
     json_list: str = json.dumps(lis)
-    plot = alt.Chart(df).mark_line().encode(x="x", y="y")
+    plot = gen_plot()
 
     # create the DP
     fn = tmp_path / "json_list.json"
@@ -79,7 +132,7 @@ def test_full_report(tmp_path: Path):
     list_asset = dp.File(data=lis, is_json=True)
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     dp_report = dp.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
-    dp_report.publish(name=name, description=description, source_url=source_url)
+    dp_report.upload(name=name, description=description, source_url=source_url)
 
     with deletable(dp_report):
         # are the fields ok
@@ -177,7 +230,7 @@ def test_complex_df_report():
     df_desc_2_t = dp.DataTable(df_desc_2)
 
     with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
-        dp_report.publish(name=gen_name())
+        dp_report.upload(name=gen_name())
 
         # NOTE - as above, downloading embedded assets from a report currently not supported in API
         # check_df_equal(tz_df, tz_t.download_df())
@@ -189,7 +242,7 @@ def test_complex_df_report():
 @pytest.mark.org
 def test_report_group():
     report = gen_report_simple()
-    report.publish(name="test_report_group")
+    report.upload(name="test_report_group")
     # check if the group name is default
     with deletable(report):
         assert report.group == "default"
@@ -197,6 +250,47 @@ def test_report_group():
     # test adding report to a group that doesn't exist
     report2 = gen_report_simple()
     try:
-        report2.publish(name="test_wrong_group", group="wrong-group")
+        report2.upload(name="test_wrong_group", group="wrong-group")
     except requests.HTTPError as e:
         assert e.response.status_code == 400
+
+
+###############################################################################
+# TextReport
+def _calc_text_blocks(report: dp.TextReport, expected_blocks: int):
+    r = etree.fromstring(report.api_document)
+    assert r.xpath("count(//Group[1]/*)") == expected_blocks
+
+
+def test_text_report():
+    # a simple report
+    report = dp.TextReport("test").upload(name="Test")
+    with deletable(report):
+        # inc Page and Group blocks
+        _calc_text_blocks(report, 1)
+
+        # overwrite via name
+        report = dp.TextReport("Text-1", "Text-2").upload(name="Test")
+        _calc_text_blocks(report, 2)
+
+        # overwrite via id
+        report = dp.TextReport("Text-1", "Text-2", "Text-3").upload(id=report.id)
+        _calc_text_blocks(report, 3)
+
+        # get report by id
+        report_1 = dp.TextReport.by_id(report.id)
+        assert report.id == report_1.id
+        assert report.num_blocks == report_1.num_blocks
+
+
+def test_text_report_files():
+    s_df = gen_df()
+    b_df = gen_df(1000)
+    plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
+
+    report = dp.TextReport(s_df, b_df, plot_asset).upload(name="Test")
+    with deletable(report):
+        _calc_text_blocks(report, 3)
+
+        report = dp.TextReport(text="Text", s_df=s_df, b_df=b_df, plot=plot_asset).upload(name="Test")
+        _calc_text_blocks(report, 4)

@@ -27,5 +27,5 @@ report = dp.Report(
     dp.Table(total_styled, caption="Current vaccination totals by manufacturer"),
     dp.Table(df, caption="Initial Dataset")
 )
-report.publish(name='Covid Vaccinations Demo {{ name }}',
+report.upload(name='Covid Vaccinations Demo {{ name }}',
                description="Covid Vaccinations report, using data from ourworldindata", open=True)

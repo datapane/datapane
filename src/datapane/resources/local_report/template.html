@@ -20,7 +20,7 @@
   <body>
     <div id="report-root" class="w-full pb-12"></div>
     <script>
-      const report = { document: `{{ report_doc|e }}` };
+      const report = { api_document: `{{ report_doc|e }}` };
       const { React, ReactDOM, ReportComponent } = DPLIB["local-report-base"];
       const ReportFactory = React.createElement.bind(null, ReportComponent);
       ReactDOM.render(

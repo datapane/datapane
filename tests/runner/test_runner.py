@@ -73,7 +73,7 @@ class MockScript(dp.Script):
         return cls()
 
 
-def mock_report_publish(self, **kwargs):
+def mock_report_upload(self, **kwargs):
     """Mock creating a report object"""
     report = mock.Mock()
     report.id = "ABC"
@@ -98,7 +98,7 @@ def _runner(params: SDict, env: SSDict, script: Path, sdist: Path = Path(".")) -
 
 # TODO - fix exception handling stacktraces
 @mock.patch("datapane.runner.exec_script.setup_script", autospec=True)
-@mock.patch("datapane.client.api.Report.publish", autospec=True, side_effect=mock_report_publish)
+@mock.patch("datapane.client.api.Report.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
     """Test running an isolated code snippet with params
     NOTE - we can simplify by calling exec_script.run directly, doesn't test as much of API however
@@ -134,7 +134,7 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
     f("WORLD")
 
 
-@mock.patch("datapane.client.api.Report.publish", autospec=True, side_effect=mock_report_publish)
+@mock.patch("datapane.client.api.Report.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")

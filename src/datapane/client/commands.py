@@ -16,7 +16,7 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import SDict, _setup_dp_logging, log
+from datapane.common import SDict, _setup_dp_logging, dict_drop_empty, log
 
 from . import analytics, api
 from . import config as c
@@ -246,7 +246,7 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], gr
     script = script and Path(script)
     config = config and Path(config)
     init_kwargs = dict(name=name, script=script, config_file=config, group=group)
-    kwargs = {k: v for k, v in init_kwargs.items() if v is not None}
+    kwargs = dict_drop_empty(init_kwargs, none_only=True)
 
     # if not (script or config or sc.DatapaneCfg.exists()):
     #     raise DPError(f"Not valid project dir")
@@ -351,7 +351,7 @@ def report():
 #     """Create a Report from the provided FILES"""
 #     blocks = [api.Asset.upload_file(file=Path(f)) for f in files]
 #     r = api.Report(*blocks)
-#     r.publish(name=name, visibility=visibility)
+#     r.upload(name=name, visibility=visibility)
 #     success_msg(f"Created Report {r.web_url}")
 
 

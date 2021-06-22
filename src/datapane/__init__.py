@@ -50,6 +50,7 @@ from .client.api import (
     SelectType,
     Table,
     Text,
+    TextReport,
     Variable,
     Visibility,
     by_datapane,

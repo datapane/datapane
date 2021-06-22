@@ -1,8 +1,8 @@
 """Tests for the API that can run locally (due to design or mocked out)"""
 import os
+import typing as t
 from pathlib import Path
 
-import altair as alt
 import pandas as pd
 import pytest
 from dominate.tags import h2
@@ -11,13 +11,15 @@ from lxml import etree
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
-from datapane.client import DPError, api
+from datapane.client import DPError
 from datapane.client.api.report.blocks import BaseElement
 from datapane.client.api.report.core import BuilderState
 from datapane.common.report import validate_report_doc
 
-from ..e2e.common import gen_df
+from ...e2e.common import gen_df, gen_plot
 
+################################################################################
+# Helpers
 md_block_id = dp.Text(text="# Test markdown block <hello/> \n Test **content**", name="test-id-1")
 md_block = dp.Text(text="# Test markdown block <hello/> \n Test **content**")
 str_md_block = "Simple string Markdown"
@@ -33,72 +35,6 @@ def num_blocks(report_str: str) -> int:
     return int(etree.fromstring(report_str).xpath(x))
 
 
-def test_params_loading(datadir: Path):
-    """Test that the API allows loading params from the datapane file"""
-    config_fn = datadir / "datapane.yaml"
-    initial_vals = dict(p1="a", p3=3)
-
-    assert len(dp.Params) == 0
-
-    # load some values
-    api._reset_runtime(initial_vals)
-    assert len(dp.Params) == 2
-    assert dp.Params["p1"] == initial_vals["p1"]
-
-    # clear and load again
-    api._reset_runtime({})
-    assert len(dp.Params) == 0
-    api._reset_runtime(initial_vals)
-
-    # load from file
-    dp.Params.load_defaults(config_fn=config_fn)
-    # ensure values are merged
-    assert len(dp.Params) == 3
-    assert dp.Params["p1"] == "hello"
-    assert dp.Params["p2"] == 4
-    assert dp.Params["p3"] == initial_vals["p3"]
-
-
-def test_markdown_format(datadir: Path):
-    text = """
-# My wicked markdown
-
-{{plot}}
-
-As above we do ...
-
-{{select}}
-
-Here's the dataset used...
-
-{{}}
-"""
-
-    table_asset = gen_df()
-    plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
-    select_asset = dp.Select(dp.Text("Hello"), "World")
-
-    # missing context
-    with pytest.raises(DPError):
-        dp.Text(text).format(table_asset, plot=plot_asset, select1=select_asset)
-    with pytest.raises(DPError):
-        dp.Text(text).format(plot=plot_asset, select=select_asset)
-
-    # test string
-    group = dp.Text(text).format(table_asset, plot=plot_asset, select=select_asset)
-    assert isinstance(group, dp.Group)
-    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "Table"]
-
-    # test file
-    group = dp.Text(file=datadir / "report.md").format(table_asset, plot=plot_asset, select=select_asset)
-    assert isinstance(group, dp.Group)
-    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "Table"]
-    assert "file-input" in element_to_str(group)
-    assert "file-input" in glom(group, "blocks.0.content")
-
-
-################################################################################
-# Reporting
 def assert_report(report: dp.Report, expected_attachments: int = None, expected_num_blocks: int = None):
     report_str, attachments = report._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
     # print(report_str)
@@ -110,6 +46,8 @@ def assert_report(report: dp.Report, expected_attachments: int = None, expected_
     return (report_str, attachments)
 
 
+################################################################################
+# Generators
 def gen_report_simple() -> dp.Report:
     return dp.Report(
         blocks=[
@@ -166,7 +104,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
 
     # assets
-    plot_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"), caption="Plot Asset")
+    plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
     list_asset = dp.File(data=lis, filename="List Asset", is_json=True)
     img_asset = dp.File(file=datadir / "datapane-logo.png")
 
@@ -195,6 +133,8 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
         )
 
 
+################################################################################
+# PyReport Tests
 def test_gen_report_simple():
     report = gen_report_simple()
     assert_report(report, 0)
@@ -229,7 +169,7 @@ def test_gen_report_primitives(datadir: Path):
     report = dp.Report(
         "Simple string Markdown #2",  # Markdown
         gen_df(),  # Table
-        alt.Chart(gen_df()).mark_line().encode(x="x", y="y"),  # Plot
+        gen_plot(),  # Plot
         datadir / "datapane-logo.png",  # File
     )
     assert_report(report, 3)
@@ -312,61 +252,6 @@ def test_gen_report_with_files(datadir: Path):
 
 
 ################################################################################
-# Templates
-def test_demo_report():
-    report = dp.templates.build_demo_report()
-    assert_report(report, 23, 67)
-
-
-def test_add_code():
-    b = dp.templates.add_code(md_block, "print(1)")
-    assert isinstance(b, dp.Select)
-    assert glom(b, ("blocks", ["_tag"])) == ["Text", "Code"]
-    assert "print(1)" in element_to_str(b)
-
-
-def test_build_md_report():
-    text = """
-# Hello
-
-{{}}
-
-{{table}}
-"""
-
-    report = dp.templates.build_md_report(text, gen_df(4), table=gen_df(8))
-    assert_report(report, 2, 5)
-
-
-def test_add_header():
-    text = "HEADER"
-
-    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
-
-    r1 = dp.templates.add_header(r, header=text, all_pages=True)
-    assert_report(r1, 0, 18)
-    assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, text, text]
-
-    r1 = dp.templates.add_header(r, header=text, all_pages=False)
-    assert_report(r1, 0, 14)
-    assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, md_block.content, md_block.content]
-
-
-def test_add_footer():
-    text = "FOOTER"
-
-    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
-
-    r1 = dp.templates.add_footer(r, footer=text, all_pages=True)
-    assert_report(r1, 0, 18)
-    assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, text, text]
-
-    r1 = dp.templates.add_footer(r, footer=text, all_pages=False)
-    assert_report(r1, 0, 14)
-    assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, md_block.content, md_block.content]
-
-
-################################################################################
 # Local saving
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
 def test_local_report_simple(datadir: Path, monkeypatch):
@@ -380,3 +265,63 @@ def test_local_report_with_files(datadir: Path, monkeypatch):
     monkeypatch.chdir(datadir)
     report = gen_report_complex_with_files(datadir, local_report=True)
     report.save(path="test_out.html", name="Even better report")
+
+
+################################################################################
+# TextReport
+def assert_text_report(tr: dp.TextReport, expected_num_assets: int, names: t.Optional[t.List[str]] = None):
+    report_str, _ = tr._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+    r = etree.fromstring(report_str)
+    assert r.xpath("count(//Group[1]/*)") == expected_num_assets
+    if names:
+        assert r.xpath("//Group[1]/*/@name") == names
+
+
+def __test_gen_report_id_check():
+    """Test case unused atm"""
+    # all fresh
+    report = dp.Report(md_block, md_block, md_block)
+    assert_report(report)  # expected_id_count=5)
+    # 2 fresh
+    report = dp.Report(md_block, md_block_id, md_block)
+    assert_report(report)  # expected_id_count=4)
+    # 0 fresh
+    report = dp.Report(md_block_id, dp.Text("test", name="test-2"))
+    assert_report(report)  # expected_id_count=2)
+
+
+def test_textreport_gen():
+    """Test TextReport API and id/naming handling"""
+    s_df = gen_df()
+
+    # Simple
+    report = dp.TextReport("Text-3")
+    assert_text_report(report, 1)
+
+    # multiple blocks
+    report = dp.TextReport("Text-1", "Text-2", s_df)
+    assert_text_report(report, 3)
+
+    # empty
+    report = dp.TextReport()
+    assert_text_report(report, 0)
+
+    # mixed naming usage
+    report = dp.TextReport("text-1", dp.Text("Text-4", name="test"))
+    assert_text_report(report, 2)
+
+    # arg/kwarg naming tests
+    report = dp.TextReport(
+        dp.Text("Text-arg-1"),
+        dp.Text("Text-arg-2", name="text-arg-2"),
+        t1="Text-1",
+        t2=dp.Text("Text-2"),
+        t3=dp.Text("Text-3", name="overwritten"),
+    )
+    assert_text_report(report, 5, ["text-1", "text-arg-2", "t1", "t2", "t3"])
+
+    # dict/list test
+    report = dp.TextReport(blocks=dict(t1="text-1", t2=dp.Text("Text-2"), t3=dp.Text("Text-3", name="overwritten")))
+    assert_text_report(report, 3, ["t1", "t2", "t3"])
+    report = dp.TextReport(blocks=["Text-1", dp.Text("Text-2"), dp.Text("Text-3", name="text-3")])
+    assert_text_report(report, 3, ["text-1", "text-2", "text-3"])

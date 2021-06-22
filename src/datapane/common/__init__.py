@@ -28,6 +28,7 @@ from .dp_types import (
     set_dp_mode,
 )
 from .utils import (
+    dict_drop_empty,
     guess_type,
     log,
     log_command,

@@ -5,9 +5,11 @@ Datapane helper functions to make creating your reports a bit simpler and reduce
 """
 import random
 import typing as t
+import warnings
 from copy import deepcopy
 from pathlib import Path
 
+import altair as alt
 import importlib_resources as ir
 import numpy as np
 import pandas as pd
@@ -17,7 +19,16 @@ from datapane.common import NPath
 from .report import blocks as b
 from .report.core import Report
 
-__all__ = ["add_code", "add_header", "add_footer", "build_md_report", "build_demo_report", "gen_df", "gen_table_df"]
+__all__ = [
+    "add_code",
+    "add_header",
+    "add_footer",
+    "build_md_report",
+    "build_demo_report",
+    "gen_df",
+    "gen_table_df",
+    "gen_plot",
+]
 
 
 def _map_page_blocks(page: b.Page, f: t.Callable[[b.BlockList], b.BlockList]) -> b.Page:
@@ -66,12 +77,14 @@ def build_md_report(
         **kwargs: keyword template context arguments
 
     Returns:
-        A datapane Report object for saving or publishing
+        A datapane Report object for saving or uploading
 
     ..tip:: Either text or file is required as input
     ..tip:: Context, via args/kwargs can be plain Python objects, e.g. dataframes, and plots, or Datapane blocks, e.g. dp.Plot, etc.
 
     """
+    # TODO(api-compat) - remove on 0.12
+    warnings.warn("Deprecated, use TextReport instead to write long form articles from the browser.")
     try:
         b_text = b.Text(file=text_or_file) if Path(text_or_file).exists() else b.Text(text=text_or_file)
     except OSError:
@@ -131,12 +144,17 @@ def gen_table_df(rows: int = 4, alphabet: str = "ABCDEF") -> pd.DataFrame:
     return pd.DataFrame.from_dict(data)
 
 
+def gen_plot() -> alt.Chart:
+    """Generate a sample Altair plot"""
+    return alt.Chart(gen_df()).mark_line().encode(x="x", y="y")
+
+
 def build_demo_report() -> Report:
     """
     Generate a sample demo report
 
     Returns:
-        A datapane Report object for saving or publishing
+        A datapane Report object for saving or uploading
 
     """
 

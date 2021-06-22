@@ -160,7 +160,9 @@ class DPObjectRef:
 
     # user-facing helper functions
     def refresh(self):
-        """Refresh the object with the latest data from the Datapane Server"""
+        """Refresh the object with the latest data from the Datapane Server
+        - override to pull updated fields from dto to top-level
+        """
         self.dto = self.res.get()
         log.debug(f"Refreshed {self.url}")
 

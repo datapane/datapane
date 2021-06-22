@@ -27,7 +27,7 @@ def validate_report_doc(
     xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, quiet: bool = False
 ) -> bool:
     """Validate the model against the schema, throws an etree.DocumentInvalid if not"""
-    assert xml_str or xml_doc
+    assert xml_str or xml_doc is not None
     if xml_str:
         xml_doc = etree.fromstring(xml_str)
 

@@ -1,12 +1,11 @@
 """
 Datapane Reports Object
 
-Describes the `Report` object and included APIs for saving and publishing them.
+Describes the `Report` object and included APIs for saving and uploading them.
 """
-
 import shutil
 import typing as t
-import uuid
+import warnings
 import webbrowser
 from base64 import b64encode
 from enum import Enum, IntEnum
@@ -24,11 +23,23 @@ from datapane.client.analytics import capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError
-from datapane.common import log, timestamp
+from datapane.client.utils import DPError, InvalidReportError
+from datapane.common import dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from .blocks import BlockOrPrimitive, BuilderState, E, Group, Page, PageOrPrimitive, Select
+from .blocks import (
+    Block,
+    BlockOrPrimitive,
+    BuilderState,
+    E,
+    Group,
+    Page,
+    PageOrPrimitive,
+    Select,
+    wrap_block,
+)
+
+U = t.TypeVar("U", bound="TextReport")
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
@@ -45,6 +56,7 @@ class Visibility(IntEnum):
     """The report visibility type"""
 
     PRIVATE = 0  # private to owner
+    # UNLISTED = 1  # public but not searchable
     PUBLIC = 2  # anon/unauthed access
 
 
@@ -126,7 +138,6 @@ class ReportFileWriter:
         )
 
     def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):
-
         # create template on demand
         if not self.template:
             self._setup_template()
@@ -146,20 +157,226 @@ class ReportFileWriter:
         Path(path).write_text(r, encoding="utf-8")
 
 
-################################################################################
-# Report DPObject
-class Report(DPObjectRef):
+class BaseReport(DPObjectRef):
+    endpoint: str = "/reports/"
+    pages: t.List[Page]
+    report_type: ReportType = ReportType.REPORT
+    # id_count: int = 1
+
+    def _to_xml(
+        self, embedded: bool, title: str = "Title", description: str = "Description", author: str = "Anonymous"
+    ) -> t.Tuple[Element, t.List[Path]]:
+        """Build XML report document"""
+        # convert Pages to XML
+        s = BuilderState(embedded)
+        _s = reduce(lambda _s, p: p._to_xml(_s), self.pages, s)
+
+        # add main structure
+        report_doc: Element = E.Report(
+            E.Internal(),
+            E.Main(*_s.elements),
+            version="1",
+        )
+
+        # add optional Meta
+        if embedded:
+            meta = E.Meta(
+                E.Author(c.config.username or author),
+                E.CreatedOn(timestamp()),
+                E.Title(title),
+                E.Description(description),
+                E.Type(self.report_type.value),
+            )
+            report_doc.insert(0, meta)
+        return (report_doc, _s.attachments)
+
+    def _gen_report(
+        self,
+        embedded: bool,
+        title: str = "Title",
+        description: str = "Description",
+        author: str = "Anonymous",
+    ) -> t.Tuple[str, t.List[Path]]:
+        """Generate a report for saving/uploading"""
+        report_doc, attachments = self._to_xml(embedded, title, description, author)
+
+        # post_process and validate
+        processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
+        validate_report_doc(xml_doc=processed_report_doc)
+        self._report_status_checks(processed_report_doc, embedded)
+
+        # convert to string
+        report_str = etree.tounicode(processed_report_doc)
+        log.debug("Successfully Built Report")
+        # log.debug(report_str)
+        return (report_str, attachments)
+
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
+        # NOTE - common checks go here
+        pass
+
+    def _upload_report(
+        self,
+        name: str,
+        description: str = "",
+        source_url: str = "",
+        visibility: t.Union[Visibility, str] = "",
+        tags: t.List[str] = None,
+        group: t.Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        # TODO - clean up arg handling
+        # process params
+        tags = tags or []
+        visibility_str: str
+        if isinstance(visibility, str):
+            visibility_str = visibility.upper()
+        else:
+            visibility_str = visibility.name
+        kwargs.update(
+            name=name,
+            description=description,
+            tags=tags,
+            source_url=source_url,
+            visibility=visibility_str,
+            group=group,
+            type=self.report_type.value,  # set the type of report using type argument passed to the constructor
+        )
+        # current protocol is to strip all empty args and patch (via a post)
+        # TODO(protocol) - alternate plan would be keeping local state in resource handle and posting all
+        kwargs = dict_drop_empty(kwargs)
+
+        # generate the report
+        report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
+        # TODO(protocol) always include attachments parameter
+        # if not attachments:
+        #     kwargs["attachments"] = []
+        res = Resource(self.endpoint).post_files(dict(attachments=attachments), api_document=report_str, **kwargs)
+
+        # Set dto based on new URL
+        self.url = res.url
+        self.refresh()
+
+        # add report to internal API handler for use by_datapane
+        _report.append(self)
+
+
+BlockDict = t.Dict[str, BlockOrPrimitive]
+BlockList = t.List[BlockOrPrimitive]
+
+
+class TextReport(BaseReport):
+    """
+    Upload plots, text, tables, and files as assets that can be used within a TextReport created in the browser
+    """
+
+    def __init__(
+        self, *arg_blocks: BlockOrPrimitive, blocks: t.Union[BlockDict, BlockList] = None, **kw_blocks: BlockOrPrimitive
+    ):
+        """
+        Blocks can be created with the `name` parameter, if not set, one can be provided here using keyword args.
+        Use the blocks dict parameter to add a dynamically generated set of named blocks, useful when working in Jupyter
+
+        Args:
+            *arg_blocks: List of blocks to add to document - if a name is not present it will be auto-generated
+            blocks: Allows providing the document blocks as a single dictionary of named blocks
+            **kw_blocks: Keyword argument set of blocks, whose block name will be that given in the keyword
+
+        Returns:
+            A `TextReport` object containing assets that can be uploaded for use with your online TextReport
+
+        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
+          `dp.TextReport(my_plot=plot, my_table=table)` or `dp.TextReport(blocks={"my_plot": plot, "my_table":table})`
+
+        .. tip:: Create a dictionary first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
+        """
+        super().__init__()
+
+        # set the blocks
+        def _conv_block(name: str, block: BlockOrPrimitive) -> Block:
+            x = wrap_block(block)
+            x._set_name(name)
+            return x
+
+        _blocks: BlockList
+        if isinstance(blocks, dict):
+            _blocks = [_conv_block(k, v) for (k, v) in blocks.items()]
+        elif isinstance(blocks, list):
+            _blocks = blocks
+        else:
+            # use arg and kw blocks
+            _blocks = list(arg_blocks)
+            _blocks.extend([_conv_block(k, v) for (k, v) in kw_blocks.items()])
+
+        if not _blocks:
+            log.debug("No blocks provided - creating empty report")
+
+        # set the pages
+        self.pages = [Page(blocks=[Group(blocks=_blocks, name="top-group")])]
+
+    @property
+    def edit_url(self):
+        return f"{self.web_url}edit/"
+
+    def upload(
+        self,
+        id: t.Optional[str] = "",
+        name: t.Optional[str] = "",
+        description: str = "",
+        source_url: str = "",
+        visibility: t.Union[Visibility, str] = "",
+        tags: t.List[str] = None,
+        group: t.Optional[str] = None,
+        open: bool = False,
+        **kwargs,
+    ) -> "TextReport":
+        """
+        Create a TextReport document on the logged-in Datapane Server.
+
+        Args:
+            id: The document id - use when pushing assets to an existing report
+            name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
+            description: A high-level description for the document, this is displayed in searches and thumbnails
+            source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
+            visibility: "PRIVATE"` (default) or `"PUBLIC"``
+            tags: A list of tags (as strings) used to categorise your document
+            group: Group to add the report to (Teams only)
+            open: Open the file in your browser after creating
+
+        Returns:
+            A `TextReport` document object that can be used to upload assets
+        """
+
+        assert id or name, "id or name must be set"
+        if id:
+            # TODO - this seems incorrect - do we want this indirection
+            # TODO - cache the name? - would this work if name changed?
+            x: "TextReport" = TextReport.by_id(id)
+            if not x.is_text_report:
+                raise DPError("Expected a TextReport object, found a Report object")
+            name = x.name
+
+        self._upload_report(name, description, source_url, visibility, tags, group, is_text_report=True, **kwargs)
+        display_msg(text=f"TextReport successfully {'updated' if id else 'created'} - edit at {self.edit_url}")
+
+        if open:
+            webbrowser.open_new_tab(self.edit_url)
+        return self
+
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
+        super()._report_status_checks(processed_report_doc, embedded)
+
+
+# Python/API Report
+class Report(BaseReport):
     """
     Report documents collate plots, text, tables, and files into an interactive document that
     can be analysed and shared by users in their Browser
     """
 
-    endpoint: str = "/reports/"
-    pages: t.List[Page]
     _last_saved: t.Optional[str] = None  # Path to local report
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
-    report_type: ReportType = ReportType.REPORT
     list_fields: t.List[str] = ["name", "web_url", "group"]
     """When set, the report is full-width suitable for use in a dashboard"""
 
@@ -177,10 +394,12 @@ class Report(DPObjectRef):
             type: Set the Report type, this will affect the formatting and layout of the document
 
         Returns:
-            A `Report` document object that can be published, saved, etc.
+            A `Report` document object that can be uploaded, saved, etc.
 
-        .. tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
+        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
+
+        .. tip:: Create a list first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__(**kwargs)
         self.report_type = type
@@ -198,107 +417,43 @@ class Report(DPObjectRef):
             # add additional top-level Group element to group mixed elements
             self.pages = [Page(blocks=[Group(blocks=pages)])]
 
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
-        # check for any unsupported local features, e.g. DataTable
-        # NOTE - we could eventually have different validators for local and published reports
-        if embedded:
-            pass
-        else:
-            # TODO - remove this eventually
-            has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
-            if not has_text:
-                display_msg(
-                    "Your report doesn't contain any text - did you know you can add text to your report from your browser once published?"
-                )
-
-            single_block = processed_report_doc.xpath("count(/Report/Main//*)") < 4
-            if single_block:
-                display_msg(
-                    "Your report only contains a single element - did you know you can add multiple plots and tables to a report, add text to it and export directly to Medium once published?"
-                )
-
-    def _gen_report(
-        self, embedded: bool, title: str, description: str = "Description", author: str = "Anonymous"
-    ) -> t.Tuple[str, t.List[Path]]:
-        """Build XML report document"""
-        # convert Pages to XML
-        s = BuilderState(embedded)
-        _s = reduce(lambda _s, p: p._to_xml(_s), self.pages, s)
-
-        # add main structure and Meta
-        report_doc: Element = E.Report(
-            E.Meta(
-                E.Author(c.config.username or "anonymous"),
-                E.CreatedOn(timestamp()),
-                E.Title(title),
-                E.Description(description),
-            ),
-            E.Main(*_s.elements, type=self.report_type.value),
-            version="1",
-        )
-        report_doc.set("{http://www.w3.org/XML/1998/namespace}id", f"_{uuid.uuid4().hex}")
-
-        # post_process and validate
-        processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
-        validate_report_doc(xml_doc=processed_report_doc)
-        self._report_status_checks(processed_report_doc, embedded)
-
-        # convert to string
-        report_str = etree.tounicode(processed_report_doc, pretty_print=True)
-        log.debug("Successfully Built Report")
-        # log.debug(report_str)
-        return (report_str, _s.attachments)
-
-    def publish(
+    def upload(
         self,
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: Visibility = Visibility.PRIVATE,
-        open: bool = False,
+        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
+        open: bool = False,
         **kwargs,
     ) -> None:
         """
-        Publish the report document, including its attached assets, to the logged-in Datapane Server.
+        Upload the report document, including its attached assets, to the logged-in Datapane Server.
 
         Args:
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             visibility: "PRIVATE"` (default) or `"PUBLIC"``
-            open: Open the file in your browser after creating
             tags: A list of tags (as strings) used to categorise your document
+            group: Group to add the report to (Teams only)
+            open: Open the file in your browser after creating
         """
 
         display_msg("Publishing document and associated data - *please wait...*")
 
-        # process params
-        tags = tags or []
-        kwargs.update(
-            name=name,
-            description=description,
-            tags=tags,
-            source_url=source_url,
-            visibility=visibility.name,
-            group=group,
-            type=self.report_type.value,  # set the type of report using type argument passed to the constructor
-        )
-        report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
-        res = Resource(self.endpoint).post_files(dict(attachments=attachments), document=report_str, **kwargs)
+        self._upload_report(name, description, source_url, visibility, tags, group, **kwargs)
 
-        # Set dto based on new URL
-        self.url = res.url
-        self.refresh()
-
-        # add report to internal API handler for use by_datapane
-        _report.append(self)
         if open:
             webbrowser.open_new_tab(self.web_url)
         display_msg(
-            text=f"Report successfully published at {self.web_url} - you can edit and add additional text online"
+            text=f"Report successfully uploaded at {self.web_url} - it's currently {self.visibility}, you can configure this from the report page"
         )
+
+    def publish(self, *a, **kw) -> None:
+        warnings.warn("Deprecated - please use report.upload instead")
+        self.upload(*a, **kw)
 
     @capture_event("CLI Report Save")
     def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
@@ -354,3 +509,26 @@ class Report(DPObjectRef):
             return IFrame(src=str(iframe_src), width=width, height=height)
         else:
             log.warning("Can't preview - are you running in Jupyter?")
+
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
+        super()._report_status_checks(processed_report_doc, embedded)
+
+        # check for any unsupported local features, e.g. DataTable
+        # NOTE - we could eventually have different validators for local and uploaded reports
+        if embedded:
+            pass
+        else:
+            # TODO - validate at least a single element
+            asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
+            if asset_blocks < 3:
+                raise InvalidReportError("Empty report - must contain at least one asset/block")
+            elif asset_blocks < 4:
+                display_msg(
+                    "Your report only contains a single element - did you know you can add multiple plots and tables to a report, add text to it and export directly to Medium once uploaded?"
+                )
+
+            has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
+            if not has_text:
+                display_msg(
+                    "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
+                )

@@ -70,12 +70,12 @@ class BuilderState:
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
     elements: t.List[etree.Element] = dc.field(default_factory=list)
     attachments: t.List[Path] = dc.field(default_factory=list)
-    id_count: t.Iterator[int] = dc.field(default_factory=lambda: itertools.count(start=1))
+    id_counter: t.Iterator[int] = dc.field(default_factory=lambda: itertools.count(start=1))
 
     def add_element(self, block: "BaseElement", e: etree.Element, f: t.Optional[Path] = None) -> "BuilderState":
         if not isinstance(block, Page):
-            # set fresh name if not set
-            _name = block.name if block.name else f"{block._block_name}-{next(self.id_count)}"
+            # set fresh auto-name if not set
+            _name = block.name if block.name else f"{block._block_name}-{next(self.id_counter)}"
             e.set("name", _name)
 
         self.elements.append(e)
@@ -106,12 +106,14 @@ class BaseElement(ABC):
         self._block_name = self._tag.lower()
         self._attributes = dict()
         self._add_attributes(**kwargs)
+        self._set_name(name)
 
         if "caption" in kwargs:
             _caption = kwargs["caption"]
             if _caption and len(_caption) > 512:
                 raise DPError("Caption must be less than 512 characters")
 
+    def _set_name(self, name: str = None):
         if name:
             # validate name
             if not is_valid_id(name):
@@ -162,8 +164,9 @@ class LayoutBlock(BaseElement):
 
     def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
         self.blocks = blocks or list(arg_blocks)
-        if len(self.blocks) == 0:
-            raise DPError("Can't create container with 0 objects")
+        # NOTE - removed to support empty groups
+        # if len(self.blocks) == 0:
+        #     raise DPError("Can't create container with 0 objects")
         self.blocks = [wrap_block(b) for b in self.blocks]
 
         super().__init__(**kwargs)
@@ -218,6 +221,8 @@ class Page(LayoutBlock):
             warnings.warn("dp.Page label= argument is deprecated, to be removed in next release, use title= instead.")
         label = label or title
         super().__init__(*arg_blocks, blocks=blocks, label=label)
+        if len(self.blocks) < 1:
+            raise DPError("Can't create Page with no objects")
         self._wrap_blocks()
 
     def _wrap_blocks(self) -> None:
@@ -697,7 +702,7 @@ class DataTable(AssetBlock):
     and can be downloaded by them as a CSV or Excel file.
 
     ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider using the `Table` block
-    ..note:: The DataTable component has advanced analysis features that requires a server and is not supported when saving locally, please publish such reports to a Datapane Server or use dp.Table
+    ..note:: The DataTable component has advanced analysis features that requires a server and is not supported when saving locally, please upload such reports to a Datapane Server or use dp.Table
 
     """
 

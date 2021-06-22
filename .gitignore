@@ -1,9 +1,3 @@
-test_proj*
-test_report*
-test_script*
-.ipynb_checkpoints
-/docs
-
 # Log file
 *.log
 
@@ -30,3 +24,10 @@ _version.py
 dp-cache
 dp-tmp-*
 local-report-base*
+
+# repo specific
+test_proj*/
+test_report*/
+test_script*/
+.ipynb_checkpoints
+/docs

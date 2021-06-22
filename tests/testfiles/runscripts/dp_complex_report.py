@@ -1,8 +1,7 @@
 """datapane script"""
 import os
-import altair as alt
 import datapane as dp
-from datapane.client.api.templates import gen_df
+from datapane.client.api.templates import gen_df, gen_plot
 from bokeh.plotting import figure
 from pathlib import Path
 import folium
@@ -69,7 +68,7 @@ file_asset = dp.File(data=lis)
 img_asset = dp.File(file=Path("./datapane-logo.png"))
 
 # Vega
-vega_asset = dp.Plot(data=alt.Chart(gen_df()).mark_line().encode(x="x", y="y"))
+vega_asset = dp.Plot(data=gen_plot())
 
 # Table
 df_table_asset = dp.Table(gen_df())
@@ -120,4 +119,4 @@ blocks = [
 dp.Report(blocks=blocks).save(path="local_xml_report.html")
 # add datatable
 blocks.append(df_datatable_asset)
-dp.Report(blocks=blocks).publish(name="xml_report")
+dp.Report(blocks=blocks).upload(name="xml_report")

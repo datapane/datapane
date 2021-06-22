@@ -39,6 +39,10 @@ class UnsupportedFeatureError(DPError):
     ...
 
 
+class InvalidReportError(DPError):
+    ...
+
+
 class MissingCloudPackagesError(DPError):
     def __init__(self, *a, **kw):
         # quick hack until we setup a conda meta-package for cloud

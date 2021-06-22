@@ -7,29 +7,37 @@
 namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 
 start = element Report {
-  attribute xml:id { xsd:ID },
   # unsignedByte ?
   attribute version { xsd:positiveInteger },
-  Meta, Main
+  Meta?, Internal, Main
 }
 
 ################################################################################
 # Metadata fields
-# we extract these into the Report DB fields for quick lookup
+# These are optional and only used with local reports
+# extract these into the Report DB fields on dp-server for ease-of-use/modification
 Meta = element Meta {
   element Author { xsd:string { minLength = "1" maxLength = "127" } } &
   element CreatedOn { xsd:dateTime } &
   element Title { xsd:string { minLength = "1" maxLength = "127" } } &
-  element Description { xsd:string { maxLength = "10240" } }
+  element Description { xsd:string { maxLength = "10240" } } &
+  element Type { string "dashboard" | string "report" | string "article" }
+}
+
+
+################################################################################
+# Internal fields, used when modifying the internal report structure
+Internal = element Internal {
+  empty
+  # id_count used to track free variables count
+  # attribute id_count { xsd:nonNegativeInteger }
 }
 
 
 ################################################################################
 # Main Report Tree
 Main = element Main {
-  Page+,
-  attribute type { string "dashboard" | string "report" | string "article" }
-  # attribute full_width { xsd:boolean },
+  Page+
 }
 
 # name always present, can be user-defined but auto-generated if not - used for exporting and asset lookup
@@ -55,12 +63,12 @@ Group = element Group {
   block_label_name,
   attribute rows { xsd:nonNegativeInteger },
   attribute columns { xsd:nonNegativeInteger },
-  Block+
+  Block*
 }
 
 Block = LayoutBlock | DataBlock
 
-DataBlock = EmbeddedTextBlock | AssetBlock | BigNumber
+DataBlock = EmbeddedTextBlock | AssetBlock | BigNumber | AssetRef
 
 EmbeddedTextBlock = Text | HTML | Code | Embed | Formula
 
@@ -100,6 +108,12 @@ Embed = element Embed {
   xsd:string { minLength = "1" }
 }
 
+Formula = element Formula {
+  block_label_name,
+  opt_caption,
+  xsd:string { minLength = "1" }
+}
+
 BigNumber = element BigNumber {
   block_label_name,
   attribute heading { xsd:string { minLength = "1" maxLength = "127" } },
@@ -112,10 +126,10 @@ BigNumber = element BigNumber {
   attribute is_upward_change { xsd:boolean }?
 }
 
-Formula = element Formula {
+AssetRef = element AssetRef {
   block_label_name,
   opt_caption,
-  xsd:string { minLength = "1" }
+  attribute ref { xsd:string { minLength = "1" } }
 }
 
 ################################################################################
