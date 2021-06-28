@@ -9,6 +9,16 @@ import click
 from datapane.common import JDict
 
 
+def is_jupyter() -> bool:
+    """Checks if inside ipython shell inside browser"""
+    try:
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
+    except Exception:
+        return False
+
+
+################################################################################
+# Built-in exceptions
 def add_help_text(x: str) -> str:
     return f"{x}\nPlease run with `dp.enable_logging()`, restart your Jupyter kernel/Python instance, and/or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
 

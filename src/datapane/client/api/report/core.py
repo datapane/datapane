@@ -23,7 +23,7 @@ from datapane.client.analytics import capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError, InvalidReportError
+from datapane.client.utils import DPError, InvalidReportError, is_jupyter
 from datapane.common import dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
@@ -45,13 +45,14 @@ local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
 # only these types will be documented by default
-__all__ = ["Report", "Visibility", "ReportType"]
+__all__ = ["Report", "ReportType"]
 
 __pdoc__ = {
     "Report.endpoint": False,
 }
 
 
+# TODO(protocol) TODO(obsolete)
 class Visibility(IntEnum):
     """The report visibility type"""
 
@@ -68,15 +69,8 @@ class ReportType(Enum):
     ARTICLE = "article"
 
 
+# Used to detect a single display message once per VM invocation
 SKIP_DISPLAY_MSG = False
-
-
-def is_jupyter() -> bool:
-    """Checks if inside ipython shell inside browser"""
-    try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
-    except Exception:
-        return False
 
 
 def display_msg(text: str, md: str = None):
@@ -124,10 +118,11 @@ class ReportFileWriter:
         self.template = template_env.get_template("template.html")
 
     def _display_msg(self):
+        # TODO(obsolete)
         global SKIP_DISPLAY_MSG
 
         # only display once per session, else skip
-        if SKIP_DISPLAY_MSG or not c.config.is_public:
+        if SKIP_DISPLAY_MSG or c.config.is_org:
             return None
         else:
             SKIP_DISPLAY_MSG = True
@@ -142,7 +137,14 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        self._display_msg()
+        url = "https://datapane.com/create-workspace/"
+        display_msg(
+            text=f"Report saved to {path}. To host and share securely, create a free private workspace at {url}",
+            md=f"Report saved to {path}. To host and share securely, [create a free private workspace]({url})",
+        )
+
+        # TODO(obsolete)
+        # self._display_msg()
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
@@ -220,7 +222,6 @@ class BaseReport(DPObjectRef):
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         **kwargs,
@@ -228,17 +229,11 @@ class BaseReport(DPObjectRef):
         # TODO - clean up arg handling
         # process params
         tags = tags or []
-        visibility_str: str
-        if isinstance(visibility, str):
-            visibility_str = visibility.upper()
-        else:
-            visibility_str = visibility.name
         kwargs.update(
             name=name,
             description=description,
             tags=tags,
             source_url=source_url,
-            visibility=visibility_str,
             group=group,
             type=self.report_type.value,  # set the type of report using type argument passed to the constructor
         )
@@ -324,7 +319,6 @@ class TextReport(BaseReport):
         name: t.Optional[str] = "",
         description: str = "",
         source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         open: bool = False,
@@ -338,7 +332,6 @@ class TextReport(BaseReport):
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
-            visibility: "PRIVATE"` (default) or `"PUBLIC"``
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
             open: Open the file in your browser after creating
@@ -356,8 +349,11 @@ class TextReport(BaseReport):
                 raise DPError("Expected a TextReport object, found a Report object")
             name = x.name
 
-        self._upload_report(name, description, source_url, visibility, tags, group, is_text_report=True, **kwargs)
-        display_msg(text=f"TextReport successfully {'updated' if id else 'created'} - edit at {self.edit_url}")
+        self._upload_report(name, description, source_url, tags, group, is_text_report=True, **kwargs)
+        display_msg(
+            text=f"TextReport assets successfully uploaded - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
+            md=f"TextReport assets successfully uploaded - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
+        )
 
         if open:
             webbrowser.open_new_tab(self.edit_url)
@@ -422,7 +418,6 @@ class Report(BaseReport):
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         open: bool = False,
@@ -435,20 +430,32 @@ class Report(BaseReport):
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
-            visibility: "PRIVATE"` (default) or `"PUBLIC"``
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
             open: Open the file in your browser after creating
         """
 
+        if "visibility" in kwargs:
+            kwargs.pop("visibility")
+            if c.config.is_public:
+                warnings.warn(
+                    "Visibility parameter deprecated, your reports are drafts by default and can be published via the report share feature in your browser"
+                )
+            else:
+                warnings.warn(
+                    "Visibility parameter deprecated, your reports are private by default and can be shared via the report share feature in your browser"
+                )
+
         display_msg("Publishing document and associated data - *please wait...*")
 
-        self._upload_report(name, description, source_url, visibility, tags, group, **kwargs)
+        self._upload_report(name, description, source_url, tags, group, **kwargs)
 
         if open:
             webbrowser.open_new_tab(self.web_url)
+
         display_msg(
-            text=f"Report successfully uploaded at {self.web_url} - it's currently {self.visibility}, you can configure this from the report page"
+            text=f"Report successfully uploaded at {self.web_url}, follow the link to view your report and optionally share it with the Datapane Community",
+            md=f"Report successfully uploaded, click [here]({self.web_url}) to view your report and optionally share it with the Datapane Community",
         )
 
     def publish(self, *a, **kw) -> None:
@@ -523,8 +530,10 @@ class Report(BaseReport):
             if asset_blocks < 3:
                 raise InvalidReportError("Empty report - must contain at least one asset/block")
             elif asset_blocks < 4:
+                url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
                 display_msg(
-                    "Your report only contains a single element - did you know you can add multiple plots and tables to a report, add text to it and export directly to Medium once uploaded?"
+                    text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out {url} for more info",
+                    md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out [the docs]({url}) for more info",
                 )
 
             has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")

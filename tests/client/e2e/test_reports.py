@@ -27,8 +27,9 @@ def test_report_simple():
 
 @pytest.mark.org
 def test_report_simple_permissions():
+    # TODO(e2e-move) - already moved - obsolete
     report = gen_report_simple()
-    report.upload(name="TEST", description="DESCRIPTION", visibility=dp.Visibility.PRIVATE)
+    report.upload(name="TEST", description="DESCRIPTION")
     with deletable(report):
         # check we can't access api & web urls
         r = requests.get(url=report.url)
@@ -38,7 +39,7 @@ def test_report_simple_permissions():
         assert r.status_code == 200
         # check we can't embed a private report
         f = furl(origin=c.config.server, path="api/oembed/", args=dict(url=report.web_url))
-        r = requests.get(url=str(f))
+        r = requests.get(url=f.url)
         assert r.status_code in [400, 401, 403]
 
 
@@ -48,7 +49,6 @@ def test_report_update_metadata():
     props = dict(
         description="TEST-DESCRIPTION",
         source_url="https://www.github.com/datapane",
-        visibility="PUBLIC",
         tags=["a", "b"],
     )
 
@@ -71,7 +71,6 @@ def test_report_update_metadata():
         assert x == y or sorted(x) == sorted(y)
 
     with deletable(report):
-        assert report.visibility == "PUBLIC"
         for (k, v) in props.items():
             check(report.dto[k], v)
         orig_dto = deepcopy(report.dto)

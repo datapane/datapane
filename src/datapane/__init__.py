@@ -52,7 +52,6 @@ from .client.api import (
     Text,
     TextReport,
     Variable,
-    Visibility,
     by_datapane,
     login,
     logout,

@@ -49,6 +49,10 @@ class Config:
     def is_public(self) -> bool:
         return self.server == DEFAULT_SERVER
 
+    @property
+    def is_org(self) -> bool:
+        return not self.is_public
+
     # MANAGER functions
     @classmethod
     def load(cls, env: str = "default") -> "Config":

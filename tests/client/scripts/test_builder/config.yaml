@@ -21,6 +21,5 @@ parameters: [
 # docker_image: datapane-python-default
 # volatile: False
 # privileged: False
-# visibility: False
 # Persist the script between requests
 # persistent: True

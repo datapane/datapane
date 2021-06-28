@@ -14,7 +14,6 @@ from .common import check_name, code, deletable, gen_df, gen_name
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 df = gen_df()
-visibility = "PUBLIC"
 
 
 # TODO - split these tests out and add export
