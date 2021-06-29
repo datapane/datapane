@@ -37,6 +37,17 @@ double_ext_map: t.Dict[str, MIME] = {k: MIME(v) for k, v in _double_ext_map.item
 ON_WINDOWS = sys.platform == "win32"
 
 ################################################################################
+# CONSTANTS
+DEFAULT_HTML_HEADER = """<style type="text/css">
+    :root {
+      --dp-accent-color: #4E46E5;
+      --dp-bg-color: #FFF;
+      --dp-text-align: justify;
+      --dp-font-family: Inter var, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
+    }
+</style>"""
+
+################################################################################
 # Logging
 # export the application logger at WARNING level by default
 log: logging.Logger = logging.getLogger("datapane")

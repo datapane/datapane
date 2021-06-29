@@ -26,6 +26,7 @@ from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, is_jupyter
 from datapane.common import dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
+from datapane.common.utils import DEFAULT_HTML_HEADER
 
 from .blocks import (
     Block,
@@ -154,6 +155,7 @@ class ReportFileWriter:
             report_name=name,
             report_author=author,
             report_date=timestamp(),
+            html_header=DEFAULT_HTML_HEADER,
             dp_logo=self.logo,
         )
         Path(path).write_text(r, encoding="utf-8")

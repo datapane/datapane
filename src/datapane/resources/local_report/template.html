@@ -24,7 +24,7 @@
       const { React, ReactDOM, ReportComponent } = DPLIB["local-report-base"];
       const ReportFactory = React.createElement.bind(null, ReportComponent);
       ReactDOM.render(
-        ReportFactory({ report }),
+        ReportFactory({ report, htmlHeader: `{{ html_header }}` }),
         document.querySelector("#report-root")
       );
     </script>
