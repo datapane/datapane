@@ -158,6 +158,22 @@ class DPObjectRef:
     def __repr__(self) -> str:
         return pprint.pformat(self._dto.toDict()) if self.has_dto else self.__str__()
 
+    # ipython integration
+    def __dir__(self) -> t.Iterable[str]:
+        x = super().__dir__()
+        if self.has_dto:
+            print(self.dto.keys())
+            x = list(x)
+            x.extend(self.dto.keys())
+        return x
+
+    def _repr_pretty_(self, p, cycle):
+        name = self.__class__.__name__
+        if self.has_dto:
+            p.text(f"Uploaded {name} - view at {self.url}")
+        else:
+            p.text(f"Local {name}")
+
     # user-facing helper functions
     def refresh(self):
         """Refresh the object with the latest data from the Datapane Server
