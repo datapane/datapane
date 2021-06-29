@@ -170,7 +170,7 @@ class DPObjectRef:
     def _repr_pretty_(self, p, cycle):
         name = self.__class__.__name__
         if self.has_dto:
-            p.text(f"Uploaded {name} - view at {self.url}")
+            p.text(f"Uploaded {name} - view at {self.web_url}")
         else:
             p.text(f"Local {name}")
 
