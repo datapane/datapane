@@ -200,6 +200,7 @@ class BaseReport(DPObjectRef):
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
+        check_empty: bool = False,
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
         report_doc, attachments = self._to_xml(embedded, title, description, author)
@@ -207,7 +208,7 @@ class BaseReport(DPObjectRef):
         # post_process and validate
         processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
         validate_report_doc(xml_doc=processed_report_doc)
-        self._report_status_checks(processed_report_doc, embedded)
+        self._report_status_checks(processed_report_doc, embedded, check_empty)
 
         # convert to string
         report_str = etree.tounicode(processed_report_doc)
@@ -215,7 +216,7 @@ class BaseReport(DPObjectRef):
         # log.debug(report_str)
         return (report_str, attachments)
 
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
         # NOTE - common checks go here
         pass
 
@@ -361,8 +362,17 @@ class TextReport(BaseReport):
             webbrowser.open_new_tab(self.edit_url)
         return self
 
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
-        super()._report_status_checks(processed_report_doc, embedded)
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
+        super()._report_status_checks(processed_report_doc, embedded, check_empty)
+
+        if embedded:
+            return None
+
+        asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
+        if asset_blocks < 3 and check_empty:
+            raise InvalidReportError(
+                "Empty TextReport, require at least one asset, please see the docs for syntax help"
+            )
 
 
 # Python/API Report
@@ -519,8 +529,8 @@ class Report(BaseReport):
         else:
             log.warning("Can't preview - are you running in Jupyter?")
 
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
-        super()._report_status_checks(processed_report_doc, embedded)
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
+        super()._report_status_checks(processed_report_doc, embedded, check_empty)
 
         # check for any unsupported local features, e.g. DataTable
         # NOTE - we could eventually have different validators for local and uploaded reports
@@ -529,7 +539,7 @@ class Report(BaseReport):
         else:
             # TODO - validate at least a single element
             asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
-            if asset_blocks < 3:
+            if asset_blocks < 3 and check_empty:
                 raise InvalidReportError("Empty report - must contain at least one asset/block")
             elif asset_blocks < 4:
                 url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
