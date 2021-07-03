@@ -27,7 +27,7 @@ def validate_report_doc(
     xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, quiet: bool = False
 ) -> bool:
     """Validate the model against the schema, throws an etree.DocumentInvalid if not"""
-    assert xml_str or xml_doc is not None
+    assert xml_str or (xml_doc is not None)
     if xml_str:
         xml_doc = etree.fromstring(xml_str)
 
@@ -35,9 +35,8 @@ def validate_report_doc(
         rng_validator.assertValid(xml_doc)
         return True
     except DocumentInvalid:
-        if not xml_str:
-            xml_str = etree.tounicode(xml_doc, pretty_print=True)
         if not quiet:
+            xml_str = xml_str if xml_str else etree.tounicode(xml_doc, pretty_print=True)
             log.error(f"Error validating report document:\n\n{xml_str}")
         raise
 
