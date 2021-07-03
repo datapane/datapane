@@ -200,7 +200,7 @@ class BaseReport(DPObjectRef):
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
-        check_empty: bool = False,
+        check_empty: bool = True,
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
         report_doc, attachments = self._to_xml(embedded, title, description, author)

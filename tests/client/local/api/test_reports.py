@@ -178,30 +178,30 @@ def test_gen_report_primitives(datadir: Path):
 
 def test_gen_failing_reports():
     # nested pages
-    with pytest.raises((DocumentInvalid, DPError)):
+    with pytest.raises(DPError):
         r = dp.Report(dp.Page(dp.Page(md_block)))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
-    with pytest.raises((DocumentInvalid, DPError)):
+    with pytest.raises(DPError):
         r = dp.Report(dp.Group(dp.Page(md_block)))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # group with 0 object
-    with pytest.raises((DocumentInvalid, DPError)):
+    with pytest.raises(DPError):
         r = dp.Report(dp.Page(dp.Group(blocks=[])))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # select with 1 object
-    with pytest.raises((DocumentInvalid, DPError)):
+    with pytest.raises(DPError):
         r = dp.Report(dp.Page(dp.Select(blocks=[md_block])))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # empty text block
-    with pytest.raises((AssertionError, DocumentInvalid, DPError)):
+    with pytest.raises(AssertionError):
         r = dp.Report(dp.Text(" "))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # empty df
-    with pytest.raises((AssertionError, DocumentInvalid, DPError)):
+    with pytest.raises(DPError):
         r = dp.Report(dp.DataTable(pd.DataFrame()))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
@@ -302,9 +302,10 @@ def test_textreport_gen():
     report = dp.TextReport("Text-1", "Text-2", s_df)
     assert_text_report(report, 3)
 
-    # empty
-    report = dp.TextReport()
-    assert_text_report(report, 0)
+    # empty - raise error
+    with pytest.raises(DPError):
+        report = dp.TextReport()
+        assert_text_report(report, 0)
 
     # mixed naming usage
     report = dp.TextReport("text-1", dp.Text("Text-4", name="test"))
