@@ -59,7 +59,6 @@ def test_report_update_metadata():
         "username",
         "web_url",
         "embed_url",
-        "created_date",
         "type",
         "files",
         "num_blocks",
