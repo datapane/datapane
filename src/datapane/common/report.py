@@ -5,7 +5,7 @@ import typing as t
 import importlib_resources as ir
 from lxml import etree
 from lxml.etree import DocumentInvalid
-from micawber import ProviderException, bootstrap_basic, cache
+from micawber import ProviderException, bootstrap_basic, bootstrap_noembed, cache
 
 from datapane.client import DPError
 from datapane.common import HTML
@@ -74,6 +74,13 @@ def get_embed_url(url: str, width: int = 960, height: int = 540) -> Embedded:
     """Return html for an embeddable URL"""
     try:
         r = providers.request(url, maxwidth=width, maxheight=height)
-        return Embedded(html=r["html"], title=r.get("title", "Title"), provider=r.get("provider_name", "Embedding"))
     except ProviderException:
-        raise DPError(f"No embed provider found for URL '{url}' - is there an active internet connection?")
+        # add noembed to the list and try again
+        try:
+            log.debug("Initialising NoEmbed OEmbed provider")
+            bootstrap_noembed(registry=providers)
+            r = providers.request(url, maxwidth=width, maxheight=height)
+        except ProviderException:
+            raise DPError(f"No embed provider found for URL '{url}' - is there an active internet connection?")
+
+    return Embedded(html=r["html"], title=r.get("title", "Title"), provider=r.get("provider_name", "Embedding"))

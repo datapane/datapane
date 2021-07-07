@@ -79,6 +79,7 @@ boltons = "^20.0.0"
 dominate = "^2.4.0"  # latest on conda
 micawber = ">=0.5.0"
 posthog = "^1.4.1"
+pydantic = "^1.8.2"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium"]
