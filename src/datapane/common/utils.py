@@ -15,6 +15,10 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
+from nbconvert import NotebookExporter
+from nbconvert.preprocessors import ClearOutputPreprocessor, TagRemovePreprocessor
+from nbconvert.preprocessors.sanitize import SanitizeHTML
+from traitlets.config import Config
 
 from .dp_types import MIME, DPMode, NPath, get_dp_mode
 
@@ -263,3 +267,23 @@ def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
         return {k: v for (k, v) in xs.items() if v is not None}
     else:
         return {k: v for (k, v) in xs.items() if v}
+
+
+def process_notebook(input_file: Path, output_file: Path):
+    """
+    Strips the output of the jupyter notebook provided as input and also removes cells tagged as "exclude".
+    input_file: file object or path of jupyter notebook that needs to be processed
+    output_file: path of the output file
+    """
+    # Setup config
+    c = Config()
+    # Configure tag removal preprocessors
+    c.TagRemovePreprocessor.remove_cell_tags = ("exclude",)
+    exporter = NotebookExporter(config=c)
+    exporter.register_preprocessor(ClearOutputPreprocessor(config=c), True)
+    exporter.register_preprocessor(TagRemovePreprocessor(config=c), True)
+    exporter.register_preprocessor(SanitizeHTML(config=c), True)
+    # Run exporter
+    output, _ = exporter.from_filename(input_file)
+    # write output to file
+    Path(output_file).write_text(output)

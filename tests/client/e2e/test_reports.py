@@ -108,7 +108,8 @@ def test_demo_report():
         ...
 
 
-def test_full_report(tmp_path: Path):
+def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
+    monkeypatch.chdir(shared_datadir)
     df = gen_df()
     name = gen_name()
     description = gen_description()
@@ -130,7 +131,12 @@ def test_full_report(tmp_path: Path):
     list_asset = dp.File(data=lis, is_json=True)
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     dp_report = dp.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
-    dp_report.upload(name=name, description=description, source_url=source_url)
+    dp_report.upload(
+        name=name,
+        description=description,
+        source_url=source_url,
+        source_file=Path("sample_notebook.ipynb"),
+    )
 
     with deletable(dp_report):
         # are the fields ok

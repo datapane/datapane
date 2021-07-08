@@ -24,9 +24,9 @@ from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, is_jupyter
-from datapane.common import dict_drop_empty, log, timestamp
+from datapane.common import NPath, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
-from datapane.common.utils import DEFAULT_HTML_HEADER
+from datapane.common.utils import DEFAULT_HTML_HEADER, process_notebook
 
 from .blocks import (
     Block,
@@ -227,6 +227,7 @@ class BaseReport(DPObjectRef):
         source_url: str = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
+        source_file: t.Optional[NPath] = None,
         **kwargs,
     ) -> None:
         # TODO - clean up arg handling
@@ -249,7 +250,15 @@ class BaseReport(DPObjectRef):
         # TODO(protocol) always include attachments parameter
         # if not attachments:
         #     kwargs["attachments"] = []
-        res = Resource(self.endpoint).post_files(dict(attachments=attachments), api_document=report_str, **kwargs)
+        files = dict(attachments=attachments)
+
+        # create a temp output file for stripped down version of notebook
+        with DPTmpFile(".ipynb") as output_file:
+            if source_file:
+                # strip the output of original notebook and store in temp file
+                process_notebook(Path(source_file), output_file.file)
+                files["source_file"] = [output_file.file]
+            res = Resource(self.endpoint).post_files(files, api_document=report_str, **kwargs)
 
         # Set dto based on new URL
         self.url = res.url
@@ -286,7 +295,7 @@ class TextReport(BaseReport):
         .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
           `dp.TextReport(my_plot=plot, my_table=table)` or `dp.TextReport(blocks={"my_plot": plot, "my_table":table})`
 
-        .. tip:: Create a dictionary first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
+        .. tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__()
 
@@ -324,6 +333,7 @@ class TextReport(BaseReport):
         source_url: str = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
+        source_file: t.Optional[NPath] = None,
         open: bool = False,
         **kwargs,
     ) -> "TextReport":
@@ -337,6 +347,7 @@ class TextReport(BaseReport):
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
+            source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
 
         Returns:
@@ -352,7 +363,7 @@ class TextReport(BaseReport):
                 raise DPError("Expected a TextReport object, found a Report object")
             name = x.name
 
-        self._upload_report(name, description, source_url, tags, group, is_text_report=True, **kwargs)
+        self._upload_report(name, description, source_url, tags, group, source_file, is_text_report=True, **kwargs)
         display_msg(
             text=f"TextReport assets successfully uploaded - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
             md=f"TextReport assets successfully uploaded - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
@@ -432,6 +443,7 @@ class Report(BaseReport):
         source_url: str = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
+        source_file: t.Optional[NPath] = None,
         open: bool = False,
         **kwargs,
     ) -> None:
@@ -444,6 +456,7 @@ class Report(BaseReport):
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
+            source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
         """
 
@@ -460,7 +473,7 @@ class Report(BaseReport):
 
         display_msg("Publishing document and associated data - *please wait...*")
 
-        self._upload_report(name, description, source_url, tags, group, **kwargs)
+        self._upload_report(name, description, source_url, tags, group, source_file, **kwargs)
 
         if open:
             webbrowser.open_new_tab(self.web_url)
