@@ -47,6 +47,7 @@ __all__ = [
     "BigNumber",
     "Text",
     "Code",
+    "Embed",
     "HTML",
     "File",
     "Formula",
