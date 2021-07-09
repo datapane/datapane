@@ -15,12 +15,8 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
-from nbconvert import NotebookExporter
-from nbconvert.preprocessors import ClearOutputPreprocessor, TagRemovePreprocessor
-from nbconvert.preprocessors.sanitize import SanitizeHTML
-from traitlets.config import Config
 
-from .dp_types import MIME, DPMode, NPath, get_dp_mode
+from .dp_types import MIME, DPError, DPMode, NPath, get_dp_mode
 
 mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
@@ -275,6 +271,21 @@ def process_notebook(input_file: Path, output_file: Path):
     input_file: file object or path of jupyter notebook that needs to be processed
     output_file: path of the output file
     """
+    import nbconvert
+    from packaging.version import parse as parse_version
+
+    # check available nbconvert version and raise error if it is not >=6.0.0
+    if parse_version(nbconvert.__version__) < parse_version("6.0.0"):
+        raise DPError("Source file upload only works with nbconvert >= 6.0.0. Run pip install 'nbconvert>=6.0.0'")
+
+    from nbconvert import NotebookExporter
+    from nbconvert.preprocessors import ClearOutputPreprocessor, TagRemovePreprocessor
+    from nbconvert.preprocessors.sanitize import SanitizeHTML
+    from traitlets.config import Config
+
+    if input_file.suffix != ".ipynb":
+        raise DPError("Source file should be a jupyter notebook.")
+
     # Setup config
     c = Config()
     # Configure tag removal preprocessors

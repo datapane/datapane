@@ -5,6 +5,7 @@ from .datafiles import ArrowFormat
 from .dp_types import (
     ARROW_EXT,
     ARROW_MIMETYPE,
+    DPError,
     DPMode,
     HTML,
     JSON,

@@ -16,11 +16,12 @@ from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import SDict, _setup_dp_logging, dict_drop_empty, log
+from datapane.common import DPError, SDict, _setup_dp_logging, dict_drop_empty, log
+from datapane.common.dp_types import add_help_text
 
 from . import analytics, api
 from . import config as c
-from . import scripts, utils
+from . import scripts
 from .scripts import config as sc
 from .utils import failure_msg, process_cmd_param_vals, success_msg
 
@@ -80,10 +81,10 @@ class GlobalCommandHandler(click.Group):
             analytics.capture("CLI Error", dict(msg=str(e), type=str(type(e))))
             if EXTRA_OUT:
                 log.exception(e)
-            if isinstance(e, utils.DPError):
+            if isinstance(e, DPError):
                 failure_msg(str(e))
             else:
-                failure_msg(utils.add_help_text(str(e)), do_exit=True)
+                failure_msg(add_help_text(str(e)), do_exit=True)
 
 
 def recursive_help(cmd, parent=None):

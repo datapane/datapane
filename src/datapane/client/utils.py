@@ -6,7 +6,7 @@ from typing import Iterator, Tuple
 
 import click
 
-from datapane.common import JDict
+from datapane.common import DPError, JDict
 
 
 def is_jupyter() -> bool:
@@ -19,16 +19,6 @@ def is_jupyter() -> bool:
 
 ################################################################################
 # Built-in exceptions
-def add_help_text(x: str) -> str:
-    return f"{x}\nPlease run with `dp.enable_logging()`, restart your Jupyter kernel/Python instance, and/or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
-
-
-class DPError(Exception):
-    def __str__(self):
-        # update the error message with help text
-        return add_help_text(super().__str__())
-
-
 class IncompatibleVersionError(DPError):
     ...
 
