@@ -81,6 +81,22 @@ This would package a standalone HTML report document such as the following:
 
 ![Report Example](https://user-images.githubusercontent.com/3541695/117442319-82a2dd00-af2e-11eb-843e-29097f425a55.png)
 
+## Text Reports
+
+If you are writing a report with a lot of text e.g. an article or tutorial, try our [Text Report](https://docs.datapane.com/reports/blocks/text-reports) web editor, where you can combine Markdown with assets uploaded from Python. Here's how you'd do it for the previous example: 
+
+```Python
+dp.TextReport("## Vaccination Report",
+    dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
+    dp.Table(total_styled, caption="Current vaccination totals by manufacturer")
+).upload(name="Example vaccination report")
+```
+
+Note that you'll need an account on Datapane.com to use TextReports. This will bring up the web editor, where you can add additional commentary to these assets: 
+
+<img width="1077" alt="TextReport editor and preview" src="https://user-images.githubusercontent.com/16949044/125301674-1cb64580-e323-11eb-83ea-9b1e1b981734.png">
+
+
 ## Featured Examples
 
 Here a few samples of the top reports created by the Datapane community. To see more, see our [featured](https://datapane.com/featured) section.
@@ -112,11 +128,11 @@ In addition to saving documents locally, you can use [Datapane Community](https:
 - You can embed them into places like Medium, Reddit, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
 - Viewers can explore and download your data with additional DataTable analysis features
 
-To get started, create a free API key (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `publish` function on your report,
+To get started, create a free API key (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `upload` function on your report,
 
 ```python
 r = dp.Report(dp.DataTable(df), dp.Plot(chart))
-r.publish(name="2020 Stock Portfolio", open=True)
+r.upload(name="2020 Stock Portfolio", open=True)
 ```
 
 ## Private sharing
