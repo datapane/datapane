@@ -21,7 +21,6 @@ Meta = element Meta {
   element CreatedOn { xsd:dateTime } &
   element Title { xsd:string { minLength = "1" maxLength = "127" } } &
   element Description { xsd:string { maxLength = "10240" } } &
-  element Type { string "dashboard" | string "report" | string "article" }
 }
 
 

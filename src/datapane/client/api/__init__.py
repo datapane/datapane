@@ -65,7 +65,7 @@ from .report.blocks import (
     Text,
     Table,
 )
-from .report.core import Report, ReportType, TextReport
+from .report.core import FontChoice, Report, ReportFormatting, ReportType, ReportWidth, TextAlignment, TextReport
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .teams import Blob, Run, Schedule, Script, Variable
 from .user import login, logout, ping

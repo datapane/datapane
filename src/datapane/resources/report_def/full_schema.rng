@@ -49,13 +49,6 @@
             <param name="maxLength">10240</param>
           </data>
         </element>
-        <element name="Type">
-          <choice>
-            <value type="string" datatypeLibrary="">dashboard</value>
-            <value type="string" datatypeLibrary="">report</value>
-            <value type="string" datatypeLibrary="">article</value>
-          </choice>
-        </element>
       </interleave>
     </element>
   </define>

@@ -20,11 +20,14 @@
   <body>
     <div id="report-root" class="w-full pb-12"></div>
     <script>
-      const report = { api_document: `{{ report_doc|e }}` };
+      const report = { api_document: `{{ report_doc|e }}`, width: "{{ report_width }}" };
+      const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
+
       const { React, ReactDOM, ReportComponent } = DPLIB["local-report-base"];
       const ReportFactory = React.createElement.bind(null, ReportComponent);
+
       ReactDOM.render(
-        ReportFactory({ report, htmlHeader: `{{ html_header }}` }),
+        ReportFactory({ report, htmlHeader, isLightProse: {{ is_light_prose }} }),
         document.querySelector("#report-root")
       );
     </script>

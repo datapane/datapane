@@ -3,6 +3,8 @@ Datapane Reports Object
 
 Describes the `Report` object and included APIs for saving and uploading them.
 """
+import dataclasses as dc
+import json
 import shutil
 import typing as t
 import warnings
@@ -26,7 +28,7 @@ from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, is_jupyter
 from datapane.common import NPath, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
-from datapane.common.utils import DEFAULT_HTML_HEADER, process_notebook
+from datapane.common.utils import process_notebook
 
 from .blocks import (
     Block,
@@ -46,7 +48,7 @@ local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
 # only these types will be documented by default
-__all__ = ["Report", "ReportType"]
+__all__ = ["Report", "ReportWidth"]
 
 __pdoc__ = {
     "Report.endpoint": False,
@@ -62,12 +64,60 @@ class Visibility(IntEnum):
     PUBLIC = 2  # anon/unauthed access
 
 
+# TODO(protocol)
+class ReportWidth(Enum):
+    """The document width"""
+
+    NARROW = "narrow"
+    MEDIUM = "medium"
+    FULL = "full"
+
+
 class ReportType(Enum):
     """The document type"""
 
     DASHBOARD = "dashboard"
     REPORT = "report"
     ARTICLE = "article"
+
+
+class TextAlignment(Enum):
+    JUSTIFY = "justify"
+    LEFT = "left"
+    RIGHT = "right"
+    CENTER = "center"
+
+
+class FontChoice(Enum):
+    DEFAULT = "Inter var, ui-sans-serif, system-ui"
+    SANS = "ui-sans-serif, sans-serif, system-ui"
+    SERIF = "ui-serif, serif, system-ui"
+    MONOSPACE = "ui-monospace, monospace, system-ui"
+
+
+@dc.dataclass
+class ReportFormatting:
+    """Set the basic styling for your report"""
+
+    bg_color: str = "#FFF"
+    accent_color: str = "#4E46E5"
+    font: t.Union[FontChoice, str] = FontChoice.DEFAULT
+    text_alignment: TextAlignment = TextAlignment.JUSTIFY
+    width: ReportWidth = ReportWidth.MEDIUM
+    light_prose: bool = False
+
+    def to_css(self) -> str:
+        if isinstance(self.font, FontChoice):
+            font = self.font.value
+        else:
+            font = self.font
+
+        return f""":root {{
+    --dp-accent-color: {self.accent_color};
+    --dp-bg-color: {self.bg_color};
+    --dp-text-align: {self.text_alignment.value};
+    --dp-font-family: {font};
+}}"""
 
 
 # Used to detect a single display message once per VM invocation
@@ -133,7 +183,18 @@ class ReportFileWriter:
             md="Thanks for using **Datapane**, to automate and securely share documents in your organization please see [Datapane Teams](https://datapane.com/)",
         )
 
-    def write(self, report_doc: str, path: str, report_type: ReportType, name: str, author: t.Optional[str]):
+    def write(
+        self,
+        report_doc: str,
+        path: str,
+        name: str,
+        author: t.Optional[str] = None,
+        formatting: ReportFormatting = None,
+    ):
+
+        if formatting is None:
+            formatting = ReportFormatting()
+
         # create template on demand
         if not self.template:
             self._setup_template()
@@ -151,11 +212,12 @@ class ReportFileWriter:
         report_doc_esc = report_doc.replace("`", r"\`")
         r = self.template.render(
             report_doc=report_doc_esc,
-            report_type=report_type,
+            report_width=formatting.width.value,
             report_name=name,
             report_author=author,
             report_date=timestamp(),
-            html_header=DEFAULT_HTML_HEADER,
+            css_header=formatting.to_css(),
+            is_light_prose=json.dumps(formatting.light_prose),
             dp_logo=self.logo,
         )
         Path(path).write_text(r, encoding="utf-8")
@@ -164,7 +226,6 @@ class ReportFileWriter:
 class BaseReport(DPObjectRef):
     endpoint: str = "/reports/"
     pages: t.List[Page]
-    report_type: ReportType = ReportType.REPORT
     # id_count: int = 1
 
     def _to_xml(
@@ -189,7 +250,6 @@ class BaseReport(DPObjectRef):
                 E.CreatedOn(timestamp()),
                 E.Title(title),
                 E.Description(description),
-                E.Type(self.report_type.value),
             )
             report_doc.insert(0, meta)
         return (report_doc, _s.attachments)
@@ -228,18 +288,31 @@ class BaseReport(DPObjectRef):
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
+        formatting: t.Optional[ReportFormatting] = None,
         **kwargs,
     ) -> None:
         # TODO - clean up arg handling
         # process params
         tags = tags or []
+        formatting_kwargs = {}
+
+        if formatting:
+            if c.config.is_org:
+                formatting_kwargs.update(width=formatting.width.value)
+            else:
+                formatting_kwargs.update(
+                    width=formatting.width.value,
+                    css_header=formatting.to_css(),
+                    is_light_prose=formatting.light_prose,
+                )
+
         kwargs.update(
             name=name,
             description=description,
             tags=tags,
             source_url=source_url,
             group=group,
-            type=self.report_type.value,  # set the type of report using type argument passed to the constructor
+            **formatting_kwargs,
         )
         # current protocol is to strip all empty args and patch (via a post)
         # TODO(protocol) - alternate plan would be keeping local state in resource handle and posting all
@@ -335,6 +408,7 @@ class TextReport(BaseReport):
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
         open: bool = False,
+        formatting: t.Optional[ReportFormatting] = None,
         **kwargs,
     ) -> "TextReport":
         """
@@ -349,11 +423,11 @@ class TextReport(BaseReport):
             group: Group to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
+            formatting: Set the basic styling for your report
 
         Returns:
             A `TextReport` document object that can be used to upload assets
         """
-
         assert id or name, "id or name must be set"
         if id:
             # TODO - this seems incorrect - do we want this indirection
@@ -363,7 +437,17 @@ class TextReport(BaseReport):
                 raise DPError("Expected a TextReport object, found a Report object")
             name = x.name
 
-        self._upload_report(name, description, source_url, tags, group, source_file, is_text_report=True, **kwargs)
+        self._upload_report(
+            name,
+            description,
+            source_url,
+            tags,
+            group,
+            source_file,
+            is_text_report=True,
+            formatting=formatting,
+            **kwargs,
+        )
         display_msg(
             text=f"TextReport assets successfully uploaded - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
             md=f"TextReport assets successfully uploaded - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
@@ -421,7 +505,10 @@ class Report(BaseReport):
         .. tip:: Create a list first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__(**kwargs)
-        self.report_type = type
+
+        if type:
+            warnings.warn("use dp.ReportFormatting instead when calling upload or save")
+
         self._preprocess_pages(blocks or list(arg_blocks))
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
@@ -445,6 +532,7 @@ class Report(BaseReport):
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
         open: bool = False,
+        formatting: t.Optional[ReportFormatting] = None,
         **kwargs,
     ) -> None:
         """
@@ -458,6 +546,7 @@ class Report(BaseReport):
             group: Group to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
+            formatting: Set the basic styling for your report
         """
 
         if "visibility" in kwargs:
@@ -473,7 +562,7 @@ class Report(BaseReport):
 
         display_msg("Publishing document and associated data - *please wait...*")
 
-        self._upload_report(name, description, source_url, tags, group, source_file, **kwargs)
+        self._upload_report(name, description, source_url, tags, group, source_file, formatting=formatting, **kwargs)
 
         if open:
             webbrowser.open_new_tab(self.web_url)
@@ -488,7 +577,14 @@ class Report(BaseReport):
         self.upload(*a, **kw)
 
     @capture_event("CLI Report Save")
-    def save(self, path: str, open: bool = False, name: t.Optional[str] = None, author: t.Optional[str] = None) -> None:
+    def save(
+        self,
+        path: str,
+        open: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[ReportFormatting] = None,
+    ) -> None:
         """Save the report document to a local HTML file
 
         Args:
@@ -496,6 +592,7 @@ class Report(BaseReport):
             open: Open in your browser after creating (default: False)
             name: Name of the document (optional: uses path if not provided)
             author: The report author / email / etc. (optional)
+            formatting: Set the basic styling for your report
         """
         self._last_saved = path
 
@@ -503,7 +600,12 @@ class Report(BaseReport):
             name = Path(path).stem[:127]
 
         local_doc, _ = self._gen_report(embedded=True, title=name)
-        self._local_writer.write(local_doc, path, self.report_type, name=name, author=author or c.config.username)
+        self._local_writer.write(
+            local_doc,
+            path,
+            name=name,
+            formatting=formatting,
+        )
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"

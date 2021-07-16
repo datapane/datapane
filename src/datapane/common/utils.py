@@ -38,13 +38,15 @@ ON_WINDOWS = sys.platform == "win32"
 
 ################################################################################
 # CONSTANTS
-DEFAULT_HTML_HEADER = """<style type="text/css">
-    :root {
-      --dp-accent-color: #4E46E5;
-      --dp-bg-color: #FFF;
-      --dp-text-align: justify;
-      --dp-font-family: Inter var, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont;
-    }
+DEFAULT_CSS_HEADER = """:root {
+    --dp-accent-color: #4E46E5;
+    --dp-bg-color: #FFF;
+    --dp-text-align: justify;
+    --dp-font-family: Inter var, ui-sans-serif, system-ui;
+}"""
+
+DEFAULT_HTML_HEADER = f"""<style type="text/css">
+{DEFAULT_CSS_HEADER}
 </style>"""
 
 ################################################################################
@@ -262,7 +264,7 @@ def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
     if none_only:
         return {k: v for (k, v) in xs.items() if v is not None}
     else:
-        return {k: v for (k, v) in xs.items() if v}
+        return {k: v for (k, v) in xs.items() if v or isinstance(v, bool)}
 
 
 def process_notebook(input_file: Path, output_file: Path):
