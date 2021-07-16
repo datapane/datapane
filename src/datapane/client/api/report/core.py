@@ -549,6 +549,7 @@ class Report(BaseReport):
             formatting: Set the basic styling for your report
         """
 
+        # TODO(protocol)
         if "visibility" in kwargs:
             kwargs.pop("visibility")
             if c.config.is_public:
@@ -620,6 +621,9 @@ class Report(BaseReport):
             width: Width of the preview in Jupyter (default: 960)
             height: Height of the preview in Jupyter (default: 700)
         """
+        warnings.warn(
+            "report.preview is deprecated, recommend using report.save instead and opening in a new browser tab"
+        )
         if is_jupyter():
             from IPython.display import IFrame
 
