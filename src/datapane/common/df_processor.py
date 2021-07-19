@@ -38,7 +38,8 @@ def downcast_numbers(data: pd.DataFrame):
 
 def timedelta_to_str(df: pd.DataFrame):
     """
-    convert timedelta to str - NOTE - only until arrow.js supports Duration type
+    convert timedelta to str
+    NOTE - only until arrow.js supports Duration type
     """
     df_td = df.select_dtypes("timedelta")
     df[df_td.columns] = np.where(pd.isnull(df_td), pd.NA, df_td.astype("string"))

@@ -34,7 +34,7 @@ python = "^3.7.0"
 
 # DS
 # numpy = "^1.16.5"
-pandas = "^1.0.1"
+pandas = "^1.1.0"
 pyarrow = "^3.0.0"
 
 # viz - only altair is required

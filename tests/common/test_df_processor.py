@@ -88,7 +88,7 @@ def test_timedelta_to_str():
         dict(
             str_col=[str(x) for x in range(30)],
             int_col=[x for x in range(30)],
-            time_col=[timedelta(seconds=1) for x in range(30)],
+            time_col=[timedelta(seconds=x) for x in range(30)],
         )
     )
     timedelta_to_str(df)
