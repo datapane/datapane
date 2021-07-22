@@ -46,7 +46,7 @@ folium = { version = "0.12.*", optional = true }
 # ipython = "^7.7.0" # needed for nbconvert?
 
 # cloud support
-nbconvert = ">=5.6.1"
+nbconvert = ">=5.6.1,<7.0.0"
 flit-core = { version = "~3.0.0", optional = true }
 jsonschema = "^3.0.0"
 stringcase = "^1.2.0"
@@ -78,9 +78,9 @@ boltons = "^20.0.0"
 dominate = "^2.4.0"  # latest on conda
 micawber = ">=0.5.0"
 posthog = "^1.4.1"
-pydantic = "^1.8.2"
-Jinja2 = ">=2.11.0"
-chardet = ">=3.0.4"
+pydantic = "^1.6.0"
+Jinja2 = ">=2.11.0,<4.0.0"
+chardet = ">=3.0.4,<5.0.0"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium"]
