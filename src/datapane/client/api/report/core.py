@@ -199,10 +199,10 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        url = "https://datapane.com/create-workspace/"
+        url = "https://datapane.com/teams/"
         display_msg(
-            text=f"Report saved to {path}. To host and share securely, create a free private workspace at {url}",
-            md=f"Report saved to {path}. To host and share securely, [create a free private workspace]({url})",
+            text=f"Report saved to {path}. To host and share securely, request a free private workspace at {url}",
+            md=f"Report saved to {path}. To host and share securely, [request a free private workspace]({url})",
         )
 
         # TODO(obsolete)
