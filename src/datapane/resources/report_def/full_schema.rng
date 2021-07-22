@@ -82,6 +82,7 @@
     <attribute name="label">
       <data type="string">
         <param name="minLength">1</param>
+        <param name="maxLength">256</param>
       </data>
     </attribute>
   </define>

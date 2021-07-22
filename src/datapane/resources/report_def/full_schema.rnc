@@ -20,7 +20,7 @@ Meta = element Meta {
   element Author { xsd:string { minLength = "1" maxLength = "127" } } &
   element CreatedOn { xsd:dateTime } &
   element Title { xsd:string { minLength = "1" maxLength = "127" } } &
-  element Description { xsd:string { maxLength = "10240" } } &
+  element Description { xsd:string { maxLength = "10240" } }
 }
 
 
@@ -41,7 +41,7 @@ Main = element Main {
 
 # name always present, can be user-defined but auto-generated if not - used for exporting and asset lookup
 block_name = attribute name { xsd:ID }
-block_label = attribute label { xsd:string { minLength = "1" } }
+block_label = attribute label { xsd:string { minLength = "1" maxLength = "256" } }
 block_label_name = block_name, block_label?
 
 
@@ -145,7 +145,6 @@ assetAttributes =
 
 File = element File {
   assetAttributes,
-
   attribute filename { xsd:string { minLength = "1" maxLength = "127" } }
   }
 
