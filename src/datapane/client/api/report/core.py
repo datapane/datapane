@@ -487,7 +487,7 @@ class Report(BaseReport):
         self,
         *arg_blocks: PageOrPrimitive,
         blocks: t.List[PageOrPrimitive] = None,
-        type: ReportType = ReportType.REPORT,
+        type: t.Optional[ReportType] = None,
         **kwargs,
     ):
         """
@@ -507,7 +507,9 @@ class Report(BaseReport):
         super().__init__(**kwargs)
 
         if type:
-            warnings.warn("use dp.ReportFormatting instead when calling upload or save")
+            warnings.warn(
+                "ReportType argument deprecated, please use dp.ReportFormatting instead when calling `upload` or `save`"
+            )
 
         self._preprocess_pages(blocks or list(arg_blocks))
 
