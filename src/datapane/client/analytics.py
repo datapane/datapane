@@ -11,8 +11,8 @@ from datapane import _IN_DPSERVER, _IN_PYTEST, ON_DATAPANE, __version__, log
 
 from . import config as c
 
-posthog.api_key = "wgDS94MS51wVhjXKouBmKwb_I3s8rK0ojtLJL4qVH7w"
-posthog.host = "https://numbers.datapane.com/"
+posthog.api_key = "phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy"
+posthog.host = "https://events.datapane.com/"
 _NO_ANALYTICS_FILE: Path = c.APP_DIR / "no_analytics"
 
 
@@ -34,7 +34,7 @@ def capture(event: str, properties: Optional[dict] = None) -> None:
         return None
     config = c.get_config()
     properties = properties or {}
-    properties.update(source="cli")
+    properties.update(source="cli", dp_version=__version__)
     with suppress(Exception):
         posthog.capture(config.session_id, event, properties)
 

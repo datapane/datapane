@@ -37,7 +37,7 @@ class Config:
     token: str = DEFAULT_TOKEN
     username: str = ""
     session_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
-    version: int = 1
+    version: int = 1  # if version doesn't exist in file
 
     _env: t.ClassVar[Optional[str]]
     _path: t.ClassVar[Optional[Path]]
@@ -104,12 +104,14 @@ class Config:
         return APP_DIR / f"{env}.yaml"
 
     def upgrade_config_format(self):
-        """Handles updating the older config format"""
+        """Handles updating the older config format
+        - we default to oldest version with default values, and upgrade here
+        """
         # migrate older config files
         if self.version == 1:
             from .analytics import capture_init
 
-            self.version = 2
+            self.version = 3
 
             # If token exists check still valid and can login
             if self.token and self.token != DEFAULT_TOKEN:
@@ -118,8 +120,15 @@ class Config:
                 with suppress(Exception):
                     self.username = ping(config=self, cli_login=True, verbose=False)
 
-            capture_init(self)
             self.save()
+            capture_init(self)
+        elif self.version == 2:
+            # re-init against new server
+            from .analytics import capture_init
+
+            self.version = 3
+            self.save()
+            capture_init(self)
 
 
 # TODO - create a ConfigMgr singleton object?

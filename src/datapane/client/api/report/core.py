@@ -5,6 +5,7 @@ Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
 import json
+import random
 import typing as t
 import warnings
 import webbrowser
@@ -612,6 +613,13 @@ class Report(BaseReport):
             formatting=formatting,
         )
 
+        # feedback form
+        if random.random() < 0.05:
+            display_msg(
+                text="How is your experience of Datapane? Please take two minutes to answer our anonymous product survey at https://bit.ly/3lWjRlr",
+                md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey](https://bit.ly/3lWjRlr)",
+            )
+
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
@@ -632,15 +640,17 @@ class Report(BaseReport):
             asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
             if asset_blocks < 3 and check_empty:
                 raise InvalidReportError("Empty report - must contain at least one asset/block")
-            elif asset_blocks < 4:
-                url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
-                display_msg(
-                    text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out {url} for more info",
-                    md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out [the docs]({url}) for more info",
-                )
+            elif c.config.is_public:
+                # only nudge public users
+                if asset_blocks < 4:
+                    url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
+                    display_msg(
+                        text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out {url} for more info",
+                        md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out [the docs]({url}) for more info",
+                    )
 
-            has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
-            if not has_text:
-                display_msg(
-                    "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
-                )
+                has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
+                if not has_text:
+                    display_msg(
+                        "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
+                    )
