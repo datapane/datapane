@@ -297,14 +297,15 @@ class BaseReport(DPObjectRef):
         formatting_kwargs = {}
 
         if formatting:
-            if c.config.is_org:
-                formatting_kwargs.update(width=formatting.width.value)
-            else:
-                formatting_kwargs.update(
-                    width=formatting.width.value,
-                    css_header=formatting.to_css(),
-                    is_light_prose=formatting.light_prose,
-                )
+            formatting_kwargs.update(
+                width=formatting.width.value,
+                style_header=(
+                    f'<style type="text/css">\n{formatting.to_css()}\n</style>'
+                    if c.config.is_org
+                    else formatting.to_css()
+                ),
+                is_light_prose=formatting.light_prose,
+            )
 
         kwargs.update(
             name=name,
