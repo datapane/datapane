@@ -5,7 +5,6 @@ Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
 import json
-import shutil
 import typing as t
 import warnings
 import webbrowser
@@ -615,41 +614,8 @@ class Report(BaseReport):
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    @capture_event("CLI Report Preview")
-    def preview(self, width: int = 960, height: int = 700):
-        """
-        Preview the document inside your currently running Jupyter notebook
-
-        Args:
-            width: Width of the preview in Jupyter (default: 960)
-            height: Height of the preview in Jupyter (default: 700)
-        """
-        warnings.warn(
-            "report.preview is deprecated, recommend using report.save instead and opening in a new browser tab"
-        )
-        if is_jupyter():
-            from IPython.display import IFrame
-
-            # Remove the previous temp report if it's been generated
-            if self._tmp_report and self._tmp_report.exists():
-                self._tmp_report.unlink()
-
-            # We need to copy the report HTML to a local temp file,
-            # as most browsers block iframes to absolute local paths.
-            tmpfile = DPTmpFile(ext=".html")
-            if self._last_saved:
-                # Copy to tmp file if already saved
-                shutil.copy(self._last_saved, tmpfile.name)
-            else:
-                # Else save directly to tmp file
-                self.save(path=tmpfile.name)
-            self._tmp_report = tmpfile.file
-
-            # NOTE - iframe must be relative path
-            iframe_src = self._tmp_report.relative_to(Path(".").absolute())
-            return IFrame(src=str(iframe_src), width=width, height=height)
-        else:
-            log.warning("Can't preview - are you running in Jupyter?")
+    def preview(self, *a, **kw) -> None:
+        warnings.warn("Preview is deprecated, please use report.save to view locally")
 
     def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
         super()._report_status_checks(processed_report_doc, embedded, check_empty)

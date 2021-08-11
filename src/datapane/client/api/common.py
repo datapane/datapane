@@ -15,7 +15,7 @@ from contextlib import contextmanager, suppress
 from copy import copy
 from datetime import timedelta
 from pathlib import Path
-from tempfile import mkdtemp, mkstemp
+from tempfile import gettempdir, mkdtemp, mkstemp
 from urllib import parse as up
 
 import click
@@ -44,19 +44,16 @@ __all__ = []
 # We create a tmp-dir per Python execution that stores all working files,
 # we attempt to delete where possible, but where not, we allow the atexit handler
 # to cleanup for us on shutdown
-# This tmp-dir needs to be in the cwd rather than /tmp so can be previewed in Jupyter
-# To avoid cluttering up the user's cwd, we nest these inside a `dp-cache` intermediate dir
-cache_dir = Path("dp-cache").absolute()
-cache_dir.mkdir(parents=True, exist_ok=True)
+cache_dir = Path(gettempdir())
 
-# Remove any old ./dp-tmp-* dirs over 24hrs old which might not have been cleaned up due to unexpected exit
+# Remove any old dp-tmp-* dirs over 24hrs old which might not have been cleaned up due to unexpected exit
 one_day_ago = time.time() - timedelta(days=1).total_seconds()
 prev_tmp_dirs = (p for p in cache_dir.glob("dp-tmp-*") if p.is_dir() and p.stat().st_mtime < one_day_ago)
 for p in prev_tmp_dirs:
     log.debug(f"Removing stale temp dir {p}")
     shutil.rmtree(p, ignore_errors=True)
 
-# create new dp-tmp for this session, nested inside `dp-cache`
+# create new dp-tmp for this session
 tmp_dir = Path(mkdtemp(prefix="dp-tmp-", dir=cache_dir)).absolute()
 
 
