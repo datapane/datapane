@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from typing import ContextManager
 
 import pytest
-import stringcase
 
 from datapane.client.api import HTTPError
 from datapane.client.api.dp_object import U
@@ -21,8 +20,7 @@ def gen_name(n=10):
 
 
 def check_name(obj, orig_name: str):
-    assert obj.title == orig_name
-    assert obj.name == stringcase.spinalcase(orig_name)
+    assert obj.name == orig_name
 
 
 def gen_description() -> str:
