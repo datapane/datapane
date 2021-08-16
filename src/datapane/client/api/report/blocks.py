@@ -636,7 +636,7 @@ class File(AssetBlock):
         ..note:: either `data` or `file` must be provided
         """
         if file:
-            file = Path(file)
+            file = Path(file).expanduser()
         else:
             out_fn = self._save_obj(data, as_json=is_json)
             file = out_fn.file

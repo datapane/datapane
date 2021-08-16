@@ -13,6 +13,7 @@ from enum import Enum, IntEnum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
+from uuid import uuid4
 
 import importlib_resources as ir
 from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
@@ -480,6 +481,7 @@ class Report(BaseReport):
     _last_saved: t.Optional[str] = None  # Path to local report
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
+    _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "group"]
     """When set, the report is full-width suitable for use in a dashboard"""
 
@@ -614,8 +616,9 @@ class Report(BaseReport):
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
             webbrowser.open_new_tab(path_uri)
 
-    def preview(self, *a, **kw) -> None:
-        warnings.warn("Preview is deprecated, please use report.save to view locally")
+    @capture_event("CLI Report Preview")
+    def preview(self) -> None:
+        self.save(self._preview_file.name, open=True)
 
     def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
         super()._report_status_checks(processed_report_doc, embedded, check_empty)

@@ -11,7 +11,7 @@ import pprint
 import shutil
 import time
 import typing as t
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from copy import copy
 from datetime import timedelta
 from pathlib import Path
@@ -98,10 +98,6 @@ def cleanup_tmp():
     """Ensure we cleanup the tmp_dir on Python VM exit"""
     # log.debug(f"Removing current session DP tmp work dir {tmp_dir}")
     shutil.rmtree(tmp_dir, ignore_errors=True)
-    # try remove cache_dir if empty
-    with suppress(OSError):
-        cache_dir.rmdir()
-        # log.debug("Removed empty dp-cache dir")
 
 
 ################################################################################
