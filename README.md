@@ -7,6 +7,7 @@
     <a href="https://datapane.com">Datapane Teams</a> |
     <a href="https://docs.datapane.com">Documentation</a> |
     <a href="https://datapane.github.io/datapane/">API Docs</a> |
+    <a href="https://docs.datapane.com/changelog">Changelog</a> |
     <a href="https://twitter.com/datapaneapp">Twitter</a> |
     <a href="https://blog.datapane.com">Blog</a>
     <br /><br />
@@ -83,7 +84,7 @@ This would package a standalone HTML report document such as the following:
 
 ## Text Reports
 
-If you are writing a report with a lot of text e.g. an article or tutorial, try our [Text Report](https://docs.datapane.com/reports/blocks/text-reports) web editor, where you can combine Markdown with assets uploaded from Python. Here's how you'd do it for the previous example: 
+If you are writing a report with a lot of text e.g. an article or tutorial, try our [Text Report](https://docs.datapane.com/reports/blocks/text-reports) web editor, where you can combine Markdown with assets uploaded from Python. Here's how you'd do it for the previous example:
 
 ```Python
 dp.TextReport("## Vaccination Report",
@@ -92,10 +93,9 @@ dp.TextReport("## Vaccination Report",
 ).upload(name="Example vaccination report")
 ```
 
-Note that you'll need an account on Datapane.com to use TextReports. This will bring up the web editor, where you can add additional commentary to these assets: 
+Note that you'll need an account on Datapane.com to use TextReports. This will bring up the web editor, where you can add additional commentary to these assets:
 
 <img width="1077" alt="TextReport editor and preview" src="https://user-images.githubusercontent.com/16949044/125301674-1cb64580-e323-11eb-83ea-9b1e1b981734.png">
-
 
 ## Featured Examples
 
