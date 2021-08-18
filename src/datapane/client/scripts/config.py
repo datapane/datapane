@@ -14,7 +14,7 @@ import yaml
 
 from datapane.client import DPError
 from datapane.client.utils import MissingCloudPackagesError
-from datapane.common import SDict, SSDict, log
+from datapane.common import SDict, SSDict, log, utf_read_text
 
 # app paths
 DATAPANE_YAML = Path("datapane.yaml")
@@ -122,7 +122,7 @@ class DatapaneCfg:
                 log.debug("Converting notebook")
                 mod_code = extract_py_notebook(abs_script)
             else:
-                mod_code = abs_script.read_text()
+                mod_code = utf_read_text(abs_script)
             log.debug("Reading config from python script/notebook")
             log.debug(mod_code)
 
@@ -132,7 +132,7 @@ class DatapaneCfg:
         raw_config.update(kw)
         readme = config_file.parent / "README.md"
         if readme.exists():
-            raw_config["description"] = readme.read_text()
+            raw_config["description"] = utf_read_text(readme)
         elif "description" not in raw_config:
             raw_config["description"] = cls.description
 

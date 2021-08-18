@@ -162,7 +162,7 @@ class ReportFileWriter:
 
         # load the logo
         logo_img = (self.assets / "datapane-logo-dark.png").read_bytes()
-        self.logo = f"data:image/png;base64,{b64encode(logo_img).decode()}"
+        self.logo = f"data:image/png;base64,{b64encode(logo_img).decode('ascii')}"
 
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)

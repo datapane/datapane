@@ -25,7 +25,7 @@ from lxml.etree import Element
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
-from datapane.common import PKL_MIMETYPE, NPath, guess_type
+from datapane.common import PKL_MIMETYPE, NPath, guess_type, utf_read_text
 from datapane.common.report import conv_attribs, get_embed_url, is_valid_id
 
 from ..common import DPTmpFile
@@ -362,17 +362,19 @@ class Text(EmbeddedTextBlock):
 
     def __init__(self, text: str = None, file: NPath = None, name: str = None, label: str = None):
         """
-        Args:te
+        Args:
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
             file: Path to a file containing markdown text
             name: A unique name for the block to reference when adding text or embedding (optional)
+
+        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.File
         """
         super().__init__(name=name, label=label)
 
         if text:
             text = text.strip()
         assert text or file
-        self.content = text if text else Path(file).read_text()
+        self.content = text or utf_read_text(Path(file).expanduser())
 
     def format(self, *args: BlockOrPrimitive, **kwargs: BlockOrPrimitive) -> Group:
         """
@@ -580,7 +582,7 @@ class AssetBlock(DataBlock):
             # load the file and embed into a data-uri
             # NOTE - currently we read entire file into memory first prior to b64 encoding,
             #  to consider using base64io-python to stream and encode in 1-pass
-            content = b64encode(self.file.read_bytes()).decode()
+            content = b64encode(self.file.read_bytes()).decode("ascii")
             e = _E(
                 type=content_type,
                 size=file_size,
@@ -676,10 +678,9 @@ class Table(AssetBlock):
     """
     Table blocks store the contents of a dataframe as a HTML `table` whose style can be customised using
     pandas' `Styler` API.
-
-    ..note:: Please use Table component when saving files locally over the DataTable component which has more features but requires publishing your report
-
     """
+
+    # NOTE - Tables are stored as HTML fragment files rather than inline within the Report document
 
     _tag = "Table"
 

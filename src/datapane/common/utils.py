@@ -1,5 +1,6 @@
 import datetime
 import gzip
+import locale
 import logging
 import logging.config
 import mimetypes
@@ -13,6 +14,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
 
+import chardet
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
 
@@ -300,3 +302,21 @@ def process_notebook(input_file: Path, output_file: Path):
     output, _ = exporter.from_filename(input_file)
     # write output to file
     Path(output_file).write_text(output)
+
+
+def utf_read_text(file: Path) -> str:
+    """Encoding-aware text reader
+    - handles cases like on windows where a file is UTF-8, but default locale is windows-1252
+    """
+    if ON_WINDOWS:
+        f_bytes = file.read_bytes()
+        f_enc: str = chardet.detect(f_bytes)["encoding"]
+        # NOTE - can just special case utf-8 files here?
+        def_enc = locale.getpreferredencoding()
+        log.debug(f"Default encoding is {def_enc}, file encoded as {f_enc}")
+        if def_enc.upper() != f_enc.upper():
+            log.warning(f"Text file {file} encoded as {f_enc}, auto-converting")
+        return f_bytes.decode(encoding=f_enc)
+    else:
+        # for linux/macOS assume utf-8
+        return file.read_text()

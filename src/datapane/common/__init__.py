@@ -36,4 +36,5 @@ from .utils import (
     _setup_dp_logging,
     temp_fname,
     timestamp,
+    utf_read_text,
 )
