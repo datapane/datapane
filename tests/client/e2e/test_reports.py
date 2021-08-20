@@ -102,7 +102,7 @@ def test_report_with_files(datadir: Path):
 
 
 def test_demo_report():
-    report = dp.templates.build_demo_report()
+    report = dp.builtins.build_demo_report()
     report.upload(name="TEST", description="DESCRIPTION")
     with deletable(report):
         ...
