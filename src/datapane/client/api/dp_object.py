@@ -162,7 +162,6 @@ class DPObjectRef:
     def __dir__(self) -> t.Iterable[str]:
         x = super().__dir__()
         if self.has_dto:
-            print(self.dto.keys())
             x = list(x)
             x.extend(self.dto.keys())
         return x

@@ -7,10 +7,9 @@ import dataclasses as dc
 import json
 import random
 import typing as t
-import warnings
 import webbrowser
 from base64 import b64encode
-from enum import Enum, IntEnum
+from enum import Enum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
@@ -56,30 +55,12 @@ __pdoc__ = {
 }
 
 
-# TODO(protocol) TODO(obsolete)
-class Visibility(IntEnum):
-    """The report visibility type"""
-
-    PRIVATE = 0  # private to owner
-    # UNLISTED = 1  # public but not searchable
-    PUBLIC = 2  # anon/unauthed access
-
-
-# TODO(protocol)
 class ReportWidth(Enum):
     """The document width"""
 
     NARROW = "narrow"
     MEDIUM = "medium"
     FULL = "full"
-
-
-class ReportType(Enum):
-    """The document type"""
-
-    DASHBOARD = "dashboard"
-    REPORT = "report"
-    ARTICLE = "article"
 
 
 class TextAlignment(Enum):
@@ -169,21 +150,6 @@ class ReportFileWriter:
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template("template.html")
 
-    def _display_msg(self):
-        # TODO(obsolete)
-        global SKIP_DISPLAY_MSG
-
-        # only display once per session, else skip
-        if SKIP_DISPLAY_MSG or c.config.is_org:
-            return None
-        else:
-            SKIP_DISPLAY_MSG = True
-
-        display_msg(
-            text="Thanks for using Datapane, to automate and securely share documents in your organization please see Datapane Teams - https://datapane.com/",
-            md="Thanks for using **Datapane**, to automate and securely share documents in your organization please see [Datapane Teams](https://datapane.com/)",
-        )
-
     def write(
         self,
         report_doc: str,
@@ -205,9 +171,6 @@ class ReportFileWriter:
             text=f"Report saved to {path}. To host and share securely, request a free private workspace at {url}",
             md=f"Report saved to {path}. To host and share securely, [request a free private workspace]({url})",
         )
-
-        # TODO(obsolete)
-        # self._display_msg()
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
@@ -322,12 +285,9 @@ class BaseReport(DPObjectRef):
 
         # generate the report
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
-        # TODO(protocol) always include attachments parameter
-        # if not attachments:
-        #     kwargs["attachments"] = []
         files = dict(attachments=attachments)
 
-        # create a temp output file for stripped down version of notebook
+        # create empty temp file to potentially store stripped down notebook
         with DPTmpFile(".ipynb") as output_file:
             if source_file:
                 # strip the output of original notebook and store in temp file
@@ -490,7 +450,6 @@ class Report(BaseReport):
         self,
         *arg_blocks: PageOrPrimitive,
         blocks: t.List[PageOrPrimitive] = None,
-        type: t.Optional[ReportType] = None,
         **kwargs,
     ):
         """
@@ -508,12 +467,6 @@ class Report(BaseReport):
         .. tip:: Create a list first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__(**kwargs)
-
-        if type:
-            warnings.warn(
-                "ReportType argument deprecated, please use dp.ReportFormatting instead when calling `upload` or `save`"
-            )
-
         self._preprocess_pages(blocks or list(arg_blocks))
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
@@ -554,19 +507,7 @@ class Report(BaseReport):
             formatting: Set the basic styling for your report
         """
 
-        # TODO(protocol)
-        if "visibility" in kwargs:
-            kwargs.pop("visibility")
-            if c.config.is_public:
-                warnings.warn(
-                    "Visibility parameter deprecated, your reports are drafts by default and can be published via the report share feature in your browser"
-                )
-            else:
-                warnings.warn(
-                    "Visibility parameter deprecated, your reports are private by default and can be shared via the report share feature in your browser"
-                )
-
-        display_msg("Publishing document and associated data - *please wait...*")
+        display_msg("Uploading report and associated data - *please wait...*")
 
         self._upload_report(name, description, source_url, tags, group, source_file, formatting=formatting, **kwargs)
 
@@ -574,13 +515,9 @@ class Report(BaseReport):
             webbrowser.open_new_tab(self.web_url)
 
         display_msg(
-            text=f"Report successfully uploaded at {self.web_url}, follow the link to view your report and optionally share it with the Datapane Community",
-            md=f"Report successfully uploaded, click [here]({self.web_url}) to view your report and optionally share it with the Datapane Community",
+            text=f"Report successfully uploaded at {self.web_url}, follow the link to view and share your report",
+            md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report",
         )
-
-    def publish(self, *a, **kw) -> None:
-        warnings.warn("Deprecated - please use report.upload instead")
-        self.upload(*a, **kw)
 
     @capture_event("CLI Report Save")
     def save(
@@ -645,12 +582,12 @@ class Report(BaseReport):
                 if asset_blocks < 4:
                     url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
                     display_msg(
-                        text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out {url} for more info",
-                        md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a report? Check out [the docs]({url}) for more info",
+                        text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
+                        md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
                     )
 
-                has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
-                if not has_text:
-                    display_msg(
-                        "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
-                    )
+                # has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
+                # if not has_text:
+                #     display_msg(
+                #         "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
+                #     )

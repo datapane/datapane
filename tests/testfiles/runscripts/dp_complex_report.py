@@ -1,7 +1,7 @@
 """datapane script"""
 import os
 import datapane as dp
-from datapane.client.api.templates import gen_df, gen_plot
+from datapane.client.api.builtins import gen_df, gen_plot
 from bokeh.plotting import figure
 from pathlib import Path
 import folium

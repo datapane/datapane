@@ -10,12 +10,12 @@ from .test_reports import assert_report, element_to_str, md_block
 ################################################################################
 # Templates
 def test_demo_report():
-    report = dp.templates.build_demo_report()
+    report = dp.builtins.build_demo_report()
     assert_report(report, 23, 67)
 
 
 def test_add_code():
-    b = dp.templates.add_code(md_block, "print(1)")
+    b = dp.builtins.add_code(md_block, "print(1)")
     assert isinstance(b, dp.Select)
     assert glom(b, ("blocks", ["_tag"])) == ["Text", "Code"]
     assert "print(1)" in element_to_str(b)
@@ -30,7 +30,7 @@ def test_build_md_report():
 {{table}}
 """
 
-    report = dp.templates.build_md_report(text, gen_df(4), table=gen_df(8))
+    report = dp.builtins.build_md_report(text, gen_df(4), table=gen_df(8))
     assert_report(report, 2, 5)
 
 
@@ -39,11 +39,11 @@ def test_add_header():
 
     r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
-    r1 = dp.templates.add_header(r, header=text, all_pages=True)
+    r1 = dp.builtins.add_header(r, header=text, all_pages=True)
     assert_report(r1, 0, 18)
     assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, text, text]
 
-    r1 = dp.templates.add_header(r, header=text, all_pages=False)
+    r1 = dp.builtins.add_header(r, header=text, all_pages=False)
     assert_report(r1, 0, 14)
     assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, md_block.content, md_block.content]
 
@@ -53,10 +53,10 @@ def test_add_footer():
 
     r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
-    r1 = dp.templates.add_footer(r, footer=text, all_pages=True)
+    r1 = dp.builtins.add_footer(r, footer=text, all_pages=True)
     assert_report(r1, 0, 18)
     assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, text, text]
 
-    r1 = dp.templates.add_footer(r, footer=text, all_pages=False)
+    r1 = dp.builtins.add_footer(r, footer=text, all_pages=False)
     assert_report(r1, 0, 14)
     assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, md_block.content, md_block.content]

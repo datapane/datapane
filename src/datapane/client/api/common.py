@@ -96,6 +96,7 @@ class DPTmpFile:
 @atexit.register
 def cleanup_tmp():
     """Ensure we cleanup the tmp_dir on Python VM exit"""
+    # breaks tests
     # log.debug(f"Removing current session DP tmp work dir {tmp_dir}")
     shutil.rmtree(tmp_dir, ignore_errors=True)
 
@@ -201,9 +202,10 @@ class Resource:
         extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
 
         max_size = 25 if c.config.is_public else 100
+        log.debug(f"Report size ~{e.len/SIZE_1_MB:.1f} MB")
         if e.len > max_size * SIZE_1_MB:
             raise ReportTooLargeError(
-                f"Report and attachments over f{max_size} MB after compression (~{e.len/SIZE_1_MB:.1f} MB) - please reduce the size of your charts/plots"
+                f"Report and attachments over {max_size} MB after compression (~{e.len/SIZE_1_MB:.1f} MB) - please reduce the size of your charts/plots"
             )
         elif e.len > SIZE_1_MB:
             log.debug("Using upload monitor")

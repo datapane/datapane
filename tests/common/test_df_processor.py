@@ -174,7 +174,7 @@ def test_e2e_df_processing(tmp_path: Path):
             cat_obj_col=[("a", "b") for x in range(30)],
         )
     )
-    _test_df(df, ["string", "category", "UInt8", "float64", "string", "datetime64[ns]", "string", "category"])
+    _test_df(df, ["string", "category", "UInt8", "Float64", "string", "datetime64[ns]", "string", "category"])
 
     df = pd.DataFrame(
         dict(
@@ -187,4 +187,4 @@ def test_e2e_df_processing(tmp_path: Path):
             date_col=[datetime.utcnow() for x in range(30)] + [pd.NaT, pd.NaT],
         )
     )
-    _test_df(df, ["string", "category", "Int64", "float64", "string", "datetime64[ns]"])
+    _test_df(df, ["string", "category", "UInt8", "Float64", "string", "datetime64[ns]"])

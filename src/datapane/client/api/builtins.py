@@ -1,11 +1,8 @@
 """
-Datapane helper functions to make creating your reports a bit simpler and reduce common tasks
-
-..note:: Please submit any new templates you've used to our repo - it's open-source and will help everyone in creating great reports!
+Datapane built-in helper functions to make creating your reports a bit simpler and reduce common tasks
 """
 import random
 import typing as t
-import warnings
 from copy import deepcopy
 from pathlib import Path
 
@@ -83,8 +80,6 @@ def build_md_report(
     ..tip:: Context, via args/kwargs can be plain Python objects, e.g. dataframes, and plots, or Datapane blocks, e.g. dp.Plot, etc.
 
     """
-    # TODO(api-compat) - remove on 0.12
-    warnings.warn("Deprecated, use TextReport instead to write long form articles from the browser.")
     try:
         b_text = b.Text(file=text_or_file) if Path(text_or_file).exists() else b.Text(text=text_or_file)
     except OSError:

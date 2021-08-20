@@ -103,10 +103,11 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     # convert timedelta
     timedelta_to_str(df)
 
+    df = df.convert_dtypes()
+
     downcast_numbers(df)
     # save timedeltas cols (unneeded whilst timedelta_to_str used)
     # td_col = df.select_dtypes("timedelta")
-    df = df.convert_dtypes()
     # df[td_col.columns] = td_col
     obj_to_str(df)
     parse_categories(df)

@@ -65,26 +65,11 @@ from .report.blocks import (
     Text,
     Table,
 )
-from .report.core import FontChoice, Report, ReportFormatting, ReportType, ReportWidth, TextAlignment, TextReport
+from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, TextReport
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .teams import Blob, Run, Schedule, Script, Variable
 from .user import login, logout, ping
 from ..utils import IncompatibleVersionError
 from ..config import init
 
-from . import templates
-
-
-################################################################################
-# deprecations
-# TODO - remove deprecation
-class Markdown(Text):
-    def __init__(self, *a, **kw):
-        warnings.warn("Deprecated, to be removed in next release, use dp.Text instead.")
-        super().__init__(*a, **kw)
-
-
-class Blocks(Group):
-    def __init__(self, *a, **kw):
-        warnings.warn("Deprecated, to be removed in next release, use dp.Group instead.")
-        super().__init__(*a, **kw)
+from . import builtins

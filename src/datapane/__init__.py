@@ -25,7 +25,6 @@ from .common.utils import enable_logging, log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
-    Blocks,
     Blob,
     BigNumber,
     Code,
@@ -37,13 +36,11 @@ from .client.api import (
     Formula,
     HTML,
     Text,
-    Markdown,
     Page,
     Params,
     Plot,
     Report,
     ReportFormatting,
-    ReportType,
     ReportWidth,
     Result,
     Run,
@@ -60,7 +57,7 @@ from .client.api import (
     login,
     logout,
     ping,
-    templates,
+    builtins,
 )
 from .client.config import init
 from .common.dp_types import DPMode, set_dp_mode, get_dp_mode
