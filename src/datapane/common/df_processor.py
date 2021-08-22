@@ -6,17 +6,24 @@ import numpy as np
 import pandas as pd
 
 
-def convert_indices(df: pd.DataFrame):
-    """
-    extract all indices to columns if all are not numerical
-    and don't clash with existing column names
-    """
-    if df.index.nlevels > 1:
-        # always reset multi-index
-        df.reset_index(inplace=True)
-    elif df.index.dtype == np.dtype("int64"):
-        # Int64Index -> RangeIndex if possible
+def convert_axis(df: pd.DataFrame):
+    """flatten both columns and indexes"""
+
+    # flatten hierarchical columns and convert to strings
+    if df.columns.nlevels > 1:
+        df.columns = ["/".join(a) for a in df.columns.to_flat_index()]
+
+    df.columns = df.columns.astype("string")
+
+    # flatten/reset indexes
+    if isinstance(df.index, pd.RangeIndex):
+        pass  # allow RangeIndex - reset numbers?
+    elif isinstance(df.index, pd.Int64Index):
         df.reset_index(inplace=True, drop=True)
+    else:
+        # reset if any other index type, e.g. MultiIndex, custom Index
+        # all new column dtypes will converted in latter functions
+        df.reset_index(inplace=True)
 
 
 def downcast_numbers(data: pd.DataFrame):
@@ -98,7 +105,7 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     if copy:
         df = df.copy(deep=True)
 
-    convert_indices(df)
+    convert_axis(df)
 
     # convert timedelta
     timedelta_to_str(df)

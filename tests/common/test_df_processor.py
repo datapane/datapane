@@ -8,6 +8,7 @@ import pandas as pd
 
 from datapane.common import ArrowFormat
 from datapane.common.df_processor import (
+    convert_axis,
     downcast_numbers,
     obj_to_str,
     parse_categories,
@@ -33,6 +34,34 @@ def save_load_arrow(tmp_path: Path, df: pd.DataFrame) -> pd.DataFrame:
     fn = mktemp(".arrow", dir=tmp_path)
     ArrowFormat.save_file(str(fn), df.copy(deep=True))
     return ArrowFormat.load_file(fn)
+
+
+def test_convert_axis():
+    def _test_df(df: pd.DataFrame):
+        convert_axis(df)
+        assert df.columns.nlevels == 1
+        assert df.index.nlevels == 1
+        assert isinstance(df.index, pd.RangeIndex)
+
+    # ontario systems df - as per https://github.com/datapane/datapane-hosted/issues/762
+    data = {
+        "Jan": pd.DataFrame(columns=["Market", "Units Sold", "New Customers"], data=[["East", 14, 1]]).set_index(
+            "Market"
+        ),
+        "Feb": pd.DataFrame(columns=["Market", "Units Sold", "New Customers"], data=[["East", 45, 6]]).set_index(
+            "Market"
+        ),
+    }
+    df_o = pd.concat(data, axis=1)
+    _test_df(df_o)
+
+    # pandas multiindex demo
+    index = pd.MultiIndex.from_tuples(
+        [("bird", "falcon"), ("bird", "parrot"), ("mammal", "lion"), ("mammal", "monkey")], names=["class", "name"]
+    )
+    columns = pd.MultiIndex.from_tuples([("speed", "max"), ("species", "type")])
+    df_m = pd.DataFrame([(389.0, "fly"), (24.0, "fly"), (80.5, "run"), (np.nan, "jump")], index=index, columns=columns)
+    _test_df(df_m)
 
 
 def test_parse_categories_small():
