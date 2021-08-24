@@ -35,7 +35,7 @@ python = "^3.7.1"
 # DS
 # numpy = "^1.16.5"
 pandas = "^1.1.0"
-pyarrow = "^5.0.0"
+pyarrow = ">=3.0.0, < 6.0.0"
 
 # viz - only altair is required
 altair = "^4.0.0"
@@ -53,7 +53,7 @@ stringcase = "^1.2.0"
 
 # misc
 dacite = "^1.0.2"
-colorlog = "^5.0.1"
+colorlog = ">= 4.1.0, <7.0.0"
 munch = "^2.3.0"
 PyYAML = "^5.1.0"
 packaging = ">=20.0.0,<22.0.0"
