@@ -83,6 +83,7 @@ Jinja2 = ">=2.11.0,<4.0.0"
 chardet = ">=3.0.4,<5.0.0"
 datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
+vega-datasets = "^0.9.0"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium"]
