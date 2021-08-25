@@ -44,6 +44,8 @@ def identify(session_id: str, properties: Optional[dict] = None) -> None:
     properties.update(os=platform.system(), python_version=platform.python_version(), dp_version=__version__)
     with suppress(Exception):
         posthog.identify(session_id, properties)
+    # Also generate a CLI identify event to help disambiguation
+    capture("CLI Identify")
 
 
 def capture_init(config: c.Config) -> None:
