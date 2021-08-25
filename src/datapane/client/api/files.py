@@ -6,7 +6,6 @@ from functools import singledispatch
 from pathlib import Path
 from typing import IO, Any, BinaryIO, Generic, Optional, TextIO, Type, TypeVar
 
-import bleach
 from altair.utils import SchemaBase
 from numpy import ndarray
 from pandas import DataFrame
@@ -106,10 +105,6 @@ class BaseTable(BaseAsset):
     TABLE_CELLS_LIMIT: int = 5000
     obj_type: U
     block_type = Table
-    # TODO - move to own bleach class/module?
-    allowed_attrs = ["id", "class", "type", "style"]
-    allowed_tags = ["style", "table", "thead", "tbody", "tr", "td", "th"]
-    allowed_protocols = ["http", "https"]
 
     def write_file(self, f: IO, x: U):
         n_cells = self._get_cells(x)
@@ -118,14 +113,7 @@ class BaseTable(BaseAsset):
                 f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead or aggregating the df first"
             )
 
-        # sanitise the generated HTML
-        safe_html = bleach.clean(
-            self.render_html(x),
-            tags=self.allowed_tags,
-            attributes=self.allowed_attrs,
-            protocols=self.allowed_protocols,
-        )
-        f.write(safe_html)
+        f.write(self.render_html(x))
 
     def to_block(self, x: T) -> DataBlock:
         return Table(x) if self._get_cells(x) <= self.TABLE_CELLS_LIMIT else DataTable(x)

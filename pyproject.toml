@@ -72,7 +72,6 @@ importlib_resources = "^5.0.0"
 lxml = "^4.0.0"
 requests-toolbelt = "^0.9.1"
 furl = "^2.0.0"
-bleach = "^4.0.0"
 glom = "^20.5.0"
 boltons = "^21.0.0"
 dominate = "^2.4.0"  # latest on conda
