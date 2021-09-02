@@ -9,7 +9,7 @@ import random
 import typing as t
 import webbrowser
 from base64 import b64encode
-from enum import Enum
+from enum import Enum, IntEnum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
@@ -48,11 +48,22 @@ local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
 # only these types will be documented by default
-__all__ = ["Report", "ReportWidth"]
+__all__ = ["Report", "ReportWidth", "Visibility"]
 
 __pdoc__ = {
     "Report.endpoint": False,
 }
+
+
+class Visibility(IntEnum):
+    """The report visibility type, set for reports on Datapane Studio
+
+    ..note :: This is ignored on Datapane Enterprise, reports are always private
+    """
+
+    DEFAULT = 1  # not listed on the users portfolio
+    PORTFOLIO = 2  # above + added to user's portfolio page
+    PRIVATE = 3  # private to owner
 
 
 class ReportWidth(Enum):
@@ -249,6 +260,7 @@ class BaseReport(DPObjectRef):
         name: str,
         description: str = "",
         source_url: str = "",
+        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
@@ -258,8 +270,9 @@ class BaseReport(DPObjectRef):
         # TODO - clean up arg handling
         # process params
         tags = tags or []
-        formatting_kwargs = {}
+        visibility_str = visibility.upper() if isinstance(visibility, str) else visibility.name
 
+        formatting_kwargs = {}
         if formatting:
             formatting_kwargs.update(
                 width=formatting.width.value,
@@ -276,6 +289,7 @@ class BaseReport(DPObjectRef):
             description=description,
             tags=tags,
             source_url=source_url,
+            visibility=visibility_str,
             group=group,
             **formatting_kwargs,
         )
@@ -366,6 +380,7 @@ class TextReport(BaseReport):
         name: t.Optional[str] = "",
         description: str = "",
         source_url: str = "",
+        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
@@ -381,6 +396,7 @@ class TextReport(BaseReport):
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
+            visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
@@ -403,6 +419,7 @@ class TextReport(BaseReport):
             name,
             description,
             source_url,
+            visibility,
             tags,
             group,
             source_file,
@@ -486,6 +503,7 @@ class Report(BaseReport):
         name: str,
         description: str = "",
         source_url: str = "",
+        visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
         group: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
@@ -500,6 +518,7 @@ class Report(BaseReport):
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
+            visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
             tags: A list of tags (as strings) used to categorise your document
             group: Group to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
@@ -509,7 +528,9 @@ class Report(BaseReport):
 
         display_msg("Uploading report and associated data - *please wait...*")
 
-        self._upload_report(name, description, source_url, tags, group, source_file, formatting=formatting, **kwargs)
+        self._upload_report(
+            name, description, source_url, visibility, tags, group, source_file, formatting=formatting, **kwargs
+        )
 
         if open:
             webbrowser.open_new_tab(self.web_url)

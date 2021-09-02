@@ -53,6 +53,7 @@ from .client.api import (
     TextAlignment,
     TextReport,
     Variable,
+    Visibility,
     by_datapane,
     login,
     logout,

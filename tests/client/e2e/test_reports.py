@@ -6,7 +6,6 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import requests
-from furl import furl
 from lxml import etree
 
 import datapane as dp
@@ -25,31 +24,16 @@ def test_report_simple():
         ...
 
 
-@pytest.mark.org
-def test_report_simple_permissions():
-    # TODO(e2e-move) - already moved - obsolete
-    report = gen_report_simple()
-    report.upload(name="TEST", description="DESCRIPTION")
-    with deletable(report):
-        # check we can't access api & web urls
-        r = requests.get(url=report.url)
-        assert r.status_code == 403
-        r = requests.get(url=report.web_url)
-        assert r.history[0].status_code == 302  # redirect to login
-        assert r.status_code == 200
-        # check we can't embed a private report
-        f = furl(origin=c.config.server, path="api/oembed/", args=dict(url=report.web_url))
-        r = requests.get(url=f.url)
-        assert r.status_code in [400, 401, 403]
-
-
 def test_report_update_metadata():
     report = gen_report_simple()
     name = "TEST-META"
+
+    visibility = dp.Visibility.PORTFOLIO.name if c.config.is_public else dp.Visibility.DEFAULT.name
     props = dict(
         description="TEST-DESCRIPTION",
         source_url="https://www.github.com/datapane",
         tags=["a", "b"],
+        visibility=visibility,
     )
 
     same_props = (
@@ -58,7 +42,6 @@ def test_report_update_metadata():
         "owner",
         "username",
         "web_url",
-        "embed_url",
         "width",
         "files",
         "num_blocks",
