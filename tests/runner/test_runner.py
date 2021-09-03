@@ -23,7 +23,7 @@ from datapane.runner.typedefs import RunResult
 # running/rendering with our runner calling into user code
 pytestmark = pytest.mark.skipif(
     not (sys.platform == "linux" and sys.version_info.minor >= 7),
-    reason="Only supported on Linux 3.7+",
+    reason="Only supported on Linux/py3.7+",
 )
 
 

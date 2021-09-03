@@ -26,24 +26,35 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_ENV = "default"
 DEFAULT_SERVER = "https://datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
+LATEST_VERSION = 3
 
 
 # TODO - wrap into a singleton object that includes callable?
+# TODO - switch to pydantic
 @dc.dataclass
 class Config:
-    """Global config read from config file"""
+    """
+    Global config read from config file
+
+    Version is set to 1 when loading from file, then we pass into out upgrade function to bring it to latest
+    """
 
     server: str = DEFAULT_SERVER
     token: str = DEFAULT_TOKEN
     username: str = ""
     session_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
     version: int = 1  # if version doesn't exist in file
+    completed_action: bool = False  # only active on first action
+
+    from_file: dc.InitVar[bool] = False
 
     _env: t.ClassVar[Optional[str]]
     _path: t.ClassVar[Optional[Path]]
 
-    def __post_init__(self):
+    def __post_init__(self, from_file: bool):
         self.server = self.server.rstrip("/")  # server should be a valid origin
+        if not from_file:
+            self.version = LATEST_VERSION
 
     @property
     def is_public(self) -> bool:
@@ -65,6 +76,7 @@ class Config:
             c_yaml = yaml.safe_load(f)
 
         # load config obj from file
+        c_yaml["from_file"] = True
         config = dacite.from_dict(Config, c_yaml)
         config._env = env
         config._path = config_f
@@ -80,15 +92,14 @@ class Config:
     @classmethod
     def create_default(cls, env: str, config_f: Path) -> None:
         """Create an default config file"""
-        from .analytics import capture_init
-
         # create default file
         _config = Config()
         _config.save(env)
         log.info(f"Created config file at {config_f}")
-        capture_init(_config)
 
     def save(self, env: t.Optional[str] = None):
+        assert env or self._path
+
         if env:
             self._env = env
             self._path = self.get_config_file(env)
@@ -109,8 +120,7 @@ class Config:
         """
         # migrate older config files
         if self.version == 1:
-            from .analytics import capture_init
-
+            # capture_init()
             self.version = 3
 
             # If token exists check still valid and can login
@@ -121,14 +131,11 @@ class Config:
                     self.username = ping(config=self, cli_login=True, verbose=False)
 
             self.save()
-            capture_init(self)
         elif self.version == 2:
             # re-init against new server
-            from .analytics import capture_init
-
+            # capture_init()
             self.version = 3
             self.save()
-            capture_init(self)
 
 
 # TODO - create a ConfigMgr singleton object?

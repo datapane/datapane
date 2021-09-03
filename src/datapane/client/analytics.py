@@ -33,6 +33,13 @@ def capture(event: str, properties: Optional[dict] = None) -> None:
     if _NO_ANALYTICS:
         return None
     config = c.get_config()
+
+    # run identify on first action, (NOTE - don't change the order here)
+    if not config.completed_action:
+        config.completed_action = True
+        identify(config.session_id)
+        config.save()
+
     properties = properties or {}
     properties.update(source="cli", dp_version=__version__)
     with suppress(Exception):
@@ -48,11 +55,11 @@ def identify(session_id: str, properties: Optional[dict] = None) -> None:
     capture("CLI Identify")
 
 
-def capture_init(config: c.Config) -> None:
-    # Generates an identify event on init
-    if _NO_ANALYTICS:
-        return None
-    identify(config.session_id)
+# def capture_init(config: c.Config) -> None:
+#     # Generates an identify event on init
+#     if _NO_ANALYTICS:
+#         return None
+#     identify(config.session_id)
 
 
 def capture_event(name: str):

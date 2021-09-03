@@ -59,3 +59,5 @@ jobs:
           poetry install -E plotting -E cloud
           # run CLI tests (junit tests not captured yet)
           poetry run python -m pytest --ignore=tests/client/e2e/ . --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
+          # run top-level CLI tests (junit tests not captured yet)
+          poetry run python -m pytest tests_toplevel --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml

@@ -50,7 +50,7 @@ def login(token: str, server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, 
     config.username = username
     config.save(env=env)
     c.init(config=config)
-    return username
+    return config.username
 
 
 def logout(env: str = c.DEFAULT_ENV) -> None:
