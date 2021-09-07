@@ -124,7 +124,7 @@ def cli(ctx, verbose: int, env: str):
 ###############################################################################
 # Auth
 @cli.command()
-@click.option("--token", prompt="Your API Token", help="API Token to the Datapane server.")
+@click.option("--token", default=None, help="API Token to the Datapane server.")
 @click.option("--server", default=c.DEFAULT_SERVER, help="Datapane API Server URL.")
 @click.pass_obj
 def login(obj: DPContext, token, server):
@@ -147,6 +147,18 @@ def ping():
         api.ping()
     except HTTPError as e:
         log.error(e)
+
+
+@cli.command()
+def signup():
+    """Signup using datapane.com, and link your new account to the Datapane CLI"""
+    api.signup()
+
+
+@cli.command()
+def hello():
+    """Create an example hello.py report and open it in the browser"""
+    api.hello()
 
 
 ###############################################################################
@@ -317,7 +329,7 @@ def run(
     if wait:
         with click_spinner.spinner():
             while not r.is_complete():
-                time.sleep(2)
+                time.sleep(5)
                 r.refresh()
             log.debug(f"Run completed with status {r.status}")
             if show_output:

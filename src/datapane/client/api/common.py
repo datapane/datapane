@@ -133,6 +133,7 @@ def _process_res(r: Response, empty_ok: bool = False) -> t.Union[Munch, JSON]:
             except ValueError:
                 log.error(pprint.pformat(r.text))
     r.raise_for_status()
+
     if empty_ok and not r.content:
         r_data = {}
     else:
@@ -166,7 +167,7 @@ class Resource:
 
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the basic instance
-        basic_endpoints = ["files", "oembed", "reports", "settings", "users"]
+        basic_endpoints = ["files", "oembed", "reports", "settings", "users", "api-signup-tokens"]
         url = furl(url)
         url_parts = url.path.segments
         if (
@@ -235,9 +236,9 @@ class Resource:
             r = self.session.post(self.url, data=e, headers=extra_headers, timeout=self.timeout)
         return _process_res(r)
 
-    def get(self, **params) -> JSON:
+    def get(self, empty_ok: bool = False, **params) -> JSON:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
-        return _process_res(r)
+        return _process_res(r, empty_ok=empty_ok)
 
     def patch(self, params: t.Dict = None, **data: JSON) -> JSON:
         params = params or dict()
