@@ -25,7 +25,6 @@ import requests
 from furl import furl
 
 from datapane import __version__
-from datapane.client.api.common import Resource
 
 from .. import config as c
 from ..analytics import capture_event
@@ -57,7 +56,7 @@ def login(
     config = c.Config(server=server)
 
     if token is None:
-        token = token_connect("/accounts/login/", action="login", config=config)
+        token = token_connect("/accounts/login/", action="login", server=config.server)
 
     config.token = token
     username = ping(config=config, cli_login=cli_login)
@@ -104,8 +103,8 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
 
 
 def signup(config: t.Optional[c.Config] = None):
-    config = config or c.check_get_config()
-    token = token_connect("/accounts/signup/", action="signup", config=config)
+    config = config or c.get_config()
+    token = token_connect("/accounts/signup/", action="signup", server=config.server)
     login(token, server=config.server)
 
 
@@ -121,31 +120,41 @@ def hello():
     success_msg("Report generated, opening in your browser")
 
 
-def token_connect(open_url: str, action: str, config: t.Optional[c.Config] = None):
+def token_connect(open_url: str, action: str, server: str):
     """
     Create a signup token, and prompt the user to login/signup while polling for completion.
     Then log the user into the CLI with the retrieved API token
     """
 
-    signup_token = Resource("/api/api-signup-tokens/").post().key
-    signup_url = furl(path=open_url, origin=config.server).add({"signup_token": signup_token}).url
+    def create_token(s: requests.Session) -> str:
+        create_endpoint = furl(path="/api/api-signup-tokens/", origin=server).url
+        r = s.post(create_endpoint)
+        return _process_res(r).key
 
-    print(
-        f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{signup_url}"
-    )
-    webbrowser.open(url=signup_url, new=2)
+    def poll_token(s: requests.Session, endpoint: str) -> t.Optional[str]:
+        r = s.get(endpoint)
+        return None if r.status_code == 204 else _process_res(r).api_key
 
-    res_poll = Resource(f"/api/api-signup-tokens/{signup_token}/")
+    with requests.Session() as s:
+        signup_token = create_token(s)
+        signup_url = furl(path=open_url, origin=server).add({"signup_token": signup_token}).url
 
-    api_key = None
-    try:
-        with click_spinner.spinner():
-            while api_key is None:
-                r = res_poll.get(empty_ok=True)
-                if r:
-                    api_key = r.api_key
-                else:
-                    time.sleep(5)
-            return api_key
-    except KeyboardInterrupt:
-        sys.exit(1)
+        print(
+            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{signup_url}"
+        )
+        webbrowser.open(url=signup_url, new=2)
+
+        # Declare the endpoint outside the poll_token function to save rebuilding on each poll
+        poll_endpoint = furl(path=f"/api/api-signup-tokens/{signup_token}/", origin=server).url
+        api_key = None
+        try:
+            with click_spinner.spinner():
+                while api_key is None:
+                    r = poll_token(s, poll_endpoint)
+                    if r:
+                        api_key = r
+                    else:
+                        time.sleep(5)
+                return api_key
+        except KeyboardInterrupt:
+            sys.exit(1)
