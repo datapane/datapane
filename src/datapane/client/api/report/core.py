@@ -21,7 +21,7 @@ from lxml import etree
 from lxml.etree import Element
 
 from datapane.client import config as c
-from datapane.client.analytics import capture_event
+from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
@@ -168,7 +168,7 @@ class ReportFileWriter:
         name: str,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
-    ):
+    ) -> str:
 
         if formatting is None:
             formatting = ReportFormatting()
@@ -177,14 +177,15 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        url = "https://datapane.com/teams/"
+        url = "https://datapane.com/"
         display_msg(
-            text=f"Report saved to {path}. To host and share securely, request a free private workspace at {url}",
-            md=f"Report saved to {path}. To host and share securely, [request a free private workspace]({url})",
+            text=f"Report saved to {path}, you can use report.upload to host and securely share reports using Datapane, see {url}",
+            md=f"Report saved to {path}, you can use report.upload to host and securely share reports using [Datapane]({url})",
         )
 
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
+        report_id = uuid4().hex
         r = self.template.render(
             report_doc=report_doc_esc,
             report_width=formatting.width.value,
@@ -194,8 +195,13 @@ class ReportFileWriter:
             css_header=formatting.to_css(),
             is_light_prose=json.dumps(formatting.light_prose),
             dp_logo=self.logo,
+            report_id=report_id,
+            author_id=c.config.session_id,
+            analytics=not _NO_ANALYTICS,
         )
         Path(path).write_text(r, encoding="utf-8")
+
+        return report_id
 
 
 class BaseReport(DPObjectRef):
@@ -540,7 +546,6 @@ class Report(BaseReport):
             md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report",
         )
 
-    @capture_event("CLI Report Save")
     def save(
         self,
         path: str,
@@ -548,6 +553,7 @@ class Report(BaseReport):
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
+        _is_preview: bool = False,
     ) -> None:
         """Save the report document to a local HTML file
 
@@ -564,12 +570,15 @@ class Report(BaseReport):
             name = Path(path).stem[:127]
 
         local_doc, _ = self._gen_report(embedded=True, title=name)
-        self._local_writer.write(
+        report_id = self._local_writer.write(
             local_doc,
             path,
             name=name,
             formatting=formatting,
         )
+
+        if not _is_preview:
+            capture("CLI Report Save", properties=dict(report_id=report_id))
 
         # feedback form
         if random.random() < 0.05:
@@ -584,7 +593,7 @@ class Report(BaseReport):
 
     @capture_event("CLI Report Preview")
     def preview(self) -> None:
-        self.save(self._preview_file.name, open=True)
+        self.save(self._preview_file.name, open=True, _is_preview=True)
 
     def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
         super()._report_status_checks(processed_report_doc, embedded, check_empty)

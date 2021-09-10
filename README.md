@@ -26,7 +26,7 @@
 
 Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown.
 
-Reports can be exported as standalone HTML documents, with rich components which allow data to be explored and visualisations to be used interactively. You can also publish reports to our free public community platform or share them securely with your team and clients.
+Reports can be exported as standalone HTML documents, with rich components which allow data to be explored and visualisations to be used interactively. You can also publish reports to our free platform for public use or share them securely with your team and clients.
 
 # Getting Started
 
@@ -122,9 +122,9 @@ Here a few samples of the top reports created by the Datapane community. To see 
 
 ## Public sharing
 
-In addition to saving documents locally, you can use [Datapane Community](https://datapane.com/explore) to publish your reports. Datapane Community is a free hosted platform which is used by tens of thousands of people each month to view and share Python reports.
+In addition to saving documents locally, you can use [Hosted Datapane](https://datapane.com/gallery) to publish your reports. Datapane is a free hosted platform used by tens of thousands of people each month to view and share Python reports.
 
-- Reports can be published for free and shared publicly
+- Reports can be published for free and shared publicly or securely
 - You can embed them into places like Medium, Reddit, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
 - Viewers can explore and download your data with additional DataTable analysis features
 

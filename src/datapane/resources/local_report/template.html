@@ -9,6 +9,9 @@
     />
     <script>
       window.dpLocal = true;
+      window.dpLocalViewEvent = {{true if analytics else false}};
+      window.dpReportId = "{{report_id}}";
+      window.dpAuthorId = "{{author_id}}";
     </script>
     <style>
       {% include "local-report-base.css" %}

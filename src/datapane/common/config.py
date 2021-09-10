@@ -66,7 +66,7 @@ def encode(config: RunnerConfig, compressed: bool) -> str:
     """Encode model and user config into a serialised string"""
     _config = json.dumps(dc.asdict(config))
     if compressed:
-        return base64.b64encode(zlib.compress(_config.encode())).decode()
+        return base64.b64encode(zlib.compress(_config.encode())).decode("ascii")
     else:
         return _config
 
