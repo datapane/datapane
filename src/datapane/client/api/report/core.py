@@ -58,7 +58,7 @@ __pdoc__ = {
 class Visibility(IntEnum):
     """The report visibility type, set for reports on Datapane Studio
 
-    ..note :: This is ignored on Datapane Enterprise, reports are always private
+    ..note:: This is ignored on Datapane Enterprise, reports are always private
     """
 
     DEFAULT = 1  # not listed on the users portfolio
@@ -90,7 +90,7 @@ class FontChoice(Enum):
 
 @dc.dataclass
 class ReportFormatting:
-    """Set the basic styling for your report"""
+    """Sets the report styling and formatting"""
 
     bg_color: str = "#FFF"
     accent_color: str = "#4E46E5"
@@ -347,10 +347,10 @@ class TextReport(BaseReport):
         Returns:
             A `TextReport` object containing assets that can be uploaded for use with your online TextReport
 
-        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
+        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
           `dp.TextReport(my_plot=plot, my_table=table)` or `dp.TextReport(blocks={"my_plot": plot, "my_table":table})`
 
-        .. tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
+        ..tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__()
 
@@ -467,7 +467,6 @@ class Report(BaseReport):
     _local_writer = ReportFileWriter()
     _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "group"]
-    """When set, the report is full-width suitable for use in a dashboard"""
 
     def __init__(
         self,
@@ -479,15 +478,14 @@ class Report(BaseReport):
         Args:
             *arg_blocks: Group to add to document
             blocks: Allows providing the document blocks as a single list
-            type: Set the Report type, this will affect the formatting and layout of the document
 
         Returns:
             A `Report` document object that can be uploaded, saved, etc.
 
-        .. tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
+        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
 
-        .. tip:: Create a list first to hold your blocks to edit them dynmically, for instance when using Jupyter, and use the `blocks` parameter
+        ..tip:: Create a list first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__(**kwargs)
         self._preprocess_pages(blocks or list(arg_blocks))
@@ -562,7 +560,7 @@ class Report(BaseReport):
             open: Open in your browser after creating (default: False)
             name: Name of the document (optional: uses path if not provided)
             author: The report author / email / etc. (optional)
-            formatting: Set the basic styling for your report
+            formatting: Sets the basic rport styling
         """
         self._last_saved = path
 

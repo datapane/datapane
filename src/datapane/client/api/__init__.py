@@ -36,7 +36,7 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
   - `datapane.client.api.teams.Schedule`
 
 
-.. note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
+..note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
     <a href="https://pypi.org/project/datapane/">
         <img src="https://img.shields.io/pypi/v/datapane?color=blue" alt="Latest release" />
     </a>

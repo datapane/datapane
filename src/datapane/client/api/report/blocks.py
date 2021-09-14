@@ -299,7 +299,7 @@ class Group(LayoutBlock):
             rows: Display the contained blocks, e.g. Plots, using _n_ rows (set to 0 to autofill)
             columns: Display the contained blocks, e.g. Plots, using _n_ columns (set to 0 to autofill)
 
-        .. tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
+        ..tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`
         """
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label)
