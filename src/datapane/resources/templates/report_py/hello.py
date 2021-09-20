@@ -17,7 +17,7 @@ plot1 = (
     .interactive()
 )
 
-dp.Report(
+report = dp.Report(
     dp.Text(
         """
 ![Imgur](https://i.imgur.com/S3MGxWd.png)
@@ -189,8 +189,13 @@ Datapane Teams is offered as both a managed SaaS service and an on-prem install.
 - [View featured reports](https://datapane.com/explore/?tab=featured)
 - [Join the community on GitHub Discussions](https://github.com/datapane/datapane/discussions)"""
     ),
-).save(
+)
+
+report.save(
     path="hello.html",
     formatting=dp.ReportFormatting(width=dp.ReportWidth.NARROW),
     open=True,
 )
+
+# You can also upload your report to a Datapane Server by logging in then running the following
+# report.upload(name="hello")

@@ -24,7 +24,7 @@ from lxml.etree import Element
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
-from datapane.common import PKL_MIMETYPE, NPath, guess_type, utf_read_text
+from datapane.common import PKL_MIMETYPE, NPath, guess_type, log, utf_read_text
 from datapane.common.report import conv_attribs, get_embed_url, is_valid_id
 
 from ..common import DPTmpFile
@@ -108,10 +108,17 @@ class BaseElement(ABC):
         self._add_attributes(**kwargs)
         self._set_name(name)
 
-        if "caption" in kwargs:
-            _caption = kwargs["caption"]
-            if _caption and len(_caption) > 512:
-                raise DPError("Caption must be less than 512 characters")
+        self._truncate_strings(kwargs, "caption", 512)
+        self._truncate_strings(kwargs, "label", 256)
+
+    def _truncate_strings(self, kwargs: dict, key: str, max_length: int):
+        if key in kwargs:
+            x: str = kwargs[key]
+            if x and len(x) > max_length:
+                kwargs[key] = f"{x[:max_length-3]}..."
+                log.warning(f"{key} currently '{x}'")
+                log.warning(f"{key} must be less than {max_length} characters, truncating")
+                # raise DPError(f"{key} must be less than {max_length} characters, '{x}'")
 
     def _set_name(self, name: str = None):
         if name:
@@ -360,6 +367,7 @@ class Text(EmbeddedTextBlock):
             text: The markdown formatted text, use triple-quotes, (`\"\"\"# My Title\"\"\"`) to create multi-line markdown text
             file: Path to a file containing markdown text
             name: A unique name for the block to reference when adding text or embedding (optional)
+            label: A label used when displaying the block (optional)
 
         ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.File
         """

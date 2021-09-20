@@ -28,7 +28,7 @@ from datapane import __version__
 
 from .. import config as c
 from ..analytics import capture_event
-from ..utils import success_msg
+from ..utils import display_msg, success_msg
 from .common import _process_res
 
 __all__ = ["login", "logout", "ping", "signup", "hello"]
@@ -109,8 +109,8 @@ def signup(config: t.Optional[c.Config] = None):
 
 
 def hello():
-    print(
-        "Creating default report `hello.py` and running it. This will take some time while it crunches the numbers, resulting it a sample report, edit the script and run again to change the report\n"
+    display_msg(
+        "Creating and running `./hello.py` - running this code generates a sample Datapane report. You can edit the script and run it again to change the generated report\n"
     )
 
     hello_path = ir.files("datapane.resources.templates.report_py") / "hello.py"

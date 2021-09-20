@@ -9,14 +9,6 @@ import click
 from datapane.common import DPError, JDict
 
 
-def is_jupyter() -> bool:
-    """Checks if inside ipython shell inside browser"""
-    try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
-    except Exception:
-        return False
-
-
 ################################################################################
 # Built-in exceptions
 class IncompatibleVersionError(DPError):
@@ -51,6 +43,8 @@ class MissingCloudPackagesError(DPError):
         )
 
 
+################################################################################
+# Output
 def success_msg(msg: str):
     click.secho(msg, fg="green")
 
@@ -65,6 +59,26 @@ def failure_msg(msg: str, do_exit: bool = False):
             exit(2)
 
 
+def is_jupyter() -> bool:
+    """Checks if inside ipython shell inside browser"""
+    try:
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
+    except Exception:
+        return False
+
+
+def display_msg(text: str, md: str = None):
+    if is_jupyter():
+        from IPython.display import Markdown, display
+
+        msg = md or text
+        display(Markdown(msg))
+    else:
+        print(text)
+
+
+################################################################################
+# Misc
 def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
     """Convert a list of k=v to a typed JSON dict"""
 

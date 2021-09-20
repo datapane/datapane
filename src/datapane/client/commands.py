@@ -136,13 +136,13 @@ def login(obj: DPContext, token, server):
 @cli.command()
 @click.pass_obj
 def logout(obj: DPContext):
-    """Logout from the server and reset the API token in the config file."""
+    """Logout from the server and reset the config file"""
     api.logout(obj.env)
 
 
 @cli.command()
 def ping():
-    """Check can connect to the server."""
+    """Check can connect to the server"""
     try:
         api.ping()
     except HTTPError as e:
@@ -151,13 +151,13 @@ def ping():
 
 @cli.command()
 def signup():
-    """Signup using datapane.com, and link your new account to the Datapane CLI"""
+    """Signup and link your account to the Datapane CLI"""
     api.signup()
 
 
 @cli.command()
 def hello():
-    """Create an example hello.py report and open it in the browser"""
+    """Create and run an example report, and open in the browser"""
     api.hello()
 
 

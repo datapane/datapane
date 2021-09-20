@@ -25,7 +25,7 @@ from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError, InvalidReportError, is_jupyter
+from datapane.client.utils import DPError, InvalidReportError, display_msg
 from datapane.common import NPath, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 from datapane.common.utils import process_notebook
@@ -114,17 +114,7 @@ class ReportFormatting:
 
 
 # Used to detect a single display message once per VM invocation
-SKIP_DISPLAY_MSG = False
-
-
-def display_msg(text: str, md: str = None):
-    if is_jupyter():
-        from IPython.display import Markdown, display
-
-        msg = md or text
-        display(Markdown(msg))
-    else:
-        print(text)
+# SKIP_DISPLAY_MSG = False
 
 
 @contextfunction
@@ -462,7 +452,6 @@ class Report(BaseReport):
     can be analysed and shared by users in their Browser
     """
 
-    _last_saved: t.Optional[str] = None  # Path to local report
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
     _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
@@ -544,25 +533,14 @@ class Report(BaseReport):
             md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report",
         )
 
-    def save(
+    def _save(
         self,
         path: str,
         open: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
-        _is_preview: bool = False,
-    ) -> None:
-        """Save the report document to a local HTML file
-
-        Args:
-            path: File path to store the document
-            open: Open in your browser after creating (default: False)
-            name: Name of the document (optional: uses path if not provided)
-            author: The report author / email / etc. (optional)
-            formatting: Sets the basic rport styling
-        """
-        self._last_saved = path
+    ) -> str:
 
         if not name:
             name = Path(path).stem[:127]
@@ -575,8 +553,32 @@ class Report(BaseReport):
             formatting=formatting,
         )
 
-        if not _is_preview:
-            capture("CLI Report Save", properties=dict(report_id=report_id))
+        if open:
+            path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
+            webbrowser.open_new_tab(path_uri)
+
+        return report_id
+
+    def save(
+        self,
+        path: str,
+        open: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[ReportFormatting] = None,
+    ) -> None:
+        """Save the report document to a local HTML file
+
+        Args:
+            path: File path to store the document
+            open: Open in your browser after creating (default: False)
+            name: Name of the document (optional: uses path if not provided)
+            author: The report author / email / etc. (optional)
+            formatting: Sets the basic report styling
+        """
+
+        report_id = self._save(path, open, name, author, formatting)
+        capture("CLI Report Save", properties=dict(report_id=report_id))
 
         # feedback form
         if random.random() < 0.05:
@@ -585,13 +587,21 @@ class Report(BaseReport):
                 md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey](https://bit.ly/3lWjRlr)",
             )
 
-        if open:
-            path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
-            webbrowser.open_new_tab(path_uri)
-
     @capture_event("CLI Report Preview")
-    def preview(self) -> None:
-        self.save(self._preview_file.name, open=True, _is_preview=True)
+    def preview(
+        self,
+        open: True,
+        formatting: t.Optional[ReportFormatting] = None,
+    ) -> None:
+        """Preview the report in a new browser window.
+        Can be called multiple times, refreshing the existing created preview file.
+        Pass open=False to stop openning a new tab on subsequent previews
+
+        Args:
+            open: Open in your browser after creating (default: True)
+            formatting: Sets the basic report styling
+        """
+        self._save(self._preview_file.name, open=open, formatting=formatting)
 
     def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
         super()._report_status_checks(processed_report_doc, embedded, check_empty)
