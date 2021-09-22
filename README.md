@@ -21,12 +21,14 @@
         <img alt="Conda (channel only)" src="https://img.shields.io/conda/vn/conda-forge/datapane">
     </a>
 </p>
-<h4>Turn a Python analysis into a beautiful document in 3 lines of code.
+<h4>Share interactive plots and data in 3 lines of Python.
 </h1>
 
-Datapane is a Python library which makes it simple to build reports from the common objects in your data analysis, such as pandas DataFrames, plots from Python visualisation libraries, and Markdown.
+Datapane is a Python library for building interactive reports for your end-users in seconds. 
 
-Reports can be exported as standalone HTML documents, with rich components which allow data to be explored and visualisations to be used interactively. You can also publish reports to our free platform for public use or share them securely with your team and clients.
+Import our library into your existing script/notebook and build reports from pandas Dataframes, plots from Python viz libraries, Markdown, as well as data exploration and layout components. 
+
+Export your reports as standalone HTML documents, or share and embed them via our free hosted platform. 
 
 # Getting Started
 
@@ -36,114 +38,167 @@ The best way to install Datapane is through pip or conda.
 
 #### pip
 
-`pip3 install -U datapane`
+```
+pip3 install -U datapane
+datapane hello
+```
 
 #### conda
 
-`conda install -c conda-forge "datapane>=0.10.0"`
+```
+conda install -c conda-forge "datapane>=0.10.0"
+datapane hello
+```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
 
-`!pip3 install --quiet datapane`
+```
+!pip3 install --quiet datapane
+!datapane signup
+```
 
 ## Explainer Video
 
-https://user-images.githubusercontent.com/3541695/117458709-7e80ba80-af42-11eb-9fa7-a11bb05229fe.mp4
+https://user-images.githubusercontent.com/16949044/134007757-0b91074a-2b32-40ba-b385-5623dff8c04e.mp4
 
 ## Hello world
 
-Let's say you wanted to create a document with a table viewer and an interactive plot:
+Let's say you wanted to create a report with an interactive plot and table viewer: 
 
 ```python
-import pandas as pd
 import altair as alt
+from vega_datasets import data
 import datapane as dp
 
-df = pd.read_csv('https://covid.ourworldindata.org/data/vaccinations/vaccinations-by-manufacturer.csv', parse_dates=['date'])
-df = df.groupby(['vaccine', 'date'])['total_vaccinations'].sum().reset_index()
+source = data.cars()
 
-plot = alt.Chart(df).mark_area(opacity=0.4, stroke='black').encode(
-    x='date:T',
-    y=alt.Y('total_vaccinations:Q'),
-    color=alt.Color('vaccine:N', scale=alt.Scale(scheme='set1')),
-    tooltip='vaccine:N'
-).interactive().properties(width='container')
+plot1 = alt.Chart(source).mark_circle(size=60).encode(
+  x='Horsepower', 
+  y='Miles_per_Gallon', 
+  color='Origin',
+  tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
+).interactive()
 
-total_df = df[df["date"] == df["date"].max()].sort_values("total_vaccinations", ascending=False).reset_index(drop=True)
-total_styled = total_df.style.bar(subset=["total_vaccinations"], color='#5fba7d', vmax=total_df["total_vaccinations"].sum())
-
-dp.Report("## Vaccination Report",
-    dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
-    dp.Table(total_styled, caption="Current vaccination totals by manufacturer")
-).save(path='report.html', open=True)
+dp.Report(
+    dp.Text("## Hello world!",
+    dp.Plot(plot1),
+    dp.DataTable(source)
+).save(path="Hello_world.html")
 ```
 
-This would package a standalone HTML report document such as the following:
+This will package a standalone HTML document that looks as follows:
 
-![Report Example](https://user-images.githubusercontent.com/3541695/117442319-82a2dd00-af2e-11eb-843e-29097f425a55.png)
+<img width="1269" alt="Simple Datapane report example with text, plot and table" src="https://user-images.githubusercontent.com/16949044/134021084-39b3369b-3c42-478c-b1fb-79f2b5b4b4a2.png">
 
-## Text Reports
+Your users can scroll & zoom on the chart, filter and download the tabular data. 
 
-If you are writing a report with a lot of text e.g. an article or tutorial, try our [Text Report](https://docs.datapane.com/reports/blocks/text-reports) web editor, where you can combine Markdown with assets uploaded from Python. Here's how you'd do it for the previous example:
+## Advanced Layout Options
 
-```Python
-dp.TextReport("## Vaccination Report",
-    dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
-    dp.Table(total_styled, caption="Current vaccination totals by manufacturer")
-).upload(name="Example vaccination report")
+Datapane is great for presenting complex data and provides many components for creating advanced interactive layouts. Let's you need to write a technical document: 
+
+```python
+import altair as alt
+from vega_datasets import data
+import datapane as dp
+
+source = data.cars()
+plot1 = alt.Chart(source).mark_circle(size=60).encode(
+    x='Horsepower', 
+    y='Miles_per_Gallon', 
+    color='Origin',
+    tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
+).interactive()
+
+dp.Report(
+    dp.Page(title="Charts and analysis", 
+            blocks=[
+                dp.Formula("x^2 + y^2 = z^2"),
+                dp.Group(
+                    dp.BigNumber(
+                        heading="Number of percentage points", 
+                        value="84%",
+                        change="2%",
+                        is_upward_change=True
+                    ),
+                    dp.BigNumber(
+                        heading="Simple Statistic", 
+                        value=100
+                    ), columns=2,
+                ),
+                dp.Select(blocks=[
+                    dp.Plot(plot1, label="Plot"),
+                    dp.HTML('''<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>''', label="Video")
+                ]),
+            ]),
+    dp.Page(title="Dataset", blocks=[
+            dp.DataTable(source)
+    ])
+).save(path="Complex_layout.html", open=True)
 ```
 
-Note that you'll need an account on Datapane.com to use TextReports. This will bring up the web editor, where you can add additional commentary to these assets:
+Layout blocks like `dp.Select`, `dp.Group` and `dp.Page` allow you to highlight key points without sacrificing detail, while content blocks like `dp.HTML` and `dp.Formula` (LaTeX) can enrich your report. The final result looks like this: 
 
-<img width="1077" alt="TextReport editor and preview" src="https://user-images.githubusercontent.com/16949044/125301674-1cb64580-e323-11eb-83ea-9b1e1b981734.png">
+<img width="1000" alt="Complex Datapane report example" src="https://user-images.githubusercontent.com/16949044/134022445-5d417993-808f-4de8-8e8c-f510bdf4a17e.png">
 
-## Featured Examples
+Check out the full list of blocks in our [documentation](https://docs.datapane.com/reports/blocks). 
+# Sharing Reports
 
-Here a few samples of the top reports created by the Datapane community. To see more, see our [featured](https://datapane.com/featured) section.
+## Datapane Studio
+
+In addition to saving documents locally, you can host, share and embed reports via [Datapane Studio](https://datapane.com/), our free platform used by tens of thousands of people each month. 
+
+To get your free API key, run the following command in your terminal and sign up via email/OAuth: 
+
+```
+datapane signup
+```
+
+Next, in your Python notebook or script simply change the `save` function to  `upload` on your report: 
+
+```python
+dp.Report(
+ ...
+#).save(path="hello_world.html")
+).upload(name="Hello world")
+```
+
+Your Studio account comes with the following: 
+- **Unlimited public reports** - great for embedding into places like Medium, Reddit, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
+- **5 private reports** - share these via email within your organization
+
+### Featured Examples
+
+Here a few samples of the top reports created by the Datapane community. To see more, check out our [gallery](https://datapane.com/gallery) section.
 
 - [Tutorial Report](https://datapane.com/u/leo/reports/tutorial-1/) by Datapane Team
 - [Coindesk analysis](https://datapane.com/u/greg/reports/initial-coindesk-article-data/) by Greg Allan
 - [COVID-19 Trends by Quarter](https://datapane.com/u/keith8/reports/covid-19-trends-by-quarter/) by Keith Johnson
 - [Ecommerce Report](https://datapane.com/u/leo/reports/e-commerce-report/) by Leo Anthias
 - [Example Academic Paper](https://datapane.com/u/kalru/reports/supplementary-material/) by Kalvyn Roux
-- [Example Sales Report](https://datapane.com/u/datapane/reports/sample-internal-report/) by Datapane Team
-- [Example Client Report](https://datapane.com/u/datapane/reports/sample-external-report/) by Datapane Team
 - [Exploration of Restaurants in Kyoto](https://datapane.com/u/ryancahildebrandt/reports/kyoto-in-stations-and-restaurants/) by Ryan Hildebrandt
-- [The Numbers on Particles](https://datapane.com/u/ryancahildebrandt/reports/the-numbers-on-particles/) by Ryan Hildebrandt
+
+# Teams
+
+[Datapane Teams](https://datapane.com/teams/) is our plan for teams, which adds the following features on top of our open-source and Studio plans: 
+
+- Private domain and organizational workspace
+- Multiple projects
+- Client-sharing functionality
+- Unlimited Datapane Apps
+- Custom App packages and environments
+- Secure Warehouse & API Integration
+- File and Dataset APIs
+- Private Slack or Teams support
+
+Datapane Teams is offered as both a managed SaaS service and an on-prem install. For more information, see [the documentation](https://docs.datapane.com/datapane-teams/tut-deploying-a-script). You can find pricing [here](https://datapane.com/pricing).
+
 
 ## Next Steps
 
 - [Read the documentation](https://docs.datapane.com)
 - [Browse the API docs](https://datapane.github.io/datapane/)
-- [Browse samples and demos](https://github.com/datapane/gallery/)
-- [View featured reports](https://datapane.com/explore/?tab=featured)
+- [View featured reports](https://github.com/datapane/gallery/)
 
-# Sharing Reports
-
-## Public sharing
-
-In addition to saving documents locally, you can use [Hosted Datapane](https://datapane.com/gallery) to publish your reports. Datapane is a free hosted platform used by tens of thousands of people each month to view and share Python reports.
-
-- Reports can be published for free and shared publicly or securely
-- You can embed them into places like Medium, Reddit, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
-- Viewers can explore and download your data with additional DataTable analysis features
-
-To get started, create a free API key (see [here](https://docs.datapane.com/tut-getting-started#authentication)) and call the `upload` function on your report,
-
-```python
-r = dp.Report(dp.DataTable(df), dp.Plot(chart))
-r.upload(name="2020 Stock Portfolio", open=True)
-```
-
-## Private sharing
-
-If you need private report sharing, [Datapane Teams](https://docs.datapane.com/datapane-teams/) allows secure sharing of reports and the ability to deploy your Jupyter Notebooks or Python scripts as interactive apps.
-
-- Share reports privately with your company or external clients
-- Deploy Jupyter Notebooks and scripts as apps, with inputs that can be run by your team interactively to dynamically create results
-- Schedule reports to automatically update
-
-Datapane Teams is offered as both a managed SaaS service and an on-prem install. For more information, see [the documentation](https://docs.datapane.com/datapane-teams/tut-deploying-a-script). You can find pricing [here](https://datapane.com/pricing).
 
 # Analytics
 
@@ -172,7 +227,7 @@ PS> ni ~/AppData/Roaming/datapane/no_analytics -ea 0
 
 You may need to try `~/AppData/Local` instead of `~/AppData/Roaming` on certain Windows configurations depending on the type of your user-account.
 
-# Joining the community
+## Joining the community
 
 Looking to get answers to questions or engage with us and the wider community? Check out our [GitHub Discussions](https://github.com/datapane/datapane/discussions) board.
 
