@@ -4,6 +4,13 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
+
+PD_VERSION = Version(pd.__version__)
+PD_1_3_GREATER = SpecifierSet(">=1.3.0")
+PD_1_2_x = SpecifierSet("~=1.2.0")
+PD_1_1_x = SpecifierSet("~=1.1.0")
 
 
 def convert_axis(df: pd.DataFrame):
@@ -29,7 +36,7 @@ def convert_axis(df: pd.DataFrame):
 def downcast_numbers(data: pd.DataFrame):
     """Downcast numerics"""
 
-    def downcast(ser: pd.Series) -> pd.Series:
+    def downcast_ints(ser: pd.Series) -> pd.Series:
         try:
             ser = pd.to_numeric(ser, downcast="signed")
             ser = pd.to_numeric(ser, downcast="unsigned")
@@ -39,8 +46,17 @@ def downcast_numbers(data: pd.DataFrame):
 
     # A result of downcast(timedelta64[ns]) is int <ns> and hard to understand.
     # e.g.) 0 days 00:54:38.777572 -> 3278777572000 [ns]
-    df_num = data.select_dtypes("number", exclude=["timedelta"])  # , pd.Int64Dtype])
-    data[df_num.columns] = df_num.apply(downcast)
+    df_num = data.select_dtypes("integer", exclude=["timedelta"])  # , pd.Int64Dtype])
+    data[df_num.columns] = df_num.apply(downcast_ints)
+
+    def downcast_floats(ser: pd.Series) -> pd.Series:
+        ser = pd.to_numeric(ser, downcast="float", errors="ignore")
+        return ser
+
+    # float downcasting currently disabled - alters values (both float64 and int64) and rounds to 'inf' instead of erroring
+    # see https://github.com/pandas-dev/pandas/issues/19729
+    # df_num = data.select_dtypes("floating")
+    # data[df_num.columns] = df_num.apply(downcast_floats)
 
 
 def timedelta_to_str(df: pd.DataFrame):
@@ -94,6 +110,14 @@ def obj_to_str(df: pd.DataFrame):
     df[df_cat.columns] = df_cat.apply(to_str_cat_vals)
 
 
+def str_to_arrow_str(df: pd.DataFrame):
+    """Use the memory-efficient pyarrow string dtype (pandas >= 1.3 only)"""
+    # convert objects to str / NA
+    if PD_VERSION in PD_1_3_GREATER:
+        df_str = df.select_dtypes("string")
+        df[df_str.columns] = df_str.astype("string[pyarrow]")
+
+
 def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     """
     Processing steps needed before writing / after reading
@@ -110,14 +134,29 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     # convert timedelta
     timedelta_to_str(df)
 
-    df = df.convert_dtypes()
+    # NOTE - pandas >= 1.3 handles downcasting of nullable values correctly
+    if PD_VERSION in PD_1_3_GREATER:
+        df = df.convert_dtypes()
+        downcast_numbers(df)
+    else:
+        # downcast first as can't downcast Int64 correctly after
+        downcast_numbers(df)
+        # convert all non-floating vals
+        non_f = df.select_dtypes(exclude="floating").convert_dtypes()
+        df[non_f.columns] = non_f
+        # convert all floating vals, but disable float64->int64 conversioon
+        f = df.select_dtypes(include="floating").convert_dtypes(convert_integer=False)
+        df[f.columns] = f
 
-    downcast_numbers(df)
     # save timedeltas cols (unneeded whilst timedelta_to_str used)
     # td_col = df.select_dtypes("timedelta")
     # df[td_col.columns] = td_col
     obj_to_str(df)
     parse_categories(df)
+
+    # convert all strings to use the arrow dtype
+    str_to_arrow_str(df)
+
     return df
 
 

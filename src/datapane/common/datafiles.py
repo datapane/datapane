@@ -9,7 +9,7 @@ from pandas.errors import ParserError
 from pyarrow import RecordBatchFileWriter
 
 from .config import log
-from .df_processor import process_df
+from .df_processor import process_df, str_to_arrow_str
 from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME
 from .utils import guess_encoding
 
@@ -50,7 +50,9 @@ class ArrowFormat(DFFormatter):
     enum = "ARROW"
 
     def load_file(fn: PathOrFile) -> pd.DataFrame:
-        return pa.ipc.open_file(fn).read_pandas()
+        df = pa.ipc.open_file(fn).read_pandas()
+        str_to_arrow_str(df)
+        return df
 
     def save_file(fn: PathOrFile, df: pd.DataFrame):
         df = process_df(df)

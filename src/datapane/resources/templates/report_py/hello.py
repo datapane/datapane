@@ -64,7 +64,7 @@ Let's start with a minimal example to understand the basic flow (feel free to co
     ),
     dp.Code(
         """
-    import datapane as dp
+  import datapane as dp
 
   dp.Report(
     dp.Plot(plot1),
@@ -141,9 +141,9 @@ Running that code generates the following report: """
         """These are great ways to add interactivity to your report with minimal effort. Spice things up even further by adding pages, HTML blocks, images and more.
 # Sharing Reports
 
-## Datapane Community
+## Datapane Studio
 
-In addition to saving documents locally, you can use [Datapane Community](https://datapane.com/explore) to host and share your reports.
+In addition to saving documents locally, you can use [Datapane Studio](https://datapane.com/explore) to host and share your reports.
 
 - You can upload and share unlimited public reports (and limited private reports)
 - Reports can be embedded in places like Medium, Notion, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))

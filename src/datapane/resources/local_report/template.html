@@ -9,7 +9,7 @@
     />
     <script>
       window.dpLocal = true;
-      window.dpLocalViewEvent = {{true if analytics else false}};
+      window.dpLocalViewEvent = {{analytics|tojson}};
       window.dpReportId = "{{report_id}}";
       window.dpAuthorId = "{{author_id}}";
     </script>
@@ -30,7 +30,7 @@
       const ReportFactory = React.createElement.bind(null, ReportComponent);
 
       ReactDOM.render(
-        ReportFactory({ report, htmlHeader, isLightProse: {{ is_light_prose }} }),
+        ReportFactory({ report, htmlHeader, isLightProse: {{ is_light_prose|tojson }} }),
         document.querySelector("#report-root")
       );
     </script>

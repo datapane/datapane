@@ -4,7 +4,6 @@ Datapane Reports Object
 Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
-import json
 import random
 import typing as t
 import webbrowser
@@ -183,7 +182,7 @@ class ReportFileWriter:
             report_author=author,
             report_date=timestamp(),
             css_header=formatting.to_css(),
-            is_light_prose=json.dumps(formatting.light_prose),
+            is_light_prose=formatting.light_prose,
             dp_logo=self.logo,
             report_id=report_id,
             author_id=c.config.session_id,
