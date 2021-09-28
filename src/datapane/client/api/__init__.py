@@ -68,7 +68,7 @@ from .report.blocks import (
 from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, TextReport, Visibility
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .teams import Blob, Run, Schedule, Script, Variable
-from .user import hello, login, logout, ping, signup
+from .user import hello_world, login, logout, ping, signup
 from ..utils import IncompatibleVersionError
 from ..config import init
 

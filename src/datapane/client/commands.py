@@ -78,7 +78,7 @@ class GlobalCommandHandler(click.Group):
         try:
             return self.main(*args, **kwargs)
         except Exception as e:
-            analytics.capture("CLI Error", dict(msg=str(e), type=str(type(e))))
+            analytics.capture("CLI Error", msg=str(e), type=str(type(e)))
             if EXTRA_OUT:
                 log.exception(e)
             if isinstance(e, DPError):
@@ -156,9 +156,9 @@ def signup():
 
 
 @cli.command()
-def hello():
+def hello_world():
     """Create and run an example report, and open in the browser"""
-    api.hello()
+    api.hello_world()
 
 
 ###############################################################################

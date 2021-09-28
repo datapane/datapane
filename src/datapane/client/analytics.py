@@ -3,7 +3,6 @@ import platform
 from contextlib import suppress
 from functools import wraps
 from pathlib import Path
-from typing import Optional
 
 import posthog
 
@@ -28,7 +27,7 @@ def is_analytics_disabled() -> bool:
 _NO_ANALYTICS: bool = is_analytics_disabled()
 
 
-def capture(event: str, properties: Optional[dict] = None) -> None:
+def capture(event: str, **properties) -> None:
     # Used for capturing generic events with properties
     if _NO_ANALYTICS:
         return None
@@ -40,14 +39,12 @@ def capture(event: str, properties: Optional[dict] = None) -> None:
         identify(config.session_id)
         config.save()
 
-    properties = properties or {}
     properties.update(source="cli", dp_version=__version__)
     with suppress(Exception):
         posthog.capture(config.session_id, event, properties)
 
 
-def identify(session_id: str, properties: Optional[dict] = None) -> None:
-    properties = properties or {}
+def identify(session_id: str, **properties) -> None:
     properties.update(os=platform.system(), python_version=platform.python_version(), dp_version=__version__)
     with suppress(Exception):
         posthog.identify(session_id, properties)

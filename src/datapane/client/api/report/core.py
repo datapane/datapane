@@ -577,7 +577,7 @@ class Report(BaseReport):
         """
 
         report_id = self._save(path, open, name, author, formatting)
-        capture("CLI Report Save", properties=dict(report_id=report_id))
+        capture("CLI Report Save", report_id=report_id)
 
         # feedback form
         if random.random() < 0.05:

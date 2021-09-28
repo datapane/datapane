@@ -27,14 +27,13 @@ from furl import furl
 from datapane import __version__
 
 from .. import config as c
-from ..analytics import capture_event
+from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "signup", "hello"]
+__all__ = ["login", "logout", "ping", "signup", "hello_world"]
 
 
-@capture_event("CLI Login")
 def login(
     token: t.Optional[str], server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True
 ) -> str:
@@ -55,6 +54,7 @@ def login(
 
     config = c.Config(server=server)
 
+    with_token = bool(token)
     if token is None:
         token = token_connect("/accounts/login/", action="login", server=config.server)
 
@@ -65,6 +65,7 @@ def login(
     config.username = username
     config.save(env=env)
     c.init(config=config)
+    capture("CLI Login", with_token=with_token)
     return config.username
 
 
@@ -102,13 +103,15 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     return username
 
 
+@capture_event("CLI Signup")
 def signup(config: t.Optional[c.Config] = None):
     config = config or c.get_config()
     token = token_connect("/accounts/signup/", action="signup", server=config.server)
     login(token, server=config.server)
 
 
-def hello():
+@capture_event("CLI Hello World")
+def hello_world():
     display_msg(
         "Creating and running `./hello.py` - running this code generates a sample Datapane report. You can edit the script and run it again to change the generated report\n"
     )
