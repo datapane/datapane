@@ -114,6 +114,7 @@ def _run_script(script: str):
 
 @capture_event("CLI Signup")
 def signup():
+    """Signup and link your account to the Datapane CLI automatically"""
     config = c.get_config()
     token = token_connect("/accounts/signup/", action="signup", server=config.server)
     # login and re-init against the signed-up server
@@ -134,6 +135,7 @@ def signup():
 
 @capture_event("CLI Hello World")
 def hello_world():
+    """Create and run an example report, and open in the browser"""
     display_msg(
         "Creating and running `./hello.py` - running this code generates a sample Datapane report. You can edit the script and run it again to change the generated report.\n"
     )
