@@ -64,6 +64,14 @@ class Config:
     def is_org(self) -> bool:
         return not self.is_public
 
+    @property
+    def is_authenticated(self) -> bool:
+        return self.token != DEFAULT_TOKEN  # or bool(self.username)
+
+    @property
+    def is_anonymous(self) -> bool:
+        return not self.is_authenticated
+
     # MANAGER functions
     @classmethod
     def load(cls, env: str = "default") -> "Config":
@@ -161,7 +169,8 @@ def init(config_env: str = "default", config: t.Optional[Config] = None) -> Conf
 
 
 def check_get_config() -> Config:
-    """Attempt to get a config object, reloading if necessary"""
+    """Attempt to get a config object, reloading if necessary
+    - used when we need a valid API token, e.g. when performing a network action"""
     global config
     if config.token == DEFAULT_TOKEN:
         # try reinit, as may have ran login in another terminal/subprocess
@@ -184,5 +193,6 @@ def set_config(c: Optional[Config]):
 
 
 def get_config() -> Config:
+    """Get the current config object, doesn't attempt to re-init the API token"""
     global config
     return config

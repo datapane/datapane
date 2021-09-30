@@ -166,12 +166,6 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        url = "https://datapane.com/"
-        display_msg(
-            text=f"Report saved to {path}, you can use report.upload to host and securely share reports using Datapane, see {url}",
-            md=f"Report saved to {path}, you can use report.upload to host and securely share reports using [Datapane]({url})",
-        )
-
         # template.html inlines the report doc with backticks so we need to escape any inside the doc
         report_doc_esc = report_doc.replace("`", r"\`")
         report_id = uuid4().hex
@@ -528,8 +522,8 @@ class Report(BaseReport):
             webbrowser.open_new_tab(self.web_url)
 
         display_msg(
-            text=f"Report successfully uploaded at {self.web_url}, follow the link to view and share your report",
-            md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report",
+            text=f"Report successfully uploaded at {self.web_url}, follow the link to view and share your report.",
+            md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report.",
         )
 
     def _save(
@@ -551,6 +545,14 @@ class Report(BaseReport):
             name=name,
             formatting=formatting,
         )
+
+        if c.config.is_anonymous:
+            display_msg(
+                text="Report saved to ./{path}. To upload and share your report, create a free Datapane account by running `{bang}datapane signup`.",
+                path=path,
+            )
+        else:
+            display_msg(text=f"Report saved to ./{path}")
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
@@ -582,8 +584,9 @@ class Report(BaseReport):
         # feedback form
         if random.random() < 0.05:
             display_msg(
-                text="How is your experience of Datapane? Please take two minutes to answer our anonymous product survey at https://bit.ly/3lWjRlr",
-                md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey](https://bit.ly/3lWjRlr)",
+                text="How is your experience of Datapane? Please take two minutes to answer our anonymous product survey at {url}",
+                md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey]({url})",
+                url="https://bit.ly/3lWjRlr",
             )
 
     @capture_event("CLI Report Preview")
@@ -617,10 +620,10 @@ class Report(BaseReport):
             elif c.config.is_public:
                 # only nudge public users
                 if asset_blocks < 4:
-                    url = "https://docs.datapane.com/reports/blocks/layout-pages-and-selects"
                     display_msg(
-                        text=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
-                        md=f"Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
+                        text="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
+                        md="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
+                        url="https://docs.datapane.com/reports/blocks/layout-pages-and-selects",
                     )
 
                 # has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")

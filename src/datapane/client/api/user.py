@@ -6,6 +6,7 @@ It's possible to authenticate within Python, however we also provide (and recomm
 via the CLI, as it's easier to script,
 
 ```
+$ datapane signup
 $ datapane login --token ...
 $ datapane logout
 ```
@@ -18,6 +19,7 @@ import sys
 import time
 import typing as t
 import webbrowser
+from pathlib import Path
 
 import click_spinner
 import importlib_resources as ir
@@ -103,24 +105,42 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     return username
 
 
+def _run_script(script: str):
+    """Run the template script and copy it locally to cwd"""
+    script_path: Path = ir.files("datapane.resources.templates.hello") / script
+    shutil.copyfile(script_path, script_path.name)
+    runpy.run_path(script_path, run_name="__datapane__")
+
+
 @capture_event("CLI Signup")
-def signup(config: t.Optional[c.Config] = None):
-    config = config or c.get_config()
+def signup():
+    config = c.get_config()
     token = token_connect("/accounts/signup/", action="signup", server=config.server)
+    # login and re-init against the signed-up server
     login(token, server=config.server)
+
+    display_msg("\nRunning `./world.py` and uploading the Datapane report to your newly created account.\n")
+
+    # run the world script
+    _run_script("world.py")
+
+    # success_msg("Report uploaded, opening in your browser")
+    display_msg(
+        text="\nLearn more about uploading and sharing reports at {learn_url}.",
+        md="\nLearn more about uploading and sharing reports [here]({learn_url}).",
+        learn_url="https://docs.datapane.com/reports/publishing-and-sharing",
+    )
 
 
 @capture_event("CLI Hello World")
 def hello_world():
     display_msg(
-        "Creating and running `./hello.py` - running this code generates a sample Datapane report. You can edit the script and run it again to change the generated report\n"
+        "Creating and running `./hello.py` - running this code generates a sample Datapane report. You can edit the script and run it again to change the generated report.\n"
     )
 
-    hello_path = ir.files("datapane.resources.templates.report_py") / "hello.py"
-    shutil.copyfile(hello_path, "./hello.py")
-    runpy.run_path(hello_path, run_name="__datapane__")
+    _run_script("hello.py")
 
-    success_msg("Report generated, opening in your browser")
+    display_msg("\nNext, run `{bang}datapane signup` to create a free account and upload a report.")
 
 
 def token_connect(open_url: str, action: str, server: str):

@@ -18,6 +18,7 @@ _IN_PYTEST = "pytest" in sys.modules
 _IN_DPSERVER = "dp" in sys.modules
 # we're running on datapane platform
 ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
+_USING_CONDA = os.path.exists(os.path.join(sys.prefix, "conda-meta", "history"))
 
 
 # Other useful re-exports
@@ -55,9 +56,11 @@ from .client.api import (
     Variable,
     Visibility,
     by_datapane,
+    signup,
     login,
     logout,
     ping,
+    hello_world,
     builtins,
 )
 from .client.config import init

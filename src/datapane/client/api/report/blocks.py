@@ -344,6 +344,10 @@ class EmbeddedTextBlock(DataBlock):
 
     content: str
 
+    def __init__(self, content: str, name: str = None, **kwargs):
+        super().__init__(name, **kwargs)
+        self.content = content.strip()
+
     def _to_xml(self, s: BuilderState) -> BuilderState:
         # NOTE - do we use etree.CDATA wrapper?
         _E = getattr(E, self._tag)
@@ -371,12 +375,12 @@ class Text(EmbeddedTextBlock):
 
         ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.File
         """
-        super().__init__(name=name, label=label)
-
         if text:
             text = text.strip()
+
         assert text or file
-        self.content = text or utf_read_text(Path(file).expanduser())
+        content = text or utf_read_text(Path(file).expanduser())
+        super().__init__(content=content, name=name, label=label)
 
     def format(self, *args: BlockOrPrimitive, **kwargs: BlockOrPrimitive) -> Group:
         """
@@ -434,8 +438,7 @@ class Code(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        super().__init__(language=language, caption=caption, name=name, label=label)
-        self.content = code
+        super().__init__(content=code, language=language, caption=caption, name=name, label=label)
 
 
 class HTML(EmbeddedTextBlock):
@@ -452,8 +455,7 @@ class HTML(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        super().__init__(name=name, label=label)
-        self.content = str(html)
+        super().__init__(content=str(html), name=name, label=label)
 
 
 class Formula(EmbeddedTextBlock):
@@ -474,9 +476,7 @@ class Formula(EmbeddedTextBlock):
             ..note:: LaTeX commonly uses special characters, hence prefix your formulas with `r` to make them
             raw strings, e.g. r"\frac{1}{\sqrt{x^2 + 1}}"
         """
-
-        super().__init__(caption=caption, name=name, label=label)
-        self.content = formula
+        super().__init__(content=formula, caption=caption, name=name, label=label)
 
 
 class Embed(EmbeddedTextBlock):
@@ -497,11 +497,12 @@ class Embed(EmbeddedTextBlock):
         """
 
         result = get_embed_url(url, width=width, height=height)
-        super().__init__(name=name, label=label, url=url, title=result.title, provider_name=result.provider)
 
         # if "html" not in result:
         #     raise DPError(f"Can't embed result from provider for URL '{url}'")
-        self.content = result.html
+        super().__init__(
+            content=result.html, name=name, label=label, url=url, title=result.title, provider_name=result.provider
+        )
 
 
 NumberValue = t.Union[str, int, float]
@@ -625,6 +626,7 @@ class File(AssetBlock):
         file: t.Optional[NPath] = None,
         is_json: bool = False,
         filename: t.Optional[str] = None,
+        caption: t.Optional[str] = None,
         name: str = None,
         label: str = None,
     ):
@@ -634,6 +636,7 @@ class File(AssetBlock):
             file: Path to a file to attach to the report (e.g. a JPEG image)
             is_json: If `True`, treat the `data` as JSON data already
             filename: Name to be used when downloading the file
+            caption: A caption to display below the file (optional)
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
@@ -645,7 +648,7 @@ class File(AssetBlock):
             out_fn = self._save_obj(data, as_json=is_json)
             file = out_fn.file
 
-        super().__init__(file=file, filename=filename or file.name, name=name, label=label)
+        super().__init__(file=file, filename=filename or file.name, caption=caption, name=name, label=label)
 
 
 class Plot(AssetBlock):

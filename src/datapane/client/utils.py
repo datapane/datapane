@@ -67,14 +67,16 @@ def is_jupyter() -> bool:
         return False
 
 
-def display_msg(text: str, md: str = None):
+def display_msg(text: str, md: str = None, **params: str):
     if is_jupyter():
         from IPython.display import Markdown, display
 
-        msg = md or text
+        params.update(bang="!")
+        msg = (md or text).format(**params)
         display(Markdown(msg))
     else:
-        print(text)
+        params.update(bang="")
+        print(text.format(**params))
 
 
 ################################################################################

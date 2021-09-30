@@ -38,15 +38,15 @@ The best way to install Datapane is through pip or conda.
 #### pip
 
 ```
-pip3 install -U datapane
-datapane hello-world
+$ pip3 install -U datapane
+$ datapane hello-world
 ```
 
 #### conda
 
 ```
-conda install -c conda-forge "datapane>=0.12.0"
-datapane hello-world
+$ conda install -c conda-forge "datapane>=0.12.0"
+$ datapane hello-world
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
@@ -143,15 +143,17 @@ Check out the full list of blocks in our [documentation](https://docs.datapane.c
 
 # Sharing Reports
 
-## Datapane Studio
+## Sign up for a free account
 
-In addition to saving documents locally, you can host, share and embed reports via [Datapane Studio](https://datapane.com/), our free platform used by tens of thousands of people each month.
+In addition to saving documents locally, you can host, share and embed reports via [Datapane Studio](https://datapane.com/).
 
-To get your free API key, run the following command in your terminal and sign up via email/OAuth:
+To get your free API key, run the following command in your terminal to sign up via email/OAuth:
 
 ```
-datapane signup
+$ datapane signup
 ```
+
+If you're using Jupyter, run `!datapane signup` instead.
 
 Next, in your Python notebook or script simply change the `save` function to `upload` on your report:
 
@@ -195,6 +197,7 @@ Datapane Teams is offered as both a managed SaaS service and an on-prem install.
 
 ## Next Steps
 
+- [Sign up for a free account](https://datapane.com/accounts/signup)
 - [Read the documentation](https://docs.datapane.com)
 - [Browse the API docs](https://datapane.github.io/datapane/)
 - [View featured reports](https://github.com/datapane/gallery/)

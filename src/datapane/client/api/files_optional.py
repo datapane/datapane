@@ -12,7 +12,7 @@ FOLIUM_V_SPECIFIER = SpecifierSet(">=0.12.0")
 def _check_version(name: str, _v: v.Version, ss: SpecifierSet):
     if _v not in ss:
         log.warning(
-            f"{name} version {_v} is not supported, your plots may not display correctly, please install version {ss}"
+            f"{name} version {_v} is not supported, these plots may not display correctly, please install version {ss}"
         )
 
 
