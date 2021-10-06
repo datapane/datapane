@@ -1,3 +1,3 @@
 ## Notes
 
-Shared datafiles that represent scripts / assets for use in all tests
+Shared datafiles that represent apps / assets for use in all tests

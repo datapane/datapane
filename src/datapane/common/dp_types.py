@@ -34,7 +34,7 @@ SIZE_1_MB: int = 1024 * 1024
 class DPMode(enum.Enum):
     """DP can operate in multiple modes as specified by this Enum"""
 
-    APP = enum.auto()  # run from the cmd-line
+    SCRIPT = enum.auto()  # run from the cmd-line
     LIBRARY = enum.auto()  # imported into a process
     FRAMEWORK = enum.auto()  # running dp-runner
 

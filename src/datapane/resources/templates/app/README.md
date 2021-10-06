@@ -1,3 +1,3 @@
 ### {{ name }}
 
-Datapane Script
+Datapane App

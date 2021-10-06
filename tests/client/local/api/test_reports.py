@@ -105,8 +105,8 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
-    list_asset = dp.File(data=lis, filename="List Asset", is_json=True)
-    img_asset = dp.File(file=datadir / "datapane-logo.png")
+    list_asset = dp.Media(data=lis, filename="List Asset", is_json=True)
+    img_asset = dp.Media(file=datadir / "datapane-logo.png")
 
     # tables
     table_asset = dp.Table(data=small_df, caption="Test Basic Table")
@@ -162,7 +162,7 @@ def test_gen_report_nested_mixed():
 
 
 def test_gen_report_primitives(datadir: Path):
-    # check we don't allow arbitary python primitives - must be pickled directly via dp.File
+    # check we don't allow arbitary python primitives - must be pickled directly via dp.Media
     with pytest.raises(DPError):
         _ = dp.Report([1, 2, 3])
 

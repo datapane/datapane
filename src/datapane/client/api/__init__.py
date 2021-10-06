@@ -19,7 +19,7 @@ The core document APIs are available for both Datapane Community and Datapane Te
     - `datapane.client.api.report.blocks.Plot`
     - `datapane.client.api.report.blocks.Table`
     - `datapane.client.api.report.blocks.DataTable`
-    - `datapane.client.api.report.blocks.File`
+    - `datapane.client.api.report.blocks.Media`
     - `datapane.client.api.report.blocks.Formula`
     - `datapane.client.api.report.blocks.BigNumber`
     - `datapane.client.api.report.blocks.Text`
@@ -30,9 +30,9 @@ The core document APIs are available for both Datapane Community and Datapane Te
 
 Additional API docs are found in `datapane.client.api.teams` that provide building, deployment, and sharing of data analytics apps and workflows
 
-  - `datapane.client.api.teams.Blob`
-  - `datapane.client.api.teams.Variable`
-  - `datapane.client.api.teams.Script`
+  - `datapane.client.api.teams.File`
+  - `datapane.client.api.teams.Environment`
+  - `datapane.client.api.teams.App`
   - `datapane.client.api.teams.Schedule`
 
 
@@ -55,7 +55,7 @@ from .report.blocks import (
     Group,
     DataTable,
     Embed,
-    File,
+    Media,
     Formula,
     HTML,
     Page,
@@ -67,7 +67,7 @@ from .report.blocks import (
 )
 from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, TextReport, Visibility
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
-from .teams import Blob, Run, Schedule, Script, Variable
+from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup
 from ..utils import IncompatibleVersionError
 from ..config import init

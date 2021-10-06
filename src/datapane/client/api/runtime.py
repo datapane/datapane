@@ -1,6 +1,6 @@
-"""## Script runtime API
+"""## App runtime API
 
-Runtime API used when running a Datapane Script
+Runtime API used when running a Datapane App
 
 ..note:: The objects in this module are available on Datapane Teams
 """
@@ -11,7 +11,7 @@ from collections import deque
 from pathlib import Path
 
 from datapane import ON_DATAPANE
-from datapane.client.scripts import DATAPANE_YAML, DatapaneCfg
+from datapane.client.apps import DATAPANE_YAML, DatapaneCfg
 from datapane.common import NPath, SDict, log
 
 if t.TYPE_CHECKING:

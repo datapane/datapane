@@ -27,20 +27,20 @@ ENVIRON_CONFIG = {
 RUN_NAME = "__datapane__"  # <datapane> ??
 
 
-def run(script: api.Script, user_config: SDict, env: SSDict) -> SDict:
+def run(app: api.App, user_config: SDict, env: SSDict) -> SDict:
     """Run a datapane python script/module"""
     api._reset_runtime(params=user_config)
-    # use the script id for unique, isolated dir per script
-    env_dir = Path(script.id)
-    setup_script(script, env_dir)
+    # use the app id for unique, isolated dir per app
+    env_dir = Path(app.id)
+    setup_script(app, env_dir)
 
     with script_env(env_dir, env):
-        # script_name = str(script.script) ## <module> ?
+        # app_name = str(app.script) ## <module> ?
         try:
             # run script in unpacked dir wrapped around pre/post-commands
-            run_commands(script.pre_commands)
-            res_scope = exec_mod(script.script)
-            run_commands(script.post_commands)
+            run_commands(app.pre_commands)
+            res_scope = exec_mod(app.script)
+            run_commands(app.post_commands)
             return res_scope
         except SyntaxError:
             raise CodeSyntaxError.from_exception()
@@ -125,7 +125,7 @@ def run_commands(cmds: List[str]) -> None:
             importlib.invalidate_caches()  # ensure new packages are detected
 
 
-def setup_script(s: api.Script, env_dir: Path):
+def setup_script(s: api.App, env_dir: Path):
     """Setup the script - unpack & install deps"""
     # TODO - add local cache check here
     if env_dir.exists():
@@ -139,7 +139,7 @@ def setup_script(s: api.Script, env_dir: Path):
     sdist.unlink()
     comp_r = compileall.compile_dir(env_dir, force=True, workers=1, quiet=1)
     if not comp_r:
-        log.warning("Compiling script bundle failed - errors may occur")
+        log.warning("Compiling app bundle failed - errors may occur")
 
     # install deps
     if s.requirements:
@@ -152,11 +152,11 @@ def setup_script(s: api.Script, env_dir: Path):
         subprocess.run(args=pip_args, check=True)
         importlib.invalidate_caches()  # ensure new packages are detected
 
-    log.info(f"Successfully installed bundle for script {s.id}")
+    log.info(f"Successfully installed bundle for app {s.id}")
 
 
 def exec_mod(script_path: Path, init_state: Optional[SDict] = None) -> SDict:
-    # a = ast.parse(script, snippet_name, "exec")
+    # a = ast.parse(app, snippet_name, "exec")
     # ast_validation(a)
     init_state = init_state or dict()
     globalscope = {

@@ -14,9 +14,9 @@ def test_login_fixture():
 
 
 @pytest.mark.org
-def test_variable():
-    test_value = "test_var_value"
+def test_environment():
+    test_env_value = {"FOO": "BAR"}
 
-    # create secret variable
-    with deletable(dp.Variable.create(name=gen_name(), value=test_value)) as v1:
-        assert v1.value == test_value
+    # create environment
+    with deletable(dp.Environment.create(name=gen_name(), environment=test_env_value)) as v1:
+        assert v1.environment == test_env_value

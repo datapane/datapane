@@ -251,7 +251,7 @@ class BaseReport(DPObjectRef):
         source_url: str = "",
         visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
-        group: t.Optional[str] = None,
+        project: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
         formatting: t.Optional[ReportFormatting] = None,
         **kwargs,
@@ -279,7 +279,7 @@ class BaseReport(DPObjectRef):
             tags=tags,
             source_url=source_url,
             visibility=visibility_str,
-            group=group,
+            project=project,
             **formatting_kwargs,
         )
         # current protocol is to strip all empty args and patch (via a post)
@@ -371,7 +371,7 @@ class TextReport(BaseReport):
         source_url: str = "",
         visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
-        group: t.Optional[str] = None,
+        project: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
         open: bool = False,
         formatting: t.Optional[ReportFormatting] = None,
@@ -387,7 +387,7 @@ class TextReport(BaseReport):
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
             tags: A list of tags (as strings) used to categorise your document
-            group: Group to add the report to (Teams only)
+            project: Project to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
             formatting: Set the basic styling for your report
@@ -410,7 +410,7 @@ class TextReport(BaseReport):
             source_url,
             visibility,
             tags,
-            group,
+            project,
             source_file,
             is_text_report=True,
             formatting=formatting,
@@ -448,7 +448,7 @@ class Report(BaseReport):
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
     _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
-    list_fields: t.List[str] = ["name", "web_url", "group"]
+    list_fields: t.List[str] = ["name", "web_url", "project"]
 
     def __init__(
         self,
@@ -491,7 +491,7 @@ class Report(BaseReport):
         source_url: str = "",
         visibility: t.Union[Visibility, str] = "",
         tags: t.List[str] = None,
-        group: t.Optional[str] = None,
+        project: t.Optional[str] = None,
         source_file: t.Optional[NPath] = None,
         open: bool = False,
         formatting: t.Optional[ReportFormatting] = None,
@@ -506,7 +506,7 @@ class Report(BaseReport):
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
             tags: A list of tags (as strings) used to categorise your document
-            group: Group to add the report to (Teams only)
+            project: Project to add the report to (Teams only)
             source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
             formatting: Set the basic styling for your report
@@ -515,7 +515,7 @@ class Report(BaseReport):
         display_msg("Uploading report and associated data - *please wait...*")
 
         self._upload_report(
-            name, description, source_url, visibility, tags, group, source_file, formatting=formatting, **kwargs
+            name, description, source_url, visibility, tags, project, source_file, formatting=formatting, **kwargs
         )
 
         if open:

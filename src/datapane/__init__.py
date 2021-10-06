@@ -26,7 +26,7 @@ from .common.utils import enable_logging, log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
-    Blob,
+    Media,
     BigNumber,
     Code,
     DataTable,
@@ -46,14 +46,14 @@ from .client.api import (
     Result,
     Run,
     Schedule,
-    Script,
+    App,
     Select,
     SelectType,
     Table,
     Text,
     TextAlignment,
     TextReport,
-    Variable,
+    Environment,
     Visibility,
     by_datapane,
     signup,
@@ -70,7 +70,7 @@ script_name = sys.argv[0]
 script_exe = Path(script_name).stem
 if script_exe == "datapane" or script_name == "-m":  # or "pytest" in script_name:
     # argv[0] will be "-m" as client module as submodule of this module
-    set_dp_mode(DPMode.APP)
+    set_dp_mode(DPMode.SCRIPT)
 elif by_datapane or script_exe == "dp-runner":
     set_dp_mode(DPMode.FRAMEWORK)
 else:
@@ -80,7 +80,7 @@ else:
 # only init fully in library-mode, as framework and app init explicitly
 if get_dp_mode() == DPMode.LIBRARY:
     init()
-    # parse any command0line params
+    # parse any commandline params
     from .client.utils import parse_command_line
     from .client.api.runtime import Params
 

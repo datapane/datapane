@@ -9,15 +9,14 @@ from pytil.various import join_multiline
 # import and run bundled file, and stdout
 try:
     # relative should fail
-    from . import dp_script
+    from . import dp_app
 
     exit(1)
 except ImportError:
-    import dp_script
+    import dp_app
 
-print("ran script")
+print("ran app")
 print(f"p2={dp.Params['p2']}")
-print(f"{os.environ['ENV_VAR']}")
 # data bundling, using __file__ and cwd lookup
 c_txt = (Path(__file__).parent / "c.json").read_text()
 c_txt_rel = Path("c.json").read_text()

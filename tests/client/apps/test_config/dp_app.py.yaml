@@ -1,4 +1,4 @@
-name: dp_test_script
+name: dp_test_app
 
 parameters: [
   {"name": "param1", "type": "string", "default": "hello"},

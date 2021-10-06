@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Optional
 
 from datapane import __version__
-from datapane.client.scripts import DatapaneCfg
+from datapane.client.apps import DatapaneCfg
 from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict, SSDict
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
 
@@ -29,79 +29,79 @@ from .dp_object import DPObjectRef, save_df
 if t.TYPE_CHECKING:
     import pandas as pd
 
-__all__ = ["Blob", "Variable", "Script", "Schedule"]
+__all__ = ["File", "Environment", "App", "Schedule"]
 
 __pdoc__ = {
-    "Blob.endpoint": False,
-    "Script.endpoint": False,
-    "Variable.endpoint": False,
+    "File.endpoint": False,
+    "App.endpoint": False,
+    "Environment.endpoint": False,
     "Schedule.endpoint": False,
-    # most script parameters we ignore
-    "Script.call": False,
-    "Script.upload_pkg": False,
-    "Script.download_pkg": False,
-    "Script.run": False,
-    "Script.local_run": False,
+    # most app parameters we ignore
+    "App.call": False,
+    "App.upload_pkg": False,
+    "App.download_pkg": False,
+    "App.run": False,
+    "App.local_run": False,
 }
 
 
-class Blob(DPObjectRef):
+class File(DPObjectRef):
     """
-    Blobs are files that can be uploaded and downloaded for use in your scripts,
+    Files are files that can be uploaded and downloaded for use in your apps,
     for instance trained models, datasets, and (pickled) Python objects.
     They are generally large, but can be any size.
 
     Attributes:
-        content_type: the blob content-type
-        size_bytes: the blob size
+        content_type: the file content-type
+        size_bytes: the file size
         num_rows: number of rows in the file (if a dataframe)
         num_colums: number of colums in the file (if a dataframe)
         cells: number of cells in the file (if a dataframe)
 
-    ..tip:: Use the static methods to create `Blobs` rather than the constructor
+    ..tip:: Use the static methods to create `Files` rather than the constructor
     """
 
-    endpoint: str = "/blobs/"
+    endpoint: str = "/files/"
 
     @classmethod
-    def upload_df(cls, df: pd.DataFrame, **kwargs) -> Blob:
+    def upload_df(cls, df: pd.DataFrame, **kwargs) -> File:
         """
-        Create a blob containing the dataframe provided
+        Create a file containing the dataframe provided
 
         Args:
-            df: The pandas dataframe to upload as a Blob
+            df: The pandas dataframe to upload as a File
 
         Returns:
-            An instance of the created `Blob` object
+            An instance of the created `File` object
         """
         with save_df(df) as fn:
             return cls.post_with_files(file=fn.file, **kwargs)
 
     @classmethod
-    def upload_file(cls, fn: NPath, **kwargs) -> Blob:
+    def upload_file(cls, fn: NPath, **kwargs) -> File:
         """
-        Create a blob containing the contents of the file provided
+        Create a file containing the contents of the file provided
 
         Args:
-            fn: Path to the file to upload as a Blob
+            fn: Path to the file to upload as a File
 
         Returns:
-            An instance of the created `Blob` object
+            An instance of the created `File` object
         """
         return cls.post_with_files(file=Path(fn), **kwargs)
 
     @classmethod
-    def upload_obj(cls, data: t.Any, as_json: bool = False, **kwargs: JSON) -> Blob:
+    def upload_obj(cls, data: t.Any, as_json: bool = False, **kwargs: JSON) -> File:
         """
-        Create a blob containing the contents of the Python object provided,
+        Create a file containing the contents of the Python object provided,
         the object may be pickled or converted to JSON before storing.
 
         Args:
-            data: Python object to upload as a Blob
+            data: Python object to upload as a File
             as_json: Convert the data to JSON rather than pickling (optional)
 
         Returns:
-            An instance of the created `Blob` object
+            An instance of the created `File` object
         """
         # import here as a very slow module due to nested imports
         from .files import save
@@ -111,10 +111,10 @@ class Blob(DPObjectRef):
 
     def download_df(self) -> pd.DataFrame:
         """
-        Download the blob and return it as a Dataframe
+        Download the file and return it as a Dataframe
 
         Returns:
-            A pandas dataframe generated from the blob
+            A pandas dataframe generated from the file
         """
         with DPTmpFile(ArrowFormat.ext) as fn:
             do_download_file(self.data_url, fn.name)
@@ -122,7 +122,7 @@ class Blob(DPObjectRef):
 
     def download_file(self, fn: NPath) -> None:
         """
-        Download the blob to the file provided
+        Download the file to the file provided
 
         Args:
             fn: Path representing the location to save the file
@@ -148,10 +148,10 @@ class Blob(DPObjectRef):
 
     def download_obj(self) -> t.Any:
         """
-        Download the blob and return it as a Python object
+        Download the file and return it as a Python object
 
         Returns:
-            The object created by deserialising the Blob (either via Pickle or JSON decoding)
+            The object created by deserialising the File (either via Pickle or JSON decoding)
         """
         with DPTmpFile(".obj") as fn:
             do_download_file(self.data_url, fn.name)
@@ -165,53 +165,58 @@ class Blob(DPObjectRef):
                 return json.loads(fn.file.read_text())
 
 
-class Variable(DPObjectRef):
+class Environment(DPObjectRef):
     """
-    User Variables represent secure pieces of data, such as tokens, database connection strings, etc. that are needed inside your scripts
+    Environments are used to set environment variables and an optional docker image for running your apps
 
-    ..tip:: Use the static methods to create `Variables` rather than the constructor
+    ..tip:: Use the static methods to create `Environment` rather than the constructor
 
     Attributes:
-        name: Name of the variable
-        value: Value of the variable
+        name: Name of the environment
+        environment: Key-value pair of environment variables
+        docker_image: docker_image to be used with apps.
+        project: Project name (optional and only applicable for organisations)
     """
 
-    endpoint: str = "/uservariables/"
+    endpoint: str = "/environments/"
     list_fields = ["name"]
 
     @classmethod
     def create(
         cls,
         name: str,
-        value: str,
-        group: Optional[str] = None,
-    ) -> Variable:
+        environment: Optional[dict] = None,
+        docker_image: Optional[str] = None,
+        project: Optional[str] = None,
+    ) -> Environment:
         """
-        Create a shareable Datapane User Variable with provided `name` and `value`
+        Create a shareable Datapane Environment with provided `name`, `environment` and `docker_image`
 
         Args:
-            name: Name of the variable
-            value: Value of the variable
-            group: Group name (optional and only applicable for organisations)
+            name: Name of the environment
+            environment: Key-value pair of environment variables
+            docker_image: docker_image to be used with apps.
+            project: Project name (optional and only applicable for organisations)
 
         Returns:
-            An instance of the created `Variable` object
+            An instance of the created `Environment` object
         """
-        return cls.post(name=name, value=value, group=group)
+        assert environment or docker_image, "environment or docker image must be set"
+        return cls.post(name=name, environment=environment, docker_image=docker_image, project=project)
 
 
-class Script(DPObjectRef):
+class App(DPObjectRef):
     """
-    Scripts allow users to build, deploy, and automate data-driven Python workflows and apps
+    Apps allow users to build, deploy, and automate data-driven Python workflows and apps
     to their cloud that can be customised and run by other users.
 
-    ..tip:: We recommend using either the Web UI or CLI, e.g. `datapane script deploy / run / ...` to work with scripts rather than using the low-level API
+    ..tip:: We recommend using either the Web UI or CLI, e.g. `datapane app deploy / run / ...` to work with apps rather than using the low-level API
     """
 
-    endpoint: str = "/scripts/"
+    endpoint: str = "/apps/"
 
     @classmethod
-    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> Script:
+    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> App:
         # TODO - use DPTmpFile
         # merge all the params for the API-call
         kwargs["api_version"] = __version__
@@ -223,7 +228,7 @@ class Script(DPObjectRef):
         return Path(fn)
 
     def call(self, env: SSDict, **params):
-        """Download, install, and call the script with the provided params"""
+        """Download, install, and call the app with the provided params"""
         # NOTE - use __call__??
         # TODO - move exec_script here?
         # TODO - call should handle param defaults
@@ -234,19 +239,19 @@ class Script(DPObjectRef):
     def run(self, parameters=None, cache=True) -> Run:
         """(remote) run the given app (cloning if needed?)"""
         parameters = parameters or dict()
-        return Run.post(script=self.url, parameter_vals=parameters, cache=cache)
+        return Run.post(app=self.url, parameter_vals=parameters, cache=cache)
 
     def local_run(self, parameters=None) -> Run:
-        """(local) run the given script"""
+        """(local) run the given app"""
         # NOTE -is there a use-case for this?
         raise NotImplementedError()
 
 
 class Run(DPObjectRef):
     """
-    Runs represent the running of a script, indicating their status, output, errors, etc.
+    Runs represent the running of a app, indicating their status, output, errors, etc.
 
-    ..tip:: We recommend using either the Web UI or CLI, e.g. `datapane script run / ...` to work with runs rather than the low-level API
+    ..tip:: We recommend using either the Web UI or CLI, e.g. `datapane app run / ...` to work with runs rather than the low-level API
     """
 
     endpoint: str = "/runs/"
@@ -258,17 +263,17 @@ class Run(DPObjectRef):
 
 class Schedule(DPObjectRef):
     """
-    Runs represent the running of a script, indicating their status, output, errors, etc.
+    Runs represent the running of a app, indicating their status, output, errors, etc.
 
     ..tip:: We recommend using the CLI, e.g. `datapane schedule create / ...` to work with schedules rather than the low-level API
     """
 
     endpoint: str = "/schedules/"
-    list_fields = ["id", "script", "cron", "parameter_vals"]
+    list_fields = ["id", "app", "cron", "parameter_vals"]
 
     @classmethod
-    def create(cls, script: Script, cron: str, parameters: SDict) -> Schedule:
-        return cls.post(script=script.url, cron=cron, parameter_vals=parameters)
+    def create(cls, app: App, cron: str, parameters: SDict) -> Schedule:
+        return cls.post(app=app.url, cron=cron, parameter_vals=parameters)
 
     def update(self, cron: str = None, parameters: SDict = None) -> None:
         super().update(cron=cron, parameter_vals=parameters)

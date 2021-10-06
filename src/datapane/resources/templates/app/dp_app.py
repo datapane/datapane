@@ -1,4 +1,4 @@
-# Sample Datapane Script - {{ name }}
+# Sample Datapane App - {{ name }}
 
 import pandas as pd
 import altair as alt

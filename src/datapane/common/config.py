@@ -22,7 +22,7 @@ def empty_parameter_spec() -> JList:
 class RunnerConfig:
     """Runtime config for a form/form, including user props"""
 
-    script_id: str = ""
+    app_id: str = ""
     config: JDict = dc.field(default_factory=dict)
     env: SSDict = dc.field(default_factory=dict)
     formats: JDict = dc.field(default_factory=dict)

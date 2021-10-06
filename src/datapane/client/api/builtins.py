@@ -254,7 +254,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     """
     logo = ir.files("datapane.resources.templates") / "datapane-logo.png"
     other = b.Group(
-        b.File(file=logo),
+        b.Media(file=logo),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
         b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}", caption="Simple formula"),
         rows=1,
@@ -368,17 +368,17 @@ dp.Embed("https://twitter.com/datapaneapp/status/1300831345413890050")
 
 {{embed}}
 
-## Files
+## Media
 
 Files and Python objects can be added to a Datapane report, and be viewed (depending on browser support) and downloaded.
 
 ```python
-dp.File(file="./logo.png")
-dp.File(data=[1,2,3], is_json=True)
-dp.File(data=[1,2,3], is_json=False)  # store as a pickle
+dp.Media(file="./logo.png")
+dp.Media(data=[1,2,3], is_json=True)
+dp.Media(data=[1,2,3], is_json=False)  # store as a pickle
 ```
 
-{{files}}
+{{media}}
 """
 
     plots = b.Group(
@@ -409,16 +409,16 @@ dp.File(data=[1,2,3], is_json=False)  # store as a pickle
         b.Embed("https://twitter.com/datapaneapp/status/1300831345413890050"),
         columns=2,
     )
-    files = b.Group(
-        b.File(file=logo, name="logo_img"),
-        b.File(data=[1, 2, 3], is_json=True),
-        b.File(data=[1, 2, 3], is_json=False),
+    media = b.Group(
+        b.Media(file=logo, name="logo_img"),
+        b.Media(data=[1, 2, 3], is_json=True),
+        b.Media(data=[1, 2, 3], is_json=False),
         rows=1,
         columns=0,
     )
 
     page_3 = b.Page(
-        b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, files=files), title="Blocks"
+        b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, media=media), title="Blocks"
     )
 
     return Report(page_1, page_2, page_3)

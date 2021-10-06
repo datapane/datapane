@@ -1,4 +1,4 @@
-"""test_proj1 script"""
+"""test_proj1 app"""
 import pandas as pd
 
 from datapane.client import api

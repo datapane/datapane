@@ -31,16 +31,16 @@ def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: TextIO = N
 
 def run_api(run_config: RunnerConfig) -> RunResult:
     """Bootstrap the recursive calls into run"""
-    script = api.Script.by_id(run_config.script_id)
-    # is the script compatible with the client runner/api
-    if not is_version_compatible(__version__, script.api_version, raise_exception=False):
+    app = api.App.by_id(run_config.app_id)
+    # is the app compatible with the client runner/api
+    if not is_version_compatible(__version__, app.api_version, raise_exception=False):
         log.warning(
-            f"Script developed for an older version of Datapane ({script.api_version}) - "
+            f"App developed for an older version of Datapane ({app.api_version}) - "
             + "this run may fail, please update."
         )
 
-    # TODO - we should pull param defaults from script and add in the call
-    script.call(run_config.env, **run_config.format())
+    # TODO - we should pull param defaults from app and add in the call
+    app.call(run_config.env, **run_config.format())
 
     # create the RunResult
     script_result = str(api.Result.get()) if api.Result.exists() else None
@@ -50,7 +50,7 @@ def run_api(run_config: RunnerConfig) -> RunResult:
         log.debug(f"Returning report id {report.id}")
         report_id = report.id
     except IndexError:
-        log.debug("User script didn't generate report - perhaps result / action only")
+        log.debug("User app didn't generate report - perhaps result / action only")
 
     return RunResult(report_id=report_id, script_result=script_result)
 

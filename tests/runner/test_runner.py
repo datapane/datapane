@@ -12,7 +12,7 @@ if not (sys.platform == "linux" and sys.version_info.minor >= 7):
 
 import datapane as dp
 from datapane.client.api.runtime import _report
-from datapane.client.scripts import build_bundle, DatapaneCfg
+from datapane.client.apps import build_bundle, DatapaneCfg
 from datapane.common.config import RunnerConfig
 from datapane.common import SDict, SSDict
 from datapane.runner import __main__ as m
@@ -51,7 +51,7 @@ def test_exec(datadir: Path, monkeypatch, capsys):
     assert out == "x is 4\nin foo\nmy_df\n5\n"
 
 
-class MockScript(dp.Script):
+class MockApp(dp.App):
     """Use custom mock class to disable constructor but keep other methods"""
 
     script = ""
@@ -81,17 +81,17 @@ def mock_report_upload(self, **kwargs):
     return mock.DEFAULT
 
 
-@mock.patch("datapane.client.api.Script", new=MockScript)
+@mock.patch("datapane.client.api.App", new=MockApp)
 def _runner(params: SDict, env: SSDict, script: Path, sdist: Path = Path(".")) -> RunResult:
-    with mock.patch.object(MockScript, "script", new_callable=mock.PropertyMock) as ep, mock.patch.object(
-        MockScript, "download_pkg"
+    with mock.patch.object(MockApp, "script", new_callable=mock.PropertyMock) as ep, mock.patch.object(
+        MockApp, "download_pkg"
     ) as dp:
-        # setup script object
+        # setup app object
         ep.return_value = script
         dp.return_value = sdist
 
         # main fn
-        x = RunnerConfig(script_id="ZBAmDk1", config=params, env=env)
+        x = RunnerConfig(app_id="ZBAmDk1", config=params, env=env)
         res = m.run_api(x)
         return res
 
@@ -99,7 +99,7 @@ def _runner(params: SDict, env: SSDict, script: Path, sdist: Path = Path(".")) -
 # TODO - fix exception handling stacktraces
 @mock.patch("datapane.runner.exec_script.setup_script", autospec=True)
 @mock.patch("datapane.client.api.Report.upload", autospec=True, side_effect=mock_report_upload)
-def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
+def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
     """Test running an isolated code snippet with params
     NOTE - we can simplify by calling exec_script.run directly, doesn't test as much of API however
     """
@@ -109,9 +109,9 @@ def test_run_single_script(rc, isc, datadir: Path, monkeypatch, capfd):
     monkeypatch.setenv("ENV_VAR", "env value")
 
     @mock.patch("datapane.runner.exec_script.script_env", autospec=True)
-    def f(val: str, script_env):
+    def f(val: str, app_env):
         # test twice to ensure stateful params are handled correctly
-        res = _runner({"p1": val}, {"ENV_VAR": "env_value"}, Path("dp_script.py"))
+        res = _runner({"p1": val}, {"ENV_VAR": "env_value"}, Path("dp_app.py"))
         # (out, err) = capsys.readouterr()
         (out, err) = capfd.readouterr()
         assert "on datapane" not in out
@@ -153,7 +153,7 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
             subprocess.run([sys.executable, "-m", "pip", "uninstall", "--yes", "pytil"], check=True)
     # asserts
     (out, err) = capsys.readouterr()
-    assert "ran script" in out
+    assert "ran app" in out
     assert "p2=xyz" in out
     assert "WORLD" in out
     assert dp.Result.get() == "hello , world!"

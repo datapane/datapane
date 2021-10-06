@@ -16,7 +16,7 @@ from datapane.common import log
 from .. import DPError
 from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure
-from .report.blocks import DataBlock, DataTable, File, Plot, Table, Text
+from .report.blocks import DataBlock, DataTable, Media, Plot, Table, Text
 
 T = TypeVar("T")
 U = TypeVar("U", DataFrame, Styler)
@@ -55,7 +55,7 @@ class BasePickleWriter(BaseAsset):
 
     mimetype = "application/vnd.pickle+binary"
     obj_type = Any
-    block_type = File
+    block_type = Media
     ext = ".pkl"
     file_mode = "wb"
 
@@ -68,7 +68,7 @@ class BaseJsonWriter(BaseAsset):
 
     mimetype = "application/json"
     obj_type = Any
-    block_type = File
+    block_type = Media
     ext = ".json"
 
     def write_file(self, f: TextIO, x: Any):
@@ -88,13 +88,13 @@ class StringWrapper(BaseAsset):
 
 
 class PathWrapper(BaseAsset):
-    """Creates a File block around Path objects"""
+    """Creates a Media block around Path objects"""
 
     obj_type = Path
-    block_type = File
+    block_type = Media
 
     def to_block(self, x: T) -> DataBlock:
-        return File(file=x)
+        return Media(file=x)
 
 
 ################################################################################
@@ -294,5 +294,5 @@ def save(obj: Any, default_to_json: bool = False) -> DPTmpFile:
 
 def convert(obj: Any) -> "DataBlock":
     """Attempt to convert/wrap a 'primitive' Python object into a Datapane 'boxed' object"""
-    error_msg = f"{type(obj)} not supported directly, please pass into in the appropriate dp object (including dp.File if want to upload as a pickle)"
+    error_msg = f"{type(obj)} not supported directly, please pass into in the appropriate dp object (including dp.Media if want to upload as a pickle)"
     return get_wrapper(obj, default_to_json=False, error_msg=error_msg).to_block(obj)

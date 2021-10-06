@@ -108,10 +108,10 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     # create the DP
     fn = tmp_path / "json_list.json"
     fn.write_text(data=json_list)
-    file_asset = dp.File(file=fn)
-    json_asset = dp.File(data=json_list, is_json=True)
+    file_asset = dp.Media(file=fn)
+    json_asset = dp.Media(data=json_list, is_json=True)
     plot_asset = dp.Plot(data=plot)
-    list_asset = dp.File(data=lis, is_json=True)
+    list_asset = dp.Media(data=lis, is_json=True)
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     dp_report = dp.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
     dp_report.upload(
@@ -227,17 +227,17 @@ def test_complex_df_report():
 
 
 @pytest.mark.org
-def test_report_group():
+def test_report_project():
     report = gen_report_simple()
     report.upload(name="test_report_group")
-    # check if the group name is default
+    # check if the project name is default
     with deletable(report):
-        assert report.group == "default"
+        assert report.project == "default"
 
     # test adding report to a group that doesn't exist
     report2 = gen_report_simple()
     try:
-        report2.upload(name="test_wrong_group", group="wrong-group")
+        report2.upload(name="test_wrong_project", project="wrong-project")
     except requests.HTTPError as e:
         assert e.response.status_code == 400
 

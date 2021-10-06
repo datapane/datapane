@@ -1,6 +1,7 @@
 """My cool plot"""
-import pandas as pd
 import altair as alt
+import pandas as pd
+
 import datapane as dp
 
 df = pd.read_csv(
@@ -13,9 +14,7 @@ chart = (
         x="Date:T",
         y="Open",
         y2="Close",
-        color=alt.condition(
-            "datum.Open <= datum.Close", alt.value("#06982d"), alt.value("#ae1325")
-        ),
+        color=alt.condition("datum.Open <= datum.Close", alt.value("#06982d"), alt.value("#ae1325")),
     )
     .mark_bar()
     .interactive()

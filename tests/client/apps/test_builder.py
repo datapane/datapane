@@ -2,7 +2,7 @@ import tarfile
 import typing as t
 from pathlib import Path
 
-from datapane.client.scripts import DatapaneCfg, builder
+from datapane.client.apps import DatapaneCfg, builder
 
 
 def gen_build_cfg() -> DatapaneCfg:

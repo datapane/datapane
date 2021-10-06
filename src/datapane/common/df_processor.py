@@ -162,7 +162,7 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
 
 def to_df(value: Any) -> pd.DataFrame:
     """
-    Converts a python object, i.e. a script's output, to a dataframe
+    Converts a python object, i.e. a app's output, to a dataframe
     NOTE - this returns a new DF each time
     """
     if value is None:

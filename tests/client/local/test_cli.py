@@ -26,11 +26,11 @@ def test_report_init(tmp_path: Path, monkeypatch):
     handle_res(result)
 
 
-def test_script_init(tmp_path: Path, monkeypatch):
+def test_app_init(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["-vv", "script", "init"])
+    result = runner.invoke(cli, ["-vv", "app", "init"])
     handle_res(result)
 
 

@@ -19,10 +19,9 @@ from datapane import __rev__, __version__
 from datapane.common import DPError, SDict, _setup_dp_logging, dict_drop_empty, log
 from datapane.common.dp_types import add_help_text
 
-from . import analytics, api
+from . import analytics, api, apps
 from . import config as c
-from . import scripts
-from .scripts import config as sc
+from .apps import config as sc
 from .utils import failure_msg, process_cmd_param_vals, success_msg
 
 EXTRA_OUT: bool = False
@@ -162,54 +161,54 @@ def hello_world():
 
 
 ###############################################################################
-# Blobs
+# Files
 @cli.group()
-def blob():
-    """Commands to work with Blobs"""
+def file():
+    """Commands to work with Files"""
     ...
 
 
-@blob.command()
+@file.command()
 @click.argument("name")
 @click.argument("file", type=click.Path(exists=True))
 @click.option("--group")
 def upload(file: str, name: str, group: str):
-    """Upload a csv or Excel file as a Datapane Blob"""
+    """Upload a csv or Excel file as a Datapane File"""
     log.info(f"Uploading {file}")
-    r = api.Blob.upload_file(file, name=name, group=group)
+    r = api.File.upload_file(file, name=name, group=group)
     success_msg(f"Uploaded {click.format_filename(file)} to {r.url}")
 
 
-@blob.command()
+@file.command()
 @click.argument("name")
 @click.option("--owner")
 @click.argument("file", type=click.Path())
 def download(name: str, owner: str, file: str):
-    """Download blob referenced by NAME to FILE"""
-    r = api.Blob.get(name, owner=owner)
+    """Download file referenced by NAME to FILE"""
+    r = api.File.get(name, owner=owner)
     r.download_file(file)
     success_msg(f"Downloaded {r.url} to {click.format_filename(file)}")
 
 
-@blob.command()
+@file.command()
 @click.argument("name")
 def delete(name: str):
-    """Delete a blob"""
-    api.Blob.get(name).delete()
-    success_msg(f"Deleted Blob {name}")
+    """Delete a file"""
+    api.File.get(name).delete()
+    success_msg(f"Deleted File {name}")
 
 
-@blob.command("list")
-def blob_list():
-    """List blobs"""
-    print_table(api.Blob.list(), "Blobs")
+@file.command("list")
+def file_list():
+    """List files"""
+    print_table(api.File.list(), "Files")
 
 
 ###############################################################################
-# Scripts
+# Apps
 @cli.group()
-def script():
-    """Commands to work with Scripts"""
+def app():
+    """Commands to work with Apps"""
     ...
 
 
@@ -235,40 +234,47 @@ def write_templates(scaffold_name: str, context: SDict):
             render_file(f, context=context)
 
 
-@script.command(name="init")
+@app.command(name="init")
 @click.argument("name", default=lambda: sc.generate_name("Report"))
-def script_init(name: str):
-    """Initialise a new script project"""
+def app_init(name: str):
+    """Initialise a new app project"""
     if sc.DATAPANE_YAML.exists():
         failure_msg("Found existing project, cancelling", do_exit=True)
 
     sc.validate_name(name)
     _context = dict(name=name)
 
-    write_templates("script", _context)
-    success_msg(f"Created dp_script.py for project '{name}', edit as needed and upload")
+    write_templates("app", _context)
+    success_msg(f"Created dp_app.py for project '{name}', edit as needed and upload")
 
 
-@script.command()
+@app.command()
 @click.option("--config", type=click.Path(exists=True))
 @click.option("--script", type=click.Path(exists=True))
 @click.option("--name")
-@click.option("--group")
-def deploy(name: Optional[str], script: Optional[str], config: Optional[str], group: str):
-    """Package and deploy a Python script or Jupyter notebook as a Datapane Script bundle"""
+@click.option("--environment")
+@click.option("--project")
+def deploy(
+    name: Optional[str],
+    script: Optional[str],
+    config: Optional[str],
+    environment: Optional[str],
+    project: Optional[str],
+):
+    """Package and deploy a Python script or Jupyter notebook as a Datapane App bundle"""
     script = script and Path(script)
     config = config and Path(config)
-    init_kwargs = dict(name=name, script=script, config_file=config, group=group)
+    init_kwargs = dict(name=name, script=script, config_file=config, environment=environment, project=project)
     kwargs = dict_drop_empty(init_kwargs, none_only=True)
 
     # if not (script or config or sc.DatapaneCfg.exists()):
     #     raise DPError(f"Not valid project dir")
 
-    dp_cfg = scripts.DatapaneCfg.create_initial(**kwargs)
+    dp_cfg = apps.DatapaneCfg.create_initial(**kwargs)
     log.debug(f"Packaging and uploading Datapane project {dp_cfg.name}")
 
     # start the build process
-    with scripts.build_bundle(dp_cfg) as sdist:
+    with apps.build_bundle(dp_cfg) as sdist:
 
         if EXTRA_OUT:
             tf: tarfile.TarFile
@@ -277,35 +283,35 @@ def deploy(name: Optional[str], script: Optional[str], config: Optional[str], gr
                 for n in tf.getnames():
                     log.debug(f"  {n}")
 
-        r: api.Script = api.Script.upload_pkg(sdist, dp_cfg)
+        r: api.App = api.App.upload_pkg(sdist, dp_cfg)
         success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
 
 
-@script.command()
+@app.command()
 @click.argument("name")
 @click.option("--owner")
 def download(name: str, owner: str):
-    """Download script referenced by NAME to FILE"""
-    s = api.Script.get(name, owner=owner)
+    """Download app referenced by NAME to FILE"""
+    s = api.App.get(name, owner=owner)
     fn = s.download_pkg()
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
 
-@script.command()
+@app.command()
 @click.argument("name")
 def delete(name: str):
-    """Delete a script"""
-    api.Script.get(name).delete()
-    success_msg(f"Deleted Script {name}")
+    """Delete a app"""
+    api.App.get(name).delete()
+    success_msg(f"Deleted App {name}")
 
 
-@script.command("list")
-def script_list():
-    """List Scripts"""
-    print_table(api.Script.list(), "Scripts")
+@app.command("list")
+def app_list():
+    """List Apps"""
+    print_table(api.App.list(), "Apps")
 
 
-@script.command()
+@app.command()
 @click.option("--parameter", "-p", multiple=True)
 @click.option("--cache/--disable-cache", default=True)
 @click.option("--wait/--no-wait", default=True)
@@ -322,10 +328,10 @@ def run(
 ):
     """Run a report"""
     params = process_cmd_param_vals(parameter)
-    log.info(f"Running script with parameters {params}")
-    script = api.Script.get(name, owner=owner)
-    with api_error_handler("Error running script"):
-        r = script.run(parameters=params, cache=cache)
+    log.info(f"Running app with parameters {params}")
+    app = api.App.get(name, owner=owner)
+    with api_error_handler("Error running app"):
+        r = app.run(parameters=params, cache=cache)
     if wait:
         with click_spinner.spinner():
             while not r.is_complete():
@@ -336,15 +342,15 @@ def run(
                 click.echo(r.output)
             if r.status == "SUCCESS":
                 if r.result:
-                    success_msg(f"Script result - '{r.result}'")
+                    success_msg(f"App result - '{r.result}'")
                 if r.report:
                     report = api.Report.by_id(r.report)
                     success_msg(f"Report generated at {report.web_url}")
             else:
-                failure_msg(f"Script run failed/cancelled\n{r.error_msg}: {r.error_detail}")
+                failure_msg(f"App run failed/cancelled\n{r.error_msg}: {r.error_detail}")
 
     else:
-        success_msg(f"Script run started, view at {script.web_url}")
+        success_msg(f"App run started, view at {app.web_url}")
 
 
 ###############################################################################
@@ -413,57 +419,56 @@ def report_list():
 
 
 #############################################################################
-# Variables
+# Environments
 @cli.group()
-def variable():
-    """Commands to work with Variables"""
+def environment():
+    """Commands to work with Environments"""
     ...
 
 
-@variable.command()
+@environment.command()
 @click.argument("name", required=True)
-@click.argument("value", required=True)
-@click.option("--group")
-def create(name: str, value: str, group: str):
+@click.option("--environment", "-env", multiple=True)
+@click.option("--docker-image")
+@click.option("--project")
+def create(name: str, environment: Tuple[str], docker_image: str, project: str):
     """
-    Create a variable
+    Create a environment
 
-    NAME: name of variable
-    VALUE: value of variable
-    group: Group name (optional and only applicable for organistations)
+    NAME: name of environment
+    ENVIRONMENT: environment variables
+    DOCKER IMAGE: docker image to be used inside apps
+    PROJECT: Project name (optional and only applicable for teams)
     """
-    api.Variable.create(name, value, group)
-    success_msg(f"Created variable: {name}")
+    environment = process_cmd_param_vals(environment)
+    api.Environment.create(name, environment, docker_image, project)
+    success_msg(f"Created environment: {name}")
 
 
-@variable.command("list")
-def variable_list():
-    """List all variables"""
-    print_table(api.Variable.list(), "Variables")
+@environment.command("list")
+def environment_list():
+    """List all environments"""
+    print_table(api.Environment.list(), "Environments")
 
 
-@variable.command()
+@environment.command()
 @click.argument("name", required=True)
 @click.option("--owner")
-@click.option("--show", is_flag=True, help="Print the variable value.")
-def get(name, owner, show):
-    """Get variable value using variable name"""
-    res = api.Variable.get(name, owner=owner)
-    if show:
-        print(str(res.value).strip())
-    else:
-        print_table(
-            [{"name": res.name, "value": res.value}],
-            "Variable",
-        )
+def get(name, owner):
+    """Get environment value using environment name"""
+    res = api.Environment.get(name, owner=owner)
+    environment = "\n".join([f"{k}={v}" for k, v in res.environment.items()])
+    success_msg(f"Available {res.name}:")
+    print(f"\nDocker Image - {res.docker_image}")
+    print(f"\nEnvironment Variables-----------\n{environment}")
 
 
-@variable.command()
+@environment.command()
 @click.argument("name")
 def delete(name):
-    """Delete a variable using variable name"""
-    api.Variable.get(name).delete()
-    success_msg(f"Deleted variable {name}")
+    """Delete a environment using environment name"""
+    api.Environment.get(name).delete()
+    success_msg(f"Deleted environment {name}")
 
 
 #############################################################################
@@ -483,15 +488,15 @@ def create(name: str, cron: str, parameter: Tuple[str], owner: str):
     """
     Create a schedule
 
-    NAME: Name of the Script to run
+    NAME: Name of the App to run
     CRON: crontab representing the schedule interval
-    PARAMETERS: key/value list of parameters to use when running the script on schedule
-    [OWNER]: Script owner
+    PARAMETERS: key/value list of parameters to use when running the app on schedule
+    [OWNER]: App owner
     """
     params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
-    script_obj = api.Script.get(name, owner=owner)
-    schedule_obj = api.Schedule.create(script_obj, cron, params)
+    app_obj = api.App.get(name, owner=owner)
+    schedule_obj = api.Schedule.create(app_obj, cron, params)
     success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
 
 
@@ -505,7 +510,7 @@ def update(id: str, cron: str, parameter: Tuple[str]):
 
     ID: ID/URL of the Schedule
     CRON: crontab representing the schedule interval
-    PARAMETERS: key/value list of parameters to use when running the script on schedule
+    PARAMETERS: key/value list of parameters to use when running the app on schedule
     """
 
     params = process_cmd_param_vals(parameter)

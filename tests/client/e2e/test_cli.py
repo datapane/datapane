@@ -34,18 +34,18 @@ def test_auth(runner: CliRunner):
 
 @pytest.mark.org
 @pytest.mark.timeout(5 * 60)  # allow 5m
-def test_cli_script(runner: CliRunner, tmp_path: Path, monkeypatch):
+def test_cli_app(runner: CliRunner, tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
-    r = runner.invoke(cli, ["-vv", "script", "init"])
+    r = runner.invoke(cli, ["-vv", "app", "init"])
     handle_res(r)
-    script_name = gen_name()
-    r = runner.invoke(cli, ["-vv", "script", "deploy", "--name", script_name])
+    app_name = gen_name()
+    r = runner.invoke(cli, ["-vv", "app", "deploy", "--name", app_name])
     handle_res(r)
 
     if "Uploaded" in r.output:
-        r = runner.invoke(cli, ["-vv", "script", "run", script_name, "--wait"])
+        r = runner.invoke(cli, ["-vv", "app", "run", app_name, "--wait"])
         handle_res(r)
 
-        r = runner.invoke(cli, ["-vv", "script", "delete", script_name])
+        r = runner.invoke(cli, ["-vv", "app", "delete", app_name])
         handle_res(r)

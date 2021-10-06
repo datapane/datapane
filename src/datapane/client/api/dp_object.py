@@ -40,7 +40,7 @@ class DPObjectRef:
     _url: URL = "<local resource>"
     _dto: t.Optional[Munch] = None
 
-    list_fields: t.List[str] = ["name", "web_url", "group"]
+    list_fields: t.List[str] = ["name", "web_url", "project"]
 
     @property
     def dto(self) -> t.Optional[Munch]:
@@ -95,7 +95,7 @@ class DPObjectRef:
         Lookup and retrieve an object from the Datapane Server by its name
 
         Args:
-            name: The name of the object, e.g. 'my-blob-3` or `fred/my-blob-3`
+            name: The name of the object, e.g. 'my-file-3` or `fred/my-file-3`
             owner: The owner of the object, e.g. `fred` (can be provided with the name as shown above)
 
         Returns:
@@ -109,7 +109,7 @@ class DPObjectRef:
         except HTTPError as e:
             lookup_str = f"{owner}/{name}" if owner else name
             log.error(
-                f"Couldn't find '{lookup_str}', are you sure it exists? If error occurs within a script please try updating the code to include the script's owner in name - e.g. 'owner/{name}'."
+                f"Couldn't find '{lookup_str}', are you sure it exists? If error occurs within a app please try updating the code to include the app's owner in name - e.g. 'owner/{name}'."
             )
             raise e
         return cls(dto=res)
@@ -214,9 +214,9 @@ class DPObjectRef:
             endpoint = items.next if items.next else None
 
 
-# NOTE - this has been inlined into Blobs for now
+# NOTE - this has been inlined into Files for now
 # class ExportableObjectMixin:
-#    """Used by both Assets and Blobs to abstract over uploading/downloading and exporting"""
+#    """Used by both Assets and Files to abstract over uploading/downloading and exporting"""
 
 
 def save_df(df: pd.DataFrame) -> DPTmpFile:

@@ -3,7 +3,7 @@
 User management functions, including authentication
 
 It's possible to authenticate within Python, however we also provide (and recommend) authenticating
-via the CLI, as it's easier to script,
+via the CLI, as it's easier to automate.
 
 ```
 $ datapane signup

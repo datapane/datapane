@@ -1,4 +1,4 @@
-"""datapane script"""
+"""datapane app"""
 import os
 import datapane as dp
 from datapane.client.api.builtins import gen_df, gen_plot
@@ -59,13 +59,13 @@ plotly_asset = dp.Plot(data=fig)
 md_block = dp.Text(text=f"# Test markdown block with env var: {os.environ['ENV_VAR']} \n Test **content**")
 
 # In-line JSON
-list_asset = dp.File(data=lis, is_json=True)
+list_asset = dp.Media(data=lis, is_json=True)
 
 # Downloadable file
-file_asset = dp.File(data=lis)
+file_asset = dp.Media(data=lis)
 
 # In-line image
-img_asset = dp.File(file=Path("./datapane-logo.png"))
+img_asset = dp.Media(file=Path("./datapane-logo.png"))
 
 # Vega
 vega_asset = dp.Plot(data=gen_plot())

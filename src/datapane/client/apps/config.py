@@ -1,4 +1,4 @@
-"""Support for handling datapane script config"""
+"""Support for handling datapane app config"""
 import dataclasses as dc
 import json
 import os
@@ -14,13 +14,13 @@ import yaml
 
 from datapane.client import DPError
 from datapane.client.utils import MissingCloudPackagesError
-from datapane.common import SDict, SSDict, log, utf_read_text
+from datapane.common import SDict, log, utf_read_text
 
-# app paths
+# script paths
 DATAPANE_YAML = Path("datapane.yaml")
 PYPROJECT_TOML = Path("pyproject.toml")
-DEFAULT_PY = Path("dp_script.py")
-DEFAULT_IPYNB = Path("dp_script.ipynb")
+DEFAULT_PY = Path("dp_app.py")
+DEFAULT_IPYNB = Path("dp_app.ipynb")
 re_check_name = re.compile(r"^[\S ]+$")
 
 # TODO - look at other libs
@@ -47,7 +47,7 @@ def validate_name(x: str):
 
 @dc.dataclass
 class DatapaneCfg:
-    """Wrapper around the datapane script config"""
+    """Wrapper around the datapane app config"""
 
     name: str = "datapane"
     # relative path to script
@@ -55,19 +55,15 @@ class DatapaneCfg:
     config: dc.InitVar[Path] = None
     proj_dir: ClassVar[Path] = None
 
-    # run options
-    container_image_name: str = ""
-    # docker_image: Optional[str] = None
     parameters: List[SDict] = dc.field(default_factory=list)
     pre_commands: List[str] = dc.field(default_factory=list)
     post_commands: List[str] = dc.field(default_factory=list)
 
-    # environment variables
-    env: List[SSDict] = dc.field(default_factory=list)
     # metadata
-    description: str = "Datapane Script"
+    description: str = "Datapane App"
     source_url: str = ""
-    group: Optional[str] = None
+    project: Optional[str] = None
+    environment: Optional[str] = None
 
     # build options
     include: List[str] = dc.field(default_factory=list)
@@ -93,7 +89,7 @@ class DatapaneCfg:
 
         # validate config
         if self.parameters:
-            config_schema = json.loads(ir.read_text("datapane.resources", "script_parameter_def.schema.json"))
+            config_schema = json.loads(ir.read_text("datapane.resources", "app_parameter_def.schema.json"))
             jsonschema.validate(self.parameters, config_schema)
 
     @classmethod

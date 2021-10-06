@@ -48,13 +48,13 @@ __all__ = [
     "Code",
     "Embed",
     "HTML",
-    "File",
+    "Media",
     "Formula",
 ]
 
 __pdoc__ = {
-    "File.caption": False,
-    "File.file": False,
+    "Media.caption": False,
+    "Media.file": False,
     "Plot.file": False,
     "DataTable.file": False,
 }
@@ -373,7 +373,7 @@ class Text(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
-        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.File
+        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Media
         """
         if text:
             text = text.strip()
@@ -611,14 +611,15 @@ class AssetBlock(DataBlock):
         return save(data, default_to_json=as_json)
 
 
-class File(AssetBlock):
+# TODO: Update the API here
+class Media(AssetBlock):
     """
-    File blocks are used to attach a file to the report that can be displayed (if possible) and downloaded by report viewers
+    Media blocks are used to attach a file to the report that can be displayed (if possible) and downloaded by report viewers
 
     Any types of files may be attached, for instance, images (png / jpg), PDFs, JSON data, Excel files, etc.
     """
 
-    _tag = "File"
+    _tag = "Media"
 
     def __init__(
         self,

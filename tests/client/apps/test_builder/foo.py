@@ -1,4 +1,4 @@
-"""test_proj1 script"""
+"""test_proj1 app"""
 
 __version__ = "0.1"
 

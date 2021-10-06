@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from datapane.client.scripts import config as sc
+from datapane.client.apps import config as sc
 
 
 def test_extract_notebook(datadir: Path):
@@ -12,16 +12,16 @@ def test_extract_notebook(datadir: Path):
 
 
 def test_config_yaml_py(datadir: Path, monkeypatch):
-    # use dp_script.py by default
+    # use dp_app.py by default
     monkeypatch.chdir(datadir)
-    cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_script.py.yaml"))
-    assert cfg.name == "dp_test_script"
+    cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_app.py.yaml"))
+    assert cfg.name == "dp_test_app"
 
 
 def test_config_yaml_notebook(datadir: Path, monkeypatch):
     monkeypatch.chdir(datadir)
     script = Path("custom_datapane.ipynb")
-    cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_script.ipynb.yaml"), script=script)
+    cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_app.ipynb.yaml"), script=script)
     assert cfg.script == script
 
 

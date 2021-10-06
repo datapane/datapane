@@ -1,7 +1,7 @@
-# Script name
+# App name
 name: Test proj 2
 
-# Script parameter definitions - see docs.data
+# App parameter definitions - see docs.data
 # see xyz for configuration docs
 parameters: [
   {
@@ -21,5 +21,5 @@ parameters: [
 # docker_image: datapane-python-default
 # volatile: False
 # privileged: False
-# Persist the script between requests
+# Persist the app between requests
 # persistent: True
