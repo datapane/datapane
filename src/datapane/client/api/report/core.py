@@ -180,7 +180,7 @@ class ReportFileWriter:
             dp_logo=self.logo,
             report_id=report_id,
             author_id=c.config.session_id,
-            analytics=not _NO_ANALYTICS,
+            events=not _NO_ANALYTICS,
         )
         Path(path).write_text(r, encoding="utf-8")
 
