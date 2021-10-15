@@ -50,7 +50,7 @@ Page = element Page {
   block_label?, LayoutBlock+
 }
 
-LayoutBlock = Group | Select
+LayoutBlock = Group | Select | Toggle
 
 Select = element Select {
   block_label_name,
@@ -65,13 +65,18 @@ Group = element Group {
   Block*
 }
 
+Toggle = element Toggle {
+  block_label_name,
+  Block
+}
+
 Block = LayoutBlock | DataBlock
 
 DataBlock = EmbeddedTextBlock | AssetBlock | BigNumber | AssetRef
 
 EmbeddedTextBlock = Text | HTML | Code | Embed | Formula
 
-AssetBlock = File | Plot | Table | DataTable
+AssetBlock = Attachment | Media | Plot | Table | DataTable
 
 
 ################################################################################
@@ -143,7 +148,11 @@ assetAttributes =
   attribute size { xsd:positiveInteger },
   opt_caption
 
-File = element File {
+Media = element Media {
+  assetAttributes
+  }
+
+Attachment = element Attachment {
   assetAttributes,
   attribute filename { xsd:string { minLength = "1" maxLength = "127" } }
   }

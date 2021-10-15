@@ -34,6 +34,7 @@ E = ElementMaker()  # XML Tag Factory
 
 # only these types will be documented by default
 __all__ = [
+    "Attachment",
     "BaseElement",
     "Page",
     "Group",
@@ -50,11 +51,14 @@ __all__ = [
     "HTML",
     "Media",
     "Formula",
+    "Media",
 ]
 
 __pdoc__ = {
     "Media.caption": False,
     "Media.file": False,
+    "Attachment.caption": False,
+    "Attachment.file": False,
     "Plot.file": False,
     "DataTable.file": False,
 }
@@ -231,14 +235,14 @@ class Page(LayoutBlock):
         """Wrap the list of blocks in a top-level block element needed"""
         if any(isinstance(b, Page) for b in self.blocks):
             raise DPError("Page objects can only be at the top-level")
-        if not all(isinstance(b, (Group, Select)) for b in self.blocks):
+        if not all(isinstance(b, (Group, Select, Toggle)) for b in self.blocks):
             # only wrap if not all blocks are a Group object
             self.blocks = [Group(blocks=self.blocks)]
 
 
 class Select(LayoutBlock):
     """
-    Select act as a container that hold a list of nested Blocks object, such
+    Selects act as a container that holds a list of nested Blocks objects, such
     as Tables, Plots, etc.. - but only one may be __visible__, or "selected", at once.
 
     The user can choose which nested object to view dynamically using either tabs or a dropdown.
@@ -277,7 +281,7 @@ class Select(LayoutBlock):
 
 class Group(LayoutBlock):
     """
-    Groups act as a container that hold a list of nested Blocks object, such
+    Groups act as a container that holds a list of nested Blocks objects, such
     as Tables, Plots, etc.. - they may even hold Group themselves recursively.
 
     Group are used to provide a grouping for blocks can have layout options applied to them
@@ -323,6 +327,37 @@ class Group(LayoutBlock):
             columns = 0
 
         self._add_attributes(rows=rows, columns=columns)
+
+
+class Toggle(LayoutBlock):
+    """
+    Toggles act as a container that holds a list of nested Block objects, whose visbility can be toggled on or off by the report viewer
+    """
+
+    _tag = "Toggle"
+
+    def __init__(
+        self,
+        *arg_blocks: BlockOrPrimitive,
+        blocks: t.List[BlockOrPrimitive] = None,
+        name: str = None,
+        label: str = None,
+    ):
+        """
+        Args:
+            *arg_blocks: Group to add to report
+            blocks: Allows providing the report blocks as a single list
+            name: A unique id for the blocks to aid querying (optional)
+            label: A label used when displaying the block (optional)
+        """
+        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label)
+        self._wrap_blocks()
+
+    def _wrap_blocks(self) -> None:
+        """Wrap the list of blocks in a top-level block element if needed"""
+        if len(self.blocks) > 1:
+            # only wrap if not all blocks are a Group object
+            self.blocks = [Group(blocks=self.blocks)]
 
 
 ################################################################################
@@ -373,7 +408,7 @@ class Text(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
-        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Media
+        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Attachment
         """
         if text:
             text = text.strip()
@@ -604,28 +639,55 @@ class AssetBlock(DataBlock):
             e.set("caption", self.caption)
         return s.add_element(self, e, self.file)
 
-    def _save_obj(cls, data: t.Any, as_json: bool) -> DPTmpFile:
+    def _save_obj(cls, data: t.Any) -> DPTmpFile:
         # import here as a very slow module due to nested imports
         from ..files import save
 
-        return save(data, default_to_json=as_json)
+        return save(data)
 
 
-# TODO: Update the API here
 class Media(AssetBlock):
     """
-    Media blocks are used to attach a file to the report that can be displayed (if possible) and downloaded by report viewers
+    Media blocks are used to attach a file to the report that can be viewed or streamed by report viewers
 
-    Any types of files may be attached, for instance, images (png / jpg), PDFs, JSON data, Excel files, etc.
+    ..note:: Supported video, audio and image formats depends on the browser used to view the report. MP3, MP4, and all common image formats are generally supported by modern browsers
     """
 
     _tag = "Media"
 
     def __init__(
         self,
+        file: NPath,
+        name: str = None,
+        label: str = None,
+        caption: t.Optional[str] = None,
+    ):
+        """
+        Args:
+            file: Path to a file to attach to the report (e.g. a JPEG image)
+            name: A unique name for the block to reference when adding text or embedding (optional)
+            caption: A caption to display below the file (optional)
+            label: A label used when displaying the block (optional)
+        """
+        file = Path(file).expanduser()
+        super().__init__(file=file, name=name, label=label)
+
+
+class Attachment(AssetBlock):
+    """
+    Attachment blocks are used to attach a file to the report that can be downloaded by report viewers
+
+    Any type of file may be attached, for instance, images (png / jpg), PDFs, JSON data, Excel files, etc.
+
+    ..tip:: To attach streamable / viewable video, audio or images, use the `dp.Media` block instead
+    """
+
+    _tag = "Attachment"
+
+    def __init__(
+        self,
         data: t.Optional[t.Any] = None,
         file: t.Optional[NPath] = None,
-        is_json: bool = False,
         filename: t.Optional[str] = None,
         caption: t.Optional[str] = None,
         name: str = None,
@@ -634,8 +696,7 @@ class Media(AssetBlock):
         """
         Args:
             data: A python object to attach to the report (e.g. a dictionary)
-            file: Path to a file to attach to the report (e.g. a JPEG image)
-            is_json: If `True`, treat the `data` as JSON data already
+            file: Path to a file to attach to the report (e.g. a csv file)
             filename: Name to be used when downloading the file
             caption: A caption to display below the file (optional)
             name: A unique name for the block to reference when adding text or embedding (optional)
@@ -646,10 +707,10 @@ class Media(AssetBlock):
         if file:
             file = Path(file).expanduser()
         else:
-            out_fn = self._save_obj(data, as_json=is_json)
+            out_fn = self._save_obj(data)
             file = out_fn.file
 
-        super().__init__(file=file, filename=filename or file.name, caption=caption, name=name, label=label)
+        super().__init__(file=file, filename=filename or file.name, name=name, label=label)
 
 
 class Plot(AssetBlock):
@@ -671,7 +732,7 @@ class Plot(AssetBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        out_fn = self._save_obj(data, as_json=False)
+        out_fn = self._save_obj(data)
         if out_fn.mime == PKL_MIMETYPE:
             raise DPError("Can't embed object as a plot")
 
@@ -700,7 +761,7 @@ class Table(AssetBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
-        out_fn = self._save_obj(data, as_json=False)
+        out_fn = self._save_obj(data)
         super().__init__(file=out_fn.file, caption=caption, name=name, label=label)
 
 
@@ -733,3 +794,15 @@ class DataTable(AssetBlock):
         fn = save_df(df)
         (rows, columns) = df.shape
         super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, name=name, label=label)
+
+
+class Divider(EmbeddedTextBlock):
+    """
+    Divider blocks add a horizontal line to your report, normally used to break up report contents
+    """
+
+    _tag = "Text"
+
+    def __init__(self):
+        # `---` is processed as a horizontal divider by the FE markdown renderer
+        super().__init__(content="---")

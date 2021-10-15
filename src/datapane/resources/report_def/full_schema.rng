@@ -107,6 +107,7 @@
     <choice>
       <ref name="Group"/>
       <ref name="Select"/>
+      <ref name="Toggle"/>
     </choice>
   </define>
   <define name="Select">
@@ -143,6 +144,12 @@
       </zeroOrMore>
     </element>
   </define>
+  <define name="Toggle">
+    <element name="Toggle">
+      <ref name="block_label_name"/>
+      <ref name="Block"/>
+    </element>
+  </define>
   <define name="Block">
     <choice>
       <ref name="LayoutBlock"/>
@@ -168,7 +175,8 @@
   </define>
   <define name="AssetBlock">
     <choice>
-      <ref name="File"/>
+      <ref name="Attachment"/>
+      <ref name="Media"/>
       <ref name="Plot"/>
       <ref name="Table"/>
       <ref name="DataTable"/>
@@ -337,8 +345,8 @@
     </attribute>
     <ref name="opt_caption"/>
   </define>
-  <define name="File">
-    <element name="File">
+  <define name="Attachment">
+    <element name="Attachment">
       <ref name="assetAttributes"/>
       <attribute name="filename">
         <data type="string">
@@ -346,6 +354,11 @@
           <param name="maxLength">127</param>
         </data>
       </attribute>
+    </element>
+  </define>
+  <define name="Media">
+    <element name="Media">
+      <ref name="assetAttributes"/>
     </element>
   </define>
   <define name="Plot">

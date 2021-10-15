@@ -50,20 +50,24 @@ import warnings
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .report.blocks import (
+    Attachment,
     BigNumber,
     Code,
     Group,
     DataTable,
+    Divider,
     Embed,
     Media,
     Formula,
     HTML,
+    Media,
     Page,
     Plot,
     Select,
     SelectType,
     Text,
     Table,
+    Toggle,
 )
 from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, TextReport, Visibility
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report

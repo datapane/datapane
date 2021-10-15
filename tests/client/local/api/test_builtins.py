@@ -11,7 +11,7 @@ from .test_reports import assert_report, element_to_str, md_block
 # Templates
 def test_demo_report():
     report = dp.builtins.build_demo_report()
-    assert_report(report, 23, 67)
+    assert_report(report, 22, 66)
 
 
 def test_add_code():

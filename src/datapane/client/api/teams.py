@@ -91,14 +91,13 @@ class File(DPObjectRef):
         return cls.post_with_files(file=Path(fn), **kwargs)
 
     @classmethod
-    def upload_obj(cls, data: t.Any, as_json: bool = False, **kwargs: JSON) -> File:
+    def upload_obj(cls, data: t.Any, **kwargs: JSON) -> File:
         """
         Create a file containing the contents of the Python object provided,
         the object may be pickled or converted to JSON before storing.
 
         Args:
             data: Python object to upload as a File
-            as_json: Convert the data to JSON rather than pickling (optional)
 
         Returns:
             An instance of the created `File` object
@@ -106,7 +105,7 @@ class File(DPObjectRef):
         # import here as a very slow module due to nested imports
         from .files import save
 
-        fn = save(data, default_to_json=as_json)
+        fn = save(data)
         return cls.post_with_files(file=fn.file, **kwargs)
 
     def download_df(self) -> pd.DataFrame:

@@ -108,12 +108,13 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     # create the DP
     fn = tmp_path / "json_list.json"
     fn.write_text(data=json_list)
-    file_asset = dp.Media(file=fn)
-    json_asset = dp.Media(data=json_list, is_json=True)
+    file_asset = dp.Attachment(file=fn)
     plot_asset = dp.Plot(data=plot)
-    list_asset = dp.Media(data=lis, is_json=True)
+    list_asset = dp.Attachment(data=lis)
+    media_asset = dp.Media(file=Path("datapane-logo.png"))
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
-    dp_report = dp.Report(m, file_asset, df_asset, json_asset, plot_asset, list_asset)
+    divider = dp.Divider()
+    dp_report = dp.Report(m, file_asset, df_asset, plot_asset, list_asset, divider, media_asset)
     dp_report.upload(
         name=name,
         description=description,
@@ -143,19 +144,6 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
         # # check the file asset via download_obj
         # loaded_file = file_asset.download_obj()
         # assert loaded_file == lis
-        #
-        # # --- JSON ASSET --- #
-        # # [1, 2, 3] uploaded as a JSON string
-        #
-        # # check the json asset via download_file
-        # with temp_fname(".json") as fn:
-        #     fn = Path(fn)
-        #     json_asset.download_file(fn)
-        #     assert fn.read_text() == json_list
-        #
-        # # check the json asset via download_obj
-        # loaded_json = json_asset.download_obj()
-        # assert loaded_json == lis
         #
         # # --- LIST ASSET --- #
         # # [1, 2, 3] uploaded as a native Python list

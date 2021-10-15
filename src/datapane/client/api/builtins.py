@@ -368,14 +368,13 @@ dp.Embed("https://twitter.com/datapaneapp/status/1300831345413890050")
 
 {{embed}}
 
-## Media
+## Media and Attachments
 
 Files and Python objects can be added to a Datapane report, and be viewed (depending on browser support) and downloaded.
 
 ```python
 dp.Media(file="./logo.png")
-dp.Media(data=[1,2,3], is_json=True)
-dp.Media(data=[1,2,3], is_json=False)  # store as a pickle
+dp.Attachment(data=[1,2,3])
 ```
 
 {{media}}
@@ -411,8 +410,7 @@ dp.Media(data=[1,2,3], is_json=False)  # store as a pickle
     )
     media = b.Group(
         b.Media(file=logo, name="logo_img"),
-        b.Media(data=[1, 2, 3], is_json=True),
-        b.Media(data=[1, 2, 3], is_json=False),
+        b.Attachment(data=[1, 2, 3]),
         rows=1,
         columns=0,
     )

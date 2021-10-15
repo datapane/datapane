@@ -38,6 +38,7 @@ from .blocks import (
     Page,
     PageOrPrimitive,
     Select,
+    Toggle,
     wrap_block,
 )
 
@@ -477,7 +478,7 @@ class Report(BaseReport):
         if all(isinstance(b, Page) for b in pages):
             # we have all pages
             self.pages = t.cast(t.List[Page], pages)
-        elif all(isinstance(b, (Group, Select)) for b in pages):
+        elif all(isinstance(b, (Group, Select, Toggle)) for b in pages):
             # all blocks - wrap as a single page
             self.pages = [Page(blocks=pages)]
         else:

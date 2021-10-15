@@ -61,18 +61,19 @@ def gen_report_complex_no_files() -> dp.Report:
     """Generate a complex layout report with simple elements"""
     select = dp.Select(blocks=[md_block, md_block], type=dp.SelectType.TABS)
     group = dp.Group(md_block, md_block, columns=2)
+    toggle = dp.Toggle(md_block, md_block)
 
     return dp.Report(
         dp.Page(
             blocks=[
                 dp.Group(md_block, md_block, columns=2),
-                dp.Select(blocks=[md_block, group], type=dp.SelectType.DROPDOWN),
+                dp.Select(blocks=[md_block, group, toggle], type=dp.SelectType.DROPDOWN),
             ],
             title="Page Uno",
         ),
         dp.Page(
             blocks=[
-                dp.Group(select, select, columns=2),
+                dp.Group(select, select, toggle, columns=2),
                 dp.Select(blocks=[md_block, md_block, md_block], type=dp.SelectType.TABS),
             ],
             title="Page Duo",
@@ -102,10 +103,11 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     big_number = dp.BigNumber(heading="Tests written", value=1234)
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
+    divider_block = dp.Divider()
 
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
-    list_asset = dp.Media(data=lis, filename="List Asset", is_json=True)
+    list_asset = dp.Attachment(data=lis, filename="List Asset")
     img_asset = dp.Media(file=datadir / "datapane-logo.png")
 
     # tables
@@ -122,9 +124,11 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
                     md_block, html_block, html_block_1, code_block, formula_block, embed_block, type=dp.SelectType.TABS
                 ),
                 dp.Group(big_number, big_number_1, columns=2),
+                dp.Toggle(md_block, html_block, label="Test Toggle"),
             ),
             dp.Page(
                 plot_asset,
+                divider_block,
                 list_asset,
                 img_asset,
                 table_asset,
@@ -162,7 +166,7 @@ def test_gen_report_nested_mixed():
 
 
 def test_gen_report_primitives(datadir: Path):
-    # check we don't allow arbitary python primitives - must be pickled directly via dp.Media
+    # check we don't allow arbitary python primitives - must be pickled directly via dp.Attachment
     with pytest.raises(DPError):
         _ = dp.Report([1, 2, 3])
 
@@ -170,10 +174,10 @@ def test_gen_report_primitives(datadir: Path):
         "Simple string Markdown #2",  # Markdown
         gen_df(),  # Table
         gen_plot(),  # Plot
-        datadir / "datapane-logo.png",  # File
+        datadir / "datapane-logo.png",  # Attachment
     )
     assert_report(report, 3)
-    assert glom(report, ("pages.0.blocks.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "File"]
+    assert glom(report, ("pages.0.blocks.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
 
 
 def test_gen_failing_reports():
@@ -226,15 +230,27 @@ def test_gen_report_nested_blocks():
                 ],
                 label="test-select-label",
             ),
+            dp.Toggle(
+                blocks=[
+                    dp.Text(s, name="test-id-3"),
+                    "Simple string Markdown",
+                ],
+                label="test-toggle-label",
+            ),
         ]
     )
 
     # No additional wrapper block
-    assert len(report.pages[0].blocks) == 2
+    assert len(report.pages[0].blocks) == 3
     assert isinstance(report.pages[0].blocks[0], dp.Group)
     assert isinstance(report.pages[0].blocks[1], dp.Select)
+    assert isinstance(report.pages[0].blocks[2], dp.Toggle)
     assert isinstance(report.pages[0].blocks[1].blocks[1], dp.Text)
-    assert glom(report, ("pages.0.blocks", ["_attributes.label"])) == ["test-group-label", "test-select-label"]
+    assert glom(report, ("pages.0.blocks", ["_attributes.label"])) == [
+        "test-group-label",
+        "test-select-label",
+        "test-toggle-label",
+    ]
     assert glom(report, "pages.0.blocks.0.blocks.0.name") == "test-id-1"
     assert glom(report, "pages.0.blocks.1.blocks.0._attributes.label") == "test-block-label"
     assert_report(report, 0)
@@ -248,7 +264,7 @@ def test_gen_report_complex_no_files():
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    assert_report(report, 5, 18)
+    assert_report(report, 5, 23)
 
 
 ################################################################################

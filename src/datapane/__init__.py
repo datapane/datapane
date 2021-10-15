@@ -26,16 +26,19 @@ from .common.utils import enable_logging, log, _setup_dp_logging
 
 # Public API re-exports
 from .client.api import (
+    Attachment,
     Media,
     BigNumber,
     Code,
     DataTable,
+    Divider,
     Embed,
-    Group,
     File,
+    Group,
     FontChoice,
     Formula,
     HTML,
+    Media,
     Text,
     Page,
     Params,
@@ -53,6 +56,7 @@ from .client.api import (
     Text,
     TextAlignment,
     TextReport,
+    Toggle,
     Environment,
     Visibility,
     by_datapane,

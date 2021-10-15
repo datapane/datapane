@@ -16,7 +16,7 @@ from datapane.common import log
 from .. import DPError
 from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure
-from .report.blocks import DataBlock, DataTable, Media, Plot, Table, Text
+from .report.blocks import Attachment, DataBlock, DataTable, Plot, Table, Text
 
 T = TypeVar("T")
 U = TypeVar("U", DataFrame, Styler)
@@ -55,24 +55,12 @@ class BasePickleWriter(BaseAsset):
 
     mimetype = "application/vnd.pickle+binary"
     obj_type = Any
-    block_type = Media
+    block_type = Attachment
     ext = ".pkl"
     file_mode = "wb"
 
     def write_file(self, f: TextIO, x: Any):
         pickle.dump(x, f)
-
-
-class BaseJsonWriter(BaseAsset):
-    """ Creates a JSON file from any object """
-
-    mimetype = "application/json"
-    obj_type = Any
-    block_type = Media
-    ext = ".json"
-
-    def write_file(self, f: TextIO, x: Any):
-        json.dump(x, f)
 
 
 class StringWrapper(BaseAsset):
@@ -88,13 +76,13 @@ class StringWrapper(BaseAsset):
 
 
 class PathWrapper(BaseAsset):
-    """Creates a Media block around Path objects"""
+    """Creates an Attachment block around Path objects"""
 
     obj_type = Path
-    block_type = Media
+    block_type = Attachment
 
     def to_block(self, x: T) -> DataBlock:
-        return Media(file=x)
+        return Attachment(file=x)
 
 
 ################################################################################
@@ -273,26 +261,26 @@ plots = [
 
 
 @singledispatch
-def get_wrapper(x: Any, default_to_json: bool, error_msg: Optional[str] = None) -> BaseAsset:
+def get_wrapper(x: Any, error_msg: Optional[str] = None) -> BaseAsset:
     if error_msg:
         raise DPError(error_msg)
 
-    # The base writer is either a pickle writer or JSON writer.
-    return BaseJsonWriter() if default_to_json else BasePickleWriter()
+    # The base writer is a pickle writer
+    return BasePickleWriter()
 
 
 for p in plots:
-    get_wrapper.register(p.obj_type, lambda _, default_to_json, error_msg, p=p: p())
+    get_wrapper.register(p.obj_type, lambda _, error_msg, p=p: p())
 
 
 # Entry Points
-def save(obj: Any, default_to_json: bool = False) -> DPTmpFile:
-    fn = get_wrapper(obj, default_to_json=default_to_json, error_msg=None).write(obj)
+def save(obj: Any) -> DPTmpFile:
+    fn = get_wrapper(obj, error_msg=None).write(obj)
     log.debug(f"Saved object to {fn} ({os.path.getsize(fn.file)} bytes)")
     return fn
 
 
 def convert(obj: Any) -> "DataBlock":
     """Attempt to convert/wrap a 'primitive' Python object into a Datapane 'boxed' object"""
-    error_msg = f"{type(obj)} not supported directly, please pass into in the appropriate dp object (including dp.Media if want to upload as a pickle)"
-    return get_wrapper(obj, default_to_json=False, error_msg=error_msg).to_block(obj)
+    error_msg = f"{type(obj)} not supported directly, please pass into in the appropriate dp object (including dp.Attachment if want to upload as a pickle)"
+    return get_wrapper(obj, error_msg=error_msg).to_block(obj)
