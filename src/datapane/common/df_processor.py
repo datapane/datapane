@@ -142,11 +142,15 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
         # downcast first as can't downcast Int64 correctly after
         downcast_numbers(df)
         # convert all non-floating vals
-        non_f = df.select_dtypes(exclude="floating").convert_dtypes()
-        df[non_f.columns] = non_f
+
+        non_f = df.select_dtypes(exclude="floating")
+        # pandas version < 1.3 raises ValueError when running convert_dtypes on empty dataframes so we need to check it
+        if len(non_f.columns) > 0:
+            df[non_f.columns] = non_f.convert_dtypes()
         # convert all floating vals, but disable float64->int64 conversioon
-        f = df.select_dtypes(include="floating").convert_dtypes(convert_integer=False)
-        df[f.columns] = f
+        f = df.select_dtypes(include="floating")
+        if len(f.columns) > 0:
+            df[f.columns] = f.convert_dtypes(convert_integer=False)
 
     # save timedeltas cols (unneeded whilst timedelta_to_str used)
     # td_col = df.select_dtypes("timedelta")
