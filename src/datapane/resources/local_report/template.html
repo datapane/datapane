@@ -25,7 +25,7 @@
   <body>
     <div id="report-root" class="w-full pb-12"></div>
     <script>
-      const report = { api_document: `{{ report_doc|e }}`, width: "{{ report_width }}" };
+      const report = { document: `{{ report_doc|e }}`, width: "{{ report_width }}" };
       const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
 
       const { React, ReactDOM, ReportComponent } = DPLIB["local-report-base"];

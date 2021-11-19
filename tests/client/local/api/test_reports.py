@@ -1,6 +1,7 @@
 """Tests for the API that can run locally (due to design or mocked out)"""
 import os
 import typing as t
+from contextlib import suppress
 from pathlib import Path
 
 import pandas as pd
@@ -11,10 +12,10 @@ from lxml import etree
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
-from datapane.client import DPError
 from datapane.client.api.report.blocks import BaseElement
 from datapane.client.api.report.core import BuilderState
-from datapane.common.report import validate_report_doc
+from datapane.client.utils import DPError, InvalidTokenError
+from datapane.common.report import load_doc, validate_report_doc
 
 from ...e2e.common import gen_df, gen_plot
 
@@ -31,8 +32,8 @@ def element_to_str(e: BaseElement) -> str:
 
 
 def num_blocks(report_str: str) -> int:
-    x = "count(/Report/Main//*)"
-    return int(etree.fromstring(report_str).xpath(x))
+    x = "count(/Report/Pages//*)"
+    return int(load_doc(report_str).xpath(x))
 
 
 def assert_report(report: dp.Report, expected_attachments: int = None, expected_num_blocks: int = None):
@@ -104,6 +105,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
     divider_block = dp.Divider()
+    empty_block = dp.Empty(name="empty-block")
 
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
@@ -113,7 +115,9 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     # tables
     table_asset = dp.Table(data=small_df, caption="Test Basic Table")
     # local reports don't support DataTable
-    dt_asset = table_asset if local_report else dp.DataTable(df=big_df, caption="Test DataTable")
+    dt_asset = (
+        table_asset if local_report else dp.DataTable(df=big_df, name="big-table-block", caption="Test DataTable")
+    )
 
     if single_file:
         return dp.Report(dp.Group(blocks=[md_block, dt_asset]))
@@ -129,6 +133,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
             dp.Page(
                 plot_asset,
                 divider_block,
+                empty_block,
                 list_asset,
                 img_asset,
                 table_asset,
@@ -143,9 +148,9 @@ def test_gen_report_simple():
     report = gen_report_simple()
     assert_report(report, 0)
     # TODO - replace accessors here with glom / boltons / toolz
-    assert len(report.pages[0].blocks[0].blocks) == 2
-    assert isinstance(report.pages[0].blocks[0].blocks[1], dp.Text)
-    assert report.pages[0].blocks[0].blocks[0].name == "test-id-1"
+    assert len(report.pages[0].blocks) == 2
+    assert isinstance(report.pages[0].blocks[1], dp.Text)
+    assert report.pages[0].blocks[0].name == "test-id-1"
 
 
 def test_gen_report_nested_mixed():
@@ -158,11 +163,11 @@ def test_gen_report_nested_mixed():
     )
 
     assert_report(report, 0)
-    assert len(glom(report, "pages.0.blocks")) == 1
+    assert len(glom(report, "pages.0.blocks")) == 2
     assert isinstance(glom(report, "pages.0.blocks.0"), dp.Group)
-    assert isinstance(report.pages[0].blocks[0].blocks[0], dp.Group)
-    assert isinstance(report.pages[0].blocks[0].blocks[1], dp.Text)
-    assert report.pages[0].blocks[0].blocks[0].blocks[0].name == "test-id-1"
+    assert isinstance(report.pages[0].blocks[0], dp.Group)
+    assert isinstance(report.pages[0].blocks[1], dp.Text)
+    assert glom(report, "pages.0.blocks.0.blocks.0.name") == "test-id-1"
 
 
 def test_gen_report_primitives(datadir: Path):
@@ -177,7 +182,7 @@ def test_gen_report_primitives(datadir: Path):
         datadir / "datapane-logo.png",  # Attachment
     )
     assert_report(report, 3)
-    assert glom(report, ("pages.0.blocks.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
+    assert glom(report, ("pages.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
 
 
 def test_gen_failing_reports():
@@ -284,61 +289,51 @@ def test_local_report_with_files(datadir: Path, monkeypatch):
 
 
 ################################################################################
-# TextReport
-def assert_text_report(tr: dp.TextReport, expected_num_assets: int, names: t.Optional[t.List[str]] = None):
-    report_str, _ = tr._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
-    r = etree.fromstring(report_str)
-    assert r.xpath("count(//Group[1]/*)") == expected_num_assets
-    if names:
-        assert r.xpath("//Group[1]/*/@name") == names
+# Report Update Assets block convertor
+def test_update_assets_api():
+    """
+    Test update assets API and id/naming handling
+    NOTE - bit hacky as we wait for the exception then run the rest of the report checks
+    """
 
+    def _assert_res(tr: dp.Report, expected_num_assets: int, names: t.Optional[t.List[str]] = None):
+        report_str, _ = tr._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r = load_doc(report_str)
+        assert r.xpath("count(//Group[1]/*)") == expected_num_assets
+        if names:
+            assert r.xpath("//Group[1]/*/@name") == names
 
-def __test_gen_report_id_check():
-    """Test case unused atm"""
-    # all fresh
-    report = dp.Report(md_block, md_block, md_block)
-    assert_report(report)  # expected_id_count=5)
-    # 2 fresh
-    report = dp.Report(md_block, md_block_id, md_block)
-    assert_report(report)  # expected_id_count=4)
-    # 0 fresh
-    report = dp.Report(md_block_id, dp.Text("test", name="test-2"))
-    assert_report(report)  # expected_id_count=2)
+    report = dp.Report("Empty Text")
 
-
-def test_textreport_gen():
-    """Test TextReport API and id/naming handling"""
-    s_df = gen_df()
-
-    # Simple
-    report = dp.TextReport("Text-3")
-    assert_text_report(report, 1)
-
-    # multiple blocks
-    report = dp.TextReport("Text-1", "Text-2", s_df)
-    assert_text_report(report, 3)
-
-    # empty - raise error
+    # Errors
+    with pytest.raises((AssertionError, InvalidTokenError)):
+        report.update_assets("Text-3")
+    with pytest.raises((AssertionError, InvalidTokenError)):
+        report.update_assets(gen_df())
     with pytest.raises(DPError):
-        report = dp.TextReport()
-        assert_text_report(report, 0)
+        report.update_assets()
+    with pytest.raises((AssertionError, InvalidTokenError)):
+        report.update_assets(dp.Text("Text-arg-1"))
 
-    # mixed naming usage
-    report = dp.TextReport("text-1", dp.Text("Text-4", name="test"))
-    assert_text_report(report, 2)
+    # basic
+    with suppress(AttributeError, InvalidTokenError):
+        report.update_assets(dp.Text("Text-4", name="test"))
+    _assert_res(report, 1)
 
     # arg/kwarg naming tests
-    report = dp.TextReport(
-        dp.Text("Text-arg-1"),
-        dp.Text("Text-arg-2", name="text-arg-2"),
-        t1="Text-1",
-        t2=dp.Text("Text-2"),
-        t3=dp.Text("Text-3", name="overwritten"),
-    )
-    assert_text_report(report, 5, ["text-1", "text-arg-2", "t1", "t2", "t3"])
+    with suppress(AttributeError, InvalidTokenError):
+        report.update_assets(
+            dp.Text("Text-arg-2", name="text-arg-2"),
+            t1="Text-1",
+            t2=dp.Text("Text-2"),
+            t3=dp.Text("Text-3", name="overwritten"),
+        )
+    _assert_res(report, 4, ["text-arg-2", "t1", "t2", "t3"])
 
     # dict/list test
-    report = dp.TextReport(blocks=dict(t1="text-1", t2=dp.Text("Text-2"), t3=dp.Text("Text-3", name="overwritten")))
-    assert_text_report(report, 3, ["t1", "t2", "t3"])
-    report = dp.TextReport(blocks=["Text-1", dp.Text("Text-2"), dp.Text("Text-3", name="text-3")])
-    assert_text_report(report, 3, ["text-1", "text-2", "text-3"])
+    with suppress(AttributeError, InvalidTokenError):
+        report.update_assets(blocks=dict(t1="text-1", t2=dp.Text("Text-2"), t3=dp.Text("Text-3", name="overwritten")))
+    _assert_res(report, 3, ["t1", "t2", "t3"])
+    with suppress(AttributeError, InvalidTokenError):
+        report.update_assets(blocks=[dp.Text("Text-2", name="text-2"), dp.Text("Text-3", name="text-3")])
+    _assert_res(report, 2, ["text-2", "text-3"])

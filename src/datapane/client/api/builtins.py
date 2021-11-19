@@ -257,7 +257,6 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
         b.Media(file=logo),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
         b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}", caption="Simple formula"),
-        rows=1,
         columns=0,
     )
     page_1 = b.Page(
@@ -277,7 +276,7 @@ Group blocks allow you to take a list of blocks, and lay-them out over a number 
 ```python
 dp.Group(plot1, plot2, columns=2)
 cells = [dp.Text(f"### Cell {x}") for x in range(6)]
-dp.Group(*cells, rows=2, columns=0)  # 0 implies auto
+dp.Group(*cells, columns=0)  # 0 implies auto
 ```
 
 {{group1}}
@@ -309,7 +308,7 @@ dp.Select(group1, df)
 """
 
     group1 = b.Group(vega_bar, vega_sine, columns=2)
-    group2 = b.Group(*[f"### Cell {x}" for x in range(6)], rows=2, columns=0)
+    group2 = b.Group(*[f"### Cell {x}" for x in range(6)], columns=3)
     select1 = b.Select(vega_bar, vega_sine, type=b.SelectType.TABS, name="vega_select")
     select2 = b.Select(vega_bar, vega_sine, type=b.SelectType.DROPDOWN)
 
@@ -400,7 +399,6 @@ dp.Attachment(data=[1,2,3])
         b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}"),
         b.HTML("<h1>Hello World</h1>", name="HTML"),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True, name="big_num"),
-        rows=1,
         columns=0,
     )
     embed = b.Group(
@@ -411,8 +409,7 @@ dp.Attachment(data=[1,2,3])
     media = b.Group(
         b.Media(file=logo, name="logo_img"),
         b.Attachment(data=[1, 2, 3]),
-        rows=1,
-        columns=0,
+        columns=2,
     )
 
     page_3 = b.Page(

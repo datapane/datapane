@@ -121,7 +121,7 @@ def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
         (rc_args, rc_kwargs) = rc.call_args
         assert rc_kwargs["description"] == "Description"
         _r: dp.Report = rc_args[0]
-        _blocks = _r.pages[0].blocks[0].blocks
+        _blocks = _r.pages[0].blocks
         assert isinstance(_blocks, list)
         assert len(_blocks) == 3
         assert val in _blocks[0].content

@@ -28,6 +28,7 @@ from .dp_types import (
     get_dp_mode,
     set_dp_mode,
 )
+from .report import load_doc
 from .utils import (
     dict_drop_empty,
     guess_type,

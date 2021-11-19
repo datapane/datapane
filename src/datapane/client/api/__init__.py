@@ -57,6 +57,7 @@ from .report.blocks import (
     DataTable,
     Divider,
     Embed,
+    Empty,
     Media,
     Formula,
     HTML,
@@ -69,7 +70,7 @@ from .report.blocks import (
     Table,
     Toggle,
 )
-from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, TextReport, Visibility
+from .report.core import FontChoice, Report, ReportFormatting, ReportWidth, TextAlignment, Visibility
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup

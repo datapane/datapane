@@ -30,19 +30,17 @@ from datapane.common.report import local_report_def, validate_report_doc
 from datapane.common.utils import process_notebook
 
 from .blocks import (
+    BaseElement,
     Block,
+    BlockList,
     BlockOrPrimitive,
     BuilderState,
     E,
     Group,
     Page,
     PageOrPrimitive,
-    Select,
-    Toggle,
     wrap_block,
 )
-
-U = t.TypeVar("U", bound="TextReport")
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
@@ -188,10 +186,58 @@ class ReportFileWriter:
         return report_id
 
 
-class BaseReport(DPObjectRef):
+# Type aliases
+BlockDict = t.Dict[str, BlockOrPrimitive]
+
+
+class Report(DPObjectRef):
+    """
+    Report documents collate plots, text, tables, and files into an interactive document that
+    can be analysed and shared by users in their Browser
+    """
+
+    _tmp_report: t.Optional[Path] = None  # Temp local report
+    _local_writer = ReportFileWriter()
+    _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
+    list_fields: t.List[str] = ["name", "web_url", "project"]
+
     endpoint: str = "/reports/"
     pages: t.List[Page]
     # id_count: int = 1
+
+    def __init__(
+        self,
+        *arg_blocks: PageOrPrimitive,
+        blocks: t.List[PageOrPrimitive] = None,
+        **kwargs,
+    ):
+        """
+        Args:
+            *arg_blocks: Group to add to document
+            blocks: Allows providing the document blocks as a single list
+
+        Returns:
+            A `Report` document object that can be uploaded, saved, etc.
+
+        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
+          `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
+
+        ..tip:: Create a list first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
+        """
+        super().__init__(**kwargs)
+        self._preprocess_pages(blocks or list(arg_blocks))
+
+    def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
+        # pre-process report blocks
+        if all(isinstance(b, Page) for b in pages):
+            # we have all pages - all good!
+            self.pages = t.cast(t.List[Page], pages)
+        elif any(isinstance(b, Page) for b in pages):
+            # mixed pages& blocks - not good!
+            raise DPError("Mixed pages and non-page blocks, please wrap using dp.Page")
+        else:
+            # all blocks - wrap as a single page, including layout/mixed/raw elements
+            self.pages = [Page(blocks=pages)]
 
     def _to_xml(
         self, embedded: bool, title: str = "Title", description: str = "Description", author: str = "Anonymous"
@@ -204,7 +250,7 @@ class BaseReport(DPObjectRef):
         # add main structure
         report_doc: Element = E.Report(
             E.Internal(),
-            E.Main(*_s.elements),
+            E.Pages(*_s.elements),
             version="1",
         )
 
@@ -242,9 +288,32 @@ class BaseReport(DPObjectRef):
         return (report_str, attachments)
 
     def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
-        # NOTE - common checks go here
-        pass
+        # check for any unsupported local features, e.g. DataTable
+        # NOTE - we could eventually have different validators for local and uploaded reports
+        if embedded:
+            return None
 
+        # Report checks
+        # TODO - validate at least a single element
+        asset_blocks = processed_report_doc.xpath("count(/Report/Pages//*)")
+        if asset_blocks < 3 and check_empty:
+            raise InvalidReportError("Empty report - must contain at least one asset/block")
+        elif c.config.is_public:
+            # only nudge public users
+            if asset_blocks < 4:
+                display_msg(
+                    text="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
+                    md="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
+                    url="https://docs.datapane.com/reports/blocks/layout-pages-and-selects",
+                )
+
+    @property
+    def edit_url(self):
+        return f"{self.web_url}edit/"
+
+    ############################################################################
+    # Uploaded Reports
+    # TODO - inline into upload - wait on new report API
     def _upload_report(
         self,
         name: str,
@@ -297,7 +366,7 @@ class BaseReport(DPObjectRef):
                 # strip the output of original notebook and store in temp file
                 process_notebook(Path(source_file), output_file.file)
                 files["source_file"] = [output_file.file]
-            res = Resource(self.endpoint).post_files(files, api_document=report_str, **kwargs)
+            res = Resource(self.endpoint).post_files(files, document=report_str, **kwargs)
 
         # Set dto based on new URL
         self.url = res.url
@@ -305,185 +374,6 @@ class BaseReport(DPObjectRef):
 
         # add report to internal API handler for use by_datapane
         _report.append(self)
-
-
-BlockDict = t.Dict[str, BlockOrPrimitive]
-BlockList = t.List[BlockOrPrimitive]
-
-
-class TextReport(BaseReport):
-    """
-    Upload plots, text, tables, and files as assets that can be used within a TextReport created in the browser
-    """
-
-    def __init__(
-        self, *arg_blocks: BlockOrPrimitive, blocks: t.Union[BlockDict, BlockList] = None, **kw_blocks: BlockOrPrimitive
-    ):
-        """
-        Blocks can be created with the `name` parameter, if not set, one can be provided here using keyword args.
-        Use the blocks dict parameter to add a dynamically generated set of named blocks, useful when working in Jupyter
-
-        Args:
-            *arg_blocks: List of blocks to add to document - if a name is not present it will be auto-generated
-            blocks: Allows providing the document blocks as a single dictionary of named blocks
-            **kw_blocks: Keyword argument set of blocks, whose block name will be that given in the keyword
-
-        Returns:
-            A `TextReport` object containing assets that can be uploaded for use with your online TextReport
-
-        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
-          `dp.TextReport(my_plot=plot, my_table=table)` or `dp.TextReport(blocks={"my_plot": plot, "my_table":table})`
-
-        ..tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
-        """
-        super().__init__()
-
-        # set the blocks
-        def _conv_block(name: str, block: BlockOrPrimitive) -> Block:
-            x = wrap_block(block)
-            x._set_name(name)
-            return x
-
-        _blocks: BlockList
-        if isinstance(blocks, dict):
-            _blocks = [_conv_block(k, v) for (k, v) in blocks.items()]
-        elif isinstance(blocks, list):
-            _blocks = blocks
-        else:
-            # use arg and kw blocks
-            _blocks = list(arg_blocks)
-            _blocks.extend([_conv_block(k, v) for (k, v) in kw_blocks.items()])
-
-        if not _blocks:
-            log.debug("No blocks provided - creating empty report")
-
-        # set the pages
-        self.pages = [Page(blocks=[Group(blocks=_blocks, name="top-group")])]
-
-    @property
-    def edit_url(self):
-        return f"{self.web_url}edit/"
-
-    def upload(
-        self,
-        id: t.Optional[str] = "",
-        name: t.Optional[str] = "",
-        description: str = "",
-        source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
-        tags: t.List[str] = None,
-        project: t.Optional[str] = None,
-        source_file: t.Optional[NPath] = None,
-        open: bool = False,
-        formatting: t.Optional[ReportFormatting] = None,
-        **kwargs,
-    ) -> "TextReport":
-        """
-        Create a TextReport document on the logged-in Datapane Server.
-
-        Args:
-            id: The document id - use when pushing assets to an existing report
-            name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
-            description: A high-level description for the document, this is displayed in searches and thumbnails
-            source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
-            visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
-            tags: A list of tags (as strings) used to categorise your document
-            project: Project to add the report to (Teams only)
-            source_file: Path of jupyter notebook file to upload
-            open: Open the file in your browser after creating
-            formatting: Set the basic styling for your report
-
-        Returns:
-            A `TextReport` document object that can be used to upload assets
-        """
-        assert id or name, "id or name must be set"
-        if id:
-            # TODO - this seems incorrect - do we want this indirection
-            # TODO - cache the name? - would this work if name changed?
-            x: "TextReport" = TextReport.by_id(id)
-            if not x.is_text_report:
-                raise DPError("Expected a TextReport object, found a Report object")
-            name = x.name
-
-        self._upload_report(
-            name,
-            description,
-            source_url,
-            visibility,
-            tags,
-            project,
-            source_file,
-            is_text_report=True,
-            formatting=formatting,
-            **kwargs,
-        )
-        display_msg(
-            text=f"TextReport assets successfully uploaded - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
-            md=f"TextReport assets successfully uploaded - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
-        )
-
-        if open:
-            webbrowser.open_new_tab(self.edit_url)
-        return self
-
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
-        super()._report_status_checks(processed_report_doc, embedded, check_empty)
-
-        if embedded:
-            return None
-
-        asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
-        if asset_blocks < 3 and check_empty:
-            raise InvalidReportError(
-                "Empty TextReport, require at least one asset, please see the docs for syntax help"
-            )
-
-
-# Python/API Report
-class Report(BaseReport):
-    """
-    Report documents collate plots, text, tables, and files into an interactive document that
-    can be analysed and shared by users in their Browser
-    """
-
-    _tmp_report: t.Optional[Path] = None  # Temp local report
-    _local_writer = ReportFileWriter()
-    _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
-    list_fields: t.List[str] = ["name", "web_url", "project"]
-
-    def __init__(
-        self,
-        *arg_blocks: PageOrPrimitive,
-        blocks: t.List[PageOrPrimitive] = None,
-        **kwargs,
-    ):
-        """
-        Args:
-            *arg_blocks: Group to add to document
-            blocks: Allows providing the document blocks as a single list
-
-        Returns:
-            A `Report` document object that can be uploaded, saved, etc.
-
-        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg, e.g.
-          `dp.Report(plot, table)` or `dp.Report(blocks=[plot, table])`
-
-        ..tip:: Create a list first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
-        """
-        super().__init__(**kwargs)
-        self._preprocess_pages(blocks or list(arg_blocks))
-
-    def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
-        # pre-process report blocks
-        if all(isinstance(b, Page) for b in pages):
-            # we have all pages
-            self.pages = t.cast(t.List[Page], pages)
-        elif all(isinstance(b, (Group, Select, Toggle)) for b in pages):
-            # all blocks - wrap as a single page
-            self.pages = [Page(blocks=pages)]
-        else:
-            # add additional top-level Group element to group mixed elements
-            self.pages = [Page(blocks=[Group(blocks=pages)])]
 
     def upload(
         self,
@@ -527,6 +417,76 @@ class Report(BaseReport):
             md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report.",
         )
 
+    def update_assets(
+        self,
+        *arg_blocks: Block,
+        blocks: t.Union[BlockDict, BlockList] = None,
+        open: bool = False,
+        **kw_blocks: BlockOrPrimitive,
+    ) -> None:
+        """
+        Upload updated plots, text, tables, and files for a report.
+        Blocks can be created with the `name` parameter, if not set, one can be provided here using keyword args.
+        Use the blocks dict parameter to add a dynamically generated set of named blocks, useful when working in Jupyter
+
+        Args:
+            *arg_blocks: List of blocks to add to document, these must be wrapped, e.g. using dp.DataTable(df) instead of df
+            blocks: Allows providing the document blocks as a single list/dictionary of named blocks
+            open: Open the report in your browser for editing after updating
+            **kw_blocks: Keyword argument set of blocks, whose block name will be that given in the keyword
+
+        Returns:
+            None
+
+        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
+          `report.update_assets(my_plot=plot, my_table=table)` or `report.update_assets(blocks={"my_plot": plot, "my_table":table})`
+
+        ..tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
+        """
+        # set the blocks
+        def _conv_block(block: BlockOrPrimitive, name: t.Optional[str] = None) -> Block:
+            x = wrap_block(block)
+            x._set_name(name)
+            return x
+
+        _blocks: BlockList
+        if isinstance(blocks, dict):
+            _blocks = [_conv_block(b, n) for (n, b) in blocks.items()]
+        elif isinstance(blocks, list):
+            _blocks = [_conv_block(b, None) for b in blocks]
+        else:
+            # use arg and kw blocks
+            _blocks = [_conv_block(b, None) for b in arg_blocks]
+            _blocks.extend([_conv_block(b, n) for (n, b) in kw_blocks.items()])
+
+        # Validity checks
+        if not _blocks:
+            raise DPError("No blocks provided to update")
+        # TODO - use typeguard
+        assert all(isinstance(x, BaseElement) for x in _blocks), "Please use kwarg syntax to upload unwrapped asses"
+        assert all(x.name for x in _blocks), "Please ensure all blocks have a name parameter set, or use kwarg syntax"
+
+        # set the pages
+        self.pages = [Page(blocks=[Group(blocks=_blocks)])]
+
+        # generate the report and upload
+        report_str, attachments = self._gen_report(embedded=False)
+        files = dict(attachments=attachments)
+        # post to the custom endpoint
+        Resource(f"{self.url}update_assets/").post_files(files, document=report_str, name=self.name)
+        self.refresh()
+
+        display_msg(
+            text=f"Successfully updated report assets  - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
+            md=f"Successfully updated report assets  - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
+        )
+
+        if open:
+            webbrowser.open_new_tab(self.edit_url)
+        return self
+
+    ############################################################################
+    # Local saved reports
     def _save(
         self,
         path: str,
@@ -583,7 +543,7 @@ class Report(BaseReport):
         capture("CLI Report Save", report_id=report_id)
 
         # feedback form
-        if random.random() < 0.05:
+        if random.random() < 0.1:
             display_msg(
                 text="How is your experience of Datapane? Please take two minutes to answer our anonymous product survey at {url}",
                 md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey]({url})",
@@ -605,30 +565,3 @@ class Report(BaseReport):
             formatting: Sets the basic report styling
         """
         self._save(self._preview_file.name, open=open, formatting=formatting)
-
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
-        super()._report_status_checks(processed_report_doc, embedded, check_empty)
-
-        # check for any unsupported local features, e.g. DataTable
-        # NOTE - we could eventually have different validators for local and uploaded reports
-        if embedded:
-            pass
-        else:
-            # TODO - validate at least a single element
-            asset_blocks = processed_report_doc.xpath("count(/Report/Main//*)")
-            if asset_blocks < 3 and check_empty:
-                raise InvalidReportError("Empty report - must contain at least one asset/block")
-            elif c.config.is_public:
-                # only nudge public users
-                if asset_blocks < 4:
-                    display_msg(
-                        text="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
-                        md="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
-                        url="https://docs.datapane.com/reports/blocks/layout-pages-and-selects",
-                    )
-
-                # has_text: bool = processed_report_doc.xpath("boolean(/Report/Main/Page//Text)")
-                # if not has_text:
-                #     display_msg(
-                #         "Your report doesn't contain any text - consider using TextReport to upload assets and add text to your report from your browser"
-                #     )

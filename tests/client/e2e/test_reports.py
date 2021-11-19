@@ -1,4 +1,5 @@
 import json
+import typing as t
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -6,10 +7,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import requests
-from lxml import etree
+from glom import glom
 
 import datapane as dp
 from datapane.client import config as c
+from datapane.common import load_doc
 
 from ..local.api.test_reports import gen_report_complex_with_files, gen_report_simple
 from .common import check_name, deletable, gen_description, gen_df, gen_name, gen_plot
@@ -84,6 +86,47 @@ def test_report_with_files(datadir: Path):
         ...
 
 
+def test_report_update_with_files(datadir: Path):
+    report = gen_report_complex_with_files(datadir)
+    report.upload(name="TEST", description="DESCRIPTION")
+    with deletable(report):
+        doc_a = report.document
+        report.upload(name="TEST", description="DESCRIPTION")
+        doc_b = report.document
+        # TODO - these should be the same once we have reuse of id's in place
+        assert doc_a != doc_b
+
+
+def test_report_update_assets(datadir: Path):
+    report = dp.Report(
+        dp.DataTable(gen_df(2501), name="df-block"), dp.DataTable(gen_df(2502)), dp.Empty(name="block1")  # unnamed
+    )
+    report.upload(name=gen_name(), description="DESCRIPTION")
+
+    def check_block_name(report, tag: str, rf_names: t.List[str]):
+        x = load_doc(report.document)
+        es = x.xpath("//*[@name='block1']")
+        assert es[0].tag == tag
+        assert len(es) == 1
+        assert x.xpath("count(/Report/Pages//*)") == 5
+        assert glom(report.report_files, ["name"]) == rf_names
+
+    with deletable(report):
+        # add a df
+        report.update_assets(block1=gen_df(2503))
+        check_block_name(report, "DataTable", ["df-block", "", "block1"])
+        # add a plot
+        report.update_assets(block1=gen_plot())
+        doc_b = report.document
+        check_block_name(report, "Plot", ["df-block", "", "block1"])
+
+        # add additional blocks
+        # note - gen_plot is deterministic, hence is adding a new copy of same asset in CAS to asset-store only
+        report.update_assets(block2=gen_plot())
+        assert doc_b == report.document
+        check_block_name(report, "Plot", ["block2", "df-block", "", "block1"])
+
+
 def test_demo_report():
     report = dp.builtins.build_demo_report()
     report.upload(name="TEST", description="DESCRIPTION")
@@ -114,7 +157,8 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     media_asset = dp.Media(file=Path("datapane-logo.png"))
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     divider = dp.Divider()
-    dp_report = dp.Report(m, file_asset, df_asset, plot_asset, list_asset, divider, media_asset)
+    empty_block = dp.Empty(name="empty-block")
+    dp_report = dp.Report(m, file_asset, df_asset, plot_asset, list_asset, divider, empty_block, media_asset)
     dp_report.upload(
         name=name,
         description=description,
@@ -228,44 +272,3 @@ def test_report_project():
         report2.upload(name="test_wrong_project", project="wrong-project")
     except requests.HTTPError as e:
         assert e.response.status_code == 400
-
-
-###############################################################################
-# TextReport
-def _calc_text_blocks(report: dp.TextReport, expected_blocks: int):
-    r = etree.fromstring(report.api_document)
-    assert r.xpath("count(//Group[1]/*)") == expected_blocks
-
-
-def test_text_report():
-    # a simple report
-    report = dp.TextReport("test").upload(name="Test")
-    with deletable(report):
-        # inc Page and Group blocks
-        _calc_text_blocks(report, 1)
-
-        # overwrite via name
-        report = dp.TextReport("Text-1", "Text-2").upload(name="Test")
-        _calc_text_blocks(report, 2)
-
-        # overwrite via id
-        report = dp.TextReport("Text-1", "Text-2", "Text-3").upload(id=report.id)
-        _calc_text_blocks(report, 3)
-
-        # get report by id
-        report_1 = dp.TextReport.by_id(report.id)
-        assert report.id == report_1.id
-        assert report.num_blocks == report_1.num_blocks
-
-
-def test_text_report_files():
-    s_df = gen_df()
-    b_df = gen_df(1000)
-    plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
-
-    report = dp.TextReport(s_df, b_df, plot_asset).upload(name="Test")
-    with deletable(report):
-        _calc_text_blocks(report, 3)
-
-        report = dp.TextReport(text="Text", s_df=s_df, b_df=b_df, plot=plot_asset).upload(name="Test")
-        _calc_text_blocks(report, 4)

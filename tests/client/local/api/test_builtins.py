@@ -1,5 +1,5 @@
 """Tests for the API that can run locally (due to design or mocked out)"""
-from glom import glom
+from glom import T, glom
 
 import datapane as dp
 
@@ -40,12 +40,13 @@ def test_add_header():
     r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
     r1 = dp.builtins.add_header(r, header=text, all_pages=True)
-    assert_report(r1, 0, 18)
+    assert_report(r1, 0, 15)
     assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, text, text]
 
     r1 = dp.builtins.add_header(r, header=text, all_pages=False)
-    assert_report(r1, 0, 14)
-    assert glom(r1, ("pages", ["blocks.0.blocks.0.content"])) == [text, md_block.content, md_block.content]
+    assert_report(r1, 0, 11)
+    assert glom(r1, ("pages", T[:1], ["blocks.0.blocks.0.content"])) == [text]
+    assert glom(r1, ("pages", T[1:], ["blocks.0.content"])) == [md_block.content, md_block.content]
 
 
 def test_add_footer():
@@ -54,9 +55,10 @@ def test_add_footer():
     r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
     r1 = dp.builtins.add_footer(r, footer=text, all_pages=True)
-    assert_report(r1, 0, 18)
+    assert_report(r1, 0, 15)
     assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, text, text]
 
     r1 = dp.builtins.add_footer(r, footer=text, all_pages=False)
-    assert_report(r1, 0, 14)
-    assert glom(r1, ("pages", ["blocks.0.blocks.-1.content"])) == [text, md_block.content, md_block.content]
+    assert_report(r1, 0, 11)
+    assert glom(r1, ("pages", T[:1], ["blocks.0.blocks.-1.content"])) == [text]
+    assert glom(r1, ("pages", T[1:], ["blocks.0.content"])) == [md_block.content, md_block.content]

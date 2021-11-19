@@ -10,12 +10,18 @@ from micawber import ProviderException, bootstrap_basic, bootstrap_noembed, cach
 from datapane.client import DPError
 from datapane.common import HTML
 
+from .dp_types import SSDict
 from .utils import log
 
 local_report_def = ir.files("datapane.resources.report_def")
 rng_validator = etree.RelaxNG(file=str(local_report_def / "full_schema.rng"))
 
 dp_namespace: str = "https://datapane.com/schemas/report/1/"
+
+
+def load_doc(x: str) -> etree._Element:
+    parser = etree.XMLParser(strip_cdata=False, recover=True, remove_blank_text=True, remove_comments=True)
+    return etree.fromstring(x, parser=parser)
 
 
 def is_valid_id(id: str) -> bool:
@@ -57,8 +63,8 @@ def conv_attrib(v: t.Any) -> t.Optional[str]:
     return v1.lower() if isinstance(v, bool) else v1
 
 
-def conv_attribs(**attribs: t.Any) -> t.Dict[str, str]:
-    # convert attributes, dropping None values
+def mk_attribs(**attribs: t.Any) -> SSDict:
+    """convert attributes, dropping None values"""
     # TODO - uncomment when 3.8+ only
     # self.attributes = {str(k): v1 for (k, v) in kwargs.items() if (v1 := _conv_attrib(v)) is not None}
     return {str(k): conv_attrib(v) for (k, v) in attribs.items() if conv_attrib(v) is not None}

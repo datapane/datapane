@@ -6,7 +6,6 @@ Describes the collection of `Block` objects that can be combined together to mak
 
 import dataclasses as dc
 import enum
-import itertools
 import re
 import typing as t
 from abc import ABC, abstractmethod
@@ -20,12 +19,11 @@ from dominate.dom_tag import dom_tag
 from glom import glom
 from lxml import etree
 from lxml.builder import ElementMaker
-from lxml.etree import Element
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
-from datapane.common import PKL_MIMETYPE, NPath, guess_type, log, utf_read_text
-from datapane.common.report import conv_attribs, get_embed_url, is_valid_id
+from datapane.common import PKL_MIMETYPE, NPath, SSDict, guess_type, log, utf_read_text
+from datapane.common.report import get_embed_url, is_valid_id, mk_attribs
 
 from ..common import DPTmpFile
 from ..dp_object import save_df
@@ -39,10 +37,13 @@ __all__ = [
     "Page",
     "Group",
     "Select",
+    "Toggle",
     "SelectType",
+    "Empty",
     "Table",
     "DataTable",
     "DataBlock",
+    "Divider",
     "Plot",
     "BigNumber",
     "Text",
@@ -70,17 +71,14 @@ class BuilderState:
 
     embedded: bool = False
     attachment_count: int = 0
-    # TODO - store as single element or a list?
+    # NOTE - store as single element or a list?
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
     elements: t.List[etree.Element] = dc.field(default_factory=list)
     attachments: t.List[Path] = dc.field(default_factory=list)
-    id_counter: t.Iterator[int] = dc.field(default_factory=lambda: itertools.count(start=1))
 
     def add_element(self, block: "BaseElement", e: etree.Element, f: t.Optional[Path] = None) -> "BuilderState":
-        if not isinstance(block, Page):
-            # set fresh auto-name if not set
-            _name = block.name if block.name else f"{block._block_name}-{next(self.id_counter)}"
-            e.set("name", _name)
+        if block.name:
+            e.set("name", block.name)
 
         self.elements.append(e)
         if f and not self.embedded:
@@ -130,16 +128,17 @@ class BaseElement(ABC):
             if not is_valid_id(name):
                 raise DPError(f"Invalid name '{name}' for block")
             self.name = name
+            self._attributes.update(name=name)
 
     def _add_attributes(self, **kwargs):
-        self._attributes.update(conv_attribs(**kwargs))
+        self._attributes.update(mk_attribs(**kwargs))
 
     @abstractmethod
     def _to_xml(self, s: BuilderState) -> BuilderState:
         ...
 
 
-Block = t.Union["Group", "Select", "DataBlock"]
+Block = t.Union["Group", "Select", "DataBlock", "Empty"]
 BlockOrPrimitive = t.Union[Block, t.Any]  # TODO - expand
 PageOrPrimitive = t.Union["Page", BlockOrPrimitive]
 BlockList = t.List[Block]
@@ -148,10 +147,6 @@ BlockList = t.List[Block]
 class SelectType(enum.Enum):
     DROPDOWN = "dropdown"
     TABS = "tabs"
-
-
-class BlockLayoutError(DPError):
-    ...
 
 
 def wrap_block(b: BlockOrPrimitive) -> Block:
@@ -183,9 +178,13 @@ class LayoutBlock(BaseElement):
         super().__init__(**kwargs)
 
     def _to_xml(self, s: BuilderState) -> BuilderState:
-        # recurse into the elements and pull them out
-        # NOTE - this works depth-first to create all sub-elements before the current, resulting in
-        # simpler implementation, but out-of-order id's - to fix by creating Block first and passing down
+        """
+        Recurse into the elements and pull them out
+        NOTE - this works depth-first to create all sub-elements before the current,
+        resulting in simpler implementation
+        NOTE - this results in a document-order created list of attachments for AssetBlocks,
+        as they are leaf nodes
+        """
         _s1: BuilderState = dc.replace(s, elements=[])
         _s2: BuilderState = reduce(lambda _s, x: x._to_xml(_s), self.blocks, _s1)
         _s3: BuilderState = dc.replace(_s2, elements=s.elements)
@@ -201,11 +200,10 @@ class Page(LayoutBlock):
     All `datapane.client.api.report.core.Report`s consist of a list of Pages.
     A Page itself is a Block, but is only allowed at the top-level and cannot be nested.
 
-    Page objects take a list of Group and Select blocks which make up the Page.
+    Page objects take a list of blocks which make up the Page.
 
-    ..note:: You can pass ordinary Blocks to a page, e.g. Plots, and Datapane will automatically wrap them in a Group.
+    ..note:: You can pass ordinary Blocks to a page, e.g. Plots or DataTables.
       Additionally, if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
-
     """
 
     # NOTE - technically a higher-level layoutblock but we keep here to maximise reuse
@@ -216,28 +214,24 @@ class Page(LayoutBlock):
         *arg_blocks: BlockOrPrimitive,
         blocks: t.List[BlockOrPrimitive] = None,
         title: str = None,
+        name: str = None,
     ):
         """
         Args:
             *arg_blocks: Blocks to add to Page
             blocks: Allows providing the report blocks as a single list
             title: The page title (optional)
+            name: A unique id for the Page to aid querying (optional)
 
         ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
         """
-        super().__init__(*arg_blocks, blocks=blocks, label=title)
+        super().__init__(*arg_blocks, blocks=blocks, label=title, name=name)
+        # error checking
         if len(self.blocks) < 1:
             raise DPError("Can't create Page with no objects")
-        self._wrap_blocks()
-
-    def _wrap_blocks(self) -> None:
-        """Wrap the list of blocks in a top-level block element needed"""
         if any(isinstance(b, Page) for b in self.blocks):
             raise DPError("Page objects can only be at the top-level")
-        if not all(isinstance(b, (Group, Select, Toggle)) for b in self.blocks):
-            # only wrap if not all blocks are a Group object
-            self.blocks = [Group(blocks=self.blocks)]
 
 
 class Select(LayoutBlock):
@@ -298,7 +292,6 @@ class Group(LayoutBlock):
         blocks: t.List[BlockOrPrimitive] = None,
         name: str = None,
         label: str = None,
-        rows: int = 0,
         columns: int = 1,
     ):
         """
@@ -307,26 +300,14 @@ class Group(LayoutBlock):
             blocks: Allows providing the report blocks as a single list
             name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
-            rows: Display the contained blocks, e.g. Plots, using _n_ rows (set to 0 to autofill)
-            columns: Display the contained blocks, e.g. Plots, using _n_ columns (set to 0 to autofill)
+            columns: Display the contained blocks, e.g. Plots, using _n_ columns (default = 1), setting to 0 auto-wraps the columns
 
         ..tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
           `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`
         """
-        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label)
 
-        # set row/column handling
-        if rows == 1 and columns == 1:
-            raise BlockLayoutError("Can't set both rows and columns to 1")
-        if rows == 0 and columns == 0:
-            raise BlockLayoutError("Can't set both rows and columns to 0")
-        if rows > 0 and columns > 0 and len(self.blocks) > rows * columns:
-            raise BlockLayoutError("Too many blocks for given rows & columns")
-        if rows > 0 and columns == 1:
-            # if user has set rows and not changed columns, convert columns to auto-flow mode
-            columns = 0
-
-        self._add_attributes(rows=rows, columns=columns)
+        # columns = columns or len(self.blocks)
+        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, columns=columns)
 
 
 class Toggle(LayoutBlock):
@@ -362,6 +343,24 @@ class Toggle(LayoutBlock):
 
 ################################################################################
 # Low-level blocks
+class Empty(BaseElement):
+    """
+    An empty block that can be patched later
+
+    Args:
+        name: A unique name for the block to reference when updating the report
+    """
+
+    _tag = "Empty"
+
+    def __init__(self, name: str):
+        super().__init__(name=name)
+
+    def _to_xml(self, s: BuilderState) -> BuilderState:
+        _E = getattr(E, self._tag)
+        return s.add_element(self, _E(**self._attributes))
+
+
 class DataBlock(BaseElement):
     """Abstract block that represents a leaf-node in the tree, e.g. a Plot or Table
 
@@ -601,6 +600,7 @@ class AssetBlock(DataBlock):
     """
 
     file: Path = None
+    file_attribs: SSDict = None
     caption: t.Optional[str] = None
 
     def __init__(self, file: Path, caption: str = None, name: str = None, label: str = None, **kwargs):
@@ -609,28 +609,31 @@ class AssetBlock(DataBlock):
         self.file = Path(file)
         self.caption = caption or ""
 
+    def get_file_attribs(self) -> t.Dict[str, str]:
+        """per-file-type attributes, override if needed"""
+        return self.file_attribs or dict()
+
     def _to_xml(self, s: BuilderState) -> BuilderState:
         _E = getattr(E, self._tag)
-
-        content_type = guess_type(self.file)
-        file_size = str(self.file.stat().st_size)
-        e: Element
+        e: etree._Element
 
         if s.embedded:
             # load the file and embed into a data-uri
             # NOTE - currently we read entire file into memory first prior to b64 encoding,
             #  to consider using base64io-python to stream and encode in 1-pass
             content = b64encode(self.file.read_bytes()).decode("ascii")
+            content_type = guess_type(self.file)
+            file_size = str(self.file.stat().st_size)
             e = _E(
                 type=content_type,
                 size=file_size,
+                uploaded_filename=self.file.name,
                 **self._attributes,
+                **self.get_file_attribs(),
                 src=f"data:{content_type};base64,{content}",
             )
         else:
             e = _E(
-                type=guess_type(self.file),
-                size=file_size,
                 **self._attributes,
                 src=f"attachment://{s.attachment_count}",
             )
@@ -670,7 +673,7 @@ class Media(AssetBlock):
             label: A label used when displaying the block (optional)
         """
         file = Path(file).expanduser()
-        super().__init__(file=file, name=name, label=label)
+        super().__init__(file=file, name=name, caption=caption, label=label)
 
 
 class Attachment(AssetBlock):
@@ -697,7 +700,7 @@ class Attachment(AssetBlock):
         Args:
             data: A python object to attach to the report (e.g. a dictionary)
             file: Path to a file to attach to the report (e.g. a csv file)
-            filename: Name to be used when downloading the file
+            filename: Name to be used when downloading the file (optional)
             caption: A caption to display below the file (optional)
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
@@ -710,7 +713,7 @@ class Attachment(AssetBlock):
             out_fn = self._save_obj(data)
             file = out_fn.file
 
-        super().__init__(file=file, filename=filename or file.name, name=name, label=label)
+        super().__init__(file=file, filename=filename or file.name, name=name, caption=caption, label=label)
 
 
 class Plot(AssetBlock):
@@ -722,13 +725,20 @@ class Plot(AssetBlock):
     _tag = "Plot"
 
     def __init__(
-        self, data: t.Any, caption: t.Optional[str] = None, responsive: bool = True, name: str = None, label: str = None
+        self,
+        data: t.Any,
+        caption: t.Optional[str] = None,
+        responsive: bool = True,
+        scale: float = 1.0,
+        name: str = None,
+        label: str = None,
     ):
         """
         Args:
             data: The `plot` object to attach
             caption: A caption to display below the plot (optional)
             responsive: Whether the plot should automatically be resized to fit, set to False if your plot looks odd (optional, default: True)
+            scale: Set the scaling factor for the plt (optional, default = 1.0)
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
@@ -736,9 +746,7 @@ class Plot(AssetBlock):
         if out_fn.mime == PKL_MIMETYPE:
             raise DPError("Can't embed object as a plot")
 
-        super().__init__(
-            file=out_fn.file, caption=caption, width=640, height=480, name=name, label=label, responsive=responsive
-        )
+        super().__init__(file=out_fn.file, caption=caption, responsive=responsive, scale=scale, name=name, label=label)
 
 
 class Table(AssetBlock):
@@ -793,7 +801,9 @@ class DataTable(AssetBlock):
         """
         fn = save_df(df)
         (rows, columns) = df.shape
-        super().__init__(file=fn.file, caption=caption, rows=rows, columns=columns, name=name, label=label)
+        # TODO - support pyarrow schema for local reports
+        self.file_attribs = mk_attribs(rows=rows, columns=columns, schema="[]")
+        super().__init__(file=fn.file, caption=caption, name=name, label=label)
 
 
 class Divider(EmbeddedTextBlock):
