@@ -171,11 +171,11 @@ def file():
 @file.command()
 @click.argument("name")
 @click.argument("file", type=click.Path(exists=True))
-@click.option("--group")
-def upload(file: str, name: str, group: str):
+@click.option("--project")
+def upload(file: str, name: str, project: str):
     """Upload a csv or Excel file as a Datapane File"""
     log.info(f"Uploading {file}")
-    r = api.File.upload_file(file, name=name, group=group)
+    r = api.File.upload_file(file, name=name, project=project)
     success_msg(f"Uploaded {click.format_filename(file)} to {r.url}")
 
 
@@ -300,7 +300,7 @@ def download(name: str, owner: str):
 @app.command()
 @click.argument("name")
 def delete(name: str):
-    """Delete a app"""
+    """Delete an app"""
     api.App.get(name).delete()
     success_msg(f"Deleted App {name}")
 
@@ -459,14 +459,15 @@ def get(name, owner):
     res = api.Environment.get(name, owner=owner)
     environment = "\n".join([f"{k}={v}" for k, v in res.environment.items()])
     success_msg(f"Available {res.name}:")
-    print(f"\nDocker Image - {res.docker_image}")
+    print(f"\nProject - {res.project}")
     print(f"\nEnvironment Variables-----------\n{environment}")
+    print(f"\nDocker Image - {res.docker_image}")
 
 
 @environment.command()
 @click.argument("name")
 def delete(name):
-    """Delete a environment using environment name"""
+    """Delete an environment using environment name"""
     api.Environment.get(name).delete()
     success_msg(f"Deleted environment {name}")
 

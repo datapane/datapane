@@ -178,7 +178,7 @@ class Environment(DPObjectRef):
     """
 
     endpoint: str = "/environments/"
-    list_fields = ["name"]
+    list_fields = ["name", "project"]
 
     @classmethod
     def create(
