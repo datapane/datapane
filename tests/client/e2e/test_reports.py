@@ -45,7 +45,7 @@ def test_report_update_metadata():
         "username",
         "web_url",
         "width",
-        "files",
+        "report_files",
         "num_blocks",
     )
 
@@ -93,8 +93,7 @@ def test_report_update_with_files(datadir: Path):
         doc_a = report.document
         report.upload(name="TEST", description="DESCRIPTION")
         doc_b = report.document
-        # TODO - these should be the same once we have reuse of id's in place
-        assert doc_a != doc_b
+        assert doc_a == doc_b
 
 
 def test_report_update_assets(datadir: Path):
@@ -108,8 +107,9 @@ def test_report_update_assets(datadir: Path):
         es = x.xpath("//*[@name='block1']")
         assert es[0].tag == tag
         assert len(es) == 1
-        assert x.xpath("count(/Report/Pages//*)") == 5
-        assert glom(report.report_files, ["name"]) == rf_names
+        assert x.xpath("count(/Report/Pages//*)") == 4
+        # ordering or report_files is non-deterministic
+        assert sorted(glom(report.report_files, ["name"])) == sorted(rf_names)
 
     with deletable(report):
         # add a df
@@ -125,6 +125,8 @@ def test_report_update_assets(datadir: Path):
         report.update_assets(block2=gen_plot())
         assert doc_b == report.document
         check_block_name(report, "Plot", ["block2", "df-block", "", "block1"])
+
+        # ['df-block', '', 'block1', 'block2']
 
 
 def test_demo_report():
@@ -171,7 +173,7 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
         check_name(dp_report, name)
         assert dp_report.description == description
         assert dp_report.source_url == source_url
-        assert len(dp_report.pages[0].blocks[0].blocks) == 6
+        assert len(dp_report.pages[0].blocks) == 8
 
         # NOTE - Asset objects no longer exists - thus below tests can't be supported
         # we do store `id` on the object, that can be used to pull out from the XML report
@@ -260,6 +262,7 @@ def test_complex_df_report():
 
 @pytest.mark.org
 def test_report_project():
+    # update a report that will automatically be added to the default group
     report = gen_report_simple()
     report.upload(name="test_report_group")
     # check if the project name is default

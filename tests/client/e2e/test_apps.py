@@ -130,7 +130,7 @@ def test_app_complex_report(shared_datadir: Path, monkeypatch):
 
             assert run.status == "SUCCESS"
             report = dp.Report.by_id(run.report)
-            assert report.num_blocks == 13
+            assert report.num_blocks == 11
 
 
 @pytest.mark.org
