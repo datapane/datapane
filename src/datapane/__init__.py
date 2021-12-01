@@ -42,6 +42,7 @@ from .client.api import (
     Media,
     Text,
     Page,
+    PageLayout,
     Params,
     Plot,
     Report,

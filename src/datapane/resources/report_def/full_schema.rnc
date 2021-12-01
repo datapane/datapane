@@ -43,6 +43,7 @@ Internal = element Internal {
 ################################################################################
 # Main Report Tree
 Pages = element Pages {
+  attribute layout { string "top" | string "side" }?,
   Page+
 }
 

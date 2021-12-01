@@ -17,7 +17,7 @@ from uuid import uuid4
 import importlib_resources as ir
 from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
 from lxml import etree
-from lxml.etree import Element
+from lxml.etree import Element, _Element
 
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
@@ -84,6 +84,11 @@ class FontChoice(Enum):
     SANS = "ui-sans-serif, sans-serif, system-ui"
     SERIF = "ui-serif, serif, system-ui"
     MONOSPACE = "ui-monospace, monospace, system-ui"
+
+
+class PageLayout(Enum):
+    TOP = "top"
+    SIDE = "side"
 
 
 @dc.dataclass
@@ -203,12 +208,14 @@ class Report(DPObjectRef):
 
     endpoint: str = "/reports/"
     pages: t.List[Page]
+    page_layout: t.Optional[PageLayout]
     # id_count: int = 1
 
     def __init__(
         self,
         *arg_blocks: PageOrPrimitive,
         blocks: t.List[PageOrPrimitive] = None,
+        layout: t.Optional[PageLayout] = None,
         **kwargs,
     ):
         """
@@ -225,6 +232,7 @@ class Report(DPObjectRef):
         ..tip:: Create a list first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
         """
         super().__init__(**kwargs)
+        self.page_layout = layout
         self._preprocess_pages(blocks or list(arg_blocks))
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
@@ -247,10 +255,15 @@ class Report(DPObjectRef):
         s = BuilderState(embedded)
         _s = reduce(lambda _s, p: p._to_xml(_s), self.pages, s)
 
-        # add main structure
+        # create the pages
+        pages: _Element = E.Pages(*_s.elements)
+        if self.page_layout:
+            pages.set("layout", self.page_layout.value)
+
+        # add to main structure
         report_doc: Element = E.Report(
             E.Internal(),
-            E.Pages(*_s.elements),
+            pages,
             version="1",
         )
 

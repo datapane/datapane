@@ -74,6 +74,14 @@
   <define name="Pages">
     <a:documentation/>
     <element name="Pages">
+      <optional>
+        <attribute name="layout">
+          <choice>
+            <value type="string" datatypeLibrary="">top</value>
+            <value type="string" datatypeLibrary="">side</value>
+          </choice>
+        </attribute>
+      </optional>
       <oneOrMore>
         <ref name="Page"/>
       </oneOrMore>
