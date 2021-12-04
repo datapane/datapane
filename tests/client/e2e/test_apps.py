@@ -103,6 +103,8 @@ def test_app_complex(shared_datadir: Path, monkeypatch):
             assert run.report is None
             assert run.result == "hello , world!"
             assert "SAMPLE OUTPUT" in run.output
+            assert "ENV_VAR=env_value" in run.output
+            assert "p2=1" in run.output
 
 
 # TODO: Fix this test after adding dp.Media block to report

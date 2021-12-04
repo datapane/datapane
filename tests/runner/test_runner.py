@@ -155,6 +155,7 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     (out, err) = capsys.readouterr()
     assert "ran app" in out
     assert "p2=xyz" in out
+    assert "ENV_VAR=env_value" in out
     assert "WORLD" in out
     assert dp.Result.get() == "hello , world!"
     assert res.report_id is None

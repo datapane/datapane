@@ -16,7 +16,11 @@ except ImportError:
     import dp_app
 
 print("ran app")
+# check env values and params
+assert os.environ['ENV_VAR'] == "env_value"
+print(f"ENV_VAR={os.environ['ENV_VAR']}")
 print(f"p2={dp.Params['p2']}")
+
 # data bundling, using __file__ and cwd lookup
 c_txt = (Path(__file__).parent / "c.json").read_text()
 c_txt_rel = Path("c.json").read_text()
