@@ -1,4 +1,5 @@
 import argparse
+import string
 import sys
 import typing as t
 from distutils.util import strtobool
@@ -67,16 +68,36 @@ def is_jupyter() -> bool:
         return False
 
 
-def display_msg(text: str, md: str = None, **params: str):
+class MarkdownFormatter(string.Formatter):
+    """Support {:l} and {:cmd} format fields"""
+
+    in_jupyter: bool
+
+    def __init__(self, in_jupyter: bool):
+        self.in_jupyter = in_jupyter
+        super().__init__()
+
+    def format_field(self, value: t.Any, format_spec: str) -> t.Any:
+        if format_spec.endswith("l"):
+            if self.in_jupyter:
+                value = f"<a href='{value}' target='_blank'>here</a>"
+            else:
+                value = f"at {value}"
+            format_spec = format_spec[:-1]
+        elif format_spec.endswith("cmd"):
+            value = f"!{value}" if self.in_jupyter else value
+            format_spec = format_spec[:-3]
+        return super().format_field(value, format_spec)
+
+
+def display_msg(text: str, **params: str):
+    msg = MarkdownFormatter(is_jupyter()).format(text, **params)
     if is_jupyter():
         from IPython.display import Markdown, display
 
-        params.update(bang="!")
-        msg = (md or text).format(**params)
         display(Markdown(msg))
     else:
-        params.update(bang="")
-        print(text.format(**params))
+        print(msg)
 
 
 ################################################################################

@@ -315,8 +315,7 @@ class Report(DPObjectRef):
             # only nudge public users
             if asset_blocks < 4:
                 display_msg(
-                    text="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out {url} for more info",
-                    md="Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? Check out [the docs]({url}) for more info",
+                    "Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? More info {url:l}",
                     url="https://docs.datapane.com/reports/blocks/layout-pages-and-selects",
                 )
 
@@ -426,8 +425,9 @@ class Report(DPObjectRef):
             webbrowser.open_new_tab(self.web_url)
 
         display_msg(
-            text=f"Report successfully uploaded at {self.web_url}, follow the link to view and share your report.",
-            md=f"Report successfully uploaded, click [here]({self.web_url}) to view and share your report.",
+            "Report successfully uploaded. View and share your report {web_url:l}, or edit your report {edit_url:l}.",
+            web_url=self.web_url,
+            edit_url=self.edit_url,
         )
 
     def update_assets(
@@ -490,8 +490,9 @@ class Report(DPObjectRef):
         self.refresh()
 
         display_msg(
-            text=f"Successfully updated report assets  - you can edit and format at {self.edit_url}, and view the final report at {self.web_url}",
-            md=f"Successfully updated report assets  - you can edit and format [here]({self.edit_url}), and view the final report [here]({self.web_url})",
+            "Successfully updated report assets  - you can edit and format {edit_url:l}, and view the final report {web_url:l}",
+            web_url=self.web_url,
+            edit_url=self.edit_url,
         )
 
         if open:
@@ -522,11 +523,12 @@ class Report(DPObjectRef):
 
         if c.config.is_anonymous:
             display_msg(
-                text="Report saved to ./{path}. To upload and share your report, create a free Datapane account by running `{bang}datapane signup`.",
+                "Report saved to ./{path}. To upload and share your report, create a free Datapane account by running `{signup:cmd}`.",
                 path=path,
+                signup="datapane signup",
             )
         else:
-            display_msg(text=f"Report saved to ./{path}")
+            display_msg(f"Report saved to ./{path}")
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
@@ -558,8 +560,7 @@ class Report(DPObjectRef):
         # feedback form
         if random.random() < 0.1:
             display_msg(
-                text="How is your experience of Datapane? Please take two minutes to answer our anonymous product survey at {url}",
-                md="How is your experience of Datapane? Please take two minutes to answer our anonymous [product survey]({url})",
+                "How is your experience of Datapane? Please take two minutes to answer our anonymous product survey {url:l}",
                 url="https://bit.ly/3lWjRlr",
             )
 

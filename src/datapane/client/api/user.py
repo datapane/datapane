@@ -127,8 +127,7 @@ def signup():
 
     # success_msg("Report uploaded, opening in your browser")
     display_msg(
-        text="\nLearn more about uploading and sharing reports at {learn_url}.",
-        md="\nLearn more about uploading and sharing reports [here]({learn_url}).",
+        "\nLearn more about uploading and sharing reports {learn_url:l}.",
         learn_url="https://docs.datapane.com/reports/publishing-and-sharing",
     )
 
@@ -142,7 +141,7 @@ def hello_world():
 
     _run_script("hello.py")
 
-    display_msg("\nNext, run `{bang}datapane signup` to create a free account and upload a report.")
+    display_msg("\nNext, run `{signup:cmd}` to create a free account and upload a report.", signup="datapane signup")
 
 
 def token_connect(open_url: str, action: str, server: str):
