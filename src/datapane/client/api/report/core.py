@@ -308,8 +308,8 @@ class Report(DPObjectRef):
 
         # Report checks
         # TODO - validate at least a single element
-        asset_blocks = processed_report_doc.xpath("count(/Report/Pages//*)")
-        if asset_blocks < 3 and check_empty:
+        asset_blocks = processed_report_doc.xpath("count(/Report/Pages/Page/*)")
+        if asset_blocks == 0 and check_empty:
             raise InvalidReportError("Empty report - must contain at least one asset/block")
         elif c.config.is_public:
             # only nudge public users

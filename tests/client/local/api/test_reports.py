@@ -144,6 +144,14 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 
 ################################################################################
 # PyReport Tests
+def test_gen_report_single():
+    # report with single block
+    report = dp.Report("test block")
+    assert_report(report, 0)
+    assert len(report.pages[0].blocks) == 1
+    assert isinstance(report.pages[0].blocks[0], dp.Text)
+
+
 def test_gen_report_simple():
     report = gen_report_simple()
     assert_report(report, 0)
@@ -194,9 +202,9 @@ def test_gen_failing_reports():
         r = dp.Report(dp.Group(dp.Page(md_block)))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
-    # group with 0 object
+    # page/pages with 0 objects
     with pytest.raises(DPError):
-        r = dp.Report(dp.Page(dp.Group(blocks=[])))
+        r = dp.Report(dp.Page(blocks=[]))
         r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
 
     # select with 1 object
