@@ -22,9 +22,9 @@ def test_app_basic(shared_datadir: Path, monkeypatch):
     """Deploying and running a basic report-generating app"""
     monkeypatch.chdir(shared_datadir)
     # upload
-    name = gen_name()
+    name = gen_name("app")
     dp_cfg = sc.DatapaneCfg.create_initial()
-    env_name = "ENV"
+    env_name = gen_name("env")
     with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"})):
         with sc.build_bundle(dp_cfg) as sdist:
             s = dp.App.upload_pkg(sdist, dp_cfg, name=name, environment=env_name)

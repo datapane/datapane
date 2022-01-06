@@ -14,7 +14,7 @@ jobs:
           lfs: true
           fetch-depth: 5
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
       - name: set pip cache dir
@@ -23,13 +23,13 @@ jobs:
         run: python -c 'import sys; print(f"PYTHON_VERSION={sys.hexversion}")' >> ${GITHUB_ENV}
       # TODO - cache the poetry pypi cache dir? (tho as we cache the venv is it needed?)
       - name: Cache .venv
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: .venv
           key: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
           restore-keys: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
       - name: Cache pip dir (${{ env.PIP_DIR }})
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ env.PIP_DIR }}
           key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}

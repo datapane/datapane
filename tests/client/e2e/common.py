@@ -1,5 +1,4 @@
-import random
-import string
+import secrets
 import uuid
 from contextlib import contextmanager
 from typing import ContextManager
@@ -15,8 +14,8 @@ print("hello world")
 """
 
 
-def gen_name(n=10):
-    return f"Test {''.join(random.choices(string.ascii_lowercase, k=n))}"
+def gen_name(prefix: str = ""):
+    return f"Test {prefix} {secrets.token_hex(3)}"
 
 
 def check_name(obj, orig_name: str):
