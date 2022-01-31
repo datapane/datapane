@@ -40,6 +40,17 @@
           }
         },
         {
+          "title": "File",
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Config Type",
+              "const": "file",
+              "default": "file"
+            }
+          }
+        },
+        {
           "title": "Integer",
           "type": "object",
           "properties": {

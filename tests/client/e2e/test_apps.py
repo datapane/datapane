@@ -75,6 +75,7 @@ def test_app_complex(shared_datadir: Path, monkeypatch):
     # upload
     dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_test_mod.yaml"))
     env_name = "ENV"
+
     with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"})):
         with sc.build_bundle(dp_cfg) as sdist:
             s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name)

@@ -50,3 +50,5 @@ parameters:
     type: float
     required: true
     default: 0
+  - name: __FILE__
+    type: file

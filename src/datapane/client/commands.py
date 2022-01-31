@@ -275,14 +275,12 @@ def deploy(
 
     # start the build process
     with apps.build_bundle(dp_cfg) as sdist:
-
         if EXTRA_OUT:
             tf: tarfile.TarFile
             log.debug("Bundle from following files:")
             with tarfile.open(sdist) as tf:
                 for n in tf.getnames():
                     log.debug(f"  {n}")
-
         r: api.App = api.App.upload_pkg(sdist, dp_cfg)
         success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
 

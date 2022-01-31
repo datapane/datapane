@@ -14,13 +14,15 @@ from __future__ import annotations
 import json
 import pickle
 import typing as t
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Optional
 
 from datapane import __version__
 from datapane.client.apps import DatapaneCfg
-from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict, SSDict
+from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict, SList, SSDict
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
+from datapane.common.utils import get_app_file_params
 
 from ..utils import DPError
 from .common import DPTmpFile, do_download_file
@@ -231,9 +233,25 @@ class App(DPObjectRef):
         # NOTE - use __call__??
         # TODO - move exec_script here?
         # TODO - call should handle param defaults
+        from datapane.client.api.common import do_download_file
         from datapane.runner.exec_script import run
 
-        run(self, params, env)
+        with ExitStack() as stack:
+            # get uploaded file params
+            file_fieldnames: SList = get_app_file_params(self.parameters)
+            user_file_params: SDict = {k: v for k, v in params.items() if k in file_fieldnames}
+
+            # download each file into appropriate field
+            for name, fn_remote in user_file_params.items():
+                if fn_remote:
+                    extension = f".{fn_remote.split('.')[-1]}"
+                    fn_tmp: NPath = stack.enter_context(DPTmpFile(extension))
+                    fn_downloaded: NPath = do_download_file(fn_remote, fn_tmp.full_name)
+                    params[name] = Path(fn_downloaded)
+                else:
+                    params[name] = None
+
+            run(self, params, env)
 
     def run(self, parameters=None, cache=True) -> Run:
         """(remote) run the given app (cloning if needed?)"""

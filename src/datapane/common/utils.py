@@ -18,7 +18,7 @@ import chardet
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
 
-from .dp_types import MIME, DPError, DPMode, NPath, get_dp_mode
+from .dp_types import MIME, DPError, DPMode, NPath, SDict, get_dp_mode
 
 mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
@@ -320,3 +320,10 @@ def utf_read_text(file: Path) -> str:
     else:
         # for linux/macOS assume utf-8
         return file.read_text()
+
+
+def get_app_file_params(params: t.List[SDict]) -> t.List[str]:
+    """
+    Returns the list of App param names that are of type `file`
+    """
+    return [p["name"] for p in params if p["type"] == "file"]

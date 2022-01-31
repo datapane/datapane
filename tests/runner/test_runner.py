@@ -11,6 +11,7 @@ if not (sys.platform == "linux" and sys.version_info.minor >= 7):
     pytest.skip("skipping linux-only 3.7+ tests", allow_module_level=True)
 
 import datapane as dp
+import typing as t
 from datapane.client.api.runtime import _report
 from datapane.client.apps import build_bundle, DatapaneCfg
 from datapane.common.config import RunnerConfig
@@ -18,6 +19,8 @@ from datapane.common import SDict, SSDict
 from datapane.runner import __main__ as m
 from datapane.runner.exec_script import exec_mod
 from datapane.runner.typedefs import RunResult
+
+from datapane.client.api.common import DPTmpFile
 
 # disabled for now - may re-enable when we support local
 # running/rendering with our runner calling into user code
@@ -59,6 +62,7 @@ class MockApp(dp.App):
     requirements = ["pytil"]
     pre_commands = ["echo PRE1", "echo PRE2"]
     post_commands = ["echo POST1", "echo POST2"]
+    parameters = []
     api_version = dp.__version__
 
     def __init__(self, *a, **kw):
@@ -81,14 +85,28 @@ def mock_report_upload(self, **kwargs):
     return mock.DEFAULT
 
 
+def mock_do_download_file(fn: str, *args):
+    """
+    Mock file download to support local paths.
+
+    Note: the real function copies the remote location into the given local file,
+    but our "remote" test location is already a local file so we just return this
+    """
+    return Path(fn)
+
+
 @mock.patch("datapane.client.api.App", new=MockApp)
-def _runner(params: SDict, env: SSDict, script: Path, sdist: Path = Path(".")) -> RunResult:
+@mock.patch("datapane.client.api.common.do_download_file", side_effect=mock_do_download_file)
+def _runner(
+    params: SDict, env: SSDict, script: Path, ddf, sdist: Path = Path("."), app_schema: t.List[SDict] = []
+) -> RunResult:
     with mock.patch.object(MockApp, "script", new_callable=mock.PropertyMock) as ep, mock.patch.object(
         MockApp, "download_pkg"
-    ) as dp:
+    ) as dp, mock.patch.object(MockApp, "parameters", new_callable=mock.PropertyMock) as pp:
         # setup app object
         ep.return_value = script
         dp.return_value = sdist
+        pp.return_value = app_schema
 
         # main fn
         x = RunnerConfig(app_id="ZBAmDk1", config=params, env=env)
@@ -146,15 +164,24 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
         # whl_file = build_bundle(dp_config, sdist, shared_datadir, username="test", version=1)
         try:
             # NOTE - need to pass in all params as we're not setting defaults via dp-server
-            res = _runner(
-                {"p1": "VAL", "p2": "xyz", "p3": True}, {"ENV_VAR": "env_value"}, dp_config.script, sdist=sdist
-            )
+            with DPTmpFile(".txt") as fn_remote_fixture:
+                fn_remote_fixture.file.write_text("abc")
+                res = _runner(
+                    {"p1": "VAL", "p2": "xyz", "p3": True, "p4": fn_remote_fixture.full_name},
+                    {"ENV_VAR": "env_value"},
+                    dp_config.script,
+                    sdist=sdist,
+                    app_schema=[
+                        {"name": "p4", "type": "file"}
+                    ],  # Only file params need to be supplied for url -> tmp file transformation
+                )
         finally:
             subprocess.run([sys.executable, "-m", "pip", "uninstall", "--yes", "pytil"], check=True)
     # asserts
     (out, err) = capsys.readouterr()
     assert "ran app" in out
     assert "p2=xyz" in out
+    assert "p4=abc" in out
     assert "ENV_VAR=env_value" in out
     assert "WORLD" in out
     assert dp.Result.get() == "hello , world!"
