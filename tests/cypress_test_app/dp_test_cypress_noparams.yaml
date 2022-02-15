@@ -1,0 +1,5 @@
+name: no params test
+script: dp_test_cypress_noparams.py
+
+# Script parameters
+parameters: []

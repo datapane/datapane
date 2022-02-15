@@ -29,20 +29,23 @@ def setup(test_org: bool):
 
     dp_objs = {"builderReportId": builder_report.id, "styleReportId": style_report.id}
 
+    def get_test_app(name: str) -> dp.App:
+        with pushd(Path(".") / "tests" / "cypress_test_app"):
+            dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path(f"{name}.yaml"), script=Path(f"{name}.py"))
+            with sc.build_bundle(dp_cfg) as sdist:
+                app = dp.App.upload_pkg(sdist, dp_cfg, name=gen_name())
+        return app
+
     # add a basic app and file
     if test_org:
-        # app
-        with pushd(Path(".") / "tests" / "cypress_test_app"):
-            dp_cfg = sc.DatapaneCfg.create_initial(
-                config_file=Path("dp_test_cypress.yaml"), script=Path("dp_test_cypress.py")
-            )
-            with sc.build_bundle(dp_cfg) as sdist:
-                demo_app = dp.App.upload_pkg(sdist, dp_cfg, name=gen_name())
+        # apps
+        params_app = get_test_app("dp_test_cypress")
+        no_params_app = get_test_app("dp_test_cypress_noparams")
         # file
         obj = {"foo": "bar"}
         obj_file = dp.File.upload_obj(data=pickle.dumps(obj), name=gen_name())
         # record obj ids
-        dp_objs.update({"appId": demo_app.id, "fileId": obj_file.id})
+        dp_objs.update({"paramsAppId": params_app.id, "noParamsAppId": no_params_app.id, "fileId": obj_file.id})
 
     # write to stderr for cypress tests to pick up
     print(json.dumps(dp_objs), flush=True, file=sys.stderr)
@@ -61,7 +64,9 @@ def teardown(test_org: bool):
         dp.Report.by_id(dp_objs["styleReportId"]).delete()
     if test_org:
         with suppress(Exception):
-            dp.App.by_id(dp_objs["appId"]).delete()
+            dp.App.by_id(dp_objs["paramsAppId"]).delete()
+        with suppress(Exception):
+            dp.App.by_id(dp_objs["noParamsAppId"]).delete()
         with suppress(Exception):
             dp.File.by_id(dp_objs["fileId"]).delete()
 
