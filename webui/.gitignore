@@ -1,0 +1,34 @@
+/node_modules
+/devBuild
+/.pnp
+.pnp.js
+/.cache
+
+# testing
+/coverage
+/test-reports
+junit.xml
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# cypress
+cypress.env.json
+/cypress/screenshots
+/cypress/videos
+
+# IDEs
+.idea
+*.swp
