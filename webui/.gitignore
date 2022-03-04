@@ -31,4 +31,5 @@ cypress.env.json
 
 # IDEs
 .idea
+.vscode/*
 *.swp
