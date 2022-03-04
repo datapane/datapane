@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build:dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -13,6 +15,9 @@
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^4.0.0",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
+    "@tailwindcss/forms": "^0.5.0",
+    "@tailwindcss/typography": "^0.5.2",
     "@types/node": "^17.0.21",
     "@vitejs/plugin-vue": "^2.2.0",
     "autoprefixer": "^10.4.2",
