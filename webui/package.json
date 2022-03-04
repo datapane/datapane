@@ -10,17 +10,28 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bokeh/bokehjs": "^2.4.2",
     "@highlightjs/vue-plugin": "^2.1.0",
+    "@revolist/revogrid": "^3.0.98",
+    "@stencil/core": "^2.14.0",
+    "axios": "^0.26.0",
+    "he": "^1.2.0",
     "highlight.js": "^11.4.0",
     "jquery": "^3.6.0",
-    "vue": "^3.2.25"
+    "marked": "^4.0.12",
+    "uuid": "^8.3.2",
+    "vue": "^3.2.25",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^4.0.0",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.2",
+    "@types/he": "^1.1.2",
+    "@types/marked": "^4.0.2",
     "@types/node": "^17.0.21",
+    "@types/uuid": "^8.3.4",
     "@vitejs/plugin-vue": "^2.2.0",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.7",
