@@ -4,6 +4,7 @@ import {
   CodeBlock,
   Elem,
   Group,
+  isGroup,
   LayoutBlock,
   Page,
   Report,
@@ -20,7 +21,10 @@ import { DataTableBlock } from "./datatable-block";
 
 export type State = {
   report?: Report;
+  singleBlockEmbed: boolean;
 };
+
+export type AppViewMode = "VIEW" | "EDIT" | "EMBED";
 
 const wrapInGroup = (elems: Elem[]): Elem[] => [
   {
@@ -46,12 +50,23 @@ const getElementByName = (elem: Elem, name: string): any => {
 };
 
 export class ReportStore {
-  public state: State = {};
+  public state: State;
 
   public constructor(reportProps: any) {
-    // const decoded = he.decode(reportProps.report.document);
-    // console.log(decoded)
-    this.state.report = this.xmlToReport(reportProps.report.document);
+    const deserializedReport = this.xmlToReport(reportProps.report.document);
+    const singleBlockEmbed = this.isSingleBlockEmbed(
+      deserializedReport.children,
+      reportProps.mode
+    );
+    this.state = {
+      report: deserializedReport,
+      singleBlockEmbed,
+    };
+
+    if (singleBlockEmbed) {
+      // Prevent scrolling on single block plot embeds
+      document.body.style.overflow = "hidden";
+    }
   }
 
   private xmlToReport(xml: string): Report {
@@ -72,11 +87,37 @@ export class ReportStore {
           })
         );
       });
+
     return new Report({
       width: attributes.width,
       layout: attributes.layout,
       children: pages,
     });
+  }
+
+  private isSingleBlockEmbed(pages: Page[], mode: AppViewMode): boolean {
+    const checkAllGroupsSingle = (node: BlockTree): boolean => {
+      /**
+       * Check there's a single route down to one leaf node
+       */
+      if (isGroup(node) && node.children.length === 1) {
+        // Node is a Group with a single child
+        return checkAllGroupsSingle(node.children[0]);
+      } else if (isGroup(node)) {
+        // Node is a Group with multiple children
+        return false;
+      } else {
+        // Node is a Select or leaf
+        return true;
+      }
+    };
+
+    return (
+      mode === "EMBED" &&
+      pages.length === 1 && // Only one page
+      pages[0].children.length === 1 && // Only one Group in that page
+      checkAllGroupsSingle(pages[0].children[0])
+    ); // No groups with multiple children in that group
   }
 
   private deserializePage = (elem: Elem): LayoutBlock[] => {

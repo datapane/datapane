@@ -3,8 +3,8 @@ import "../styles/tailwind.css";
 import { createApp } from "vue";
 import Report from "../components/Report.vue";
 
-const mountReport = (report: any) => {
-  const app = createApp(Report, { report });
+const mountReport = (reportProps: any) => {
+  const app = createApp(Report, { reportProps });
   app.mount("#report");
 };
 
