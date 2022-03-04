@@ -36,7 +36,7 @@ module.exports = defineConfig({
     },
     rollupOptions: {
       input: {
-        dplib: path.resolve(__dirname, "src/entries/main.ts"),
+        "report-component": path.resolve(__dirname, "src/entries/report.ts"),
         "code-block": path.resolve(__dirname, "src/entries/code-block.ts"),
       },
       output: {
