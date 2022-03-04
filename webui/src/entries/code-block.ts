@@ -1,3 +1,6 @@
-const obj = { foo: "bar" };
+import { defineCustomElement } from "vue";
+import CodeBlock from "../components/CodeBlock.ce.vue";
 
-export { obj };
+customElements.define("dp-code-block", defineCustomElement(CodeBlock));
+
+export { CodeBlock };

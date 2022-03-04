@@ -14,7 +14,8 @@ module.exports = defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag.includes("-"),
+          isCustomElement: (tag) =>
+            tag.startsWith("dp-") || tag.startsWith("revo-"),
         },
       },
     }),
@@ -36,7 +37,7 @@ module.exports = defineConfig({
     rollupOptions: {
       input: {
         dplib: path.resolve(__dirname, "src/entries/main.ts"),
-        code: path.resolve(__dirname, "src/entries/code-block.ts"),
+        "code-block": path.resolve(__dirname, "src/entries/code-block.ts"),
       },
       output: {
         format: "es",

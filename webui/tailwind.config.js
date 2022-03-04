@@ -1,24 +1,24 @@
 /* eslint-disable */
 
 const defaultTheme = require("tailwindcss/defaultTheme");
-const { colors: defaultColors, fontFamily } = defaultTheme;
+const { colors: fontFamily } = defaultTheme;
 
 module.exports = {
   theme: {
     fontFamily: {
+      // TODO - move to extends?
       ...fontFamily,
       "dp-prose": "var(--dp-font-family)",
     },
-    colors: {
-      ...defaultColors,
-      "dp-accent-light": "var(--dp-accent-secondary-color)",
-      "dp-accent": "var(--dp-accent-color)",
-      "dp-accent-text": "var(--dp-accent-text)",
-      "dp-background": "var(--dp-bg-color)",
-      "dp-light-gray": "var(--dp-light-gray)",
-      "dp-dark-gray": "var(--dp-dark-gray)",
-    },
     extend: {
+      colors: {
+        "dp-accent-light": "var(--dp-accent-secondary-color)",
+        "dp-accent": "var(--dp-accent-color)",
+        "dp-accent-text": "var(--dp-accent-text)",
+        "dp-background": "var(--dp-bg-color)",
+        "dp-light-gray": "var(--dp-light-gray)",
+        "dp-dark-gray": "var(--dp-dark-gray)",
+      },
       typography: (theme) => ({
         DEFAULT: {
           css: {
@@ -160,20 +160,22 @@ module.exports = {
     // FE files
     "./src/**/*.{vue,js,ts}",
     // BE files
-    "../dp-server/src/dp/apps/dp_core/templates/**/*.html",
-    "../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
-    "../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
-    "../dp-server/src/dp/apps/dp_org/templates/**/*.html",
-    "../dp-server/src/dp/apps/dp_public/templates/**/*.html",
-    "../dp-server/templates/**/*.html",
+    // TODO - update paths when deploying
+    "../datapane-hosted/dp-server/src/dp/apps/dp_core/templates/**/*.html",
+    "../datapane-hosted/dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
+    "../datapane-hosted/dp-server/src/dp/apps/dp_comments/templates/**/*.html",
+    "../datapane-hosted/dp-server/src/dp/apps/dp_org/templates/**/*.html",
+    "../datapane-hosted/dp-server/src/dp/apps/dp_public/templates/**/*.html",
+    "../datapane-hosted/dp-server/templates/**/*.html",
   ],
   safelist: [
-    /bp3-.*/,
-    /DayPicker.*/,
-    /grid-cols-.*/,
-    /grid-rows-.*/,
-    /grid-flow-.*/,
-    /dp-btn-.*/,
+    // TODO - remove redundant items
+    { pattern: /bp3-.*/ },
+    { pattern: /DayPicker.*/ },
+    { pattern: /grid-cols-.*/ },
+    { pattern: /grid-rows-.*/ },
+    { pattern: /grid-flow-.*/ },
+    { pattern: /dp-btn-.*/ },
     "text-teal-400",
     "text-orange-400",
     "text-blue-400",
