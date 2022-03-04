@@ -1,3 +1,108 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add custom overrides below */
+
+h1 {
+  @apply text-2xl;
+}
+h2 {
+  @apply text-xl;
+}
+h3 {
+  @apply text-lg;
+}
+
+/* Shorthand classes */
+
+.dp-callout {
+  @apply p-2 bg-gray-50;
+}
+
+.dp-link {
+  @apply text-indigo-600 font-semibold hover:text-indigo-700 hover:underline cursor-pointer;
+}
+
+.dp-btn {
+  @apply ease-in-out font-medium duration-150 border focus:outline-none transition text-sm py-2 px-4 rounded-md inline-flex items-center;
+}
+
+.dp-btn-lg {
+  @apply py-3 px-6 text-base font-medium;
+}
+
+.dp-btn-primary {
+  @apply bg-indigo-600 focus:border-indigo-700 text-white active:bg-indigo-700 hover:bg-indigo-500 focus:ring ring-opacity-50 ring-indigo-700 border-transparent;
+}
+
+.dp-btn-green {
+  @apply bg-green-600 focus:border-green-600 text-white active:bg-green-700 hover:bg-green-700 focus:ring ring-opacity-50 ring-indigo-700 border-transparent;
+}
+
+.dp-btn-blue {
+  @apply bg-blue-600 focus:border-blue-700 text-white active:bg-blue-700 hover:bg-blue-700 focus:ring ring-opacity-50 ring-blue-700 border-transparent;
+}
+
+.dp-btn-danger {
+  @apply focus:ring ring-opacity-50 ring-red-700 hover:bg-red-500 bg-red-600 border-transparent focus:outline-none focus:border-red-700 text-white;
+}
+
+.dp-btn-danger-outline {
+  @apply border-gray-300 text-red-700 bg-white hover:text-red-500 focus:outline-none focus:ring ring-opacity-50 ring-blue-700 focus:border-blue-300 active:text-red-800 active:bg-gray-50 active:text-red-800;
+}
+
+.dp-btn-info {
+  @apply border-gray-300 text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring ring-opacity-50 ring-blue-700 focus:border-blue-300 active:text-gray-800 active:bg-gray-50;
+}
+
+.dp-btn-dark {
+  @apply border-transparent text-white bg-gray-700 hover:bg-gray-600 hover:text-gray-200 focus:outline-none focus:ring ring-opacity-50 ring-gray-700 focus:border-gray-800;
+}
+
+.dp-btn-dark-outline {
+  @apply border-transparent text-gray-300 hover:text-white hover:bg-gray-700 focus:text-white focus:bg-gray-700;
+}
+
+.dp-btn-sm {
+  @apply inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.dp-btn-github {
+  background-color: #eee;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0, #fcfcfc),
+    to(#eee)
+  );
+  background-image: linear-gradient(to bottom, #fcfcfc 0, #eee 100%);
+  background-repeat: no-repeat;
+  border: 1px solid #d5d5d5;
+  color: #333;
+  @apply py-1;
+}
+
+.dp-btn-github:focus,
+.dp-btn-github:hover {
+  text-decoration: none;
+  background-color: #ddd;
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0, #eee),
+    to(#ddd)
+  );
+  background-image: linear-gradient(to bottom, #eee 0, #ddd 100%);
+  border-color: #ccc;
+}
+
+.dp-btn-secondary-gray {
+  @apply text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-gray-500;
+}
+
+.dp-btn-secondary-danger {
+  @apply text-red-700 bg-red-100 hover:bg-red-200 focus:ring-red-500;
+}
