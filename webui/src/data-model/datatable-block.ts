@@ -1,6 +1,6 @@
 import { markRaw } from "vue";
 import { AssetBlock, Elem } from "./blocks";
-import VDataTableBlock from "../components/DataTableBlock.connector.vue";
+import VDataTableBlock from "../components/blocks/DataTable.connector.vue";
 
 export class DataTableBlock extends AssetBlock {
   public component = markRaw(VDataTableBlock);

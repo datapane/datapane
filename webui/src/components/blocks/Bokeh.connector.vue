@@ -12,7 +12,7 @@ p.fetchAssetData().then((plotJson: any) => {
 <script lang="ts">
 export default {
   components: {
-    BokehBlock: defineAsyncComponent(() => import("./BokehBlock.vue")),
+    BokehBlock: defineAsyncComponent(() => import("../blocks/Bokeh.vue")),
   },
 };
 </script>

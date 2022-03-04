@@ -1,6 +1,7 @@
 <script lang="ts">
+import { v4 as uuid4 } from "uuid";
 const docIds: any[] = [];
-const divId = `${Math.random()}`;
+const divId = uuid4();
 </script>
 
 <script setup lang="ts">
@@ -10,7 +11,7 @@ import * as Bokeh from "@bokeh/bokehjs";
 const p = defineProps<{ plotJson: any }>();
 
 onUnmounted(() => {
-  // https://github.com/bokeh/bokeh/issues/5355#issuecomment-423580351
+  // cleanup -- https://github.com/bokeh/bokeh/issues/5355#issuecomment-423580351
   for (const doc of Bokeh.documents) {
     for (const docTimestamp of docIds) {
       // Remove any global Documents by checking their uuids

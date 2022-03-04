@@ -1,5 +1,5 @@
-import VTextBlock from "../components/TextBlock.vue";
-import VCodeBlock from "../components/CodeBlock.connector.vue";
+import VTextBlock from "../components/blocks/Text.vue";
+import VCodeBlock from "../components/Code.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";

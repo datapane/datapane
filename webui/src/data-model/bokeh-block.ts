@@ -1,5 +1,5 @@
 import { AssetBlock, Elem } from "./blocks";
-import VBokehBlock from "../components/BokehBlock.connector.vue";
+import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import { markRaw } from "vue";
 
 export class BokehBlock extends AssetBlock {
