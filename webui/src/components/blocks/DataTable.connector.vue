@@ -12,7 +12,7 @@ const childProps = reactive({});
 <script lang="ts">
 export default {
   components: {
-    DataTableBlock: defineAsyncComponent(() => import("./DataTableBlock.vue")),
+    DataTableBlock: defineAsyncComponent(() => import("./DataTable.vue")),
   },
 };
 </script>
