@@ -1,24 +1,34 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
-// import GridGenerator from "./GridGenerator.vue";
+import { ref } from "vue";
+import GridGenerator from "./GridGenerator.vue";
+import { BlockTree, isBlock } from "../data-model/blocks";
+import { createGridKey } from "./utils";
 
 const p = defineProps<{ reportProps: any }>();
 const store = new ReportStore(p.reportProps);
+const pageNumber = ref(0);
+
 const multiBlockEmbed =
   p.reportProps.mode === "EMBED" && !store.state.singleBlockEmbed;
+
+// TODO - computed?
+const rootGroup = store.state.report
+  ? store.state.report.children[pageNumber.value].children[0]
+  : undefined;
 </script>
 
 <script lang="ts">
-// export default {
-//   components: {
-//     GridGenerator,
-//   }
-// }
+export default {
+  components: {
+    GridGenerator,
+  },
+};
 </script>
 
 <template>
   <div class="max-w-full h-full bg-dp-background" data-cy="report-component">
-    <!-- TODO - custom header -->
+    <!-- TODO - custom header; custom width; pages -->
     <div
       :class="{
         'flex flex-col justify-end bg-dp-background': true,
@@ -26,7 +36,17 @@ const multiBlockEmbed =
         'pb-6': !p.reportProps.isOrg && multiBlockEmbed,
       }"
     >
-      {{ JSON.stringify(store.state.report) }}
+      <div class="flex-1 flex flex-col">
+        <div
+          :class="{ 'flex-grow': true, 'px-4': !store.state.singleBlockEmbed }"
+        >
+          <GridGenerator
+            :key="createGridKey(rootGroup, 0)"
+            :tree="rootGroup"
+            :singleBlockEmbed="store.state.singleBlockEmbed"
+          ></GridGenerator>
+        </div>
+      </div>
     </div>
   </div>
 </template>
