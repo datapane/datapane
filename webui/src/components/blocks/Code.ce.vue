@@ -27,6 +27,6 @@ export default {
 @import "highlight.js/styles/stackoverflow-light.css";
 
 pre {
-  @apply w-full h-full;
+  @apply w-full;
 }
 </style>
