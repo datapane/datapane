@@ -83,19 +83,24 @@ export class Select {
 
 /* Atomic blocks */
 
-export class Block {
+export abstract class Block {
   public refId: string;
-  public captionType?: string;
+  public captionType = "Figure";
+  public caption?: string;
   public label?: string;
   public count?: number;
-  public componentProps: any = {};
+  public componentProps: any;
 
-  public constructor(elem: Elem) {
+  public constructor(elem: Elem, caption?: string, count?: number) {
     const { attributes } = elem;
     this.refId = uuidv4();
-    this.captionType = "Figure"; // attributes.captionType || "Figure";
-    // this.label = attributes.label;
-    // this.count = attributes.count;
+    this.count = count;
+    this.caption = caption;
+    this.componentProps = { caption: this.caption, count: this.count };
+
+    if (attributes) {
+      this.label = attributes.label;
+    }
   }
 }
 
@@ -103,8 +108,8 @@ export class AssetBlock extends Block {
   public src: string;
   public type: string;
 
-  public constructor(elem: Elem) {
-    super(elem);
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
     const { attributes } = elem;
     this.src = attributes.src;
     this.type = attributes.type;
@@ -122,10 +127,14 @@ export class TextBlock extends Block {
   public content: string;
   public componentProps: any;
 
-  public constructor(elem: Elem) {
-    super(elem);
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
     this.content = getInnerText(elem);
-    this.componentProps = { content: this.content };
+    this.componentProps = {
+      ...this.componentProps,
+      content: this.content,
+      isLightProse: false,
+    };
   }
 }
 
@@ -133,11 +142,11 @@ export class CodeBlock extends AssetBlock {
   public component = markRaw(VCodeBlock);
   public componentProps: any;
 
-  public constructor(elem: Elem) {
-    super(elem);
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
     const { language } = elem.attributes;
     const code = getInnerText(elem);
-    this.componentProps = { code, language };
+    this.componentProps = { ...this.componentProps, code, language };
   }
 }
 

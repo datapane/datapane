@@ -3,7 +3,12 @@
  * Centres block and adds caption below if necessary
  */
 
-const p = defineProps<{ singleBlockEmbed: boolean }>();
+const p = defineProps<{
+  singleBlockEmbed: boolean;
+  caption?: string;
+  count?: number;
+  captionType: string;
+}>();
 </script>
 
 <template>
@@ -15,6 +20,12 @@ const p = defineProps<{ singleBlockEmbed: boolean }>();
     ]"
   >
     <slot></slot>
-    <!-- TODO - caption -->
+    <div
+      v-if="p.caption"
+      class="text-sm text-dp-light-gray italic text-justify"
+    >
+      <b>{{ p.captionType }} {{ p.count }}</b>
+      {{ p.caption }}
+    </div>
   </div>
 </template>

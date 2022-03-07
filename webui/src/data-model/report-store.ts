@@ -52,6 +52,13 @@ const getElementByName = (elem: Elem, name: string): any => {
 export class ReportStore {
   public state: State;
 
+  private counts = {
+    plots: 0,
+    tables: 0,
+    formulas: 0,
+    codeBlocks: 0,
+  };
+
   public constructor(reportProps: any) {
     const deserializedReport = this.xmlToReport(reportProps.report.document);
     const singleBlockEmbed = this.isSingleBlockEmbed(
@@ -73,6 +80,23 @@ export class ReportStore {
     const json: any = convert.xml2js(xml, { compact: false });
     const root = getElementByName(json, "Report");
     return this.deserialize(getElementByName(root, "Pages"));
+  }
+
+  private updateFigureCount(elemName: string): number {
+    /**
+     * Updates and returns the relevant count
+     */
+    let count = 0;
+    if (elemName === "Plot") {
+      count = ++this.counts.plots;
+    } else if (["Table", "DataTable"].includes(elemName)) {
+      count = ++this.counts.tables;
+    } else if (elemName === "Formula") {
+      count = ++this.counts.formulas;
+    } else if (elemName === "Code") {
+      count = ++this.counts.codeBlocks;
+    }
+    return count;
   }
 
   private deserialize(elem: Elem): Report {
@@ -187,16 +211,21 @@ export class ReportStore {
   }
 
   private deserializeBlock(elem: Elem): Block {
+    const count = this.updateFigureCount(elem.name);
+    const caption = getAttributes(elem).caption;
+
+    let BlockClass: typeof Block;
     if (maps.jsonIsMarkdown(elem)) {
-      return new TextBlock(elem);
+      BlockClass = TextBlock;
     } else if (maps.jsonIsBokeh(elem)) {
-      return new BokehBlock(elem);
+      BlockClass = BokehBlock;
     } else if (maps.jsonIsArrowTable(elem)) {
-      return new DataTableBlock(elem);
+      BlockClass = DataTableBlock;
     } else if (maps.jsonIsCode(elem)) {
-      return new CodeBlock(elem);
+      BlockClass = CodeBlock;
     } else {
-      return new UnknownBlock(elem);
+      BlockClass = UnknownBlock;
     }
+    return new BlockClass(elem, caption, count);
   }
 }
