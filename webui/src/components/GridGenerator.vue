@@ -32,11 +32,17 @@ const gridLayoutStyle = {
         v-for="child in p.tree.children"
         :key="child.refId"
         :tree="child"
+        :singleBlockEmbed="p.singleBlockEmbed"
       ></GridGenerator>
     </div>
   </template>
   <template v-else>
-    <BlockWrapper :singleBlockEmbed="p.singleBlockEmbed">
+    <BlockWrapper
+      :singleBlockEmbed="p.singleBlockEmbed"
+      :captionType="p.tree.captionType"
+      :caption="p.tree.caption"
+      :count="p.tree.count"
+    >
       <component
         :is="p.tree.component"
         v-bind="p.tree.componentProps"
