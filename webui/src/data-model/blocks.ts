@@ -162,6 +162,8 @@ export type PageLayout = "top" | "side";
 
 export type ExportType = "EXCEL" | "CSV";
 
+export const isBlock = (obj: any): obj is Block => !!obj.refId;
+
 export const isGroup = (obj: any): obj is Group => obj.name === "Group";
 
 export const isSelect = (obj: any): obj is Select => obj.name === "Select";

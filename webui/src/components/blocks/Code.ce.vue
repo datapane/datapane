@@ -3,9 +3,14 @@ const p = defineProps<{ language: string; code: string }>();
 </script>
 
 <template>
-  <div>
-    <highlightjs :language="p.language" :code="p.code" />
-  </div>
+  <!-- TODO - copy button -->
+  <link rel="stylesheet" href="/static/style.css" />
+  <highlightjs
+    :language="p.language"
+    :code="p.code"
+    class="relative w-full h-full"
+    data-cy="block-code"
+  />
 </template>
 
 <script lang="ts">

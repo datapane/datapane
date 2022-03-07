@@ -7,5 +7,9 @@ const md = computed(() => marked.parse(p.content));
 </script>
 
 <template>
-  <div v-html="md"></div>
+  <div
+    class="w-full h-full overflow-y-hidden"
+    data-cy="block-markdown"
+    v-html="md"
+  ></div>
 </template>
