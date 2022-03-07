@@ -10,7 +10,7 @@ const md = computed(() => marked.parse(p.content));
   <!-- TODO - linkReference, gfm needed? -->
   <div
     :class="[
-      'w-full h-full overflow-y-hidden prose font-dp-prose',
+      'w-full overflow-y-hidden prose font-dp-prose',
       { proseDark: p.isLightProse },
     ]"
     data-cy="block-markdown"

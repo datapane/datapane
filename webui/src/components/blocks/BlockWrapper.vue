@@ -16,7 +16,7 @@ const p = defineProps<{
     :class="[
       'w-full relative flex flex-col justify-center items-center overflow-x-auto',
       { 'h-iframe': p.singleBlockEmbed },
-      { 'p-1 h-full': !p.singleBlockEmbed },
+      { 'p-1': !p.singleBlockEmbed },
     ]"
   >
     <slot></slot>
