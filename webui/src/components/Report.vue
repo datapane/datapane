@@ -2,7 +2,6 @@
 import { ReportStore } from "../data-model/report-store";
 import { ref, provide, computed } from "vue";
 import { createGridKey } from "./utils";
-import { ReportWidth } from "../data-model/blocks";
 
 const p = defineProps<{ reportProps: any }>();
 const store = new ReportStore(p.reportProps);
@@ -38,6 +37,7 @@ import GridGenerator from "./GridGenerator.vue";
 import HPages from "./layout/HPages.vue";
 import VPages from "./layout/VPages.vue";
 import PrevNext from "./layout/PrevNext.vue";
+import MobilePages from "./layout/MobilePages.vue";
 
 export default {
   components: {
@@ -45,6 +45,7 @@ export default {
     HPages,
     VPages,
     PrevNext,
+    MobilePages,
   },
 };
 </script>
@@ -69,6 +70,13 @@ export default {
         'pb-6': !p.reportProps.isOrg && multiBlockEmbed,
       }"
     >
+      <div className="sm:hidden p-2">
+        <MobilePages
+          :labels="pageLabels"
+          :pageNumber="pageNumber"
+          @page-change="handlePageChange"
+        />
+      </div>
       <div class="sm:flex block">
         <div
           v-if="pageLabels.length > 1 && report.layout === 'side'"
