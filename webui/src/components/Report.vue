@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
-import { ref, provide } from "vue";
+import { ref, provide, computed } from "vue";
 import GridGenerator from "./GridGenerator.vue";
 import { createGridKey } from "./utils";
+import { ReportWidth } from "../data-model/blocks";
 
 const p = defineProps<{ reportProps: any }>();
 const store = new ReportStore(p.reportProps);
+const { report, singleBlockEmbed } = store.state;
 const pageNumber = ref(0);
 
 const multiBlockEmbed =
   p.reportProps.mode === "EMBED" && !store.state.singleBlockEmbed;
 
-// TODO - computed?
-const rootGroup = store.state.report
-  ? store.state.report.children[pageNumber.value].children[0]
-  : undefined;
+const isNarrowWidth = (w: ReportWidth) => !singleBlockEmbed && w === "narrow";
+const isMediumWidth = (w: ReportWidth) => !singleBlockEmbed && w === "medium";
+const isFullWidth = (w: ReportWidth) => !singleBlockEmbed && w === "full";
 
-provide("singleBlockEmbed", store.state.singleBlockEmbed);
+const rootGroup = computed(() =>
+  report ? report.children[pageNumber.value].children[0] : undefined
+);
+
+provide("singleBlockEmbed", singleBlockEmbed);
 </script>
 
 <script lang="ts">
@@ -28,7 +33,17 @@ export default {
 </script>
 
 <template>
-  <div class="max-w-full h-full bg-dp-background" data-cy="report-component">
+  <div
+    :class="[
+      'w-full bg-dp-background',
+      {
+        'max-w-3xl': isNarrowWidth(report.width),
+        'max-w-screen-xl': isMediumWidth(report.width),
+        'max-w-full': isFullWidth(report.width),
+      },
+    ]"
+    data-cy="report-component"
+  >
     <!-- TODO - custom header; custom width; pages -->
     <div
       :class="{
@@ -38,9 +53,7 @@ export default {
       }"
     >
       <div class="flex-1 flex flex-col">
-        <div
-          :class="{ 'flex-grow': true, 'px-4': !store.state.singleBlockEmbed }"
-        >
+        <div :class="['flex-grow', { 'px-4': !singleBlockEmbed }]">
           <GridGenerator
             :key="createGridKey(rootGroup, 0)"
             :tree="rootGroup"
