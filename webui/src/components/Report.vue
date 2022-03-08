@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
 import { ref, provide, computed } from "vue";
-import GridGenerator from "./GridGenerator.vue";
 import { createGridKey } from "./utils";
 import { ReportWidth } from "../data-model/blocks";
 
@@ -13,38 +12,52 @@ const pageNumber = ref(0);
 const multiBlockEmbed =
   p.reportProps.mode === "EMBED" && !store.state.singleBlockEmbed;
 
-const isNarrowWidth = (w: ReportWidth) => !singleBlockEmbed && w === "narrow";
-const isMediumWidth = (w: ReportWidth) => !singleBlockEmbed && w === "medium";
-const isFullWidth = (w: ReportWidth) => !singleBlockEmbed && w === "full";
-
 const rootGroup = computed(() =>
   report ? report.children[pageNumber.value].children[0] : undefined
 );
 
 provide("singleBlockEmbed", singleBlockEmbed);
+
+const getPageLabel = (
+  label: string | undefined,
+  pageNumber: number
+): string => {
+  return label || `Page ${pageNumber}`;
+};
+
+const pageLabels = report.children.map((page, idx) =>
+  getPageLabel(page.label, idx + 1)
+);
+
+const handlePageChange = (newPageNumber: number) =>
+  (pageNumber.value = newPageNumber);
 </script>
 
 <script lang="ts">
+import GridGenerator from "./GridGenerator.vue";
+import HPages from "./HPages.vue";
+
 export default {
   components: {
     GridGenerator,
+    HPages,
   },
 };
 </script>
 
 <template>
   <div
-    :class="[
-      'w-full bg-dp-background',
-      {
-        'max-w-3xl': isNarrowWidth(report.width),
-        'max-w-screen-xl': isMediumWidth(report.width),
-        'max-w-full': isFullWidth(report.width),
-      },
-    ]"
-    data-cy="report-component"
+    v-if="pageLabels.length > 1 && report.layout === 'top'"
+    class="hidden sm:block w-full mb-6"
   >
-    <!-- TODO - custom header; custom width; pages -->
+    <HPages
+      :labels="pageLabels"
+      :pageNumber="pageNumber"
+      @page-change="handlePageChange"
+    />
+  </div>
+  <div class="w-full bg-dp-background" data-cy="report-component">
+    <!-- TODO - custom header; pages -->
     <div
       :class="{
         'flex flex-col justify-end bg-dp-background': true,

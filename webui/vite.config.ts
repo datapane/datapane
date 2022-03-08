@@ -38,6 +38,7 @@ module.exports = defineConfig({
       input: {
         "report-component": path.resolve(__dirname, "src/entries/report.ts"),
         "code-block": path.resolve(__dirname, "src/entries/code-block.ts"),
+        base: path.resolve(__dirname, "src/entries/base.ts"),
       },
       output: {
         format: "es",

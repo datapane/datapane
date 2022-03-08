@@ -106,3 +106,10 @@ h3 {
 .dp-btn-secondary-danger {
   @apply text-red-700 bg-red-100 hover:bg-red-200 focus:ring-red-500;
 }
+
+/* body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100%;
+} */
