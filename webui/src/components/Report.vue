@@ -35,14 +35,16 @@ const handlePageChange = (newPageNumber: number) =>
 
 <script lang="ts">
 import GridGenerator from "./GridGenerator.vue";
-import HPages from "./HPages.vue";
-import VPages from "./VPages.vue";
+import HPages from "./layout/HPages.vue";
+import VPages from "./layout/VPages.vue";
+import PrevNext from "./layout/PrevNext.vue";
 
 export default {
   components: {
     GridGenerator,
     HPages,
     VPages,
+    PrevNext,
   },
 };
 </script>
@@ -85,6 +87,12 @@ export default {
               :tree="rootGroup"
             ></GridGenerator>
           </div>
+          <PrevNext
+            v-if="pageLabels.length > 1"
+            :pageNumber="pageNumber"
+            :numPages="pageLabels.length"
+            @page-change="handlePageChange"
+          />
         </div>
       </div>
     </div>
