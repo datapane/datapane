@@ -36,11 +36,13 @@ const handlePageChange = (newPageNumber: number) =>
 <script lang="ts">
 import GridGenerator from "./GridGenerator.vue";
 import HPages from "./HPages.vue";
+import VPages from "./VPages.vue";
 
 export default {
   components: {
     GridGenerator,
     HPages,
+    VPages,
   },
 };
 </script>
@@ -65,12 +67,24 @@ export default {
         'pb-6': !p.reportProps.isOrg && multiBlockEmbed,
       }"
     >
-      <div class="flex-1 flex flex-col">
-        <div :class="['flex-grow', { 'px-4': !singleBlockEmbed }]">
-          <GridGenerator
-            :key="createGridKey(rootGroup, 0)"
-            :tree="rootGroup"
-          ></GridGenerator>
+      <div class="sm:flex block">
+        <div
+          v-if="pageLabels.length > 1 && report.layout === 'side'"
+          class="hidden sm:block w-1/6 bg-gray-100 px-4"
+        >
+          <VPages
+            :labels="pageLabels"
+            :pageNumber="pageNumber"
+            @page-change="handlePageChange"
+          />
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div :class="['flex-grow', { 'px-4': !singleBlockEmbed }]">
+            <GridGenerator
+              :key="createGridKey(rootGroup, 0)"
+              :tree="rootGroup"
+            ></GridGenerator>
+          </div>
         </div>
       </div>
     </div>
