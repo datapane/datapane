@@ -119,11 +119,11 @@ export abstract class AssetBlock<T = any> extends Block {
     return decodeBase64Asset(this.src);
   }
 
-  public async fetchAssetData(): Promise<T> {
+  public fetchAssetData = async (): Promise<T> => {
     return window.dpLocal
       ? this.fetchLocalAssetData()
       : this.fetchRemoteAssetData();
-  }
+  };
 
   protected fetchRemoteAssetData = async (): Promise<
     string | object | null
@@ -142,7 +142,7 @@ export abstract class PlotAssetBlock extends AssetBlock {
     this.responsive = JSON.parse(attributes.responsive);
     this.componentProps = {
       ...this.componentProps,
-      fetchAssetData: this.fetchRemoteAssetData,
+      fetchAssetData: this.fetchAssetData,
       responsive: this.responsive,
     };
   }
