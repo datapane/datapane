@@ -19,7 +19,7 @@ import * as maps from "./test-maps";
 import { DataTableBlock } from "./datatable-block";
 
 export type State = {
-  report?: Report;
+  report: Report;
   singleBlockEmbed: boolean;
 };
 
