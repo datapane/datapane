@@ -2,21 +2,23 @@
 /**
  * Centres block and adds caption below if necessary
  */
+import { inject } from "vue";
 
 const p = defineProps<{
-  singleBlockEmbed: boolean;
   caption?: string;
   count?: number;
   captionType: string;
 }>();
+
+const singleBlockEmbed = inject("singleBlockEmbed");
 </script>
 
 <template>
   <div
     :class="[
       'w-full relative flex flex-col justify-center items-center overflow-x-auto',
-      { 'h-iframe': p.singleBlockEmbed },
-      { 'p-1': !p.singleBlockEmbed },
+      { 'h-iframe': singleBlockEmbed },
+      { 'p-1': !singleBlockEmbed },
     ]"
   >
     <slot></slot>

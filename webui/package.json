@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bokeh/bokehjs": "^2.4.2",
+    "@bokeh/bokehjs": "2.2.3",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@revolist/revogrid": "^3.0.98",
     "@stencil/core": "^2.14.0",

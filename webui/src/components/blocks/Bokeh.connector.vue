@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, defineAsyncComponent } from "vue";
+import { ref, defineAsyncComponent } from "vue";
 
-const p = defineProps<{ fetchAssetData: any }>();
-const childProps = reactive({ plotJson: null });
+const p = defineProps<{ fetchAssetData: any; responsive: boolean }>();
+const plotJson = ref<any>(null);
 
-p.fetchAssetData().then((plotJson: any) => {
-  childProps.plotJson = plotJson;
-});
+(async () => {
+  plotJson.value = await p.fetchAssetData();
+})();
 </script>
 
 <script lang="ts">
@@ -18,5 +18,9 @@ export default {
 </script>
 
 <template>
-  <BokehBlock v-bind="childProps"></BokehBlock>
+  <BokehBlock
+    v-if="plotJson"
+    :plotJson="plotJson"
+    :responsive="p.responsive"
+  ></BokehBlock>
 </template>
