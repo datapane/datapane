@@ -5,12 +5,15 @@ import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
-// TODO - use class-transformer?
-
 export class Report {
   public children: Page[];
   public width: ReportWidth;
-  public layout?: PageLayout;
+
+  private _layout?: PageLayout;
+
+  public get layout(): PageLayout {
+    return this._layout || (this.children.length > 5 ? "side" : "top");
+  }
 
   public constructor(o: {
     children: Page[];
@@ -19,7 +22,7 @@ export class Report {
   }) {
     this.children = o.children;
     this.width = o.width;
-    this.layout = o.layout;
+    this._layout = o.layout;
   }
 }
 
