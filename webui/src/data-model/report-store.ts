@@ -12,11 +12,10 @@ import {
   TextBlock,
   Toggle,
   UnknownBlock,
+  BokehBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
-import he from "he";
-import { BokehBlock } from "./bokeh-block";
 import { DataTableBlock } from "./datatable-block";
 
 export type State = {

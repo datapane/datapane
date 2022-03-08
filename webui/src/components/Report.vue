@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
-import { ref } from "vue";
+import { ref, provide } from "vue";
 import GridGenerator from "./GridGenerator.vue";
-import { BlockTree, isBlock } from "../data-model/blocks";
 import { createGridKey } from "./utils";
 
 const p = defineProps<{ reportProps: any }>();
@@ -16,6 +15,8 @@ const multiBlockEmbed =
 const rootGroup = store.state.report
   ? store.state.report.children[pageNumber.value].children[0]
   : undefined;
+
+provide("singleBlockEmbed", store.state.singleBlockEmbed);
 </script>
 
 <script lang="ts">
@@ -43,7 +44,6 @@ export default {
           <GridGenerator
             :key="createGridKey(rootGroup, 0)"
             :tree="rootGroup"
-            :singleBlockEmbed="store.state.singleBlockEmbed"
           ></GridGenerator>
         </div>
       </div>

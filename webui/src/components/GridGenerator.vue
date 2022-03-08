@@ -4,11 +4,15 @@
  */
 
 import { BlockTree, Group, isGroup } from "../data-model/blocks";
+import { inject } from "vue";
+
+const singleBlockEmbed = inject("singleBlockEmbed");
 
 const objOrEmpty = (obj: any, n: number) => (n > 0 ? obj : {});
-const p = defineProps<{ tree: BlockTree; singleBlockEmbed: boolean }>();
-const columns = (p.tree as Group).columns;
+const p = defineProps<{ tree: BlockTree }>();
 
+// TODO - move into Group component
+const columns = (p.tree as Group).columns;
 const gridLayoutStyle = {
   ...objOrEmpty(
     {
@@ -32,13 +36,11 @@ const gridLayoutStyle = {
         v-for="child in p.tree.children"
         :key="child.refId"
         :tree="child"
-        :singleBlockEmbed="p.singleBlockEmbed"
       ></GridGenerator>
     </div>
   </template>
   <template v-else>
     <BlockWrapper
-      :singleBlockEmbed="p.singleBlockEmbed"
       :captionType="p.tree.captionType"
       :caption="p.tree.caption"
       :count="p.tree.count"

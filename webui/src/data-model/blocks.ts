@@ -1,8 +1,11 @@
 import VTextBlock from "../components/blocks/Text.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
+import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+
+/* TODO - use class-transformer */
 
 const readGcsTextOrJsonFile = <T = string | object | null>(
   url: string
@@ -83,7 +86,7 @@ export class Select {
 
 /* Atomic blocks */
 
-export abstract class Block {
+export class Block {
   public refId: string;
   public captionType = "Figure";
   public caption?: string;
@@ -104,7 +107,7 @@ export abstract class Block {
   }
 }
 
-export class AssetBlock extends Block {
+export abstract class AssetBlock extends Block {
   public src: string;
   public type: string;
 
@@ -120,6 +123,26 @@ export class AssetBlock extends Block {
   > => {
     return await readGcsTextOrJsonFile(this.src);
   };
+}
+
+export abstract class PlotAssetBlock extends AssetBlock {
+  public captionType = "Plot";
+  public responsive: boolean;
+
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
+    const { attributes } = elem;
+    this.responsive = JSON.parse(attributes.responsive);
+    this.componentProps = {
+      ...this.componentProps,
+      fetchAssetData: this.fetchRemoteAssetData,
+      responsive: this.responsive,
+    };
+  }
+}
+
+export class BokehBlock extends PlotAssetBlock {
+  public component = markRaw(VBokehBlock);
 }
 
 export class TextBlock extends Block {
