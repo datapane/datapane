@@ -5,13 +5,7 @@ import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
-/* TODO - use class-transformer */
-
-const readGcsTextOrJsonFile = <T = string | object | null>(
-  url: string
-): Promise<T> => {
-  return axios.get(url).then((res) => res.data);
-};
+// TODO - use class-transformer?
 
 export class Report {
   public children: Page[];
@@ -28,6 +22,8 @@ export class Report {
     this.layout = o.layout;
   }
 }
+
+/* Layout blocks */
 
 export class Page {
   public children: LayoutBlock[];
@@ -107,7 +103,8 @@ export class Block {
   }
 }
 
-export abstract class AssetBlock extends Block {
+// TODO - generic type T needed?
+export abstract class AssetBlock<T = any> extends Block {
   public src: string;
   public type: string;
 
@@ -116,6 +113,16 @@ export abstract class AssetBlock extends Block {
     const { attributes } = elem;
     this.src = attributes.src;
     this.type = attributes.type;
+  }
+
+  protected fetchLocalAssetData(): any {
+    return decodeBase64Asset(this.src);
+  }
+
+  public async fetchAssetData(): Promise<T> {
+    return window.dpLocal
+      ? this.fetchLocalAssetData()
+      : this.fetchRemoteAssetData();
   }
 
   protected fetchRemoteAssetData = async (): Promise<
@@ -223,4 +230,14 @@ const getInnerText = (elem: Elem): string => {
     throw new Error("Can't get inner text of a node without elements");
   const innerElem = elem.elements[0];
   return innerElem.text || innerElem.cdata || "";
+};
+
+const readGcsTextOrJsonFile = <T = string | object | null>(
+  url: string
+): Promise<T> => {
+  return axios.get(url).then((res) => res.data);
+};
+
+export const decodeBase64Asset = (src: string): any => {
+  return window.atob(src.split("base64,")[1]);
 };
