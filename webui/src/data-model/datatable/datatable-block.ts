@@ -24,8 +24,8 @@ export class DataTableBlock extends AssetBlock {
     return this.rows * this.columns;
   }
 
-  public get autoLoad(): boolean {
-    return this.cells < AUTO_LOAD_CELLS_LIMIT;
+  public get deferLoad(): boolean {
+    return this.cells > AUTO_LOAD_CELLS_LIMIT;
   }
 
   public constructor(elem: Elem) {
@@ -37,7 +37,8 @@ export class DataTableBlock extends AssetBlock {
     this.casRef = attributes.cas_ref;
     this.componentProps = {
       streamContents: this.streamContents,
-      autoLoad: this.autoLoad,
+      deferLoad: this.deferLoad,
+      cells: this.cells,
     };
   }
 

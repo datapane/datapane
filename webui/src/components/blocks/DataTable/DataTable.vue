@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, defineEmits } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
+import numeral from "numeral";
+
+const emit = defineEmits(["load-full"]);
 
 const p = defineProps<{
   singleBlockEmbed: boolean;
   data: any[];
+  cells: number;
   schema: any;
   previewMode: boolean;
 }>();
+
 defineCustomElements();
 
 type Col = {
@@ -49,6 +54,10 @@ const TableIcons: { [t in KnownTypes]: string } = {
   integer: "bar-chart",
   index: "list-ol",
   unknown: "circle",
+};
+
+const formatNumber = (n: number): string => {
+  return numeral(n).format("0[.][0]a");
 };
 
 const numericCellCompare = (prop: string | number, a: any, b: any) => {
@@ -126,9 +135,11 @@ const cols: ComputedRef<Col[]> = computed(() => {
 
 <script lang="ts">
 import Header from "./Header.vue";
+import DPButton from "../../../shared/DPButton.vue";
 
 export default {
   Header,
+  DPButton,
 };
 </script>
 
@@ -142,7 +153,7 @@ export default {
   >
     <Header :singleBlockEmbed="p.singleBlockEmbed" :previewMode="false" />
     <revo-grid
-      v-if="cols.length"
+      v-if="cols.length && !p.previewMode"
       theme="compact"
       :source="p.data"
       :columns="cols"
@@ -154,6 +165,15 @@ export default {
       :readonly="true"
       :exporting="true"
     />
+    <div v-if="p.previewMode" class="w-full flex justify-center">
+      <DPButton
+        dataCy="button-load-dataset"
+        @click="emit('load-full')"
+        icon="fa-table"
+      >
+        Click to load dataset ({{ formatNumber(p.cells) }} cells)
+      </DPButton>
+    </div>
   </div>
 </template>
 

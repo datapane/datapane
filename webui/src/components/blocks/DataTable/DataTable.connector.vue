@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { defineAsyncComponent, inject, onMounted, ref, watch } from "vue";
+import { defineAsyncComponent, inject, ref } from "vue";
 import { DatasetResponse } from "../../../data-model/datatable/datatable-block";
 
 const p = defineProps<{
   streamContents: () => Promise<DatasetResponse>;
-  autoLoad: boolean;
+  deferLoad: boolean;
+  cells: number;
 }>();
 
 const singleBlockEmbed = inject("singleBlockEmbed");
-
+const previewMode = ref(p.deferLoad);
 const dsData = ref([]);
 const dsSchema = ref({});
 
@@ -25,7 +26,16 @@ const getResultData = async () => {
   }
 };
 
-getResultData();
+if (!p.deferLoad) {
+  getResultData();
+}
+
+const handleLoadFull = async () => {
+  await getResultData();
+  if (dsData.value.length) {
+    previewMode.value = false;
+  }
+};
 </script>
 
 <script lang="ts">
@@ -40,7 +50,9 @@ export default {
   <DataTableBlock
     :singleBlockEmbed="singleBlockEmbed"
     :data="dsData"
+    :cells="p.cells"
     :schema="dsSchema"
-    :previewMode="false"
+    :previewMode="previewMode"
+    @load-full="handleLoadFull"
   />
 </template>
