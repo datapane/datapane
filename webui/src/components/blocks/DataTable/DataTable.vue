@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ComputedRef, defineEmits } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
-import numeral from "numeral";
+import { formatNumber } from "./shared";
 
 const emit = defineEmits(["load-full"]);
 
@@ -54,10 +54,6 @@ const TableIcons: { [t in KnownTypes]: string } = {
   integer: "bar-chart",
   index: "list-ol",
   unknown: "circle",
-};
-
-const formatNumber = (n: number): string => {
-  return numeral(n).format("0[.][0]a");
 };
 
 const numericCellCompare = (prop: string | number, a: any, b: any) => {
@@ -151,7 +147,13 @@ export default {
       { 'h-full flex flex-col': p.singleBlockEmbed },
     ]"
   >
-    <Header :singleBlockEmbed="p.singleBlockEmbed" :previewMode="false" />
+    <Header
+      :singleBlockEmbed="p.singleBlockEmbed"
+      :previewMode="false"
+      :rows="p.data.length"
+      :columns="cols.length"
+      :cells="p.cells"
+    />
     <revo-grid
       v-if="cols.length && !p.previewMode"
       theme="compact"
