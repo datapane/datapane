@@ -7,6 +7,10 @@ const p = defineProps<{
   rows: number;
   columns: number;
   cells: number;
+  // TODO - type
+  getCsvText: any;
+  downloadLocal: any;
+  downloadRemote: any;
 }>();
 
 // TODO - refactor NStackErrorHandler and move logic there
@@ -24,14 +28,12 @@ const actionSections: Section[] = [
     options: [
       {
         name: "Copy CSV to clipboard",
-        onClick: async () => {},
-        // DPClipboard.copyOnce(await block.getCsvText()),
+        onClick: async () => DPClipboard.copyOnce(await p.getCsvText()),
         id: "copy-clipboard",
       },
       {
         name: "Download CSV",
-        // onClick: withErrHandling(block.downloadLocal),
-        onClick: withErrHandling(() => {}),
+        onClick: withErrHandling(p.downloadLocal),
         id: "download-csv",
       },
     ],
@@ -41,14 +43,12 @@ const actionSections: Section[] = [
     options: [
       {
         name: "Download CSV",
-        // onClick: withErrHandling(() => block.downloadRemote("CSV")),
-        onClick: withErrHandling(() => {}),
+        onClick: withErrHandling(() => p.downloadRemote("CSV")),
         id: "download-original-csv",
       },
       {
         name: "Download Excel",
-        // onClick: withErrHandling(() => block.downloadRemote("EXCEL")),
-        onClick: withErrHandling(() => {}),
+        onClick: withErrHandling(() => p.downloadRemote("EXCEL")),
         id: "download-original-excel",
       },
     ],
