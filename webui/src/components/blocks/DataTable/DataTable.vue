@@ -1,0 +1,178 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { defineCustomElements } from "@revolist/revogrid/custom-element";
+
+const p = defineProps<{
+  singleBlockEmbed: boolean;
+  data: any[];
+  schema: any;
+  previewMode: boolean;
+}>();
+defineCustomElements();
+
+// const rows = [
+//   {
+//     name: "New item",
+//     details: "Item description",
+//   },
+// ];
+
+// const columns = [
+//   {
+//     prop: "name",
+//     name: "First",
+//   },
+//   {
+//     prop: "details",
+//     name: "Second",
+//   },
+// ];
+
+type KnownTypes =
+  | "string"
+  | "double"
+  | "boolean"
+  | "integer"
+  | "timestamp"
+  | "category"
+  | "index"
+  | "unknown";
+
+const TableColors: { [t in KnownTypes]: string } = {
+  string: "green",
+  double: "blue",
+  boolean: "indigo",
+  timestamp: "red",
+  category: "orange",
+  integer: "teal",
+  index: "black",
+  unknown: "black",
+};
+
+const TableIcons: { [t in KnownTypes]: string } = {
+  string: "font",
+  timestamp: "calendar",
+  category: "cubes",
+  double: "bar-chart",
+  boolean: "toggle-on",
+  integer: "bar-chart",
+  index: "list-ol",
+  unknown: "circle",
+};
+
+const numericCellCompare = (prop: string | number, a: any, b: any) => {
+  /* Revogrid 3.0.97 requires an explicit numeric sort function */
+  const av = a[prop];
+  const bv = b[prop];
+  return av === bv ? 0 : av > bv ? 1 : -1;
+};
+
+const createHeader = (h: any, column: Col) => {
+  const columnType: any = column.type || "unknown";
+  const iconName = TableIcons[columnType];
+  // TODO - returning JSX doesn't work so using hyperscript instead
+  return h(
+    "div",
+    {
+      class: "flex items-center w-full whitespace-nowrap overflow-hidden",
+    },
+    h("i", {
+      class: `fa fa-${iconName} pr-2 text-${TableColors[columnType]}-400`,
+    }),
+    h("div", {}, column.name)
+  );
+};
+
+type Col = {
+  prop: string;
+  name: string;
+  sortable: boolean;
+  size: number;
+  type?: string;
+  columnTemplate?: any;
+};
+
+console.log("schema:");
+console.log(p.schema);
+
+const cols: Col[] = computed(() => {
+  const firstRow = p.data[0];
+
+  if (p.previewMode || !firstRow) {
+    return [];
+  }
+  const colNames =
+    p.schema && p.schema.length
+      ? p.schema.map((s: any) => s.name)
+      : Object.keys(firstRow);
+
+  const getColumnType = (columnType?: string) => {
+    switch (columnType) {
+      case "double":
+      case "integer":
+        return "number";
+      case "timestamp":
+        return "date";
+      case "category":
+        return "select";
+      default:
+        return "string";
+    }
+  };
+
+  return colNames.map((n: string) => {
+    const optSchemaField = p.schema && p.schema.find((f: any) => f.name === n);
+
+    // schemaType: More granular data type used by the DS header and arrow
+    // columnType: One of number/string/date/select used by revogrid
+    const schemaType =
+      optSchemaField && optSchemaField.type ? optSchemaField.type : "string";
+    const columnType = getColumnType(schemaType);
+    return {
+      prop: n,
+      name: n,
+      size: 200,
+      sortable: true,
+      columnType,
+      type: schemaType,
+      filter: columnType,
+      autoSize: true,
+      cellCompare: columnType === "number" ? numericCellCompare : undefined,
+      columnTemplate: createHeader,
+    };
+  });
+});
+</script>
+
+<script lang="ts">
+import Header from "./Header.vue";
+
+export default {
+  Header,
+};
+</script>
+
+<template>
+  <div
+    data-cy="block-datatable"
+    :class="[
+      'rounded shadow w-full',
+      { 'h-full flex flex-col': p.singleBlockEmbed },
+    ]"
+  >
+    <Header :singleBlockEmbed="p.singleBlockEmbed" :previewMode="false" />
+    <revo-grid
+      v-if="cols.length"
+      theme="compact"
+      :source="p.data"
+      :columns="cols"
+      :class="{ 'flex-1': p.singleBlockEmbed, 'h-96': !p.singleBlockEmbed }"
+      :resize="true"
+      :autoSizeColumn="true"
+      :rowHeaders="true"
+      :filter="true"
+      :readonly="true"
+      :exporting="true"
+    />
+  </div>
+</template>
