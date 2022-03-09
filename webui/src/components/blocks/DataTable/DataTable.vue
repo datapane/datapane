@@ -11,6 +11,11 @@ const p = defineProps<{
   cells: number;
   schema: any;
   previewMode: boolean;
+  refId: string;
+  // TODO - type
+  getCsvText: any;
+  downloadLocal: any;
+  downloadRemote: any;
 }>();
 
 defineCustomElements();
@@ -153,6 +158,9 @@ export default {
       :rows="p.data.length"
       :columns="cols.length"
       :cells="p.cells"
+      :getCsvText="p.getCsvText"
+      :downloadLocal="p.downloadLocal"
+      :downloadRemote="p.downloadRemote"
     />
     <revo-grid
       v-if="cols.length && !p.previewMode"
@@ -166,6 +174,7 @@ export default {
       :filter="true"
       :readonly="true"
       :exporting="true"
+      :id="`grid-${p.refId}`"
     />
     <div v-if="p.previewMode" class="w-full flex justify-center">
       <DPButton

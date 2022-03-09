@@ -6,6 +6,11 @@ const p = defineProps<{
   streamContents: () => Promise<DatasetResponse>;
   deferLoad: boolean;
   cells: number;
+  refId: string;
+  // TODO - type
+  getCsvText: any;
+  downloadLocal: any;
+  downloadRemote: any;
 }>();
 
 const singleBlockEmbed = inject("singleBlockEmbed");
@@ -53,6 +58,10 @@ export default {
     :cells="p.cells"
     :schema="dsSchema"
     :previewMode="previewMode"
+    :getCsvText="p.getCsvText"
+    :downloadLocal="p.downloadLocal"
+    :downloadRemote="p.downloadRemote"
+    :refId="p.refId"
     @load-full="handleLoadFull"
   />
 </template>
