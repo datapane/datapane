@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DPClipboard } from "../../../../DPClipboard";
+import { Section } from "../../../shared/shared";
+
 const p = defineProps<{
   previewMode: boolean;
   rows: number;
@@ -6,15 +9,63 @@ const p = defineProps<{
   cells: number;
 }>();
 
+// TODO - refactor NStackErrorHandler and move logic there
+const withErrHandling = function (f: Function): any {
+  return function (this: any, ...args: any[]) {
+    return f.apply(this, args).catch((e: any) => {
+      console.error(e);
+    });
+  };
+};
+
+const actionSections: Section[] = [
+  {
+    title: "Current State",
+    options: [
+      {
+        name: "Copy CSV to clipboard",
+        onClick: async () => {},
+        // DPClipboard.copyOnce(await block.getCsvText()),
+        id: "copy-clipboard",
+      },
+      {
+        name: "Download CSV",
+        // onClick: withErrHandling(block.downloadLocal),
+        onClick: withErrHandling(() => {}),
+        id: "download-csv",
+      },
+    ],
+  },
+  {
+    title: "Original Data",
+    options: [
+      {
+        name: "Download CSV",
+        // onClick: withErrHandling(() => block.downloadRemote("CSV")),
+        onClick: withErrHandling(() => {}),
+        id: "download-original-csv",
+      },
+      {
+        name: "Download Excel",
+        // onClick: withErrHandling(() => block.downloadRemote("EXCEL")),
+        onClick: withErrHandling(() => {}),
+        id: "download-original-excel",
+      },
+    ],
+  },
+];
+
 const showActions = !window.dpLocal && !p.previewMode;
 </script>
 
 <script lang="ts">
 import DataTag from "./DataTag.vue";
+import DPDropdown from "../../../shared/DPDropdown.vue";
 
 export default {
   components: {
     DataTag,
+    DPDropdown,
   },
 };
 </script>
@@ -31,7 +82,7 @@ export default {
         v-if="showActions"
         class="min-w-0 flex items-center pr-2 sm:divide-x flex-wrap"
       >
-        <div>Dropdown placeholder</div>
+        <DPDropdown name="Export" :sections="actionSections" />
       </div>
     </div>
   </div>
