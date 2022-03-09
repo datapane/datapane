@@ -1,6 +1,6 @@
 import { markRaw } from "vue";
-import { AssetBlock, Elem } from "./blocks";
-import VDataTableBlock from "../components/blocks/DataTable/DataTable.connector.vue";
+import { AssetBlock, Elem } from "../blocks";
+import VDataTableBlock from "../../components/blocks/DataTable/DataTable.connector.vue";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const AUTO_LOAD_CELLS_LIMIT = 500000;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, inject, onMounted, ref, watch } from "vue";
-import { DatasetResponse } from "../../../data-model/datatable-block";
+import { DatasetResponse } from "../../../data-model/datatable/datatable-block";
 
 const p = defineProps<{
   streamContents: () => Promise<DatasetResponse>;
@@ -26,18 +26,6 @@ const getResultData = async () => {
 };
 
 getResultData();
-
-// onMounted(() => {
-//   if (p.autoLoad) {
-//     getResultData();
-//   }
-// });
-
-// const p = defineProps<{ fetchAssetData: any }>();
-
-// p.fetchAssetData().then(plotJson => {
-//     childProps.plotJson = plotJson;
-// })
 </script>
 
 <script lang="ts">
