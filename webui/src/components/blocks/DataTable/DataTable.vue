@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ComputedRef } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
 
 const p = defineProps<{
@@ -10,23 +10,14 @@ const p = defineProps<{
 }>();
 defineCustomElements();
 
-// const rows = [
-//   {
-//     name: "New item",
-//     details: "Item description",
-//   },
-// ];
-
-// const columns = [
-//   {
-//     prop: "name",
-//     name: "First",
-//   },
-//   {
-//     prop: "details",
-//     name: "Second",
-//   },
-// ];
+type Col = {
+  prop: string;
+  name: string;
+  sortable: boolean;
+  size: number;
+  type?: string;
+  columnTemplate?: any;
+};
 
 type KnownTypes =
   | "string"
@@ -69,33 +60,36 @@ const numericCellCompare = (prop: string | number, a: any, b: any) => {
 
 const createHeader = (h: any, column: Col) => {
   const columnType: any = column.type || "unknown";
-  const iconName = TableIcons[columnType];
-  // TODO - returning JSX doesn't work so using hyperscript instead
+  const iconName = (TableIcons as any)[columnType];
+  const colorName = (TableColors as any)[columnType];
+
   return h(
     "div",
     {
       class: "flex items-center w-full whitespace-nowrap overflow-hidden",
     },
     h("i", {
-      class: `fa fa-${iconName} pr-2 text-${TableColors[columnType]}-400`,
+      class: `fa fa-${iconName} pr-2 text-${colorName}-400`,
     }),
     h("div", {}, column.name)
   );
 };
 
-type Col = {
-  prop: string;
-  name: string;
-  sortable: boolean;
-  size: number;
-  type?: string;
-  columnTemplate?: any;
+const getColumnType = (columnType?: string) => {
+  switch (columnType) {
+    case "double":
+    case "integer":
+      return "number";
+    case "timestamp":
+      return "date";
+    case "category":
+      return "select";
+    default:
+      return "string";
+  }
 };
 
-console.log("schema:");
-console.log(p.schema);
-
-const cols: Col[] = computed(() => {
+const cols: ComputedRef<Col[]> = computed(() => {
   const firstRow = p.data[0];
 
   if (p.previewMode || !firstRow) {
@@ -105,20 +99,6 @@ const cols: Col[] = computed(() => {
     p.schema && p.schema.length
       ? p.schema.map((s: any) => s.name)
       : Object.keys(firstRow);
-
-  const getColumnType = (columnType?: string) => {
-    switch (columnType) {
-      case "double":
-      case "integer":
-        return "number";
-      case "timestamp":
-        return "date";
-      case "category":
-        return "select";
-      default:
-        return "string";
-    }
-  };
 
   return colNames.map((n: string) => {
     const optSchemaField = p.schema && p.schema.find((f: any) => f.name === n);
@@ -176,3 +156,9 @@ export default {
     />
   </div>
 </template>
+
+<style scoped>
+revo-grid {
+  background-color: white;
+}
+</style>

@@ -16,7 +16,7 @@ import {
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
-import { DataTableBlock } from "./datatable-block";
+import { DataTableBlock } from "./datatable/datatable-block";
 
 export type State = {
   report: Report;
