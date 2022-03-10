@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
-import { ref, provide, computed } from "vue";
+import { ref, provide, computed, ComputedRef } from "vue";
 import { createGridKey } from "./utils";
+import { LayoutBlock } from "../data-model/blocks";
 
 const p = defineProps<{ reportProps: any }>();
 const store = new ReportStore(p.reportProps);
@@ -11,8 +12,8 @@ const pageNumber = ref(0);
 const multiBlockEmbed =
   p.reportProps.mode === "EMBED" && !store.state.singleBlockEmbed;
 
-const rootGroup = computed(() =>
-  report ? report.children[pageNumber.value].children[0] : undefined
+const rootGroup: ComputedRef<LayoutBlock> = computed(
+  () => report.children[pageNumber.value].children[0]
 );
 
 provide("singleBlockEmbed", singleBlockEmbed);
@@ -80,7 +81,7 @@ export default {
       <div class="sm:flex block">
         <div
           v-if="pageLabels.length > 1 && report.layout === 'side'"
-          class="hidden sm:block w-1/6 bg-gray-100 px-4"
+          class="hiddeLan sm:block w-1/6 bg-gray-100 px-4"
         >
           <VPages
             :labels="pageLabels"

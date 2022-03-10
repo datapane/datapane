@@ -16,7 +16,7 @@ const p = defineProps<{
       <i :class="`pr-2 fa ${p.icon}`" />
     </div>
     <div>
-      <span>{{ formatNumber(p.value) }}</span>
+      <span>{{ formatNumber(+p.value) }}</span>
       <span className="hidden md:inline">{{ " " }}{{ p.unit }}</span>
     </div>
   </div>

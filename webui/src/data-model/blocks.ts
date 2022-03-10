@@ -40,7 +40,7 @@ export class Page {
 
 export class Group {
   public children: BlockTree[];
-  public columns: Number;
+  public columns: number;
   public label?: string;
   public name = "Group";
 
