@@ -3,6 +3,7 @@ import { ReportStore } from "../data-model/report-store";
 import { ref, provide, computed, ComputedRef } from "vue";
 import { createGridKey } from "./utils";
 import { LayoutBlock } from "../data-model/blocks";
+import { setTheme } from "../theme";
 
 const p = defineProps<{ reportProps: any }>();
 const store = new ReportStore(p.reportProps);
@@ -31,6 +32,15 @@ const pageLabels = report.children.map((page, idx) =>
 
 const handlePageChange = (newPageNumber: number) =>
   (pageNumber.value = newPageNumber);
+
+const htmlHeaderRef = ref<HTMLDivElement | null>(null);
+const htmlHeader = p.reportProps.report.output_style_header;
+
+const onHeaderChange = (node: HTMLDivElement) => {
+  if (node !== null) {
+    setTheme(p.reportProps.report.is_light_prose);
+  }
+};
 </script>
 
 <script lang="ts">
@@ -52,6 +62,7 @@ export default {
 </script>
 
 <template>
+  <div v-if="!singleBlockEmbed" v-html="htmlHeader" :ref="onHeaderChange" />
   <div
     v-if="pageLabels.length > 1 && report.layout === 'top'"
     class="hidden sm:block w-full mb-6"

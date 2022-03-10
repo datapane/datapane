@@ -52,6 +52,7 @@ export class ReportStore {
   public state: State;
 
   private webUrl: string;
+  private isLightProse: boolean;
 
   private counts = {
     plots: 0,
@@ -62,6 +63,7 @@ export class ReportStore {
 
   public constructor(reportProps: any) {
     this.webUrl = reportProps.report.web_url;
+    this.isLightProse = reportProps.report.is_light_prose;
 
     const deserializedReport = this.xmlToReport(reportProps.report.document);
     const singleBlockEmbed = this.isSingleBlockEmbed(
@@ -222,6 +224,7 @@ export class ReportStore {
     let opts: any;
     if (maps.jsonIsMarkdown(elem)) {
       BlockClass = TextBlock;
+      opts = { isLightProse: this.isLightProse };
     } else if (maps.jsonIsBokeh(elem)) {
       BlockClass = BokehBlock;
     } else if (maps.jsonIsArrowTable(elem)) {
