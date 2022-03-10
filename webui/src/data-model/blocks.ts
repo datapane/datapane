@@ -93,7 +93,7 @@ export class Block {
   public count?: number;
   public componentProps: any;
 
-  public constructor(elem: Elem, caption?: string, count?: number) {
+  public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
     const { attributes } = elem;
     this.refId = uuidv4();
     this.count = count;

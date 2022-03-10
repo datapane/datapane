@@ -1,5 +1,5 @@
 import { markRaw } from "vue";
-import { AssetBlock, Elem } from "../blocks";
+import { AssetBlock, Elem, ExportType } from "../blocks";
 import VDataTableBlock from "../../components/blocks/DataTable/DataTable.connector.vue";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import download from "downloadjs";
@@ -18,6 +18,9 @@ const addQueryParam = (url: string, qp: { k: string; v: string }): string => {
 };
 
 const filenameFromResponse = (response: Response): string => {
+  /**
+   * Creates a filename from file response header
+   */
   const FALLBACK_NAME = "dp-export.csv";
   // eslint-disable-next-line
   const FILENAME_ATTR = 'filename="';
@@ -33,9 +36,9 @@ const filenameFromResponse = (response: Response): string => {
 };
 
 const downloadObject = async (url: string, mimeType: string) => {
-  // toast.info("Preparing file for download", {
-  // toastId: PREPARE_TOAST_ID,
-  // });
+  /**
+   * Downloads a file from the server to the local client
+   */
   try {
     const response = await fetch(urljoin(window.location.origin, url));
     if (response) {
@@ -45,8 +48,8 @@ const downloadObject = async (url: string, mimeType: string) => {
     } else {
       console.error("No url provided");
     }
-  } finally {
-    // toast.dismiss(PREPARE_TOAST_ID);
+  } catch (e) {
+    console.error(`An error occurred while downloading the file: ${e}`);
   }
 };
 
@@ -67,6 +70,7 @@ export class DataTableBlock extends AssetBlock {
   public size: number;
   public casRef: string;
 
+  private webUrl: string;
   private _revogridExportPlugin: any;
 
   public get cells(): number {
@@ -81,13 +85,15 @@ export class DataTableBlock extends AssetBlock {
     return this.buildExtensionUrl("export");
   }
 
-  public constructor(elem: Elem) {
-    super(elem);
+  public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
+    super(elem, caption, count);
     const { attributes } = elem;
     this.rows = attributes.rows;
     this.columns = attributes.columns;
     this.size = attributes.size;
     this.casRef = attributes.cas_ref;
+    this.webUrl = opts.webUrl;
+
     this.componentProps = {
       streamContents: this.streamContents,
       getCsvText: this.getCsvText,
@@ -106,6 +112,9 @@ export class DataTableBlock extends AssetBlock {
   }
 
   public streamContents = async (): Promise<DatasetResponse> => {
+    /**
+     *
+     */
     const opts: AxiosRequestConfig = {
       responseType: "arraybuffer",
     };
@@ -178,9 +187,6 @@ export class DataTableBlock extends AssetBlock {
 
   private buildExtensionUrl(name: string): string {
     // TODO - use report obj url
-    return new URL(
-      `extensions/${name}/${this.casRef}`,
-      window.location.href
-    ).toString();
+    return new URL(`extensions/${name}/${this.casRef}`, this.webUrl).toString();
   }
 }
