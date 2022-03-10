@@ -3,7 +3,7 @@ import { computed } from "vue";
 import * as marked from "marked";
 
 const p = defineProps<{ content: string; isLightProse: boolean }>();
-const md = computed(() => marked.parse(p.content));
+const md = computed(() => (marked as any).parse(p.content));
 </script>
 
 <template>

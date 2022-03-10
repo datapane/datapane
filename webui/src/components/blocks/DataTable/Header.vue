@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { DPClipboard } from "../../../../DPClipboard";
 import { Section } from "../../../shared/shared";
+import { ExportType } from "../../../data-model/blocks";
 
 const p = defineProps<{
   previewMode: boolean;
   rows: number;
   columns: number;
   cells: number;
-  // TODO - type
-  getCsvText: any;
-  downloadLocal: any;
-  downloadRemote: any;
+  getCsvText: () => Promise<string>;
+  downloadLocal: (type: ExportType) => Promise<void>;
+  downloadRemote: (type: ExportType) => Promise<void>;
 }>();
 
 // TODO - refactor NStackErrorHandler and move logic there

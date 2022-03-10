@@ -3,8 +3,11 @@
  * Recursively renders a grid of report blocks
  */
 
-import { BlockTree, Group, isGroup } from "../data-model/blocks";
+import { BlockTree, Group, isBlock, isGroup } from "../data-model/blocks";
 import { inject } from "vue";
+
+const createGridKey = (child: BlockTree, idx: number) =>
+  isBlock(child) ? `${child.refId}-${idx}` : `${child.name}-${idx}`;
 
 const singleBlockEmbed = inject("singleBlockEmbed");
 const p = defineProps<{ tree: BlockTree }>();
@@ -14,8 +17,8 @@ const p = defineProps<{ tree: BlockTree }>();
   <template v-if="isGroup(p.tree)">
     <GroupLayout :columns="p.tree.columns">
       <GridGenerator
-        v-for="child in p.tree.children"
-        :key="child.refId"
+        v-for="(child, idx) in p.tree.children"
+        :key="createGridKey(child, idx)"
         :tree="child"
       ></GridGenerator>
     </GroupLayout>

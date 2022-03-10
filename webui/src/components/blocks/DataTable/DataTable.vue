@@ -2,23 +2,7 @@
 import { computed, ComputedRef, defineEmits } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
 import { formatNumber } from "./shared";
-
-const emit = defineEmits(["load-full"]);
-
-const p = defineProps<{
-  singleBlockEmbed: boolean;
-  data: any[];
-  cells: number;
-  schema: any;
-  previewMode: boolean;
-  refId: string;
-  // TODO - type
-  getCsvText: any;
-  downloadLocal: any;
-  downloadRemote: any;
-}>();
-
-defineCustomElements();
+import { ExportType } from "../../../data-model/blocks";
 
 type Col = {
   prop: string;
@@ -98,6 +82,22 @@ const getColumnType = (columnType?: string) => {
       return "string";
   }
 };
+
+const emit = defineEmits(["load-full"]);
+
+const p = defineProps<{
+  singleBlockEmbed: boolean;
+  data: any[];
+  cells: number;
+  schema: any;
+  previewMode: boolean;
+  refId: string;
+  getCsvText: () => Promise<string>;
+  downloadLocal: (type: ExportType) => Promise<void>;
+  downloadRemote: (type: ExportType) => Promise<void>;
+}>();
+
+defineCustomElements();
 
 const cols: ComputedRef<Col[]> = computed(() => {
   const firstRow = p.data[0];

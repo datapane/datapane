@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { defineAsyncComponent, inject, ref } from "vue";
 import { DatasetResponse } from "../../../data-model/datatable/datatable-block";
+import { ExportType } from "../../../data-model/blocks";
 
 const p = defineProps<{
   streamContents: () => Promise<DatasetResponse>;
   deferLoad: boolean;
   cells: number;
   refId: string;
-  // TODO - type
-  getCsvText: any;
-  downloadLocal: any;
-  downloadRemote: any;
+  getCsvText: () => Promise<string>;
+  downloadLocal: (type: ExportType) => Promise<void>;
+  downloadRemote: (type: ExportType) => Promise<void>;
 }>();
 
-const singleBlockEmbed = inject("singleBlockEmbed");
+const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
 const previewMode = ref(p.deferLoad);
 const dsData = ref([]);
 const dsSchema = ref({});
@@ -53,7 +53,7 @@ export default {
 
 <template>
   <DataTableBlock
-    :singleBlockEmbed="singleBlockEmbed"
+    :singleBlockEmbed="!!singleBlockEmbed"
     :data="dsData"
     :cells="p.cells"
     :schema="dsSchema"
