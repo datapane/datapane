@@ -51,6 +51,8 @@ const getElementByName = (elem: Elem, name: string): any => {
 export class ReportStore {
   public state: State;
 
+  private webUrl: string;
+
   private counts = {
     plots: 0,
     tables: 0,
@@ -59,11 +61,14 @@ export class ReportStore {
   };
 
   public constructor(reportProps: any) {
+    this.webUrl = reportProps.report.web_url;
+
     const deserializedReport = this.xmlToReport(reportProps.report.document);
     const singleBlockEmbed = this.isSingleBlockEmbed(
       deserializedReport.children,
       reportProps.mode
     );
+
     this.state = {
       report: deserializedReport,
       singleBlockEmbed,
@@ -214,17 +219,19 @@ export class ReportStore {
     const caption = getAttributes(elem).caption;
 
     let BlockClass: typeof Block;
+    let opts: any;
     if (maps.jsonIsMarkdown(elem)) {
       BlockClass = TextBlock;
     } else if (maps.jsonIsBokeh(elem)) {
       BlockClass = BokehBlock;
     } else if (maps.jsonIsArrowTable(elem)) {
       BlockClass = DataTableBlock;
+      opts = { webUrl: this.webUrl };
     } else if (maps.jsonIsCode(elem)) {
       BlockClass = CodeBlock;
     } else {
       BlockClass = UnknownBlock;
     }
-    return new BlockClass(elem, caption, count);
+    return new BlockClass(elem, caption, count, opts);
   }
 }
