@@ -160,13 +160,13 @@ export class TextBlock extends Block {
   public content: string;
   public componentProps: any;
 
-  public constructor(elem: Elem, caption?: string, count?: number) {
+  public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
     super(elem, caption, count);
     this.content = getInnerText(elem);
     this.componentProps = {
       ...this.componentProps,
       content: this.content,
-      isLightProse: false,
+      isLightProse: opts.isLightProse,
     };
   }
 }

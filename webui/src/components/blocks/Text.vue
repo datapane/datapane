@@ -11,7 +11,7 @@ const md = computed(() => (marked as any).parse(p.content));
   <div
     :class="[
       'w-full overflow-y-hidden prose font-dp-prose',
-      { proseDark: p.isLightProse },
+      { 'prose-dark': p.isLightProse },
     ]"
     data-cy="block-markdown"
     v-html="md"
