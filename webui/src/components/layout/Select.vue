@@ -18,6 +18,8 @@ const getSectionType = (): string => {
   return children.length < 5 ? "tabs" : "dropdown";
 };
 
+const setTabNumber = (val: number) => (tabNumber.value = val);
+
 const sectionType = getSectionType();
 const selectSearchOptions = labels.map((label, idx) => ({
   text: label,
