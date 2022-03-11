@@ -7,7 +7,10 @@ const emit = defineEmits(["page-change"]);
 </script>
 
 <template>
-  <nav class="min-h-screen space-y-1 flex-fixed p-4 pl-0" aria-label="Sidebar">
+  <nav
+    class="min-h-screen space-y-1 flex-fixed p-4 pl-0 hidden sm:block"
+    aria-label="Sidebar"
+  >
     <a
       v-for="(label, idx) in p.labels"
       :key="idx"
