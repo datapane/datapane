@@ -148,6 +148,8 @@ module.exports = {
       backgroundColor: ["active", "odd"],
       textColor: ["active"],
       display: ["group-hover"],
+      opacity: ["disabled"],
+      cursor: ["disabled"],
     },
     opacity: ["responsive", "hover", "focus", "disabled"],
   },
@@ -167,6 +169,7 @@ module.exports = {
     "../datapane-hosted/dp-server/src/dp/apps/dp_org/templates/**/*.html",
     "../datapane-hosted/dp-server/src/dp/apps/dp_public/templates/**/*.html",
     "../datapane-hosted/dp-server/templates/**/*.html",
+    "./node_modules/@variantjs/**/*.ts",
   ],
   safelist: [
     // TODO - remove redundant items

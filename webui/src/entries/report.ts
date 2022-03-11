@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, use } from "vue";
 import Report from "../components/Report.vue";
 
 declare global {
@@ -6,7 +6,6 @@ declare global {
     dpLocal: boolean;
   }
 }
-
 const mountReport = (reportProps: any) => {
   const app = createApp(Report, { reportProps });
   app.mount("#report");

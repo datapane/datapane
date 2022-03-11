@@ -12,10 +12,13 @@
   "dependencies": {
     "@bokeh/bokehjs": "2.2.3",
     "@highlightjs/vue-plugin": "^2.1.0",
+    "@popperjs/core": "^2.11.2",
     "@revolist/revogrid": "^3.0.98",
     "@stencil/core": "^2.14.0",
+    "@variantjs/core": "0.0.87",
     "apache-arrow": "^6.0.1",
     "axios": "^0.26.0",
+    "body-scroll-lock": "^4.0.0-beta.0",
     "chroma-js": "^2.4.2",
     "clipboard": "^2.0.10",
     "downloadjs": "^1.4.7",
@@ -29,6 +32,7 @@
     "url-join": "^4.0.1",
     "uuid": "^8.3.2",
     "vue": "^3.2.25",
+    "vue-multiselect": "^3.0.0-alpha.2",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
