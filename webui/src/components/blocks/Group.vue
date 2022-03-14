@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const objOrEmpty = (obj: any, n: number) => (n > 0 ? obj : {});
 
-const p = defineProps<{ columns: number }>();
+const p = defineProps<{ columns: number; singleBlockEmbed: boolean }>();
 
 const gridLayoutStyle = {
   ...objOrEmpty(
@@ -16,8 +16,8 @@ const gridLayoutStyle = {
 <template>
   <div
     :class="[
-      'sm:grid sm:gap-4 py-4',
-      { 'grid-flow-col grid-cols-fit': !p.columns },
+      'sm:grid sm:gap-4',
+      { 'grid-flow-col grid-cols-fit': !p.columns, 'py-4': !singleBlockEmbed },
     ]"
     :style="gridLayoutStyle"
   >

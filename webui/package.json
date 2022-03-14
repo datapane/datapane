@@ -31,6 +31,9 @@
     "sass": "^1.49.9",
     "url-join": "^4.0.1",
     "uuid": "^8.3.2",
+    "vega": "^5.22.0",
+    "vega-embed": "^6.20.8",
+    "vega-lite": "^5.2.0",
     "vue": "^3.2.25",
     "vue-multiselect": "^3.0.0-alpha.2",
     "xml-js": "^1.6.11"

@@ -12,15 +12,15 @@ const plotJson = ref<any>(null);
 <script lang="ts">
 export default {
   components: {
-    BokehBlock: defineAsyncComponent(() => import("./Bokeh.vue")),
+    VegaBlock: defineAsyncComponent(() => import("./Vega.vue")),
   },
 };
 </script>
 
 <template>
-  <BokehBlock
+  <VegaBlock
     v-if="plotJson"
     :plotJson="plotJson"
     :responsive="p.responsive"
-  ></BokehBlock>
+  ></VegaBlock>
 </template>
