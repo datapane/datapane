@@ -2,6 +2,7 @@ import VTextBlock from "../components/blocks/Text.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
+import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -158,6 +159,20 @@ export class BokehBlock extends PlotAssetBlock {
 
 export class VegaBlock extends PlotAssetBlock {
   public component = markRaw(VVegaBlock);
+}
+
+export class PlotlyBlock extends PlotAssetBlock {
+  public component = markRaw(VPlotlyBlock);
+
+  protected fetchLocalAssetData(): any {
+    return JSON.parse(JSON.parse(decodeBase64Asset(this.src)));
+  }
+
+  protected fetchRemoteAssetData = async (): Promise<any> => {
+    /* TODO - type promise? */
+    const res = await readGcsTextOrJsonFile<string>(this.src);
+    return JSON.parse(res);
+  };
 }
 
 export class TextBlock extends Block {
