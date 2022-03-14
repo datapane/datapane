@@ -13,6 +13,7 @@ import {
   Toggle,
   UnknownBlock,
   BokehBlock,
+  VegaBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -232,6 +233,8 @@ export class ReportStore {
       opts = { webUrl: this.webUrl };
     } else if (maps.jsonIsCode(elem)) {
       BlockClass = CodeBlock;
+    } else if (maps.jsonIsVega(elem)) {
+      BlockClass = VegaBlock;
     } else {
       BlockClass = UnknownBlock;
     }

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { watch, onUnmounted, inject } from "vue";
+import { onUnmounted, inject, onMounted } from "vue";
 import { v4 as uuid4 } from "uuid";
 import * as Bokeh from "@bokeh/bokehjs";
 
 const docIds: any[] = [];
 const divId = uuid4();
 
-// TODO - use enum
 const singleBlockEmbed = inject("singleBlockEmbed");
 
 const p = defineProps<{ plotJson: any; responsive: boolean }>();
@@ -35,6 +34,25 @@ const cleanupDoc = (doc: any, docTimestamp: string) => {
   }
 };
 
+const addPlotToDom = async () => {
+  try {
+    p.responsive && makeResponsive(p.plotJson);
+    const plotViews = await Bokeh.embed.embed_item(p.plotJson as any, divId);
+    // Generate uuids for Bokeh Documents so they can be referenced on dismount
+    plotViews.forEach((pv: any) => {
+      const docId = uuid4();
+      (pv.model.document as any).uuid = docId;
+      docIds.push(docId);
+    });
+  } catch (e) {
+    console.error("An error occurred while rendering a Bokeh chart");
+  }
+};
+
+onMounted(() => {
+  addPlotToDom();
+});
+
 onUnmounted(() => {
   // cleanup -- https://github.com/bokeh/bokeh/issues/5355#issuecomment-423580351
   for (const doc of Bokeh.documents) {
@@ -43,30 +61,6 @@ onUnmounted(() => {
     }
   }
 });
-
-watch(
-  () => p.plotJson,
-  async () => {
-    if (p.plotJson && p.plotJson !== {}) {
-      try {
-        p.responsive && makeResponsive(p.plotJson);
-        const plotViews = await Bokeh.embed.embed_item(
-          p.plotJson as any,
-          divId
-        );
-        // Generate uuids for Bokeh Documents so they can be referenced on dismount
-        plotViews.forEach((pv: any) => {
-          const docId = uuid4();
-          (pv.model.document as any).uuid = docId;
-          docIds.push(docId);
-        });
-      } catch (e) {
-        console.error("An error occurred while rendering a Bokeh chart");
-      }
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <template>

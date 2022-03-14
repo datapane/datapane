@@ -1,6 +1,7 @@
 import VTextBlock from "../components/blocks/Text.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
+import VVegaBlock from "../components/blocks/Vega.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -153,6 +154,10 @@ export abstract class PlotAssetBlock extends AssetBlock {
 
 export class BokehBlock extends PlotAssetBlock {
   public component = markRaw(VBokehBlock);
+}
+
+export class VegaBlock extends PlotAssetBlock {
+  public component = markRaw(VVegaBlock);
 }
 
 export class TextBlock extends Block {

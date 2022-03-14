@@ -1,5 +1,6 @@
 import { createApp, use } from "vue";
 import Report from "../components/Report.vue";
+import "../styles/report.scss";
 
 declare global {
   interface Window {

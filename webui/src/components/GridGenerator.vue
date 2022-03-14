@@ -21,7 +21,7 @@ const p = defineProps<{ tree: BlockTree }>();
 
 <template>
   <template v-if="isGroup(p.tree)">
-    <GroupLayout :columns="p.tree.columns">
+    <GroupLayout :columns="p.tree.columns" :singleBlockEmbed="singleBlockEmbed">
       <GridGenerator
         v-for="(child, idx) in p.tree.children"
         :key="createGridKey(child, idx)"
