@@ -3,6 +3,7 @@ import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
 import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
+import VTableBlock from "../components/blocks/Table.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -201,7 +202,7 @@ export class TextBlock extends Block {
   }
 }
 
-export class CodeBlock extends AssetBlock {
+export class CodeBlock extends Block {
   public component = markRaw(VCodeBlock);
   public componentProps: any;
 
@@ -210,6 +211,23 @@ export class CodeBlock extends AssetBlock {
     const { language } = elem.attributes;
     const code = getInnerText(elem);
     this.componentProps = { ...this.componentProps, code, language };
+  }
+}
+
+export class TableBlock extends AssetBlock {
+  public component = markRaw(VTableBlock);
+  public captionType = "Table";
+
+  protected fetchLocalAssetData(): any {
+    return decodeBase64AssetUtf8(this.src);
+  }
+
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
+    this.componentProps = {
+      ...this.componentProps,
+      fetchAssetData: this.fetchAssetData,
+    };
   }
 }
 
@@ -269,6 +287,18 @@ const readGcsTextOrJsonFile = <T = string | object | null>(
   url: string
 ): Promise<T> => {
   return axios.get(url).then((res) => res.data);
+};
+
+const decodeBase64AssetUtf8 = (src: string) => {
+  // https://stackoverflow.com/a/64752311
+  const text = decodeBase64Asset(src);
+  const length = text.length;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    bytes[i] = text.charCodeAt(i);
+  }
+  const decoder = new TextDecoder(); // default is utf-8
+  return decoder.decode(bytes);
 };
 
 export const decodeBase64Asset = (src: string): any => {
