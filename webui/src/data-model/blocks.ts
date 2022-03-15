@@ -4,6 +4,7 @@ import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
 import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
 import VTableBlock from "../components/blocks/Table.connector.vue";
+import VHTMLBlock from "../components/blocks/HTML.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -189,15 +190,14 @@ export class PlotlyBlock extends PlotAssetBlock {
 
 export class TextBlock extends Block {
   public component = markRaw(VTextBlock);
-  public content: string;
   public componentProps: any;
 
   public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
     super(elem, caption, count);
-    this.content = getInnerText(elem);
+    const content = getInnerText(elem);
     this.componentProps = {
       ...this.componentProps,
-      content: this.content,
+      content,
       isLightProse: opts.isLightProse,
     };
   }
@@ -224,14 +224,20 @@ export class TableBlock extends AssetBlock {
   }
 }
 
-export class UnknownBlock extends Block {
-  public content: string;
+export class HTMLBlock extends Block {
+  public component = markRaw(VHTMLBlock);
 
-  public constructor(elem: Elem) {
-    super(elem);
-    this.content = `Unknown block ${elem.name}`;
+  public constructor(elem: Elem, caption?: string, count?: number) {
+    super(elem, caption, count);
+    const html = getInnerText(elem);
+    this.componentProps = {
+      ...this.componentProps,
+      html,
+    };
   }
 }
+
+export class UnknownBlock extends Block {}
 
 /* Helper types */
 

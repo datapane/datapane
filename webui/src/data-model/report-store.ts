@@ -16,6 +16,7 @@ import {
   VegaBlock,
   PlotlyBlock,
   TableBlock,
+  HTMLBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -241,6 +242,8 @@ export class ReportStore {
       BlockClass = PlotlyBlock;
     } else if (maps.jsonIsHTMLTable(elem)) {
       BlockClass = TableBlock;
+    } else if (maps.jsonIsHTML(elem)) {
+      BlockClass = HTMLBlock;
     } else {
       BlockClass = UnknownBlock;
     }
