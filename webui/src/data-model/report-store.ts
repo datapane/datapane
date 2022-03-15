@@ -15,6 +15,7 @@ import {
   BokehBlock,
   VegaBlock,
   PlotlyBlock,
+  TableBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -238,6 +239,8 @@ export class ReportStore {
       BlockClass = VegaBlock;
     } else if (maps.jsonIsPlotly(elem)) {
       BlockClass = PlotlyBlock;
+    } else if (maps.jsonIsHTMLTable(elem)) {
+      BlockClass = TableBlock;
     } else {
       BlockClass = UnknownBlock;
     }

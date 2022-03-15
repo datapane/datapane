@@ -15,7 +15,9 @@ module.exports = defineConfig({
       template: {
         compilerOptions: {
           isCustomElement: (tag) =>
-            tag.startsWith("dp-") || tag.startsWith("revo-"),
+            tag.startsWith("dp-") ||
+            tag.startsWith("x-") ||
+            tag.startsWith("revo-"),
         },
       },
     }),
