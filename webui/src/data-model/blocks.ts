@@ -119,23 +119,25 @@ export abstract class AssetBlock<T = any> extends Block {
     const { attributes } = elem;
     this.src = attributes.src;
     this.type = attributes.type;
+    this.componentProps = {
+      ...this.componentProps,
+      fetchAssetData: this.fetchAssetData.bind(this),
+    };
   }
 
   protected fetchLocalAssetData(): any {
     return decodeBase64Asset(this.src);
   }
 
-  public fetchAssetData = async (): Promise<T> => {
+  public async fetchAssetData(): Promise<T> {
     return window.dpLocal
       ? this.fetchLocalAssetData()
       : this.fetchRemoteAssetData();
-  };
+  }
 
-  protected fetchRemoteAssetData = async (): Promise<
-    string | object | null
-  > => {
+  protected async fetchRemoteAssetData(): Promise<string | object | null> {
     return await readGcsTextOrJsonFile(this.src);
-  };
+  }
 }
 
 export abstract class PlotAssetBlock extends AssetBlock {
@@ -148,7 +150,6 @@ export abstract class PlotAssetBlock extends AssetBlock {
     this.responsive = JSON.parse(attributes.responsive);
     this.componentProps = {
       ...this.componentProps,
-      fetchAssetData: this.fetchAssetData,
       responsive: this.responsive,
     };
   }
@@ -179,11 +180,11 @@ export class PlotlyBlock extends PlotAssetBlock {
     return JSON.parse(JSON.parse(decodeBase64Asset(this.src)));
   }
 
-  protected fetchRemoteAssetData = async (): Promise<any> => {
+  protected async fetchRemoteAssetData(): Promise<any> {
     /* TODO - type promise? */
     const res = await readGcsTextOrJsonFile<string>(this.src);
     return JSON.parse(res);
-  };
+  }
 }
 
 export class TextBlock extends Block {
@@ -220,14 +221,6 @@ export class TableBlock extends AssetBlock {
 
   protected fetchLocalAssetData(): any {
     return decodeBase64AssetUtf8(this.src);
-  }
-
-  public constructor(elem: Elem, caption?: string, count?: number) {
-    super(elem, caption, count);
-    this.componentProps = {
-      ...this.componentProps,
-      fetchAssetData: this.fetchAssetData,
-    };
   }
 }
 
