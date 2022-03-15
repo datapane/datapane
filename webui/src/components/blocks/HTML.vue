@@ -4,7 +4,7 @@ import iframeResize from "iframe-resizer/js/iframeResizer";
 import userIframeCss from "../../styles/user-iframe.css?inline";
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw";
 
-const p = defineProps<{ html: string }>();
+const p = defineProps<{ html: string; sandbox?: string }>();
 
 const iframeDoc: ComputedRef<string> = computed(() => {
   return `
@@ -26,8 +26,10 @@ onMounted(() => {
 <template>
   <iframe
     :srcdoc="iframeDoc"
+    :sandbox="p.sandbox"
     id="my-iframe"
     width="100%"
     frameborder="0"
+    data-cy="block-user-iframe"
   ></iframe>
 </template>

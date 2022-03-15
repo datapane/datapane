@@ -227,12 +227,13 @@ export class TableBlock extends AssetBlock {
 export class HTMLBlock extends Block {
   public component = markRaw(VHTMLBlock);
 
-  public constructor(elem: Elem, caption?: string, count?: number) {
+  public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
     super(elem, caption, count);
     const html = getInnerText(elem);
     this.componentProps = {
       ...this.componentProps,
       html,
+      sandbox: opts.isOrg ? undefined : "allow-scripts",
     };
   }
 }

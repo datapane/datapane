@@ -57,6 +57,7 @@ export class ReportStore {
 
   private webUrl: string;
   private isLightProse: boolean;
+  private isOrg: boolean;
 
   private counts = {
     plots: 0,
@@ -67,6 +68,7 @@ export class ReportStore {
 
   public constructor(reportProps: any) {
     this.webUrl = reportProps.report.web_url;
+    this.isOrg = reportProps.isOrg;
     this.isLightProse = reportProps.report.is_light_prose;
 
     const deserializedReport = this.xmlToReport(reportProps.report.document);
@@ -243,6 +245,7 @@ export class ReportStore {
     } else if (maps.jsonIsHTMLTable(elem)) {
       BlockClass = TableBlock;
     } else if (maps.jsonIsHTML(elem)) {
+      opts = { isOrg: this.isOrg };
       BlockClass = HTMLBlock;
     } else {
       BlockClass = UnknownBlock;
