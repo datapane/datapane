@@ -155,10 +155,21 @@ export abstract class PlotAssetBlock extends AssetBlock {
 
 export class BokehBlock extends PlotAssetBlock {
   public component = markRaw(VBokehBlock);
+
+  protected fetchLocalAssetData(): any {
+    const localAssetData = super.fetchLocalAssetData();
+    return JSON.parse(localAssetData);
+  }
 }
 
 export class VegaBlock extends PlotAssetBlock {
   public component = markRaw(VVegaBlock);
+
+  protected fetchLocalAssetData(): any {
+    const localAssetData = super.fetchLocalAssetData();
+    console.log(localAssetData);
+    return JSON.parse(localAssetData);
+  }
 }
 
 export class PlotlyBlock extends PlotAssetBlock {

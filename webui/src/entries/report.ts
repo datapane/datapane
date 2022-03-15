@@ -5,8 +5,10 @@ import "../styles/report.scss";
 declare global {
   interface Window {
     dpLocal: boolean;
+    reportProps?: any;
   }
 }
+
 const mountReport = (reportProps: any) => {
   const app = createApp(Report, { reportProps });
   app.mount("#report");

@@ -34,7 +34,8 @@ const handlePageChange = (newPageNumber: number) =>
   (pageNumber.value = newPageNumber);
 
 const htmlHeaderRef = ref<HTMLDivElement | null>(null);
-const htmlHeader = p.reportProps.report.output_style_header;
+const htmlHeader =
+  p.reportProps.htmlHeader || p.reportProps.report.output_style_header;
 
 const onHeaderChange = (node: HTMLDivElement) => {
   if (node !== null) {
@@ -62,7 +63,12 @@ export default {
 </script>
 
 <template>
-  <div v-if="!singleBlockEmbed" v-html="htmlHeader" :ref="onHeaderChange" />
+  <div
+    v-if="!singleBlockEmbed"
+    v-html="htmlHeader"
+    :ref="onHeaderChange"
+    id="html-header"
+  />
   <div
     v-if="pageLabels.length > 1 && report.layout === 'top'"
     class="hidden sm:block w-full mb-6"

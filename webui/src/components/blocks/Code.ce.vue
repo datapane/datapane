@@ -22,7 +22,7 @@ onUnmounted(() => {
 
 <template>
   <div class="relative">
-    <link rel="stylesheet" href="/static/style.css" />
+    <!-- <link rel="stylesheet" href="/static/style.css" /> -->
     <button
       class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
       ref="copyBtn"
@@ -55,6 +55,7 @@ export default {
 <style>
 /* TODO - serve this css statically in a link tag to avoid bloating the web component */
 @import "highlight.js/styles/stackoverflow-light.css";
+@import "../../styles/tailwind.css";
 
 pre {
   @apply w-full;
