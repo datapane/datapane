@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build:dev": "vite build --watch --mode development",
+    "build:local": "vite build --config local-report.vite.config.ts",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview"
