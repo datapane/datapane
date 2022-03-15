@@ -15,7 +15,6 @@ window.addEventListener("DOMContentLoaded", () => {
       document: he.decode(windowProps.report.document),
     },
   };
-  console.log(reportProps);
   const app = createApp(Report, { reportProps });
   app.mount("#report");
 });

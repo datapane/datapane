@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, inject, onMounted, watch } from "vue";
+import { inject, onMounted } from "vue";
 import Plotly from "plotly.js-dist";
 import { v4 as uuid4 } from "uuid";
 
@@ -31,7 +31,6 @@ const makeResponsive = (json: any) => {
 };
 
 onMounted(() => {
-  console.log(p.plotJson.data);
   p.responsive && makeResponsive(p.plotJson);
   Plotly.newPlot(divId, {
     data: p.plotJson.data,
@@ -44,11 +43,6 @@ onMounted(() => {
     frames: p.plotJson.frames || undefined,
   });
 });
-
-watch(
-  () => p.plotJson,
-  () => console.log(p.plotJson)
-);
 </script>
 
 <template>
