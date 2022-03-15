@@ -6,6 +6,7 @@ import { DPClipboard } from "../../../DPClipboard";
 const p = defineProps<{ language: string; code: string }>();
 let clip: DPClipboard;
 const copyBtn = ref<HTMLButtonElement | null>(null);
+const { dpLocal } = window;
 
 onMounted(() => {
   if (copyBtn.value) {
@@ -22,7 +23,7 @@ onUnmounted(() => {
 
 <template>
   <div class="relative">
-    <!-- <link rel="stylesheet" href="/static/style.css" /> -->
+    <link v-if="!dpLocal" rel="stylesheet" href="/static/style.css" />
     <button
       class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
       ref="copyBtn"
@@ -55,7 +56,6 @@ export default {
 <style>
 /* TODO - serve this css statically in a link tag to avoid bloating the web component */
 @import "highlight.js/styles/stackoverflow-light.css";
-@import "../../styles/tailwind.css";
 
 pre {
   @apply w-full;

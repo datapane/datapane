@@ -8,8 +8,7 @@ module.exports = defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) =>
-            tag.startsWith("dp-") || tag.startsWith("revo-"),
+          isCustomElement: (tag) => tag.startsWith("revo-"),
         },
       },
     }),
