@@ -80,7 +80,6 @@ export default {
     />
   </div>
   <div class="w-full bg-dp-background" data-cy="report-component">
-    <!-- TODO - custom header; pages -->
     <div
       :class="{
         'flex flex-col justify-end bg-dp-background': true,
