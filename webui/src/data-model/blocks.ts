@@ -167,7 +167,6 @@ export class VegaBlock extends PlotAssetBlock {
 
   protected fetchLocalAssetData(): any {
     const localAssetData = super.fetchLocalAssetData();
-    console.log(localAssetData);
     return JSON.parse(localAssetData);
   }
 }
