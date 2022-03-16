@@ -26,7 +26,6 @@ const sectionType = getSectionType();
 const tabNumbers = labels.map((_, idx) => idx);
 const customLabel = (tabNumber: number) => labels[tabNumber];
 const setTabNumber = (val: number) => (tabNumber.value = val);
-// const setTabNumberFromEvent = (ev: Event) => void ev.target && setTabNumber(+(ev.target as HTMLSelectElement).value);
 const setTabNumberFromEvent = (ev: Event) =>
   void setTabNumber(+(ev.target as HTMLSelectElement).value);
 </script>
