@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import DPButton from "../../shared/DPButton.vue";
+
 const p = defineProps<{
-  fetchAssetData: () => Promise<any>;
+  downloadFile: () => Promise<void>;
   filename: string;
 }>();
 </script>
@@ -24,20 +26,10 @@ const p = defineProps<{
       </svg>
       <span class="text-base">{{ p.filename }}</span>
       <div class="ml-auto">
-        <DPButton @click="p.fetchAssetData" icon="fa fa-download">
+        <DPButton @click="p.downloadFile" icon="fa fa-download">
           Download
         </DPButton>
       </div>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import DPButton from "../../shared/DPButton.vue";
-
-export default {
-  components: {
-    DPButton,
-  },
-};
-</script>

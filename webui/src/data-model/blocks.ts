@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { saveAs } from "file-saver";
 
+type AssetResource = Promise<string | object>;
+
 export class Report {
   public children: Page[];
   public width: ReportWidth;
@@ -113,8 +115,7 @@ export class Block {
   }
 }
 
-// TODO - generic type T needed?
-export abstract class AssetBlock<T = any> extends Block {
+export abstract class AssetBlock extends Block {
   public src: string;
   public type: string;
 
@@ -129,17 +130,17 @@ export abstract class AssetBlock<T = any> extends Block {
     };
   }
 
-  protected fetchLocalAssetData(): any {
+  protected fetchLocalAssetData(): string {
     return decodeBase64Asset(this.src);
   }
 
-  protected async fetchAssetData(): Promise<T> {
+  protected async fetchAssetData(): AssetResource {
     return window.dpLocal
       ? this.fetchLocalAssetData()
       : this.fetchRemoteAssetData();
   }
 
-  protected async fetchRemoteAssetData(): Promise<string | object | null> {
+  protected async fetchRemoteAssetData(): AssetResource {
     return await readGcsTextOrJsonFile(this.src);
   }
 }
@@ -171,7 +172,7 @@ export abstract class PlotAssetBlock extends AssetBlock {
 export class BokehBlock extends PlotAssetBlock {
   public component = markRaw(VBokehBlock);
 
-  protected fetchLocalAssetData(): any {
+  protected fetchLocalAssetData(): string {
     const localAssetData = super.fetchLocalAssetData();
     return JSON.parse(localAssetData);
   }
@@ -180,7 +181,7 @@ export class BokehBlock extends PlotAssetBlock {
 export class VegaBlock extends PlotAssetBlock {
   public component = markRaw(VVegaBlock);
 
-  protected fetchLocalAssetData(): any {
+  protected fetchLocalAssetData() {
     const localAssetData = super.fetchLocalAssetData();
     return JSON.parse(localAssetData);
   }
@@ -193,7 +194,7 @@ export class PlotlyBlock extends PlotAssetBlock {
     return JSON.parse(JSON.parse(decodeBase64Asset(this.src)));
   }
 
-  protected async fetchRemoteAssetData(): Promise<any> {
+  protected async fetchRemoteAssetData(): AssetResource {
     /* TODO - type promise? */
     const res = await readGcsTextOrJsonFile<string>(this.src);
     return JSON.parse(res);
@@ -203,11 +204,11 @@ export class PlotlyBlock extends PlotAssetBlock {
 export class SVGBlock extends PlotAssetBlock {
   public component = markRaw(VSVGBlock);
 
-  protected async fetchRemoteAssetData(): Promise<any> {
+  protected async fetchRemoteAssetData(): AssetResource {
     return this.src;
   }
 
-  protected async fetchLocalAssetData(): Promise<any> {
+  protected fetchLocalAssetData(): string {
     return this.src;
   }
 }
@@ -264,11 +265,12 @@ export class FileBlock extends AssetBlock {
     this.filename = attributes.filename;
     this.componentProps = {
       ...this.componentProps,
+      downloadFile: this.downloadFile.bind(this),
       filename: this.filename,
     };
   }
 
-  protected async fetchAssetData(): Promise<any> {
+  protected async downloadFile(): Promise<void> {
     return saveAs(this.src, this.filename);
   }
 }
@@ -336,6 +338,6 @@ const decodeBase64AssetUtf8 = (src: string) => {
   return decoder.decode(bytes);
 };
 
-export const decodeBase64Asset = (src: string): any => {
+export const decodeBase64Asset = (src: string): string => {
   return window.atob(src.split("base64,")[1]);
 };

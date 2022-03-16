@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import SVGBlock from "./SVG.vue";
 
 const p = defineProps<{ fetchAssetData: any; responsive: boolean }>();
 const plotSrc = ref<string | null>(null);
@@ -7,16 +8,6 @@ const plotSrc = ref<string | null>(null);
 (async () => {
   plotSrc.value = await p.fetchAssetData();
 })();
-</script>
-
-<script lang="ts">
-import SVGBlock from "./SVG.vue";
-
-export default {
-  components: {
-    SVGBlock,
-  },
-};
 </script>
 
 <template>

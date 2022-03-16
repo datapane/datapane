@@ -10,7 +10,10 @@ import {
   isGroup,
   isSelect,
 } from "../data-model/blocks";
+import BlockWrapper from "./blocks/BlockWrapper.vue";
+import GroupLayout from "./blocks/Group.vue";
 import { inject, defineAsyncComponent } from "vue";
+const Select = defineAsyncComponent(() => import("./layout/Select.vue"));
 
 const createGridKey = (child: BlockTree, idx: number) =>
   isBlock(child) ? `${child.refId}-${idx}` : `${child.name}-${idx}`;
@@ -45,16 +48,3 @@ const p = defineProps<{ tree: BlockTree }>();
     </BlockWrapper>
   </template>
 </template>
-
-<script lang="ts">
-import BlockWrapper from "./blocks/BlockWrapper.vue";
-import GroupLayout from "./blocks/Group.vue";
-
-export default {
-  components: {
-    BlockWrapper,
-    GroupLayout,
-    Select: defineAsyncComponent(() => import("./layout/Select.vue")),
-  },
-};
-</script>

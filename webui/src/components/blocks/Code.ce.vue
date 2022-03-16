@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { onUnmounted, onMounted, ref, computed } from "vue";
+import "highlight.js/lib/common";
+import "highlight.js/styles/stackoverflow-light.css";
+import hljsVuePlugin from "@highlightjs/vue-plugin";
 import { DPClipboard } from "../../../DPClipboard";
+
+const highlightjs = hljsVuePlugin.component;
 
 const p = defineProps<{ language: string; code: string }>();
 let clip: DPClipboard;
@@ -41,18 +46,6 @@ const code = computed(() => p.code.trim());
     <highlightjs :language="p.language" :code="code" data-cy="block-code" />
   </div>
 </template>
-
-<script lang="ts">
-import "highlight.js/lib/common";
-import "highlight.js/styles/stackoverflow-light.css";
-import hljsVuePlugin from "@highlightjs/vue-plugin";
-
-export default {
-  components: {
-    highlightjs: hljsVuePlugin.component,
-  },
-};
-</script>
 
 <style>
 /* TODO - serve this css statically in a link tag to avoid bloating the web component */

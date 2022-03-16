@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const p = defineProps<{ html: string; singleBlockEmbed?: boolean }>();
 
-const onRefChange = (node: HTMLDivElement) => {
+const onRefChange = (node: any): void => {
   if (node !== null) {
     const tbl: HTMLTableElement | null = node.querySelector(".dataframe");
     if (tbl) {

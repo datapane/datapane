@@ -2,6 +2,8 @@
 import { DPClipboard } from "../../../../DPClipboard";
 import { Section } from "../../../shared/shared";
 import { ExportType } from "../../../data-model/blocks";
+import DataTag from "./DataTag.vue";
+import DPDropdown from "../../../shared/DPDropdown.vue";
 
 const p = defineProps<{
   previewMode: boolean;
@@ -56,18 +58,6 @@ const actionSections: Section[] = [
 ];
 
 const showActions = !window.dpLocal && !p.previewMode;
-</script>
-
-<script lang="ts">
-import DataTag from "./DataTag.vue";
-import DPDropdown from "../../../shared/DPDropdown.vue";
-
-export default {
-  components: {
-    DataTag,
-    DPDropdown,
-  },
-};
 </script>
 
 <template>
