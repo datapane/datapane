@@ -3,6 +3,8 @@ import { computed, ComputedRef, defineEmits } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
 import { formatNumber } from "./shared";
 import { ExportType } from "../../../data-model/blocks";
+import Header from "./Header.vue";
+import DPButton from "../../../shared/DPButton.vue";
 
 type Col = {
   prop: string;
@@ -132,16 +134,6 @@ const cols: ComputedRef<Col[]> = computed(() => {
     };
   });
 });
-</script>
-
-<script lang="ts">
-import Header from "./Header.vue";
-import DPButton from "../../../shared/DPButton.vue";
-
-export default {
-  Header,
-  DPButton,
-};
 </script>
 
 <template>
