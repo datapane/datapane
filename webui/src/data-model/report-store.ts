@@ -17,6 +17,7 @@ import {
   PlotlyBlock,
   TableBlock,
   HTMLBlock,
+  SVGBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -228,6 +229,7 @@ export class ReportStore {
 
     let BlockClass: typeof Block;
     let opts: any;
+    // TODO - change if chain to map
     if (maps.jsonIsMarkdown(elem)) {
       BlockClass = TextBlock;
       opts = { isLightProse: this.isLightProse };
@@ -247,6 +249,8 @@ export class ReportStore {
     } else if (maps.jsonIsHTML(elem)) {
       opts = { isOrg: this.isOrg };
       BlockClass = HTMLBlock;
+    } else if (maps.jsonIsSvg(elem)) {
+      BlockClass = SVGBlock;
     } else {
       BlockClass = UnknownBlock;
     }
