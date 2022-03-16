@@ -101,6 +101,7 @@ export class Block {
   public label?: string;
   public count?: number;
   public componentProps: any;
+  public component: any;
 
   public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
     const { attributes } = elem;

@@ -6,27 +6,29 @@ import "vue-multiselect/dist/dist/vue-multiselect.esm.css";
 
 const p = defineProps<{ select: Select }>();
 
-const tabNumber = ref(0);
-
-const labels: string[] = p.select.children.map(
-  (child: BlockTree, idx) => child.label || `Section ${idx + 1}`
-);
-
 const getSectionType = (): string => {
   const { type, children } = p.select;
   if (type) return type;
   return children.length < 5 ? "tabs" : "dropdown";
 };
 
-const setTabNumber = (val: number) => (tabNumber.value = val);
+const labels: string[] = p.select.children.map(
+  (child: BlockTree, idx) => child.label || `Section ${idx + 1}`
+);
 
-const sectionType = getSectionType();
 const selectSearchOptions = labels.map((label, idx) => ({
   text: label,
   value: idx,
 }));
 
+const tabNumber = ref(0);
+const sectionType = getSectionType();
 const tabNumbers = labels.map((_, idx) => idx);
+const customLabel = (tabNumber: number) => labels[tabNumber];
+const setTabNumber = (val: number) => (tabNumber.value = val);
+// const setTabNumberFromEvent = (ev: Event) => void ev.target && setTabNumber(+(ev.target as HTMLSelectElement).value);
+const setTabNumberFromEvent = (ev: Event) =>
+  void setTabNumber(+(ev.target as HTMLSelectElement).value);
 </script>
 
 <template>
@@ -38,7 +40,7 @@ const tabNumbers = labels.map((_, idx) => idx);
         name="tabs"
         class="block mb-1 w-auto focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
         :value="tabNumber"
-        @change="(ev) => setTabNumber(+ev.target.value)"
+        @change="setTabNumberFromEvent"
       >
         <option v-for="(label, idx) in labels" :key="idx" :value="idx">
           {{ label }}
@@ -51,7 +53,7 @@ const tabNumbers = labels.map((_, idx) => idx);
         :preselect-first="true"
         :clear-on-select="false"
         :allow-empty="false"
-        :custom-label="(tabNumber) => labels[tabNumber]"
+        :custom-label="customLabel"
       />
     </div>
     <div :class="['hidden', { 'sm:block': sectionType === 'tabs' }]">
