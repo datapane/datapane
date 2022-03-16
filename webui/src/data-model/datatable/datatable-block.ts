@@ -4,7 +4,7 @@ import VDataTableBlock from "../../components/blocks/DataTable/DataTable.connect
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import download from "downloadjs";
 import urljoin from "url-join";
-import env from "../../env";
+import env from "../../environment";
 
 const addQueryParam = (url: string, qp: { k: string; v: string }): string => {
   /**
