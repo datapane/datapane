@@ -1,10 +1,11 @@
 import VTextBlock from "../components/blocks/Text.vue";
+import VHTMLBlock from "../components/blocks/HTML.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
 import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
 import VTableBlock from "../components/blocks/Table.connector.vue";
-import VHTMLBlock from "../components/blocks/HTML.vue";
+import VSVGBlock from "../components/blocks/SVG.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -141,6 +142,15 @@ export abstract class AssetBlock<T = any> extends Block {
   }
 }
 
+export class TableBlock extends AssetBlock {
+  public component = markRaw(VTableBlock);
+  public captionType = "Table";
+
+  protected fetchLocalAssetData(): any {
+    return decodeBase64AssetUtf8(this.src);
+  }
+}
+
 export abstract class PlotAssetBlock extends AssetBlock {
   public captionType = "Plot";
   public responsive: boolean;
@@ -188,6 +198,18 @@ export class PlotlyBlock extends PlotAssetBlock {
   }
 }
 
+export class SVGBlock extends PlotAssetBlock {
+  public component = markRaw(VSVGBlock);
+
+  protected async fetchRemoteAssetData(): Promise<any> {
+    return this.src;
+  }
+
+  protected async fetchLocalAssetData(): Promise<any> {
+    return this.src;
+  }
+}
+
 export class TextBlock extends Block {
   public component = markRaw(VTextBlock);
   public componentProps: any;
@@ -212,15 +234,6 @@ export class CodeBlock extends Block {
     const { language } = elem.attributes;
     const code = getInnerText(elem);
     this.componentProps = { ...this.componentProps, code, language };
-  }
-}
-
-export class TableBlock extends AssetBlock {
-  public component = markRaw(VTableBlock);
-  public captionType = "Table";
-
-  protected fetchLocalAssetData(): any {
-    return decodeBase64AssetUtf8(this.src);
   }
 }
 
