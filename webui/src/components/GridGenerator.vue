@@ -13,7 +13,7 @@ import {
 import BlockWrapper from "./blocks/BlockWrapper.vue";
 import GroupLayout from "./blocks/Group.vue";
 import { inject, defineAsyncComponent } from "vue";
-const Select = defineAsyncComponent(() => import("./layout/Select.vue"));
+const SelectLayout = defineAsyncComponent(() => import("./layout/Select.vue"));
 
 const createGridKey = (child: BlockTree, idx: number) =>
   isBlock(child) ? `${child.refId}-${idx}` : `${child.name}-${idx}`;
@@ -33,7 +33,9 @@ const p = defineProps<{ tree: BlockTree }>();
     </GroupLayout>
   </template>
   <template v-else-if="isSelect(p.tree)">
-    <Select :select="p.tree" />
+    <SelectLayout :select="p.tree" v-slot="slotProps">
+      <GridGenerator :tree="p.tree.children[slotProps.tabNumber]" />
+    </SelectLayout>
   </template>
   <template v-else>
     <BlockWrapper

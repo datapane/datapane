@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { BlockTree, Select } from "../../data-model/blocks";
-import GridGenerator from "../GridGenerator.vue";
 import MultiSelect from "vue-multiselect";
 import "vue-multiselect/dist/dist/vue-multiselect.esm.css";
 
@@ -76,7 +75,7 @@ const tabNumbers = labels.map((_, idx) => idx);
       </nav>
     </div>
     <div>
-      <GridGenerator :tree="p.select.children[tabNumber]" />
+      <slot :tabNumber="tabNumber" />
     </div>
   </div>
 </template>
