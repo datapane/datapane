@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { BlockTree, Select } from "../../data-model/blocks";
 import GridGenerator from "../GridGenerator.vue";
+import MultiSelect from "vue-multiselect";
 import "vue-multiselect/dist/dist/vue-multiselect.esm.css";
 
 const p = defineProps<{ select: Select }>();
@@ -79,17 +80,6 @@ const tabNumbers = labels.map((_, idx) => idx);
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import MultiSelect from "vue-multiselect";
-
-export default {
-  components: {
-    GridGenerator,
-    MultiSelect,
-  },
-};
-</script>
 
 <style>
 .multiselect__option--highlight {

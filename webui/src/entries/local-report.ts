@@ -1,4 +1,4 @@
-import { createApp, use } from "vue";
+import { createApp } from "vue";
 import Report from "../components/Report.vue";
 import CodeBlock from "../components/blocks/Code.ce.vue";
 import he from "he";

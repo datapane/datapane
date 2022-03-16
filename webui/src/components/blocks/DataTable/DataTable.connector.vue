@@ -2,6 +2,7 @@
 import { defineAsyncComponent, inject, ref } from "vue";
 import { DatasetResponse } from "../../../data-model/datatable/datatable-block";
 import { ExportType } from "../../../data-model/blocks";
+const DataTableBlock = defineAsyncComponent(() => import("./DataTable.vue"));
 
 const p = defineProps<{
   streamContents: () => Promise<DatasetResponse>;
@@ -40,14 +41,6 @@ const handleLoadFull = async () => {
   if (dsData.value.length) {
     previewMode.value = false;
   }
-};
-</script>
-
-<script lang="ts">
-export default {
-  components: {
-    DataTableBlock: defineAsyncComponent(() => import("./DataTable.vue")),
-  },
 };
 </script>
 

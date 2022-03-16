@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ReportStore } from "../data-model/report-store";
+import GridGenerator from "./GridGenerator.vue";
+import HPages from "./layout/HPages.vue";
+import VPages from "./layout/VPages.vue";
+import PrevNext from "./layout/PrevNext.vue";
+import MobilePages from "./layout/MobilePages.vue";
 import { ref, provide, computed, ComputedRef } from "vue";
 import { createGridKey } from "./utils";
 import { LayoutBlock } from "../data-model/blocks";
@@ -37,28 +42,10 @@ const htmlHeaderRef = ref<HTMLDivElement | null>(null);
 const htmlHeader =
   p.reportProps.htmlHeader || p.reportProps.report.output_style_header;
 
-const onHeaderChange = (node: HTMLDivElement) => {
+const onHeaderChange = (node: any) => {
   if (node !== null) {
     setTheme(p.reportProps.report.is_light_prose);
   }
-};
-</script>
-
-<script lang="ts">
-import GridGenerator from "./GridGenerator.vue";
-import HPages from "./layout/HPages.vue";
-import VPages from "./layout/VPages.vue";
-import PrevNext from "./layout/PrevNext.vue";
-import MobilePages from "./layout/MobilePages.vue";
-
-export default {
-  components: {
-    GridGenerator,
-    HPages,
-    VPages,
-    PrevNext,
-    MobilePages,
-  },
 };
 </script>
 
