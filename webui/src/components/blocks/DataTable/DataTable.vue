@@ -180,7 +180,7 @@ export default {
       <DPButton
         dataCy="button-load-dataset"
         @click="emit('load-full')"
-        icon="fa-table"
+        icon="fa fa-table"
       >
         Click to load dataset ({{ formatNumber(p.cells) }} cells)
       </DPButton>

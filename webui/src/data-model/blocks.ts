@@ -1,5 +1,6 @@
 import VTextBlock from "../components/blocks/Text.vue";
 import VHTMLBlock from "../components/blocks/HTML.vue";
+import VFileBlock from "../components/blocks/File.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
@@ -9,6 +10,7 @@ import VSVGBlock from "../components/blocks/SVG.connector.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import { saveAs } from "file-saver";
 
 export class Report {
   public children: Page[];
@@ -131,7 +133,7 @@ export abstract class AssetBlock<T = any> extends Block {
     return decodeBase64Asset(this.src);
   }
 
-  public async fetchAssetData(): Promise<T> {
+  protected async fetchAssetData(): Promise<T> {
     return window.dpLocal
       ? this.fetchLocalAssetData()
       : this.fetchRemoteAssetData();
@@ -248,6 +250,26 @@ export class HTMLBlock extends Block {
       html,
       sandbox: opts.isOrg ? undefined : "allow-scripts",
     };
+  }
+}
+
+export class FileBlock extends AssetBlock {
+  public component = markRaw(VFileBlock);
+
+  private filename: string;
+
+  public constructor(elem: Elem, caption?: string, count?: number, opts?: any) {
+    super(elem, caption, count);
+    const { attributes } = elem;
+    this.filename = attributes.filename;
+    this.componentProps = {
+      ...this.componentProps,
+      filename: this.filename,
+    };
+  }
+
+  protected async fetchAssetData(): Promise<any> {
+    return saveAs(this.src, this.filename);
   }
 }
 
