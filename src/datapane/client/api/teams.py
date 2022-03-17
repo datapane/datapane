@@ -59,6 +59,7 @@ class File(DPObjectRef):
         num_rows: number of rows in the file (if a dataframe)
         num_colums: number of colums in the file (if a dataframe)
         cells: number of cells in the file (if a dataframe)
+        overwrite: overwrite the file in project
 
     ..tip:: Use the static methods to create `Files` rather than the constructor
     """
@@ -189,6 +190,7 @@ class Environment(DPObjectRef):
         environment: Optional[dict] = None,
         docker_image: Optional[str] = None,
         project: Optional[str] = None,
+        overwrite: bool = False,
     ) -> Environment:
         """
         Create a shareable Datapane Environment with provided `name`, `environment` and `docker_image`
@@ -198,12 +200,15 @@ class Environment(DPObjectRef):
             environment: Key-value pair of environment variables
             docker_image: docker_image to be used with apps.
             project: Project name (optional and only applicable for organisations)
+            overwrite: Overwrite an existing environment
 
         Returns:
             An instance of the created `Environment` object
         """
         assert environment or docker_image, "environment or docker image must be set"
-        return cls.post(name=name, environment=environment, docker_image=docker_image, project=project)
+        return cls.post(
+            name=name, environment=environment, docker_image=docker_image, project=project, overwrite=overwrite
+        )
 
 
 class App(DPObjectRef):
@@ -217,12 +222,12 @@ class App(DPObjectRef):
     endpoint: str = "/apps/"
 
     @classmethod
-    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, **kwargs) -> App:
+    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, overwrite: bool = False, **kwargs) -> App:
         # TODO - use DPTmpFile
         # merge all the params for the API-call
         kwargs["api_version"] = __version__
         new_kwargs = {**dp_cfg.to_dict(), **kwargs}
-        return cls.post_with_files(file=sdist, **new_kwargs)
+        return cls.post_with_files(file=sdist, overwrite=overwrite, **new_kwargs)
 
     def download_pkg(self) -> Path:
         fn = do_download_file(self.data_url)

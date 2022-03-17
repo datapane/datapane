@@ -177,12 +177,13 @@ class Resource:
         ):
             raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane Teams.")
 
-    def post(self, params: t.Dict = None, **data: JSON) -> JSON:
+    def post(self, params: t.Dict = None, overwrite: bool = False, **data: JSON) -> JSON:
         params = params or dict()
-        r = self.session.post(self.url, json=data, params=params, timeout=self.timeout)
+        extra_headers = {"Datapane-Object-Overwrite": "True"} if overwrite else {}
+        r = self.session.post(self.url, headers=extra_headers, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
 
-    def post_files(self, files: FileList, **data: JSON) -> JSON:
+    def post_files(self, files: FileList, overwrite: bool = False, **data: JSON) -> JSON:
         # upload files using custom json-data protocol
         # build the fields
         file_header = {"Content-Encoding": "gzip"}
@@ -201,6 +202,8 @@ class Resource:
 
         e = MultipartEncoder(fields=fields)
         extra_headers = {"Content-Type": f"{e.content_type}; dp-files=True"}
+        if overwrite:
+            extra_headers["Datapane-Object-Overwrite"] = "True"
 
         max_size = 25 if c.config.is_public else 100
         log.debug(f"Report size ~{e.len/SIZE_1_MB:.1f} MB")

@@ -18,7 +18,7 @@ import chardet
 import importlib_resources as ir
 from chardet.universaldetector import UniversalDetector
 
-from .dp_types import MIME, DPError, DPMode, NPath, SDict, get_dp_mode
+from .dp_types import MIME, DPMode, NPath, SDict, get_dp_mode
 
 mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
 
@@ -267,41 +267,6 @@ def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
         return {k: v for (k, v) in xs.items() if v is not None}
     else:
         return {k: v for (k, v) in xs.items() if v or isinstance(v, bool)}
-
-
-def process_notebook(input_file: Path, output_file: Path):
-    """
-    Strips the output of the jupyter notebook provided as input and also removes cells tagged as "exclude".
-    input_file: file object or path of jupyter notebook that needs to be processed
-    output_file: path of the output file
-    """
-    import nbconvert
-    from packaging.version import parse as parse_version
-
-    # check available nbconvert version and raise error if it is not >=6.0.0
-    if parse_version(nbconvert.__version__) < parse_version("6.0.0"):
-        raise DPError("Source file upload only works with nbconvert >= 6.0.0. Run pip install 'nbconvert>=6.0.0'")
-
-    from nbconvert import NotebookExporter
-    from nbconvert.preprocessors import ClearOutputPreprocessor, TagRemovePreprocessor
-    from nbconvert.preprocessors.sanitize import SanitizeHTML
-    from traitlets.config import Config
-
-    if input_file.suffix != ".ipynb":
-        raise DPError("Source file should be a jupyter notebook.")
-
-    # Setup config
-    c = Config()
-    # Configure tag removal preprocessors
-    c.TagRemovePreprocessor.remove_cell_tags = ("exclude",)
-    exporter = NotebookExporter(config=c)
-    exporter.register_preprocessor(ClearOutputPreprocessor(config=c), True)
-    exporter.register_preprocessor(TagRemovePreprocessor(config=c), True)
-    exporter.register_preprocessor(SanitizeHTML(config=c), True)
-    # Run exporter
-    output, _ = exporter.from_filename(input_file)
-    # write output to file
-    Path(output_file).write_text(output)
 
 
 def utf_read_text(file: Path) -> str:

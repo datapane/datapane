@@ -92,4 +92,4 @@ blocks = [
 dp.Report(blocks=blocks).save(path="local_xml_report.html")
 # add datatable
 blocks.append(df_datatable_asset)
-dp.Report(blocks=blocks).upload(name="xml_report")
+dp.Report(blocks=blocks).upload(name="xml_report", overwrite=True)

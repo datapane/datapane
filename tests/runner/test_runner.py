@@ -161,7 +161,7 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     # TODO - we should prob use a pre-built sdist here...
     dp_config = DatapaneCfg.create_initial(config_file=Path("dp_test_mod.yaml"))
     with build_bundle(dp_config) as sdist:
-        # whl_file = build_bundle(dp_config, sdist, shared_datadir, username="test", version=1)
+        # whl_file = build_bundle(dp_config, sdist, shared_datadir, email="test@datapane.com", version=1)
         try:
             # NOTE - need to pass in all params as we're not setting defaults via dp-server
             with DPTmpFile(".txt") as fn_remote_fixture:

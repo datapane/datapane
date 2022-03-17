@@ -172,29 +172,31 @@ def file():
 @click.argument("name")
 @click.argument("file", type=click.Path(exists=True))
 @click.option("--project")
-def upload(file: str, name: str, project: str):
+@click.option("--overwrite", is_flag=True)
+def upload(file: str, name: str, project: str, overwrite: bool):
     """Upload a csv or Excel file as a Datapane File"""
     log.info(f"Uploading {file}")
-    r = api.File.upload_file(file, name=name, project=project)
+    r = api.File.upload_file(file, name=name, project=project, overwrite=overwrite)
     success_msg(f"Uploaded {click.format_filename(file)} to {r.url}")
 
 
 @file.command()
 @click.argument("name")
-@click.option("--owner")
+@click.option("--project")
 @click.argument("file", type=click.Path())
-def download(name: str, owner: str, file: str):
+def download(name: str, project: str, file: str):
     """Download file referenced by NAME to FILE"""
-    r = api.File.get(name, owner=owner)
+    r = api.File.get(name, project=project)
     r.download_file(file)
     success_msg(f"Downloaded {r.url} to {click.format_filename(file)}")
 
 
 @file.command()
 @click.argument("name")
-def delete(name: str):
+@click.option("--project")
+def delete(name: str, project: str):
     """Delete a file"""
-    api.File.get(name).delete()
+    api.File.get(name, project).delete()
     success_msg(f"Deleted File {name}")
 
 
@@ -254,12 +256,14 @@ def app_init(name: str):
 @click.option("--name")
 @click.option("--environment")
 @click.option("--project")
+@click.option("--overwrite", is_flag=True)
 def deploy(
     name: Optional[str],
     script: Optional[str],
     config: Optional[str],
     environment: Optional[str],
     project: Optional[str],
+    overwrite: Optional[bool],
 ):
     """Package and deploy a Python script or Jupyter notebook as a Datapane App bundle"""
     script = script and Path(script)
@@ -281,25 +285,26 @@ def deploy(
             with tarfile.open(sdist) as tf:
                 for n in tf.getnames():
                     log.debug(f"  {n}")
-        r: api.App = api.App.upload_pkg(sdist, dp_cfg)
+        r: api.App = api.App.upload_pkg(sdist, dp_cfg, overwrite)
         success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
 
 
 @app.command()
 @click.argument("name")
-@click.option("--owner")
-def download(name: str, owner: str):
+@click.option("--project")
+def download(name: str, project: str):
     """Download app referenced by NAME to FILE"""
-    s = api.App.get(name, owner=owner)
+    s = api.App.get(name, project=project)
     fn = s.download_pkg()
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
 
 @app.command()
 @click.argument("name")
-def delete(name: str):
+@click.option("--project")
+def delete(name: str, project: str):
     """Delete an app"""
-    api.App.get(name).delete()
+    api.App.get(name, project).delete()
     success_msg(f"Deleted App {name}")
 
 
@@ -313,7 +318,7 @@ def app_list():
 @click.option("--parameter", "-p", multiple=True)
 @click.option("--cache/--disable-cache", default=True)
 @click.option("--wait/--no-wait", default=True)
-@click.option("--owner")
+@click.option("--project")
 @click.option("--show-output", is_flag=True, default=False, help="Display the run output")
 @click.argument("name")
 def run(
@@ -321,13 +326,13 @@ def run(
     parameter: Tuple[str],
     cache: bool,
     wait: bool,
-    owner: str,
+    project: str,
     show_output: bool,
 ):
     """Run a report"""
     params = process_cmd_param_vals(parameter)
     log.info(f"Running app with parameters {params}")
-    app = api.App.get(name, owner=owner)
+    app = api.App.get(name, project=project)
     with api_error_handler("Error running app"):
         r = app.run(parameters=params, cache=cache)
     if wait:
@@ -394,9 +399,10 @@ def report_init(name: str, format: str):
 
 @report.command()
 @click.argument("name")
-def delete(name: str):
+@click.option("--project")
+def delete(name: str, project: str):
     """Delete a report"""
-    api.Report.get(name).delete()
+    api.Report.get(name, project).delete()
     success_msg(f"Deleted Report {name}")
 
 
@@ -409,11 +415,11 @@ def report_list():
 # NOTE - NYI - disabled
 # @report.command()
 # @click.argument("name")
-# @click.option("--owner")
+# @click.option("--project")
 # @click.option("--filename", default="output.html", type=click.Path())
-# def render(name: str, owner: str, filename: str):
+# def render(name: str, project: str, filename: str):
 #     """Render a report to a static file"""
-#     api.Report.get(name, owner=owner).render()
+#     api.Report.get(name, project=project).render()
 
 
 #############################################################################
@@ -429,9 +435,10 @@ def environment():
 @click.option("--environment", "-env", multiple=True)
 @click.option("--docker-image")
 @click.option("--project")
-def create(name: str, environment: Tuple[str], docker_image: str, project: str):
+@click.option("--overwrite", is_flag=True)
+def create(name: str, environment: Tuple[str], docker_image: str, project: str, overwrite: bool):
     """
-    Create a environment
+    Create an environment
 
     NAME: name of environment
     ENVIRONMENT: environment variables
@@ -439,7 +446,7 @@ def create(name: str, environment: Tuple[str], docker_image: str, project: str):
     PROJECT: Project name (optional and only applicable for teams)
     """
     environment = process_cmd_param_vals(environment)
-    api.Environment.create(name, environment, docker_image, project)
+    api.Environment.create(name, environment, docker_image, project, overwrite)
     success_msg(f"Created environment: {name}")
 
 
@@ -451,10 +458,10 @@ def environment_list():
 
 @environment.command()
 @click.argument("name", required=True)
-@click.option("--owner")
-def get(name, owner):
+@click.option("--project")
+def get(name, project):
     """Get environment value using environment name"""
-    res = api.Environment.get(name, owner=owner)
+    res = api.Environment.get(name, project=project)
     environment = "\n".join([f"{k}={v}" for k, v in res.environment.items()])
     success_msg(f"Available {res.name}:")
     print(f"\nProject - {res.project}")
@@ -464,9 +471,10 @@ def get(name, owner):
 
 @environment.command()
 @click.argument("name")
-def delete(name):
+@click.option("--project")
+def delete(name: str, project: str):
     """Delete an environment using environment name"""
-    api.Environment.get(name).delete()
+    api.Environment.get(name, project).delete()
     success_msg(f"Deleted environment {name}")
 
 
@@ -482,19 +490,19 @@ def schedule():
 @click.option("--parameter", "-p", multiple=True)
 @click.argument("name", required=True)
 @click.argument("cron", required=True)
-@click.option("--owner")
-def create(name: str, cron: str, parameter: Tuple[str], owner: str):
+@click.option("--project")
+def create(name: str, cron: str, parameter: Tuple[str], project: str):
     """
     Create a schedule
 
     NAME: Name of the App to run
     CRON: crontab representing the schedule interval
     PARAMETERS: key/value list of parameters to use when running the app on schedule
-    [OWNER]: App owner
+    [Project]: Project in which the app is present
     """
     params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
-    app_obj = api.App.get(name, owner=owner)
+    app_obj = api.App.get(name, project=project)
     schedule_obj = api.Schedule.create(app_obj, cron, params)
     success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
 

@@ -90,26 +90,26 @@ class DPObjectRef:
             self.url = dto.id
 
     @classmethod
-    def get(cls: Type[U], name: str, owner: Optional[str] = None) -> U:
+    def get(cls: Type[U], name: str, project: Optional[str] = None) -> U:
         """
         Lookup and retrieve an object from the Datapane Server by its name
 
         Args:
-            name: The name of the object, e.g. 'my-file-3` or `fred/my-file-3`
-            owner: The owner of the object, e.g. `fred` (can be provided with the name as shown above)
+            name: The name of the object, e.g. 'my-file-3` or `project1/my-file-3`
+            project: The project of the object, e.g. `project1` (can be provided with the name as shown above)
 
         Returns:
             The object if found
         """
         lookup_value = name.split("/", maxsplit=1)
         if len(lookup_value) == 2:
-            owner, name = lookup_value
+            project, name = lookup_value
         try:
-            res = Resource(f"{cls.endpoint}/lookup/").get(name=name, owner=owner)
+            res = Resource(f"{cls.endpoint}/lookup/").get(name=name, project=project)
         except HTTPError as e:
-            lookup_str = f"{owner}/{name}" if owner else name
+            lookup_str = f"{project}/{name}" if project else name
             log.error(
-                f"Couldn't find '{lookup_str}', are you sure it exists? If error occurs within a app please try updating the code to include the app's owner in name - e.g. 'owner/{name}'."
+                f"Couldn't find '{lookup_str}', are you sure it exists? If error occurs within a app please try updating the code to include the app's project in name - e.g. 'project1/{name}'."
             )
             raise e
         return cls(dto=res)
@@ -131,19 +131,21 @@ class DPObjectRef:
         return x
 
     @classmethod
-    def post_with_files(cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, **kwargs) -> U:
+    def post_with_files(
+        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **kwargs
+    ) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList
             files: FileList = dict(uploaded_file=[file])
 
-        res = Resource(cls.endpoint).post_files(files, **kwargs)
-        return cls(res)
+        res = Resource(cls.endpoint).post_files(files, overwrite=overwrite, **kwargs)
+        return cls(dto=res)
 
     @classmethod
-    def post(cls: Type[U], **kwargs) -> U:
-        res = Resource(cls.endpoint).post(**kwargs)
-        return cls(res)
+    def post(cls: Type[U], overwrite: bool = False, **kwargs) -> U:
+        res = Resource(cls.endpoint).post(overwrite=overwrite, **kwargs)
+        return cls(dto=res)
 
     def __getattr__(self, attr):
         if self.has_dto and not attr.startswith("__"):

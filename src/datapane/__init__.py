@@ -59,7 +59,6 @@ from .client.api import (
     TextAlignment,
     Toggle,
     Environment,
-    Visibility,
     by_datapane,
     signup,
     login,

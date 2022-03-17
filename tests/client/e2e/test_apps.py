@@ -25,7 +25,7 @@ def test_app_basic(shared_datadir: Path, monkeypatch):
     name = gen_name("app")
     dp_cfg = sc.DatapaneCfg.create_initial()
     env_name = gen_name("env")
-    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"})):
+    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
             s = dp.App.upload_pkg(sdist, dp_cfg, name=name, environment=env_name)
 
@@ -76,7 +76,7 @@ def test_app_complex(shared_datadir: Path, monkeypatch):
     dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_test_mod.yaml"))
     env_name = "ENV"
 
-    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"})):
+    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
             s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name)
 
@@ -120,9 +120,9 @@ def test_app_complex_report(shared_datadir: Path, monkeypatch):
     # upload
     dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path("dp_complex_report.yaml"))
     env_name = "ENV"
-    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"})):
+    with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name)
+            s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name, overwrite=True)
 
         with deletable(s):
             run = s.run()

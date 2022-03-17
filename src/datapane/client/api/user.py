@@ -49,7 +49,7 @@ def login(
         cli_login: Toggle if this login is occuring via the CLI (optional)
 
     Returns:
-        the username for the logged in user
+        the email for the logged in user
 
     ..note:: Can also be ran via CLI as `"datapane login"`
     """
@@ -61,14 +61,14 @@ def login(
         token = token_connect("/accounts/login/", action="login", server=config.server)
 
     config.token = token
-    username = ping(config=config, cli_login=cli_login)
+    email = ping(config=config, cli_login=cli_login)
 
     # update config with valid values
-    config.username = username
+    config.email = email
     config.save(env=env)
     c.init(config=config)
     capture("CLI Login", with_token=with_token)
-    return config.username
+    return config.email
 
 
 def logout(env: str = c.DEFAULT_ENV) -> None:
@@ -97,12 +97,13 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     headers = {"Authorization": f"Token {config.token}", "Datapane-API-Version": __version__}
     q_params = dict(cli_id=config.session_id) if cli_login else {}
     r = requests.get(str(f), headers=headers, params=q_params)
-    username = _process_res(r).username
+    response = _process_res(r)
+    email = response.email
 
     if verbose:
-        success_msg(f"Connected successfully to {config.server} as {username}")
+        success_msg(f"Connected successfully to {config.server} as {email}")
 
-    return username
+    return email
 
 
 def _run_script(script: str):

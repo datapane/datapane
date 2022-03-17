@@ -27,7 +27,7 @@ def setup(test_org: bool):
     builder_report.upload(name="CYPRESS-DEMO-REPORT", description="DESCRIPTION")
     style_report.upload(name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
 
-    dp_objs = {"builderReportId": builder_report.id, "styleReportId": style_report.id}
+    dp_objs = {"builderReportURL": builder_report.web_url, "styleReportURL": style_report.web_url}
 
     def get_test_app(name: str) -> dp.App:
         with pushd(Path(".") / "tests" / "cypress_test_app"):
@@ -44,8 +44,10 @@ def setup(test_org: bool):
         # file
         obj = {"foo": "bar"}
         obj_file = dp.File.upload_obj(data=pickle.dumps(obj), name=gen_name())
-        # record obj ids
-        dp_objs.update({"paramsAppId": params_app.id, "noParamsAppId": no_params_app.id, "fileId": obj_file.id})
+        # record obj urls
+        dp_objs.update(
+            {"paramsAppURL": params_app.web_url, "noParamsAppURL": no_params_app.web_url, "fileURL": obj_file.web_url}
+        )
 
     # write to stderr for cypress tests to pick up
     print(json.dumps(dp_objs), flush=True, file=sys.stderr)
@@ -54,21 +56,21 @@ def setup(test_org: bool):
 def teardown(test_org: bool):
     """Delete the cypress test objects"""
     print("Deleting test reports / apps")
-    # read the id's from stdin
+    # read the urls from stdin
     dp_objs: dict = json.load(sys.stdin)
 
     # delete the objects, ignoring errors
     with suppress(Exception):
-        dp.Report.by_id(dp_objs["builderReportId"]).delete()
+        dp.Report.by_id(dp_objs["builderReportURL"]).delete()
     with suppress(Exception):
-        dp.Report.by_id(dp_objs["styleReportId"]).delete()
+        dp.Report.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
         with suppress(Exception):
-            dp.App.by_id(dp_objs["paramsAppId"]).delete()
+            dp.App.by_id(dp_objs["paramsAppURL"]).delete()
         with suppress(Exception):
-            dp.App.by_id(dp_objs["noParamsAppId"]).delete()
+            dp.App.by_id(dp_objs["noParamsAppURL"]).delete()
         with suppress(Exception):
-            dp.File.by_id(dp_objs["fileId"]).delete()
+            dp.File.by_id(dp_objs["fileURL"]).delete()
 
 
 if __name__ == "__main__":

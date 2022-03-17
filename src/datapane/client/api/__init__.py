@@ -70,7 +70,7 @@ from .report.blocks import (
     Table,
     Toggle,
 )
-from .report.core import FontChoice, PageLayout, Report, ReportFormatting, ReportWidth, TextAlignment, Visibility
+from .report.core import FontChoice, PageLayout, Report, ReportFormatting, ReportWidth, TextAlignment
 from .runtime import Params, Result, by_datapane, _reset_runtime, _report
 from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup

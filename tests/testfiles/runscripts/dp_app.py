@@ -12,4 +12,4 @@ if dp.ON_DATAPANE:
 if __name__ == "__datapane__":  # same as dp.by_datapane
     print("by datapane")
     report = dp.Report(blocks=blocks)
-    report.upload(name="dp_report", description="Description")
+    report.upload(name="dp_report", description="Description", overwrite=True)

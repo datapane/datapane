@@ -8,7 +8,7 @@ import random
 import typing as t
 import webbrowser
 from base64 import b64encode
-from enum import Enum, IntEnum
+from enum import Enum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
@@ -25,9 +25,8 @@ from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
-from datapane.common import NPath, dict_drop_empty, log, timestamp
+from datapane.common import dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
-from datapane.common.utils import process_notebook
 
 from .blocks import (
     BaseElement,
@@ -46,22 +45,11 @@ local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
 # only these types will be documented by default
-__all__ = ["Report", "ReportWidth", "Visibility"]
+__all__ = ["Report", "ReportWidth"]
 
 __pdoc__ = {
     "Report.endpoint": False,
 }
-
-
-class Visibility(IntEnum):
-    """The report visibility type, set for reports on Datapane Studio
-
-    ..note:: This is ignored on Datapane Enterprise, reports are always private
-    """
-
-    DEFAULT = 1  # not listed on the users portfolio
-    PORTFOLIO = 2  # above + added to user's portfolio page
-    PRIVATE = 3  # private to owner
 
 
 class ReportWidth(Enum):
@@ -270,7 +258,7 @@ class Report(DPObjectRef):
         # add optional Meta
         if embedded:
             meta = E.Meta(
-                E.Author(c.config.username or author),
+                E.Author(author or ""),
                 E.CreatedOn(timestamp()),
                 E.Title(title),
                 E.Description(description),
@@ -331,17 +319,16 @@ class Report(DPObjectRef):
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
+        publicly_visible: bool = False,
         tags: t.List[str] = None,
         project: t.Optional[str] = None,
-        source_file: t.Optional[NPath] = None,
         formatting: t.Optional[ReportFormatting] = None,
+        overwrite: bool = False,
         **kwargs,
     ) -> None:
         # TODO - clean up arg handling
         # process params
         tags = tags or []
-        visibility_str = visibility.upper() if isinstance(visibility, str) else visibility.name
 
         formatting_kwargs = {}
         if formatting:
@@ -360,7 +347,7 @@ class Report(DPObjectRef):
             description=description,
             tags=tags,
             source_url=source_url,
-            visibility=visibility_str,
+            publicly_visible=publicly_visible,
             project=project,
             **formatting_kwargs,
         )
@@ -372,13 +359,7 @@ class Report(DPObjectRef):
         report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
         files = dict(attachments=attachments)
 
-        # create empty temp file to potentially store stripped down notebook
-        with DPTmpFile(".ipynb") as output_file:
-            if source_file:
-                # strip the output of original notebook and store in temp file
-                process_notebook(Path(source_file), output_file.file)
-                files["source_file"] = [output_file.file]
-            res = Resource(self.endpoint).post_files(files, document=report_str, **kwargs)
+        res = Resource(self.endpoint).post_files(files, overwrite=overwrite, document=report_str, **kwargs)
 
         # Set dto based on new URL
         self.url = res.url
@@ -392,12 +373,12 @@ class Report(DPObjectRef):
         name: str,
         description: str = "",
         source_url: str = "",
-        visibility: t.Union[Visibility, str] = "",
+        publicly_visible: bool = False,
         tags: t.List[str] = None,
         project: t.Optional[str] = None,
-        source_file: t.Optional[NPath] = None,
         open: bool = False,
         formatting: t.Optional[ReportFormatting] = None,
+        overwrite: bool = False,
         **kwargs,
     ) -> None:
         """
@@ -407,18 +388,26 @@ class Report(DPObjectRef):
             name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
             description: A high-level description for the document, this is displayed in searches and thumbnails
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
-            visibility: "UNLISTED" (default), "PRIVATE", or "PUBLISHED" (for studio product only, ignored on enterprise)
+            publicly_visible: Visible to anyone with the link
             tags: A list of tags (as strings) used to categorise your document
             project: Project to add the report to (Teams only)
-            source_file: Path of jupyter notebook file to upload
             open: Open the file in your browser after creating
             formatting: Set the basic styling for your report
+            overwrite: Overwrite the report
         """
 
         display_msg("Uploading report and associated data - *please wait...*")
 
         self._upload_report(
-            name, description, source_url, visibility, tags, project, source_file, formatting=formatting, **kwargs
+            name,
+            description,
+            source_url,
+            publicly_visible,
+            tags,
+            project,
+            formatting=formatting,
+            overwrite=overwrite,
+            **kwargs,
         )
 
         if open:

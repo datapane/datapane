@@ -16,13 +16,13 @@ def test_new_config(gad, tmp_path: Path, monkeypatch):
         "datapane.client.analytics._NO_ANALYTICS", False
     ), mock.patch("datapane.client.api.user.ping", autospect=True) as ping:
 
-        ping.return_value = "joebloggs"
+        ping.return_value = "joebloggs@datapane.com"
 
         from datapane.client import config as c
 
         # check pre-invariants
-        assert c.config.version == 3
-        assert c.config.username == ""
+        assert c.config.version == 4
+        assert c.config.email == ""
         assert not c.config.completed_action
         assert posthog.identify.call_count == 0
         assert posthog.capture.call_count == 0
@@ -31,12 +31,12 @@ def test_new_config(gad, tmp_path: Path, monkeypatch):
         import datapane as dp
         from datapane.client import config as c
 
-        username = dp.login(token="TOKEN")
-        assert username == "joebloggs"
+        email = dp.login(token="TOKEN")
+        assert email == "joebloggs@datapane.com"
 
         # check config file
-        assert c.config.version == 3
-        assert c.config.username == "joebloggs"
+        assert c.config.version == 4
+        assert c.config.email == "joebloggs@datapane.com"
         assert c.config.completed_action
 
         # check analytics
@@ -45,8 +45,8 @@ def test_new_config(gad, tmp_path: Path, monkeypatch):
 
         # load and check config file
         _config = c.Config.load()
-        assert c.config.version == 3
-        assert _config.username == "joebloggs"
+        assert c.config.version == 4
+        assert _config.email == "joebloggs@datapane.com"
         assert _config.completed_action
 
         # run additional event

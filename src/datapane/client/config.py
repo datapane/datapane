@@ -26,7 +26,7 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_ENV = "default"
 DEFAULT_SERVER = "https://datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
-LATEST_VERSION = 3
+LATEST_VERSION = 4
 
 
 # TODO - wrap into a singleton object that includes callable?
@@ -41,7 +41,7 @@ class Config:
 
     server: str = DEFAULT_SERVER
     token: str = DEFAULT_TOKEN
-    username: str = ""
+    email: str = ""
     session_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
     version: int = 1  # if version doesn't exist in file
     completed_action: bool = False  # only active on first action
@@ -66,7 +66,7 @@ class Config:
 
     @property
     def is_authenticated(self) -> bool:
-        return self.token != DEFAULT_TOKEN  # or bool(self.username)
+        return self.token != DEFAULT_TOKEN  # or bool(self.email)
 
     @property
     def is_anonymous(self) -> bool:
@@ -130,19 +130,22 @@ class Config:
         if self.version == 1:
             # capture_init()
             self.version = 3
+            self.save()
+        elif self.version == 2:
+            # re-init against new server
+            # capture_init()
+            self.version = 3
+            self.save()
+
+        if self.version == 3:
+            self.version = 4
 
             # If token exists check still valid and can login
             if self.token and self.token != DEFAULT_TOKEN:
                 from .api import ping
 
                 with suppress(Exception):
-                    self.username = ping(config=self, cli_login=True, verbose=False)
-
-            self.save()
-        elif self.version == 2:
-            # re-init against new server
-            # capture_init()
-            self.version = 3
+                    self.email = ping(config=self, cli_login=True, verbose=False)
             self.save()
 
 

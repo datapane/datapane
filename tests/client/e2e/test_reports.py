@@ -21,28 +21,23 @@ pytestmark = pytest.mark.usefixtures("dp_login")
 
 def test_report_simple():
     report = gen_report_simple()
-    report.upload(name="TEST", description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         ...
 
 
 def test_report_update_metadata():
     report = gen_report_simple()
-    name = "TEST-META"
+    name = gen_name()
 
-    visibility = dp.Visibility.PORTFOLIO.name if c.config.is_public else dp.Visibility.DEFAULT.name
-    props = dict(
-        description="TEST-DESCRIPTION",
-        source_url="https://www.github.com/datapane",
-        tags=["a", "b"],
-        visibility=visibility,
-    )
+    props = dict(description="TEST-DESCRIPTION", source_url="https://www.github.com/datapane", tags=["a", "b"])
+    if c.config.is_public:
+        props["publicly_visible"] = True
 
     same_props = (
         "url",
         "id",
-        "owner",
-        "username",
+        "author",
         "web_url",
         "width",
         "report_files",
@@ -59,8 +54,8 @@ def test_report_update_metadata():
             check(report.dto[k], v)
         orig_dto = deepcopy(report.dto)
 
-        # upload again, using defaults
-        report.upload(name)
+        # overwrite and upload again, using defaults
+        report.upload(name, overwrite=True)
         # check props haven't changed
         for (k, v) in props.items():
             check(report.dto[k], v)
@@ -74,24 +69,24 @@ def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
     # Test we can save then upload
     report.save(str(datadir / "test_report.html"))
-    report.upload(name="TEST", description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         ...
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    report.upload(name="TEST", description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         ...
 
 
 def test_report_update_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    report.upload(name="TEST", description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         doc_a = report.document
-        report.upload(name="TEST", description="DESCRIPTION")
+        report.upload(name=gen_name(), description="DESCRIPTION")
         doc_b = report.document
         assert doc_a == doc_b
 
@@ -131,7 +126,7 @@ def test_report_update_assets(datadir: Path):
 
 def test_demo_report():
     report = dp.builtins.build_demo_report()
-    report.upload(name="TEST", description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         ...
 
@@ -161,12 +156,7 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     divider = dp.Divider()
     empty_block = dp.Empty(name="empty-block")
     dp_report = dp.Report(m, file_asset, df_asset, plot_asset, list_asset, divider, empty_block, media_asset)
-    dp_report.upload(
-        name=name,
-        description=description,
-        source_url=source_url,
-        source_file=Path("sample_notebook.ipynb"),
-    )
+    dp_report.upload(name=name, description=description, source_url=source_url)
 
     with deletable(dp_report):
         # are the fields ok
@@ -262,9 +252,9 @@ def test_complex_df_report():
 
 @pytest.mark.org
 def test_report_project():
-    # update a report that will automatically be added to the default group
+    # update a report that will automatically be added to the default project
     report = gen_report_simple()
-    report.upload(name="test_report_group")
+    report.upload(name="test_report_project")
     # check if the project name is default
     with deletable(report):
         assert report.project == "default"

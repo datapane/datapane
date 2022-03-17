@@ -148,7 +148,6 @@ These are great ways to add interactivity to your report with minimal effort. Sp
 
 In addition to saving documents locally, you can use [Datapane Studio](https://datapane.com/explore) to host and share your reports.
 
-- Unlimited public reports, plus limited private reports
 - Embed reports in places like Medium, Notion, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
 - Viewers can explore and download your data with additional DataTable analysis features
 

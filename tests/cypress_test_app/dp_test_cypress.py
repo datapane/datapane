@@ -10,4 +10,4 @@ dp.Report(
     dp.Text(str(int_param)),
     dp.Text(str(float_param)),
     dp.Text(file_param.read_text()),
-).upload(name="params-test-report")
+).upload(name="params-test-report", overwrite=True)
