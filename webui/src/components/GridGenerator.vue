@@ -3,13 +3,8 @@
  * Recursively renders a grid of report blocks
  */
 
-import {
-    BlockTree,
-    isGroup,
-    isSelect,
-    isToggle,
-    isBlock,
-} from "../data-model/blocks";
+import { BlockTree, isGroup, isSelect, isToggle } from "../data-model/blocks";
+import { createGridKey } from "./utils";
 import { defineAsyncComponent, inject } from "vue";
 import GroupLayout from "./blocks/Group.vue";
 import BlockWrapper from "./blocks/BlockWrapper.vue";
@@ -17,9 +12,6 @@ const SelectLayout = defineAsyncComponent(() => import("./layout/Select.vue"));
 
 const p = defineProps<{ tree: BlockTree }>();
 const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
-
-const createGridKey = (child: BlockTree, idx: number) =>
-    isBlock(child) ? `${child.refId}-${idx}` : `${child.name}-${idx}`;
 </script>
 
 <template>
