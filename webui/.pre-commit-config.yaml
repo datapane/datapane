@@ -104,21 +104,18 @@ repos:
         #exclude: '^(dp-server|tasks|email-templates)/'
         #files: \.(js|jsx|ts|tsx)$
         # only run for JS files in fe-components
-        files: ^fe-components/\S+\.(js|jsx|ts|tsx)$
+        files: ^src/\S+\.(js|ts|vue)$
         types: [text, file, non-executable]
         additional_dependencies:
-          - eslint@5.12.0
+          - eslint@6.8.0
           - babel-eslint@10.0.1
           - "@typescript-eslint/eslint-plugin@1.x"
           - "@typescript-eslint/parser@1.9.0"
           - typescript@3.x
-          - eslint-plugin-react@7.16.0
-          - eslint-config-react-app@4.0.1
           - eslint-plugin-flowtype@2.50.3
           - eslint-plugin-import@2.17.3
-          - eslint-plugin-jsx-a11y@6.2.3
-          - eslint-plugin-react-hooks@1.6.0
           - tslint@5.20.0
+          - eslint-plugin-vue@v7.5.0
           - "@typescript-eslint/eslint-plugin-tslint@2.4.0"
   # sh shellcheck
   - repo: git://github.com/detailyang/pre-commit-shell
