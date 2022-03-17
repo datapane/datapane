@@ -4,47 +4,46 @@ import "highlight.js/lib/common";
 import "highlight.js/styles/stackoverflow-light.css";
 import hljsVuePlugin from "@highlightjs/vue-plugin";
 import { DPClipboard } from "../../../DPClipboard";
-
 const highlightjs = hljsVuePlugin.component;
 
 const p = defineProps<{ language: string; code: string }>();
-let clip: DPClipboard;
+
+const clip = ref<DPClipboard>();
 const copyBtn = ref<HTMLButtonElement | null>(null);
+const code = computed(() => p.code.trim());
 const { dpLocal } = window;
 
 onMounted(() => {
-  if (copyBtn.value) {
-    clip = new DPClipboard(copyBtn.value, {
-      text: code.value,
-    });
-  }
+    if (copyBtn.value) {
+        clip.value = new DPClipboard(copyBtn.value, {
+            text: code.value,
+        });
+    }
 });
 
 onUnmounted(() => {
-  clip && clip.destroy();
+    clip.value?.destroy();
 });
-
-const code = computed(() => p.code.trim());
 </script>
 
 <template>
-  <div class="relative">
-    <!-- TODO - prevent flicker on load -->
-    <link v-if="!dpLocal" rel="stylesheet" href="/static/style.css" />
-    <button
-      class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
-      ref="copyBtn"
-    >
-      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-        <title>Copy</title>
-        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
-        <path
-          d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"
-        ></path>
-      </svg>
-    </button>
-    <highlightjs :language="p.language" :code="code" data-cy="block-code" />
-  </div>
+    <div class="relative">
+        <!-- TODO - prevent flicker on load -->
+        <link v-if="!dpLocal" rel="stylesheet" href="/static/style.css" />
+        <button
+            class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
+            ref="copyBtn"
+        >
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <title>Copy</title>
+                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                <path
+                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"
+                ></path>
+            </svg>
+        </button>
+        <highlightjs :language="p.language" :code="code" data-cy="block-code" />
+    </div>
 </template>
 
 <style>
@@ -52,6 +51,6 @@ const code = computed(() => p.code.trim());
 @import "highlight.js/styles/stackoverflow-light.css";
 
 pre {
-  @apply w-full;
+    @apply w-full;
 }
 </style>

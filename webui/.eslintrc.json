@@ -1,40 +1,42 @@
 {
-  "env": {
-    "browser": true,
-    "es6": true,
-    "vue/setup-compiler-macros": true
-  },
-  "parser": "vue-eslint-parser",
-  "parserOptions": { "parser": "@typescript-eslint/parser" },
-  "plugins": ["vue", "@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:vue/base",
-    "plugin:vue/vue3-recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "overrides": [
-    {
-      "files": ["**/*.ts", "**/*.vue"],
-      "rules": {
-        "@typescript-eslint/no-angle-bracket-type-assertion": ["off"],
-        "no-useless-constructor": "off",
-        "@typescript-eslint/no-useless-constructor": "error",
-        "vue/script-setup-uses-vars": "error",
-        "@typescript-eslint/no-unused-vars": ["error"],
-        "@typescript-eslint/no-explicit-any": ["off"],
-        "@typescript-eslint/explicit-function-return-type": ["off"],
-        "@typescript-eslint/indent": ["off"],
-        "@typescript-eslint/prefer-interface": ["off"],
-        "@typescript-eslint/camelcase": ["off"],
-        "@typescript-eslint/no-throw-literal": ["off"]
-      }
+    "env": {
+        "browser": true,
+        "es6": true,
+        "vue/setup-compiler-macros": true
+    },
+    "parser": "vue-eslint-parser",
+    "parserOptions": { "parser": "@typescript-eslint/parser" },
+    "plugins": ["vue", "@typescript-eslint"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:vue/base",
+        "plugin:vue/vue3-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "overrides": [
+        {
+            "files": ["**/*.ts", "**/*.vue"],
+            "rules": {
+                "@typescript-eslint/no-angle-bracket-type-assertion": ["off"],
+                "no-useless-constructor": "off",
+                "@typescript-eslint/no-useless-constructor": "error",
+                "vue/script-setup-uses-vars": "error",
+                "@typescript-eslint/no-unused-vars": ["error"],
+                "@typescript-eslint/no-explicit-any": ["off"],
+                "@typescript-eslint/explicit-function-return-type": ["off"],
+                "@typescript-eslint/indent": ["off"],
+                "@typescript-eslint/prefer-interface": ["off"],
+                "@typescript-eslint/camelcase": ["off"],
+                "@typescript-eslint/no-throw-literal": ["off"]
+            }
+        }
+    ],
+    "rules": {
+        "@typescript-eslint/interface-name-prefix": ["off", "never"],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
+        "vue/html-indent": ["off"],
+        "vue/script-indent": ["off"]
     }
-  ],
-  "rules": {
-    "@typescript-eslint/interface-name-prefix": ["off", "never"],
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "double"],
-    "semi": ["error", "always"]
-  }
 }

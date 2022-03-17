@@ -5,29 +5,29 @@
 import { inject } from "vue";
 
 const p = defineProps<{
-  caption?: string;
-  count?: number;
-  captionType: string;
+    caption?: string;
+    count?: number;
+    captionType: string;
 }>();
 
 const singleBlockEmbed = inject("singleBlockEmbed");
 </script>
 
 <template>
-  <div
-    :class="[
-      'w-full relative flex flex-col justify-center items-center overflow-x-auto',
-      { 'h-iframe': singleBlockEmbed },
-      { 'p-1': !singleBlockEmbed },
-    ]"
-  >
-    <slot></slot>
     <div
-      v-if="p.caption"
-      class="text-sm text-dp-light-gray italic text-justify"
+        :class="[
+            'w-full relative flex flex-col justify-center items-center overflow-x-auto',
+            { 'h-iframe': singleBlockEmbed },
+            { 'p-1': !singleBlockEmbed },
+        ]"
     >
-      <b>{{ p.captionType }} {{ p.count }}</b>
-      {{ p.caption }}
+        <slot />
+        <div
+            v-if="p.caption"
+            class="text-sm text-dp-light-gray italic text-justify"
+        >
+            <b>{{ p.captionType }} {{ p.count }}</b>
+            {{ p.caption }}
+        </div>
     </div>
-  </div>
 </template>
