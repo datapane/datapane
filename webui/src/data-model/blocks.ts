@@ -8,6 +8,7 @@ import VVegaBlock from "../components/blocks/Vega.connector.vue";
 import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
 import VTableBlock from "../components/blocks/Table.connector.vue";
 import VSVGBlock from "../components/blocks/SVG.connector.vue";
+import VMediaBlock from "../components/blocks/Media.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -327,6 +328,19 @@ export class FormulaBlock extends Block {
         this.componentProps = {
             ...this.componentProps,
             content,
+        };
+    }
+}
+
+export class MediaBlock extends AssetBlock {
+    public component = markRaw(VMediaBlock);
+
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        this.componentProps = {
+            ...this.componentProps,
+            type: this.type,
+            src: this.src,
         };
     }
 }
