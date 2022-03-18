@@ -20,10 +20,12 @@ import {
     FileBlock,
     FormulaBlock,
     MediaBlock,
+    EmbedBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
 import { DataTableBlock } from "./datatable/datatable-block";
+import { jsonIsEmbed } from "./test-maps";
 
 export type State = {
     report: Report;
@@ -261,6 +263,8 @@ export class ReportStore {
             BlockClass = FormulaBlock;
         } else if (maps.jsonIsMedia(elem)) {
             BlockClass = MediaBlock;
+        } else if (jsonIsEmbed(elem)) {
+            BlockClass = EmbedBlock;
         } else {
             BlockClass = FileBlock;
         }
