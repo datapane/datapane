@@ -1,27 +1,23 @@
 <script setup lang="ts">
 /* eslint-disable no-useless-escape */
 import { computed, ComputedRef, onMounted } from "vue";
-import iframeResize from "iframe-resizer/js/iframeResizer";
-import userIframeCss from "../../styles/user-iframe.css?inline";
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw";
 import { v4 as uuid4 } from "uuid";
+import iframeResize from "iframe-resizer/js/iframeResizer";
 
-const p = defineProps<{ html: string; sandbox?: string }>();
-
+const p = defineProps<{ html: string; isIframe: boolean }>();
 const iframeId = `iframe_${uuid4()}`;
 
 const iframeDoc: ComputedRef<string> = computed(() => {
     /**
-     * Inject some base CSS into the iframe, alongside the JS needed to
-     * make the iframe resizer work
+     * Inject the JS needed to make the iframe resizer work
      */
     return `
         <!DOCTYPE html>
         <html>
         <body>
-            <style>${userIframeCss}</style>
             <script>${contentWindowJs}<\/script>
-            <div class="doc-root">${p.html}</div>
+            ${p.html}
         </body>
         </html>
     `;
@@ -33,11 +29,15 @@ onMounted(() => {
 </script>
 
 <template>
+    <div
+        v-if="isIframe"
+        v-html="p.html"
+        class="flex justify-center items-center"
+    />
     <iframe
-        :srcdoc="iframeDoc"
-        :sandbox="p.sandbox"
+        v-else
         :id="iframeId"
-        width="100%"
-        data-cy="block-user-iframe"
-    ></iframe>
+        :srcdoc="iframeDoc"
+        class="flex justify-center items-center"
+    />
 </template>

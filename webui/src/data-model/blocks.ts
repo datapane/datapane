@@ -1,7 +1,8 @@
 import VTextBlock from "../components/blocks/Text.vue";
 import VHTMLBlock from "../components/blocks/HTML.vue";
 import VFileBlock from "../components/blocks/File.vue";
-import VFormulaBlock from "../components/blocks/Formula.vue";
+import VEmbedBlock from "../components/blocks/Embed.vue";
+import VFormulaBlock from "../components/blocks/Formula.connector.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
 import VVegaBlock from "../components/blocks/Vega.connector.vue";
@@ -157,7 +158,13 @@ export class Block {
     public componentProps: any;
     public component: any;
 
-    public constructor(elem: Elem, caption?: string, count?: number) {
+    public constructor(
+        elem: Elem,
+        caption?: string,
+        count?: number,
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        opts?: any
+    ) {
         const { attributes } = elem;
         this.refId = uuidv4();
         this.count = count;
@@ -341,6 +348,40 @@ export class MediaBlock extends AssetBlock {
             ...this.componentProps,
             type: this.type,
             src: this.src,
+        };
+    }
+}
+
+export class EmbedBlock extends AssetBlock {
+    public component = markRaw(VEmbedBlock);
+
+    private _isIFrame?: boolean;
+    private html: string;
+
+    public get isIFrame(): boolean {
+        if (typeof this._isIFrame === "undefined") {
+            const doc: Document = new DOMParser().parseFromString(
+                this.html,
+                "text/html"
+            );
+            const root: HTMLBodyElement | null = doc.documentElement.querySelector(
+                "body"
+            );
+            this._isIFrame =
+                !!root &&
+                root.childElementCount === 1 &&
+                root.children[0].tagName.toLowerCase() === "iframe";
+        }
+        return this._isIFrame;
+    }
+
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        this.html = getInnerText(elem);
+        this.componentProps = {
+            ...this.componentProps,
+            html: this.html,
+            isIframe: this.isIFrame,
         };
     }
 }
