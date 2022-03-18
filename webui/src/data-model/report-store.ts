@@ -19,6 +19,7 @@ import {
     SVGBlock,
     FileBlock,
     FormulaBlock,
+    MediaBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -258,6 +259,8 @@ export class ReportStore {
             BlockClass = SVGBlock;
         } else if (maps.jsonIsFormula(elem)) {
             BlockClass = FormulaBlock;
+        } else if (maps.jsonIsMedia(elem)) {
+            BlockClass = MediaBlock;
         } else {
             BlockClass = FileBlock;
         }
