@@ -1,0 +1,20 @@
+<script setup lang="ts">
+import { ref, inject } from "vue";
+import Folium from "./Folium.vue";
+
+const p = defineProps<{ fetchAssetData: any }>();
+const singleBlockEmbed = inject("singleBlockEmbed");
+const iframeContent = ref<string | null>(null);
+
+(async () => {
+    iframeContent.value = await p.fetchAssetData();
+})();
+</script>
+
+<template>
+    <folium
+        v-if="iframeContent"
+        :iframe-content="iframeContent"
+        :single-block-embed="singleBlockEmbed"
+    />
+</template>

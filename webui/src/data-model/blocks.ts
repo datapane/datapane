@@ -2,6 +2,7 @@ import VTextBlock from "../components/blocks/Text.vue";
 import VHTMLBlock from "../components/blocks/HTML.vue";
 import VFileBlock from "../components/blocks/File.vue";
 import VEmbedBlock from "../components/blocks/Embed.vue";
+import VFoliumBlock from "../components/blocks/Folium.connector.vue";
 import VFormulaBlock from "../components/blocks/Formula.connector.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
@@ -214,6 +215,11 @@ export class TableBlock extends AssetBlock {
     protected fetchLocalAssetData(): any {
         return decodeBase64AssetUtf8(this.src);
     }
+}
+
+export class FoliumBlock extends AssetBlock {
+    public component = markRaw(VFoliumBlock);
+    public captionType = "Plot";
 }
 
 export abstract class PlotAssetBlock extends AssetBlock {
