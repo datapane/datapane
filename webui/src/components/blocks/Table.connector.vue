@@ -14,7 +14,7 @@ const html = ref<string | null>(null);
     <x-table-block
         v-if="html"
         :html="html"
-        :singleBlockEmbed="singleBlockEmbed"
+        :single-block-embed="singleBlockEmbed"
         class="w-full"
-    ></x-table-block>
+    />
 </template>

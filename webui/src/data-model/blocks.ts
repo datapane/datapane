@@ -150,7 +150,7 @@ export class Select {
     }
 }
 
-/* Atomic blocks */
+/* Inline blocks */
 
 export class Block {
     public refId: string;
@@ -177,109 +177,6 @@ export class Block {
         if (attributes) {
             this.label = attributes.label;
         }
-    }
-}
-
-export abstract class AssetBlock extends Block {
-    public src: string;
-    public type: string;
-
-    public constructor(elem: Elem, caption?: string, count?: number) {
-        super(elem, caption, count);
-        const { attributes } = elem;
-        this.src = attributes.src;
-        this.type = attributes.type;
-        this.componentProps = {
-            ...this.componentProps,
-            fetchAssetData: this.fetchAssetData.bind(this),
-        };
-    }
-
-    protected fetchLocalAssetData(): string {
-        return decodeBase64Asset(this.src);
-    }
-
-    protected async fetchAssetData(): AssetResource {
-        return window.dpLocal
-            ? this.fetchLocalAssetData()
-            : this.fetchRemoteAssetData();
-    }
-
-    protected async fetchRemoteAssetData(): AssetResource {
-        return await readGcsTextOrJsonFile(this.src);
-    }
-}
-
-export class TableBlock extends AssetBlock {
-    public component = markRaw(VTableBlock);
-    public captionType = "Table";
-
-    protected fetchLocalAssetData(): any {
-        return decodeBase64AssetUtf8(this.src);
-    }
-}
-
-export class FoliumBlock extends AssetBlock {
-    public component = markRaw(VFoliumBlock);
-    public captionType = "Plot";
-}
-
-export abstract class PlotAssetBlock extends AssetBlock {
-    public captionType = "Plot";
-    public responsive: boolean;
-
-    public constructor(elem: Elem, caption?: string, count?: number) {
-        super(elem, caption, count);
-        const { attributes } = elem;
-        this.responsive = JSON.parse(attributes.responsive);
-        this.componentProps = {
-            ...this.componentProps,
-            responsive: this.responsive,
-        };
-    }
-}
-
-export class BokehBlock extends PlotAssetBlock {
-    public component = markRaw(VBokehBlock);
-
-    protected fetchLocalAssetData(): string {
-        const localAssetData = super.fetchLocalAssetData();
-        return JSON.parse(localAssetData);
-    }
-}
-
-export class VegaBlock extends PlotAssetBlock {
-    public component = markRaw(VVegaBlock);
-
-    protected fetchLocalAssetData() {
-        const localAssetData = super.fetchLocalAssetData();
-        return JSON.parse(localAssetData);
-    }
-}
-
-export class PlotlyBlock extends PlotAssetBlock {
-    public component = markRaw(VPlotlyBlock);
-
-    protected fetchLocalAssetData(): any {
-        return JSON.parse(JSON.parse(decodeBase64Asset(this.src)));
-    }
-
-    protected async fetchRemoteAssetData(): AssetResource {
-        /* TODO - type promise? */
-        const res = await readGcsTextOrJsonFile<string>(this.src);
-        return JSON.parse(res);
-    }
-}
-
-export class SVGBlock extends PlotAssetBlock {
-    public component = markRaw(VSVGBlock);
-
-    protected async fetchRemoteAssetData(): AssetResource {
-        return this.src;
-    }
-
-    protected fetchLocalAssetData(): string {
-        return this.src;
     }
 }
 
@@ -363,8 +260,8 @@ export class BigNumberBlock extends Block {
         if (!useSimple) {
             this.componentProps = {
                 ...this.componentProps,
-                isPositiveIntent: attributes.is_positive_intent,
-                isUpwardChange: attributes.is_upward_change,
+                isPositiveIntent: JSON.parse(attributes.is_positive_intent),
+                isUpwardChange: JSON.parse(attributes.is_upward_change),
                 prevValue: attributes.prev_value,
                 change: attributes.change,
             };
@@ -372,17 +269,50 @@ export class BigNumberBlock extends Block {
     }
 }
 
-export class MediaBlock extends AssetBlock {
-    public component = markRaw(VMediaBlock);
+/* Asset blocks */
+
+export abstract class AssetBlock extends Block {
+    public src: string;
+    public type: string;
 
     public constructor(elem: Elem, caption?: string, count?: number) {
         super(elem, caption, count);
+        const { attributes } = elem;
+        this.src = attributes.src;
+        this.type = attributes.type;
         this.componentProps = {
             ...this.componentProps,
-            type: this.type,
-            src: this.src,
+            fetchAssetData: this.fetchAssetData.bind(this),
         };
     }
+
+    protected fetchLocalAssetData(): string {
+        return decodeBase64Asset(this.src);
+    }
+
+    protected async fetchAssetData(): AssetResource {
+        return window.dpLocal
+            ? this.fetchLocalAssetData()
+            : this.fetchRemoteAssetData();
+    }
+
+    protected async fetchRemoteAssetData(): AssetResource {
+        return await readGcsTextOrJsonFile(this.src);
+    }
+}
+
+export class TableBlock extends AssetBlock {
+    public component = markRaw(VTableBlock);
+    public captionType = "Table";
+
+    protected fetchLocalAssetData(): any {
+        return decodeBase64AssetUtf8(this.src);
+    }
+}
+
+export class FoliumBlock extends AssetBlock {
+    public component = markRaw(VFoliumBlock);
+    public captionType = "Plot";
 }
 
 export class EmbedBlock extends AssetBlock {
@@ -391,7 +321,20 @@ export class EmbedBlock extends AssetBlock {
     private _isIFrame?: boolean;
     private html: string;
 
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        this.html = getInnerText(elem);
+        this.componentProps = {
+            ...this.componentProps,
+            html: this.html,
+            isIframe: this.isIFrame,
+        };
+    }
+
     public get isIFrame(): boolean {
+        /**
+         * Returns `true` if the embed HTML is an iframe element
+         */
         if (typeof this._isIFrame === "undefined") {
             const doc: Document = new DOMParser().parseFromString(
                 this.html,
@@ -406,16 +349,6 @@ export class EmbedBlock extends AssetBlock {
                 root.children[0].tagName.toLowerCase() === "iframe";
         }
         return this._isIFrame;
-    }
-
-    public constructor(elem: Elem, caption?: string, count?: number) {
-        super(elem, caption, count);
-        this.html = getInnerText(elem);
-        this.componentProps = {
-            ...this.componentProps,
-            html: this.html,
-            isIframe: this.isIFrame,
-        };
     }
 }
 
@@ -440,9 +373,78 @@ export class FileBlock extends AssetBlock {
     }
 }
 
-/* Helper types */
+export class MediaBlock extends AssetBlock {
+    public component = markRaw(VMediaBlock);
 
-type BlockProps = { captionType?: string; label?: string; count?: number };
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        this.componentProps = {
+            ...this.componentProps,
+            type: this.type,
+            src: this.src,
+        };
+    }
+}
+
+export abstract class PlotAssetBlock extends AssetBlock {
+    public captionType = "Plot";
+    public responsive: boolean;
+
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        const { attributes } = elem;
+        this.responsive = JSON.parse(attributes.responsive);
+        this.componentProps = {
+            ...this.componentProps,
+            responsive: this.responsive,
+        };
+    }
+}
+
+export class BokehBlock extends PlotAssetBlock {
+    public component = markRaw(VBokehBlock);
+
+    protected fetchLocalAssetData(): string {
+        const localAssetData = super.fetchLocalAssetData();
+        return JSON.parse(localAssetData);
+    }
+}
+
+export class VegaBlock extends PlotAssetBlock {
+    public component = markRaw(VVegaBlock);
+
+    protected fetchLocalAssetData() {
+        const localAssetData = super.fetchLocalAssetData();
+        return JSON.parse(localAssetData);
+    }
+}
+
+export class PlotlyBlock extends PlotAssetBlock {
+    public component = markRaw(VPlotlyBlock);
+
+    protected fetchLocalAssetData(): any {
+        return JSON.parse(JSON.parse(decodeBase64Asset(this.src)));
+    }
+
+    protected async fetchRemoteAssetData(): AssetResource {
+        const res = await readGcsTextOrJsonFile<string>(this.src);
+        return JSON.parse(res);
+    }
+}
+
+export class SVGBlock extends PlotAssetBlock {
+    public component = markRaw(VSVGBlock);
+
+    protected async fetchRemoteAssetData(): AssetResource {
+        return this.src;
+    }
+
+    protected fetchLocalAssetData(): string {
+        return this.src;
+    }
+}
+
+/* Helper types */
 
 export type LayoutBlock = Group | Select | Toggle;
 

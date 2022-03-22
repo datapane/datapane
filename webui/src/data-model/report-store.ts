@@ -268,6 +268,11 @@ export class ReportStore {
     }
 
     private get blockMap(): BlockTest[] {
+        /**
+         * class_: The deserialized class that maps to a JSON `elem`
+         * test: Function that returns true if the JSON should deserialize into the associated `class_`
+         * opts: Additional metadata to be passed into the class
+         */
         return [
             {
                 class_: TextBlock,

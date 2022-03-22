@@ -3,7 +3,7 @@ import { ref, inject } from "vue";
 import Folium from "./Folium.vue";
 
 const p = defineProps<{ fetchAssetData: any }>();
-const singleBlockEmbed = inject("singleBlockEmbed");
+const singleBlockEmbed: boolean | undefined = inject("singleBlockEmbed");
 const iframeContent = ref<string | null>(null);
 
 (async () => {
@@ -15,6 +15,6 @@ const iframeContent = ref<string | null>(null);
     <folium
         v-if="iframeContent"
         :iframe-content="iframeContent"
-        :single-block-embed="singleBlockEmbed"
+        :single-block-embed="!!singleBlockEmbed"
     />
 </template>

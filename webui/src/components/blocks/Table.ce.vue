@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const p = defineProps<{ html: string; singleBlockEmbed?: boolean }>();
+import { computed } from "vue";
+const p = defineProps<{ html: string; singleBlockEmbed: string }>();
+
+const singleBlockEmbed = computed(() => JSON.parse(p.singleBlockEmbed));
 
 const tableRef = (node: any): void => {
     /**
@@ -16,8 +19,8 @@ const tableRef = (node: any): void => {
 
 <template>
     <div
-        :class="['w-full', { 'h-full': p.singleBlockEmbed }]"
         :ref="tableRef"
+        :class="['w-full', { 'h-full': singleBlockEmbed }]"
         v-html="p.html"
         data-cy="block-shadow"
     />

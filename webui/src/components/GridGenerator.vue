@@ -16,28 +16,28 @@ const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
 
 <template>
     <template v-if="isGroup(p.tree)">
-        <GroupLayout
+        <group-layout
             :columns="p.tree.columns"
-            :singleBlockEmbed="!!singleBlockEmbed"
+            :single-block-embed="!!singleBlockEmbed"
         >
-            <GridGenerator
+            <grid-generator
                 v-for="(child, idx) in p.tree.children"
                 :key="createGridKey(child, idx)"
                 :tree="child"
-            ></GridGenerator>
-        </GroupLayout>
+            ></grid-generator>
+        </group-layout>
     </template>
     <template v-else-if="isSelect(p.tree)">
-        <SelectLayout :select="p.tree" v-slot="slotProps">
-            <GridGenerator :tree="p.tree.children[slotProps.tabNumber]" />
-        </SelectLayout>
+        <select-layout :select="p.tree" v-slot="slotProps">
+            <grid-generator :tree="p.tree.children[slotProps.tabNumber]" />
+        </select-layout>
     </template>
     <template v-else-if="isToggle(p.tree)">
         <div><!-- TODO --></div>
     </template>
     <template v-else>
-        <BlockWrapper
-            :captionType="p.tree.captionType"
+        <block-wrapper
+            :caption-type="p.tree.captionType"
             :caption="p.tree.caption"
             :count="p.tree.count"
         >
@@ -45,6 +45,6 @@ const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
                 :is="p.tree.component"
                 v-bind="p.tree.componentProps"
             ></component>
-        </BlockWrapper>
+        </block-wrapper>
     </template>
 </template>

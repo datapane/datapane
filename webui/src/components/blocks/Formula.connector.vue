@@ -5,5 +5,5 @@ const p = defineProps<{ content: string }>();
 </script>
 
 <template>
-    <Formula :content="p.content"></Formula>
+    <formula :content="p.content"></formula>
 </template>
