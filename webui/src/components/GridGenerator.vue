@@ -6,8 +6,9 @@
 import { BlockTree, isGroup, isSelect, isToggle } from "../data-model/blocks";
 import { createGridKey } from "./utils";
 import { defineAsyncComponent, inject } from "vue";
-import GroupLayout from "./blocks/Group.vue";
-import BlockWrapper from "./blocks/BlockWrapper.vue";
+import GroupLayout from "./layout/Group.vue";
+import BlockWrapper from "./layout/BlockWrapper.vue";
+import ToggleLayout from "./layout/Toggle.vue";
 const SelectLayout = defineAsyncComponent(() => import("./layout/Select.vue"));
 
 const p = defineProps<{ tree: BlockTree }>();
@@ -33,7 +34,13 @@ const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
         </select-layout>
     </template>
     <template v-else-if="isToggle(p.tree)">
-        <div><!-- TODO --></div>
+        <toggle-layout :label="p.tree.label">
+            <grid-generator
+                v-for="(child, idx) in p.tree.children"
+                :key="createGridKey(child, idx)"
+                :tree="child"
+            ></grid-generator>
+        </toggle-layout>
     </template>
     <template v-else>
         <block-wrapper
