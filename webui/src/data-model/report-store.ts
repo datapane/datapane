@@ -22,11 +22,17 @@ import {
     MediaBlock,
     EmbedBlock,
     FoliumBlock,
+    BigNumberBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
 import { DataTableBlock } from "./datatable/datatable-block";
-import { jsonIsEmbed, jsonIsIFrameHTML } from "./test-maps";
+
+type BlockTest = {
+    class_: typeof Block;
+    test: (elem: Elem) => boolean;
+    opts?: any;
+};
 
 export type State = {
     report: Report;
@@ -48,9 +54,38 @@ const wrapInGroup = (elems: Elem[]): Elem[] => [
     },
 ];
 
+const isSingleBlockEmbed = (pages: Page[], mode: AppViewMode): boolean => {
+    /**
+     * Returns `true` if the report consists of a single block, and is in embed (iframe) mode.
+     * Single blocks embedded in an iframe require style changes to ensure they fit the iframe dimensions
+     */
+    const checkAllGroupsSingle = (node: BlockTree): boolean => {
+        /* Check there's a single route down to one leaf node */
+        if (isGroup(node) && node.children.length === 1) {
+            // Node is a Group with a single child
+            return checkAllGroupsSingle(node.children[0]);
+        } else if (isGroup(node)) {
+            // Node is a Group with multiple children
+            return false;
+        } else {
+            // Node is a Select or leaf
+            return true;
+        }
+    };
+
+    return (
+        mode === "EMBED" &&
+        pages.length === 1 && // Only one page
+        pages[0].children.length === 1 && // Only one Group in that page
+        checkAllGroupsSingle(pages[0].children[0])
+    ); // No groups with multiple children in that group
+};
+
 const getAttributes = (elem: Elem): any =>
-    /* Ensure the attributes object is never undefined
-     * -- xml-js removes the attributes property when a tag has none. */
+    /**
+     * Ensure the attributes object is never undefined
+     * -- xml-js removes the attributes property when a tag has none.
+     **/
     elem.attributes || {};
 
 const getElementByName = (elem: Elem, name: string): any => {
@@ -59,11 +94,14 @@ const getElementByName = (elem: Elem, name: string): any => {
 };
 
 export class ReportStore {
+    /**
+     * deserializes and stores the Report object, and related metadata
+     */
     public state: State;
 
-    private webUrl: string;
-    private isLightProse: boolean;
-    private isOrg: boolean;
+    private readonly webUrl: string;
+    private readonly isLightProse: boolean;
+    private readonly isOrg: boolean;
 
     private counts = {
         plots: 0,
@@ -80,7 +118,8 @@ export class ReportStore {
         const deserializedReport = this.xmlToReport(
             reportProps.report.document
         );
-        const singleBlockEmbed = this.isSingleBlockEmbed(
+
+        const singleBlockEmbed = isSingleBlockEmbed(
             deserializedReport.children,
             reportProps.mode
         );
@@ -97,8 +136,12 @@ export class ReportStore {
     }
 
     private xmlToReport(xml: string): Report {
+        /**
+         * Convert an XML string document to a deserialized tree of `Block` objects
+         */
         const json: any = convert.xml2js(xml, { compact: false });
         const root = getElementByName(json, "Report");
+
         return this.deserialize(getElementByName(root, "Pages"));
     }
 
@@ -120,6 +163,9 @@ export class ReportStore {
     }
 
     private deserialize(elem: Elem): Report {
+        /**
+         * Convert a serialised JSON object to a deserialized tree of `Block` objects
+         */
         const attributes = getAttributes(elem);
         const pages: Page[] = [];
         elem.elements &&
@@ -139,39 +185,15 @@ export class ReportStore {
         });
     }
 
-    private isSingleBlockEmbed(pages: Page[], mode: AppViewMode): boolean {
-        const checkAllGroupsSingle = (node: BlockTree): boolean => {
-            /**
-             * Check there's a single route down to one leaf node
-             */
-            if (isGroup(node) && node.children.length === 1) {
-                // Node is a Group with a single child
-                return checkAllGroupsSingle(node.children[0]);
-            } else if (isGroup(node)) {
-                // Node is a Group with multiple children
-                return false;
-            } else {
-                // Node is a Select or leaf
-                return true;
-            }
-        };
-
-        return (
-            mode === "EMBED" &&
-            pages.length === 1 && // Only one page
-            pages[0].children.length === 1 && // Only one Group in that page
-            checkAllGroupsSingle(pages[0].children[0])
-        ); // No groups with multiple children in that group
-    }
-
     private deserializePage = (elem: Elem): LayoutBlock[] => {
         /**
-         * Deserializes a page elem into an array of LayoutBlock
+         * Deserialize a page elem into an array of LayoutBlock
          */
         if (
             elem.elements &&
             (elem.elements.length > 1 || elem.elements[0].name !== "Group")
         ) {
+            // Ensure there's a single top-level `Group` as the child of the `Page`
             elem.elements = wrapInGroup(elem.elements);
         }
         return this.deserializeChildren(elem) as LayoutBlock[];
@@ -179,12 +201,11 @@ export class ReportStore {
 
     private deserializeGroup = (elem: Elem): Group => {
         /**
-         * Deserializes a group elem into an array of BlockTrees (Block | Select | Group)
+         * Deserialize a group elem into an array of BlockTrees (Block | Select | Group)
          */
         const attributes = getAttributes(elem);
-        const children: BlockTree[] = this.deserializeChildren(elem);
         return new Group({
-            children,
+            children: this.deserializeChildren(elem),
             columns: +attributes.columns,
             label: attributes.label,
         });
@@ -195,9 +216,8 @@ export class ReportStore {
          * Deserializes a toggle elem into an array of BlockTrees
          */
         const attributes = getAttributes(elem);
-        const children: BlockTree[] = this.deserializeChildren(elem);
         return new Toggle({
-            children,
+            children: this.deserializeChildren(elem),
             label: attributes.label,
         });
     };
@@ -207,9 +227,8 @@ export class ReportStore {
          * Deserializes a select elem into (Group | Block)[]
          */
         const attributes = getAttributes(elem);
-        const children: BlockTree[] = this.deserializeChildren(elem);
         return new Select({
-            children,
+            children: this.deserializeChildren(elem),
             type: attributes.type,
             label: attributes.label,
         });
@@ -217,7 +236,7 @@ export class ReportStore {
 
     private deserializeChildren(elem: Elem): BlockTree[] {
         /**
-         * Recursively deserialize layout blocks
+         * Recursively deserialize layout block children
          */
         const children: BlockTree[] = [];
         elem.elements &&
@@ -236,41 +255,47 @@ export class ReportStore {
         const count = this.updateFigureCount(elem.name);
         const caption = getAttributes(elem).caption;
 
-        let BlockClass: typeof Block;
-        let opts: any;
-        // TODO - change `if` chain to map
-        if (maps.jsonIsMarkdown(elem)) {
-            BlockClass = TextBlock;
-            opts = { isLightProse: this.isLightProse };
-        } else if (maps.jsonIsBokeh(elem)) {
-            BlockClass = BokehBlock;
-        } else if (maps.jsonIsArrowTable(elem)) {
-            BlockClass = DataTableBlock;
-            opts = { webUrl: this.webUrl };
-        } else if (maps.jsonIsCode(elem)) {
-            BlockClass = CodeBlock;
-        } else if (maps.jsonIsVega(elem)) {
-            BlockClass = VegaBlock;
-        } else if (maps.jsonIsPlotly(elem)) {
-            BlockClass = PlotlyBlock;
-        } else if (maps.jsonIsHTMLTable(elem)) {
-            BlockClass = TableBlock;
-        } else if (maps.jsonIsHTML(elem)) {
-            opts = { isOrg: this.isOrg };
-            BlockClass = HTMLBlock;
-        } else if (maps.jsonIsSvg(elem)) {
-            BlockClass = SVGBlock;
-        } else if (maps.jsonIsFormula(elem)) {
-            BlockClass = FormulaBlock;
-        } else if (maps.jsonIsMedia(elem)) {
-            BlockClass = MediaBlock;
-        } else if (jsonIsEmbed(elem)) {
-            BlockClass = EmbedBlock;
-        } else if (jsonIsIFrameHTML(elem)) {
-            BlockClass = FoliumBlock;
+        const blockTest: BlockTest | undefined = this.blockMap.find((b) =>
+            b.test(elem)
+        );
+
+        if (blockTest) {
+            const { class_, opts } = blockTest;
+            return new class_(elem, caption, count, opts);
         } else {
-            BlockClass = FileBlock;
+            throw `Couldn't deserialize from JSON ${elem}`;
         }
-        return new BlockClass(elem, caption, count, opts);
+    }
+
+    private get blockMap(): BlockTest[] {
+        return [
+            {
+                class_: TextBlock,
+                test: maps.jsonIsMarkdown,
+                opts: { isLightProse: this.isLightProse },
+            },
+            { class_: BokehBlock, test: maps.jsonIsBokeh },
+            {
+                class_: DataTableBlock,
+                test: maps.jsonIsArrowTable,
+                opts: { webUrl: this.webUrl },
+            },
+            { class_: CodeBlock, test: maps.jsonIsCode },
+            { class_: VegaBlock, test: maps.jsonIsVega },
+            { class_: PlotlyBlock, test: maps.jsonIsPlotly },
+            { class_: TableBlock, test: maps.jsonIsHTMLTable },
+            {
+                class_: HTMLBlock,
+                test: maps.jsonIsHTML,
+                opts: { isOrg: this.isOrg },
+            },
+            { class_: SVGBlock, test: maps.jsonIsSvg },
+            { class_: FormulaBlock, test: maps.jsonIsFormula },
+            { class_: MediaBlock, test: maps.jsonIsMedia },
+            { class_: EmbedBlock, test: maps.jsonIsEmbed },
+            { class_: FoliumBlock, test: maps.jsonIsIFrameHTML },
+            { class_: BigNumberBlock, test: maps.jsonIsBigNumber },
+            { class_: FileBlock, test: () => true },
+        ];
     }
 }

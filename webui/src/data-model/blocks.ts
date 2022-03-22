@@ -11,6 +11,8 @@ import VPlotlyBlock from "../components/blocks/Plotly.connector.vue";
 import VTableBlock from "../components/blocks/Table.connector.vue";
 import VSVGBlock from "../components/blocks/SVG.connector.vue";
 import VMediaBlock from "../components/blocks/Media.vue";
+import VBigNumberBlock from "../components/blocks/BigNumber.vue";
+import VBigNumberBlockSimple from "../components/blocks/BigNumberSimple.vue";
 import { markRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -345,6 +347,31 @@ export class FormulaBlock extends Block {
     }
 }
 
+export class BigNumberBlock extends Block {
+    public constructor(elem: Elem, caption?: string, count?: number) {
+        super(elem, caption, count);
+        const { attributes } = elem;
+        const useSimple = !attributes.prev_value && !attributes.change;
+        this.component = markRaw(
+            useSimple ? VBigNumberBlockSimple : VBigNumberBlock
+        );
+        this.componentProps = {
+            ...this.componentProps,
+            heading: attributes.heading,
+            value: attributes.value,
+        };
+        if (!useSimple) {
+            this.componentProps = {
+                ...this.componentProps,
+                isPositiveIntent: attributes.is_positive_intent,
+                isUpwardChange: attributes.is_upward_change,
+                prevValue: attributes.prev_value,
+                change: attributes.change,
+            };
+        }
+    }
+}
+
 export class MediaBlock extends AssetBlock {
     public component = markRaw(VMediaBlock);
 
@@ -412,8 +439,6 @@ export class FileBlock extends AssetBlock {
         return saveAs(this.src, this.filename);
     }
 }
-
-export class UnknownBlock extends Block {}
 
 /* Helper types */
 
