@@ -50,17 +50,17 @@ const handlePageChange = (newPageNumber: number) =>
 <template>
     <div
         v-if="!singleBlockEmbed"
-        v-html="htmlHeader"
         :ref="htmlHeaderRef"
         id="html-header"
+        v-html="htmlHeader"
     />
     <div
         v-if="pageLabels.length > 1 && report.layout === 'top'"
         class="hidden sm:block w-full mb-6"
     >
-        <HPages
+        <h-pages
             :labels="pageLabels"
-            :pageNumber="pageNumber"
+            :page-number="pageNumber"
             @page-change="handlePageChange"
         />
     </div>
@@ -73,9 +73,9 @@ const handlePageChange = (newPageNumber: number) =>
             }"
         >
             <div className="sm:hidden p-2">
-                <MobilePages
+                <mobile-pages
                     :labels="pageLabels"
-                    :pageNumber="pageNumber"
+                    :page-number="pageNumber"
                     @page-change="handlePageChange"
                 />
             </div>
@@ -84,23 +84,23 @@ const handlePageChange = (newPageNumber: number) =>
                     v-if="pageLabels.length > 1 && report.layout === 'side'"
                     class="hiddeLan sm:block w-1/6 bg-gray-100 px-4"
                 >
-                    <VPages
+                    <v-pages
                         :labels="pageLabels"
-                        :pageNumber="pageNumber"
+                        :page-number="pageNumber"
                         @page-change="handlePageChange"
                     />
                 </div>
                 <div class="flex-1 flex flex-col">
                     <div :class="['flex-grow', { 'px-4': !singleBlockEmbed }]">
-                        <GridGenerator
+                        <grid-generator
                             :key="createGridKey(rootGroup, 0)"
                             :tree="rootGroup"
-                        ></GridGenerator>
+                        />
                     </div>
-                    <PrevNext
+                    <prev-next
                         v-if="pageLabels.length > 1"
-                        :pageNumber="pageNumber"
-                        :numPages="pageLabels.length"
+                        :page-number="pageNumber"
+                        :num-pages="pageLabels.length"
                         @page-change="handlePageChange"
                     />
                 </div>

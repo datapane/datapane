@@ -6,14 +6,14 @@ const p = defineProps<{ fetchAssetData: any; responsive: boolean }>();
 const plotJson = ref<any>(null);
 
 (async () => {
-  plotJson.value = await p.fetchAssetData();
+    plotJson.value = await p.fetchAssetData();
 })();
 </script>
 
 <template>
-  <BokehBlock
-    v-if="plotJson"
-    :plotJson="plotJson"
-    :responsive="p.responsive"
-  ></BokehBlock>
+    <bokeh-block
+        v-if="plotJson"
+        :plot-json="plotJson"
+        :responsive="p.responsive"
+    ></bokeh-block>
 </template>
