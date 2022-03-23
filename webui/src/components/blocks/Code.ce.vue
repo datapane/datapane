@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, onMounted, ref, computed } from "vue";
 import "highlight.js/lib/common";
-import "highlight.js/styles/stackoverflow-light.css";
 import hljsVuePlugin from "@highlightjs/vue-plugin";
 import { DPClipboard } from "../../../DPClipboard";
 const highlightjs = hljsVuePlugin.component;
