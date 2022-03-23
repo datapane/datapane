@@ -11,7 +11,9 @@ const renderFormula = (node: any) => {
 };
 
 const formulaRef = (node: any) => {
-    renderFormula(node);
+    if (node) {
+        renderFormula(node);
+    }
 };
 </script>
 

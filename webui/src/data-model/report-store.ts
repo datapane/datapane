@@ -139,6 +139,7 @@ export class ReportStore {
         /**
          * Convert an XML string document to a deserialized tree of `Block` objects
          */
+        xml = xml.replace("<\\/script>", "</script>");
         const json: any = convert.xml2js(xml, { compact: false });
         const root = getElementByName(json, "Report");
 
