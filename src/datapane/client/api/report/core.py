@@ -15,9 +15,10 @@ from pathlib import Path
 from uuid import uuid4
 
 import importlib_resources as ir
-from jinja2 import Environment, FileSystemLoader, Markup, Template, contextfunction
+from jinja2 import Environment, FileSystemLoader, Template, contextfunction
 from lxml import etree
 from lxml.etree import Element, _Element
+from markupsafe import Markup  # used by Jinja
 
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
