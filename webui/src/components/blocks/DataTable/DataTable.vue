@@ -199,7 +199,7 @@ const TableIcons: { [t in KnownTypes]: string } = {
     </div>
 </template>
 
-<style scoped>
+<style>
 revo-grid {
     background-color: white;
 }

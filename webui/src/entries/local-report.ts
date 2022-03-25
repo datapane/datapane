@@ -6,19 +6,20 @@ import "../styles/report.scss";
 import "../styles/tailwind.css";
 
 window.addEventListener("DOMContentLoaded", () => {
-  const windowProps = window.reportProps;
-  const reportProps = {
-    ...windowProps,
-    htmlHeader: he.decode(windowProps.htmlHeader),
-    report: {
-      ...windowProps.report,
-      document: he.decode(windowProps.report.document),
-    },
-  };
-  const app = createApp(Report, { reportProps });
+    const windowProps = window.reportProps;
+    const reportProps = {
+        ...windowProps,
+        htmlHeader: he.decode(windowProps.htmlHeader),
+        report: {
+            ...windowProps.report,
+            document: he.decode(windowProps.report.document),
+        },
+    };
 
-  // Register WCs as standard Vue components in local mode
-  app.component("dp-code-block", CodeBlock);
+    const app = createApp(Report, { reportProps });
 
-  app.mount("#report");
+    // Register WCs as standard Vue components in local mode
+    app.component("dp-code-block", CodeBlock);
+
+    app.mount("#report");
 });
