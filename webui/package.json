@@ -8,7 +8,9 @@
         "build:local": "node_modules/.bin/vite build --config local-report.vite.config.ts",
         "build": "node_modules/.bin/vite build",
         "typecheck": "node_modules/.bin/vue-tsc --noEmit",
-        "preview": "node_modules/.bin/vite preview"
+        "preview": "node_modules/.bin/vite preview",
+        "storybook": "start-storybook -p 6006",
+        "build-storybook": "build-storybook"
     },
     "dependencies": {
         "@bokeh/bokehjs": "2.2.3",
@@ -44,7 +46,12 @@
         "xml-js": "^1.6.11"
     },
     "devDependencies": {
+        "@babel/core": "^7.17.8",
         "@rollup/plugin-replace": "^4.0.0",
+        "@storybook/addon-actions": "^6.4.19",
+        "@storybook/addon-essentials": "^6.4.19",
+        "@storybook/addon-links": "^6.4.19",
+        "@storybook/vue3": "^6.4.19",
         "@tailwindcss/aspect-ratio": "^0.4.0",
         "@tailwindcss/forms": "^0.5.0",
         "@tailwindcss/typography": "^0.5.2",
@@ -62,12 +69,15 @@
         "@types/uuid": "^8.3.4",
         "@vitejs/plugin-vue": "^2.2.0",
         "autoprefixer": "^10.4.2",
+        "babel-loader": "^8.2.4",
         "eslint-plugin-vue": "^8.5.0",
         "postcss": "^8.4.7",
+        "storybook-builder-vite": "^0.1.21",
         "tailwindcss": "^3.0.23",
         "typescript": "^4.5.4",
         "vite": "^2.8.0",
         "vue-eslint-parser": "^8.3.0",
+        "vue-loader": "^16.8.3",
         "vue-tsc": "^0.29.8"
     }
 }
