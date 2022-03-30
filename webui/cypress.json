@@ -1,0 +1,18 @@
+{
+    "viewportWidth": 1680,
+    "viewportHeight": 1050,
+    "defaultCommandTimeout": 8000,
+    "baseUrl": "http://localhost:8090",
+    "includeShadowDom": true,
+    "video": false,
+    "env": {
+        "testUsername": "datapane-test",
+        "testPassword": "",
+        "staffUsername": "datapane",
+        "staffPassword": "",
+        "builderReportId": "",
+        "styleReportId": "",
+        "paramsAppId": "",
+        "noParamsAppId": ""
+    }
+}

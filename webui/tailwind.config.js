@@ -29,6 +29,14 @@ module.exports = {
                         "pre code": false,
                         "code::before": false,
                         "code::after": false,
+                        p: {
+                            "text-align": "var(--dp-text-align)",
+                            hyphens: "auto",
+                        },
+                        li: {
+                            "text-align": "var(--dp-text-align)",
+                            hyphens: "auto",
+                        },
                     },
                 },
             },

@@ -33,6 +33,7 @@ onMounted(() => {
         v-if="isIframe"
         v-html="p.html"
         class="flex justify-center items-center"
+        data-cy="block-embed"
     />
     <iframe
         v-else
