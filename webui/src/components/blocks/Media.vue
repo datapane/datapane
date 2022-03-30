@@ -3,7 +3,7 @@ const p = defineProps<{ src: string; type: string }>();
 </script>
 
 <template>
-    <div class="w-full flex items-center justify-center">
+    <div class="w-full flex items-center justify-center" data-cy="block-media">
         <video
             v-if="p.type.startsWith('video')"
             controls
