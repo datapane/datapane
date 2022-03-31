@@ -28,6 +28,7 @@ const md = computed(() => (marked as any).parse(p.content));
 <style scoped>
 .text-container :deep(pre) {
     background: #f6f6f6 !important;
+    padding: 1rem !important;
 }
 
 .dark :deep(code) {
