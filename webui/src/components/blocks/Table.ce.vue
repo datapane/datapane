@@ -3,6 +3,7 @@ import { computed } from "vue";
 const p = defineProps<{ html: string; singleBlockEmbed: string }>();
 
 const singleBlockEmbed = computed(() => JSON.parse(p.singleBlockEmbed));
+const { dpLocal } = window;
 
 const tableRef = (node: any): void => {
     /**
@@ -18,9 +19,10 @@ const tableRef = (node: any): void => {
 </script>
 
 <template>
+    <link v-if="!dpLocal" rel="stylesheet" href="/static/style.css" />
     <div
         :ref="tableRef"
-        :class="['w-full', { 'h-full': singleBlockEmbed }]"
+        :class="['w-full', { 'h-full absolute top-0': singleBlockEmbed }]"
         v-html="p.html"
         data-cy="block-shadow"
     />

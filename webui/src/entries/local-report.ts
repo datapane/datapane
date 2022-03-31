@@ -1,8 +1,12 @@
-import { createApp } from "vue";
+import { createApp, defineCustomElement } from "vue";
 import Report from "../components/Report.vue";
 import CodeBlock from "../components/blocks/Code.ce.vue";
+import TableBlock from "../components/blocks/Table.ce.vue";
 import "../styles/report.scss";
 import "../styles/tailwind.css";
+import "highlight.js/styles/stackoverflow-light.css";
+
+customElements.define("x-table-block", defineCustomElement(TableBlock));
 
 window.addEventListener("DOMContentLoaded", () => {
     const windowProps = window.reportProps;
