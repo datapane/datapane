@@ -45,10 +45,7 @@ onUnmounted(() => {
     </div>
 </template>
 
-<style>
-/* TODO - serve this css statically in a link tag to avoid bloating the web component */
-@import "highlight.js/styles/stackoverflow-light.css";
-
+<style scoped>
 pre {
     @apply w-full;
 }
