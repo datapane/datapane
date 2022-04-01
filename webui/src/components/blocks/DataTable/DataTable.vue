@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
+import { computed, ref, ComputedRef } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
 import { formatNumber } from "./shared";
 import { ExportType } from "../../../data-model/blocks";
-import Header from "./Header.vue";
+import TableHeader from "./Header.vue";
 import DPButton from "../../../shared/DPButton.vue";
+import QueryArea from "./QueryArea.vue";
+
+const DEFAULT_QUERY = "SELECT * FROM $table";
 
 const p = defineProps<{
     singleBlockEmbed: boolean;
@@ -19,6 +22,9 @@ const p = defineProps<{
 }>();
 
 const emit = defineEmits(["load-full"]);
+const query = ref<string>(DEFAULT_QUERY);
+const queryOpen = ref(false);
+const { log } = console;
 
 defineCustomElements();
 
@@ -160,15 +166,24 @@ const TableIcons: { [t in KnownTypes]: string } = {
             { 'h-full flex flex-col': p.singleBlockEmbed },
         ]"
     >
-        <Header
-            :singleBlockEmbed="p.singleBlockEmbed"
-            :previewMode="false"
+        <table-header
+            :single-block-embed="p.singleBlockEmbed"
+            :preview-mode="p.previewMode"
+            :query-open="queryOpen"
             :rows="p.data.length"
             :columns="cols.length"
             :cells="p.cells"
-            :getCsvText="p.getCsvText"
-            :downloadLocal="p.downloadLocal"
-            :downloadRemote="p.downloadRemote"
+            :get-csv-text="p.getCsvText"
+            :download-local="p.downloadLocal"
+            :download-remote="p.downloadRemote"
+            @toggle-query-open="queryOpen = !queryOpen"
+        />
+        <query-area
+            v-if="queryOpen"
+            :query="query"
+            @query-change="log"
+            @run-query="null"
+            @clear-query="null"
         />
         <revo-grid
             v-if="cols.length && !p.previewMode"
