@@ -4,9 +4,11 @@ import { Section } from "../../../shared/shared";
 import { ExportType } from "../../../data-model/blocks";
 import DataTag from "./DataTag.vue";
 import DPDropdown from "../../../shared/DPDropdown.vue";
+import DPButton from "../../../shared/DPButton.vue";
 
 const p = defineProps<{
     previewMode: boolean;
+    queryOpen: boolean;
     rows: number;
     columns: number;
     cells: number;
@@ -14,6 +16,8 @@ const p = defineProps<{
     downloadLocal: (type: ExportType) => Promise<void>;
     downloadRemote: (type: ExportType) => Promise<void>;
 }>();
+
+const emit = defineEmits(["toggle-query-open"]);
 
 const withErrHandling = function (f: Function): any {
     return function (this: any, ...args: any[]) {
@@ -71,6 +75,19 @@ const showActions = !window.dpLocal && !p.previewMode;
                 v-if="showActions"
                 class="min-w-0 flex items-center pr-2 sm:divide-x flex-wrap"
             >
+                <div class="pr-2 sm:flex hidden space-x-2">
+                    <DPButton
+                        @click="emit('toggle-query-open')"
+                        :icon="`fa ${
+                            p.queryOpen ? 'fa-caret-up' : 'fa-caret-down'
+                        }`"
+                        :disabled="p.previewMode"
+                        data-cy="btn-open-query"
+                        class="dp-btn-info"
+                    >
+                        Run SQL Query
+                    </DPButton>
+                </div>
                 <DPDropdown name="Export" :sections="actionSections" />
             </div>
         </div>
