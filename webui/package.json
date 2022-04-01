@@ -21,6 +21,7 @@
         "@revolist/revogrid": "^3.0.98",
         "@stencil/core": "^2.14.0",
         "@variantjs/core": "0.0.87",
+        "alasql": "^1.7.3",
         "apache-arrow": "^6.0.1",
         "axios": "^0.26.0",
         "body-scroll-lock": "^4.0.0-beta.0",

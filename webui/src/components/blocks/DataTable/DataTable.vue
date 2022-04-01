@@ -1,3 +1,58 @@
+<script lang="ts">
+type Col = {
+    prop: string;
+    name: string;
+    sortable: boolean;
+    size: number;
+    type?: string;
+    columnTemplate?: any;
+};
+
+type QueryResult =
+    | {
+          data: any[];
+          schema: { name: string; type: string }[];
+      }
+    | undefined
+    | null;
+
+type KnownTypes =
+    | "string"
+    | "double"
+    | "boolean"
+    | "integer"
+    | "timestamp"
+    | "category"
+    | "index"
+    | "unknown";
+
+const TableColors: { [t in KnownTypes]: string } = {
+    string: "green",
+    double: "blue",
+    boolean: "indigo",
+    timestamp: "red",
+    category: "orange",
+    integer: "teal",
+    index: "black",
+    unknown: "black",
+};
+
+const TableIcons: { [t in KnownTypes]: string } = {
+    string: "font",
+    timestamp: "calendar",
+    category: "cubes",
+    double: "bar-chart",
+    boolean: "toggle-on",
+    integer: "bar-chart",
+    index: "list-ol",
+    unknown: "circle",
+};
+
+const DEFAULT_QUERY = "SELECT * FROM $table";
+
+const SCHEMA_SEARCH_LIMIT = 10;
+</script>
+
 <script setup lang="ts">
 import { computed, ref, ComputedRef } from "vue";
 import { defineCustomElements } from "@revolist/revogrid/custom-element";
@@ -6,8 +61,7 @@ import { ExportType } from "../../../data-model/blocks";
 import TableHeader from "./Header.vue";
 import DPButton from "../../../shared/DPButton.vue";
 import QueryArea from "./QueryArea.vue";
-
-const DEFAULT_QUERY = "SELECT * FROM $table";
+import alasql from "alasql";
 
 const p = defineProps<{
     singleBlockEmbed: boolean;
@@ -23,8 +77,11 @@ const p = defineProps<{
 
 const emit = defineEmits(["load-full"]);
 const query = ref<string>(DEFAULT_QUERY);
+const queryResult = ref<QueryResult>();
 const queryOpen = ref(false);
-const { log } = console;
+
+const schema = computed(() => queryResult.value?.schema ?? p.schema);
+const data = computed(() => queryResult.value?.data ?? p.data);
 
 defineCustomElements();
 
@@ -83,13 +140,13 @@ const cols: ComputedRef<Col[]> = computed(() => {
 
     // Use the schema to get column names, otherwise use first row as a fallback
     const colNames =
-        p.schema && p.schema.length
-            ? p.schema.map((s: any) => s.name)
+        schema.value && schema.value.length
+            ? schema.value.map((s: any) => s.name)
             : Object.keys(firstRow);
 
     return colNames.map((n: string) => {
         const optSchemaField =
-            p.schema && p.schema.find((f: any) => f.name === n);
+            schema.value && schema.value.find((f: any) => f.name === n);
 
         // schemaType: More granular data type used by the DS header and arrow
         // columnType: One of number/string/date/select used by revogrid
@@ -113,48 +170,52 @@ const cols: ComputedRef<Col[]> = computed(() => {
         };
     });
 });
-</script>
 
-<script lang="ts">
-type Col = {
-    prop: string;
-    name: string;
-    sortable: boolean;
-    size: number;
-    type?: string;
-    columnTemplate?: any;
+const runQuery = () => {
+    const alasqlQuery = query.value.replace(/\$table/g, "?");
+
+    const data = alasql(alasqlQuery, [p.data]);
+
+    const getQueryColumnType = (v: any) => {
+        if (Number(v) === v && `${v}`.includes(".")) {
+            return "double";
+        } else if (Number(v) === v) {
+            return "integer";
+        } else {
+            return "string";
+        }
+    };
+
+    const buildSchema = () => {
+        /* For each column, search for the first non-empty cell in the first 10 rows */
+        const columns = Object.keys(data[0]);
+        const schema: any[] = [];
+        for (let col of columns) {
+            let rowNum = 0;
+            let v;
+            while (
+                !v &&
+                rowNum <= Math.min(SCHEMA_SEARCH_LIMIT, data.length - 1)
+            ) {
+                // Assign the next row cell if v is empty or limit not reached
+                v = data[rowNum++][col];
+            }
+            schema.push({ name: col, type: getQueryColumnType(v) });
+        }
+        return schema;
+    };
+
+    const schema = data.length ? buildSchema() : [];
+    queryResult.value = { data, schema };
 };
 
-type KnownTypes =
-    | "string"
-    | "double"
-    | "boolean"
-    | "integer"
-    | "timestamp"
-    | "category"
-    | "index"
-    | "unknown";
-
-const TableColors: { [t in KnownTypes]: string } = {
-    string: "green",
-    double: "blue",
-    boolean: "indigo",
-    timestamp: "red",
-    category: "orange",
-    integer: "teal",
-    index: "black",
-    unknown: "black",
+const onQueryChange = (newQuery: string) => {
+    query.value = newQuery;
 };
 
-const TableIcons: { [t in KnownTypes]: string } = {
-    string: "font",
-    timestamp: "calendar",
-    category: "cubes",
-    double: "bar-chart",
-    boolean: "toggle-on",
-    integer: "bar-chart",
-    index: "list-ol",
-    unknown: "circle",
+const clearQuery = () => {
+    queryResult.value = null;
+    query.value = DEFAULT_QUERY;
 };
 </script>
 
@@ -181,14 +242,14 @@ const TableIcons: { [t in KnownTypes]: string } = {
         <query-area
             v-if="queryOpen"
             :query="query"
-            @query-change="log"
-            @run-query="null"
-            @clear-query="null"
+            @query-change="onQueryChange"
+            @run-query="runQuery"
+            @clear-query="clearQuery"
         />
         <revo-grid
             v-if="cols.length && !p.previewMode"
             theme="compact"
-            :source="p.data"
+            :source="data"
             :columns="cols"
             :class="{
                 'flex-1': p.singleBlockEmbed,

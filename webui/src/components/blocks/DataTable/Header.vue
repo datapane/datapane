@@ -3,8 +3,8 @@ import { DPClipboard } from "../../../../DPClipboard";
 import { Section } from "../../../shared/shared";
 import { ExportType } from "../../../data-model/blocks";
 import DataTag from "./DataTag.vue";
-import DPDropdown from "../../../shared/DPDropdown.vue";
-import DPButton from "../../../shared/DPButton.vue";
+import DpDropdown from "../../../shared/DPDropdown.vue";
+import DpButton from "../../../shared/DPButton.vue";
 
 const p = defineProps<{
     previewMode: boolean;
@@ -67,16 +67,16 @@ const showActions = !window.dpLocal && !p.previewMode;
     <div class="bg-gray-100 py-2" data-cy="block-datatable">
         <div class="flex justify-between items-center flex-wrap">
             <div class="flex justify-end md:space-x-2 ml-2">
-                <DataTag :value="p.rows" icon="fa-bars" unit="rows" />
-                <DataTag :value="p.columns" icon="fa-columns" unit="columns" />
-                <DataTag :value="p.cells" icon="fa-th-large" unit="cells" />
+                <data-tag :value="p.rows" icon="fa-bars" unit="rows" />
+                <data-tag :value="p.columns" icon="fa-columns" unit="columns" />
+                <data-tag :value="p.cells" icon="fa-th-large" unit="cells" />
             </div>
             <div
                 v-if="showActions"
                 class="min-w-0 flex items-center pr-2 sm:divide-x flex-wrap"
             >
                 <div class="pr-2 sm:flex hidden space-x-2">
-                    <DPButton
+                    <dp-button
                         @click="emit('toggle-query-open')"
                         :icon="`fa ${
                             p.queryOpen ? 'fa-caret-up' : 'fa-caret-down'
@@ -86,9 +86,9 @@ const showActions = !window.dpLocal && !p.previewMode;
                         class="dp-btn-info"
                     >
                         Run SQL Query
-                    </DPButton>
+                    </dp-button>
                 </div>
-                <DPDropdown name="Export" :sections="actionSections" />
+                <dp-dropdown name="Export" :sections="actionSections" />
             </div>
         </div>
     </div>

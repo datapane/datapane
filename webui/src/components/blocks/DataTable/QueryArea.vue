@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineEmits } from "vue";
-import dpbutton from "../../../shared/DPButton.vue";
+import DpButton from "../../../shared/DPButton.vue";
 import codemirror from "codemirror-editor-vue3";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/sql/sql.js";
@@ -30,7 +30,7 @@ const onQueryChange = (query: string) => emit("query-change", query);
                 @change="onQueryChange"
             />
             <div class="flex justify-start flex-fixed my-2 px-2">
-                <dpbutton
+                <dp-button
                     @click="emit('run-query')"
                     :disabled="!p.query"
                     icon="fa fa-play"
@@ -38,15 +38,15 @@ const onQueryChange = (query: string) => emit("query-change", query);
                     class="w-28 dp-btn-primary"
                 >
                     Run Query
-                </dpbutton>
-                <dpbutton
+                </dp-button>
+                <dp-button
                     @click="emit('clear-query')"
                     icon="fa fa-undo"
                     class="ml-2 w-28 dp-btn-secondary-gray"
                     data-cy="btn-reset-data"
                 >
                     Reset Data
-                </dpbutton>
+                </dp-button>
             </div>
         </div>
     </div>
