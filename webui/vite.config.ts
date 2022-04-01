@@ -9,7 +9,7 @@ module.exports = defineConfig({
             template: {
                 compilerOptions: {
                     isCustomElement: (tag) =>
-                        tag.startsWith("dp-") ||
+                        tag.startsWith("dpx-") ||
                         tag.startsWith("x-") ||
                         tag.startsWith("revo-"),
                 },

@@ -4,5 +4,5 @@ const childProps = { code: p.code, language: p.language };
 </script>
 
 <template>
-  <dp-code-block v-bind="childProps" class="w-full"></dp-code-block>
+    <dpx-code-block v-bind="childProps" class="w-full"></dpx-code-block>
 </template>
