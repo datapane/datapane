@@ -15,7 +15,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import importlib_resources as ir
-from jinja2 import Environment, FileSystemLoader, Template, contextfunction
+from jinja2 import Environment, FileSystemLoader, Template, pass_context
 from lxml import etree
 from lxml.etree import Element, _Element
 from markupsafe import Markup  # used by Jinja
@@ -109,7 +109,7 @@ class ReportFormatting:
 # SKIP_DISPLAY_MSG = False
 
 
-@contextfunction
+@pass_context
 def include_raw(ctx, name):
     """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
     env = ctx.environment
