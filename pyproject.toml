@@ -65,7 +65,7 @@ furl = "^2.0.0"
 glom = "^20.5.0"
 # httpx = "^0.7.5"
 importlib_resources = ">=3.0.0,<6.0.0"
-Jinja2 = ">=2.11.0,<4.0.0"  # includes markupsafe dep
+Jinja2 = ">=2.11.0,<3.1.0"  # includes markupsafe dep
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
