@@ -1,3 +1,10 @@
+"""
+- Tests for config handling, these run in a separate instance as have to mock several global modules
+- This is as we use globals quite a bit for initial module setup, e.g. config, DP mode, etc.
+- Simpler to code, but harder to test
+- is there a way to run this within the normal test framework
+  i.e. perhaps unloading/reloading datapane module so we can setup our mocks/patches first?
+"""
 import os
 from unittest import mock
 
@@ -107,9 +114,6 @@ def test_upgrade_v3_completed(mock_analytics):
 
 
 def test_new_config(mock_analytics, monkeypatch):
-    # TODO - is there a way to run this within the normal test framework, i.e. perhaps unloading/reloading datapane module so we can
-    #  setup our mocks/patches first?
-
     (posthog, tmp_path) = mock_analytics
 
     # NOTE - we can't import this until we've set up the mocks, hence the separate test-runner

@@ -58,6 +58,6 @@ jobs:
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install -E plotting -E cloud
           # run CLI tests (junit tests not captured yet)
-          poetry run python -m pytest -v --ignore=tests/client/e2e/ . --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
+          poetry run python -m pytest -v --ignore=tests/client/e2e/ tests --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
           # run top-level CLI tests (junit tests not captured yet)
-          poetry run python -m pytest -v tests_toplevel --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
+          poetry run python -m pytest -v tests_toplevel --junitxml=${{github.workspace}}/test-reports/datapane-local-toplevel-${{ matrix.os }}-${{ matrix.python-version }}.xml
