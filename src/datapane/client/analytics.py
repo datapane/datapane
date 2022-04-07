@@ -3,6 +3,7 @@ import platform
 from contextlib import suppress
 from functools import wraps
 from pathlib import Path
+from typing import Optional
 
 import posthog
 
@@ -28,16 +29,16 @@ def is_analytics_disabled() -> bool:
 _NO_ANALYTICS: bool = is_analytics_disabled()
 
 
-def capture(event: str, **properties) -> None:
+def capture(event: str, config: Optional[c.Config] = None, **properties) -> None:
     # Used for capturing generic events with properties
     if _NO_ANALYTICS:
         return None
-    config = c.get_config()
+    config = config or c.get_config()
 
     # run identify on first action, (NOTE - don't change the order here)
     if not config.completed_action:
         config.completed_action = True
-        identify(config.session_id)
+        identify(config)
         config.save()
 
     properties.update(source="cli", dp_version=__version__, in_jupyter=is_jupyter(), using_conda=_USING_CONDA)
@@ -46,7 +47,7 @@ def capture(event: str, **properties) -> None:
         posthog.capture(config.session_id, event, properties)
 
 
-def identify(session_id: str, **properties) -> None:
+def identify(config: c.Config, **properties) -> None:
     properties.update(
         os=platform.system(),
         python_version=platform.python_version(),
@@ -55,9 +56,9 @@ def identify(session_id: str, **properties) -> None:
         using_conda=_USING_CONDA,
     )
     with suppress(Exception):
-        posthog.identify(session_id, properties)
+        posthog.identify(config.session_id, properties)
     # Also generate a CLI identify event to help disambiguation
-    capture("CLI Identify")
+    capture("CLI Identify", config=config)
 
 
 # def capture_init(config: c.Config) -> None:

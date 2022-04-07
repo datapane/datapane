@@ -36,14 +36,17 @@ class Config:
     """
     Global config read from config file
 
-    Version is set to 1 when loading from file, then we pass into out upgrade function to bring it to latest
+    Versioning
+    - for b/c from before versioning config file, we set version to 1 if doesn't exist
+    - else we set it to latest version for a new config via post_init hook
+    - only on loading a config file do we run the upgrade function
     """
 
     server: str = DEFAULT_SERVER
     token: str = DEFAULT_TOKEN
     email: str = ""
     session_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
-    version: int = 1  # if version doesn't exist in file
+    version: int = 1  # for b/c if version doesn't exist in file, set to latest in post_init hook
     completed_action: bool = False  # only active on first action
 
     from_file: dc.InitVar[bool] = False
@@ -54,6 +57,7 @@ class Config:
     def __post_init__(self, from_file: bool):
         self.server = self.server.rstrip("/")  # server should be a valid origin
         if not from_file:
+            # set to latest if generating config file
             self.version = LATEST_VERSION
 
     @property
@@ -124,29 +128,30 @@ class Config:
 
     def upgrade_config_format(self):
         """Handles updating the older config format
-        - we default to oldest version with default values, and upgrade here
+        - we default to the oldest version with default values, and upgrade here
         """
+
         # migrate older config files
-        if self.version == 1:
-            # capture_init()
-            self.version = 3
-            self.save()
-        elif self.version == 2:
-            # re-init against new server
-            # capture_init()
-            self.version = 3
-            self.save()
-
-        if self.version == 3:
-            self.version = 4
-
-            # If token exists check still valid and can login
+        if self.version in (1, 2, 3):
+            # If token exists check still valid and can login, use to get server props
             if self.token and self.token != DEFAULT_TOKEN:
-                from .api import ping
+                from .api.user import ping
 
                 with suppress(Exception):
+                    # get the email for v4 of spec
                     self.email = ping(config=self, cli_login=True, verbose=False)
+
+                if not self.completed_action:
+                    # we could be on older version, but with a valid token
+                    # but haven't completed an action, so force it
+                    from .analytics import capture
+
+                    capture("CLI Login", config=self, with_token=True)
+
+            self.version = 4
             self.save()
+        elif self.version == 4:
+            pass  # current
 
 
 # TODO - create a ConfigMgr singleton object?
