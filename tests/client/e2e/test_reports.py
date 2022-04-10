@@ -47,7 +47,10 @@ def test_report_update_metadata():
     report.upload(name, **props)
 
     def check(x, y):
-        assert x == y or sorted(x) == sorted(y)
+        if isinstance(x, list) and isinstance(y, list):
+            assert sorted(x) == sorted(y)
+        else:
+            assert x == y
 
     with deletable(report):
         for (k, v) in props.items():
