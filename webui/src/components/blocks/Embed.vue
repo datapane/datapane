@@ -8,6 +8,13 @@ import iframeResize from "iframe-resizer/js/iframeResizer";
 const p = defineProps<{ html: string; isIframe: boolean }>();
 const iframeId = `iframe_${uuid4()}`;
 
+// Unescape script tags when embedding
+const decodedHtml: ComputedRef<string> = computed(() => {
+    return p.html
+        .replace("&lt;script&gt;", "<script>")
+        .replace("&lt;&sol;script&gt;", "<\/script>");
+});
+
 const iframeDoc: ComputedRef<string> = computed(() => {
     /**
      * Inject the JS needed to make the iframe resizer work
@@ -17,7 +24,7 @@ const iframeDoc: ComputedRef<string> = computed(() => {
         <html>
         <body>
             <script>${contentWindowJs}<\/script>
-            ${p.html}
+            ${decodedHtml.value}
         </body>
         </html>
     `;
@@ -31,7 +38,7 @@ onMounted(() => {
 <template>
     <div
         v-if="isIframe"
-        v-html="p.html"
+        v-html="decodedHtml"
         class="flex justify-center items-center"
         data-cy="block-embed"
     />
