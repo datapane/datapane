@@ -113,7 +113,7 @@ export class ReportStore {
     public constructor(reportProps: any) {
         this.webUrl = reportProps.report.web_url;
         this.isOrg = reportProps.isOrg;
-        this.isLightProse = reportProps.report.is_light_prose;
+        this.isLightProse = reportProps.report.output_is_light_prose;
 
         const deserializedReport = this.xmlToReport(
             reportProps.report.document
