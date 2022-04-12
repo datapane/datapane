@@ -33,7 +33,7 @@ const htmlHeaderRef = (node: any) => {
      * Set report theme on HTML header node load
      */
     if (node !== null) {
-        setTheme(p.reportProps.report.is_light_prose);
+        setTheme(p.reportProps.report.output_is_light_prose);
     } else {
         console.error("Unable to find HTML header node");
     }
