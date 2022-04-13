@@ -5,13 +5,35 @@ import HPages from "./layout/HPages.vue";
 import VPages from "./layout/VPages.vue";
 import PrevNext from "./layout/PrevNext.vue";
 import MobilePages from "./layout/MobilePages.vue";
-import { ref, provide, computed, ComputedRef } from "vue";
+import { ref, provide, computed, ComputedRef, onMounted } from "vue";
 import { createGridKey } from "./utils";
 import { LayoutBlock } from "../data-model/blocks";
 import { setTheme } from "../theme";
+import { trackLocalReportView, trackReportView } from "../dp-track";
 
 const p = defineProps<{ reportProps: any }>();
 const pageNumber = ref(0);
+
+onMounted(() => {
+    /* View tracking */
+    if (window.dpLocal && window.dpLocalViewEvent) {
+        trackLocalReportView();
+    } else {
+        if (p.reportProps.disableTrackViews) {
+            return;
+        }
+        const { report } = p.reportProps;
+        const { web_url, id, published, username, num_blocks } = report;
+        trackReportView({
+            id: id,
+            web_url: web_url,
+            published,
+            author_username: username,
+            num_blocks,
+            is_embed: window.location.href.includes("/embed/"),
+        });
+    }
+});
 
 // Set up deserialised report object and embed properties
 const store = new ReportStore(p.reportProps);
