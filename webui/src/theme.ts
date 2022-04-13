@@ -36,6 +36,6 @@ export const setTheme = (isLightProse?: boolean) => {
         root.style.setProperty("--dp-light-gray", lightFontColor);
         root.style.setProperty("--dp-dark-gray", darkFontColor);
     } catch (e) {
-        console.error("An error occurred while setting a theme property", e);
+        console.error("An error occurred while setting a theme property: ", e);
     }
 };
