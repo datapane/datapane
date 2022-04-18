@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const app = createApp(Report, { reportProps });
 
     // Register WCs as standard Vue components in local mode
-    app.component("dp-code-block", CodeBlock);
+    app.component("dpx-code-block", CodeBlock);
 
     app.mount("#report");
 });
