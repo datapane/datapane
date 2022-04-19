@@ -51,7 +51,7 @@ class BaseAsset(Generic[T], abc.ABC):
 
 
 class BasePickleWriter(BaseAsset):
-    """ Creates a pickle file from any object """
+    """Creates a pickle file from any object"""
 
     mimetype = "application/vnd.pickle+binary"
     obj_type = Any

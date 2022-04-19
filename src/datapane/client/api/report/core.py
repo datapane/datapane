@@ -111,7 +111,7 @@ class ReportFormatting:
 
 @contextfunction
 def include_raw(ctx, name):
-    """ Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code """
+    """Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code"""
     env = ctx.environment
     # Escape </script> to prevent 3rd party JS terminating the local report bundle.
     # Note there's an extra "\" because it needs to be escaped at both the python and JS level
@@ -120,7 +120,7 @@ def include_raw(ctx, name):
 
 
 class ReportFileWriter:
-    """ Collects data needed to display a local report document, and generates the local HTML """
+    """Collects data needed to display a local report document, and generates the local HTML"""
 
     template: t.Optional[Template] = None
     assets: Path
@@ -128,7 +128,7 @@ class ReportFileWriter:
     dev_mode: bool = False
 
     def _setup_template(self):
-        """ Jinja template setup for local rendering """
+        """Jinja template setup for local rendering"""
         # check we have the FE files, abort if not
         self.assets = ir.files("datapane.resources.local_report")
         if not (self.assets / "local-report-base.css").exists():
