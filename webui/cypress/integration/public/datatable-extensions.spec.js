@@ -102,27 +102,9 @@ describe("Report datatable block extensions", () => {
         cy.get(".CodeMirror").then((editor) => {
             editor[0].CodeMirror.setValue("should err");
             cy.get("[data-cy=btn-run-query").click();
-            cy.get("[data-cy=btn-see-errors")
-                .as("btn-see-errs")
-                .should("exist");
-            cy.get("@btn-see-errs").click();
             cy.get("[data-cy=alasql-error-msg]").should("exist");
-            cy.get("[data-cy=btn-close-alasql-modal]").click();
-            cy.get("[data-cy=alasql-error-msg]").should("not.exist");
-        });
-    });
-
-    it("Should run a SQL query with no results", () => {
-        cy.scrollToFirst("[data-cy=page-2]").click();
-
-        cy.get("[data-cy=btn-open-query").click();
-
-        cy.get(".CodeMirror").then((editor) => {
-            editor[0].CodeMirror.setValue("SELECT * FROM $table WHERE FALSE");
-            cy.get("[data-cy=btn-run-query").click();
-            cy.get("[data-cy=no-data-msg]").should("exist");
             cy.get("[data-cy=btn-reset-data").click();
-            cy.get(".rgRow").should("have.length.gt", 2);
+            cy.get("[data-cy=alasql-error-msg]").should("not.exist");
         });
     });
 });

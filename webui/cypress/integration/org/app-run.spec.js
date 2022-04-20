@@ -47,7 +47,7 @@ describe("Running an app", () => {
 
         // file is attached programatically so we need to manually trigger the store update
         cy.window().then((win) => {
-            win.DPLIB["app-detail-base"].$testResources.paramsStore.serialized[
+            win.$testResources.paramsStore.serialized[
                 "__FILE__"
             ] = FILE_PARAM_NAME;
         });
@@ -67,6 +67,11 @@ describe("Running an app", () => {
 
     it("Should run an app and cancel", () => {
         visit(URLS.PARAMS_APP);
+
+        // Seems like a small delay is needed between page load and run to allow form fields to be populated
+        // TODO - use a more deterministic method
+        cy.wait(500);
+
         // Run
         cy.intercept("POST", "**/runs/new/").as("getRuns");
         cy.get("[data-cy=button-run]").click();
