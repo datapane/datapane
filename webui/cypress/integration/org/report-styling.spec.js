@@ -28,7 +28,7 @@ describe("Changing a report's style", () => {
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
-            .should("have.css", "color", "rgb(243, 244, 246)")
+            .should("have.css", "color", "rgb(209, 213, 219)")
             .and("have.css", "text-align", "right")
             .and("have.css", "font-family", "monospace");
         cy.get("[data-cy=report-component").should(
@@ -65,7 +65,7 @@ describe("Changing a report's style", () => {
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
-            .should("have.css", "color", "rgb(17, 24, 39)");
+            .should("have.css", "color", "rgb(55, 65, 81)");
     });
 
     it("Should empty both global and local themes, and verify fallback default theme", () => {

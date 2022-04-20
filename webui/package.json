@@ -3,16 +3,16 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "dev": "node_modules/.bin/vite",
-        "build:dev": "node_modules/.bin/vite build --watch --mode development",
-        "build:local": "node_modules/.bin/vite build --config local-report.vite.config.ts",
+        "build:base": "vite build --config base/vite.config.ts",
+        "build:report": "vite build --config report/vite.config.ts",
+        "build:local-report": "vite build --config report/local-report.vite.config.ts",
+        "build": "npm run build:base && npm run build:report && npm run build:local-report",
+        "dev:report": "vite build --watch --mode development --config report/vite.config.ts",
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/integration/public/*\"",
+        "test:org": "node_modules/.bin/cypress run --spec \"cypress/integration/org/*\"",
         "test:open": "node_modules/.bin/cypress open --browser electron",
-        "build": "node_modules/.bin/vite build",
         "typecheck": "node_modules/.bin/vue-tsc --noEmit",
-        "preview": "node_modules/.bin/vite preview",
-        "storybook": "start-storybook -p 6006",
-        "build-storybook": "build-storybook"
+        "storybook": "start-storybook -p 6006"
     },
     "dependencies": {
         "@bokeh/bokehjs": "2.2.3",

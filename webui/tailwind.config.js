@@ -101,15 +101,16 @@ module.exports = {
     ],
     content: [
         // FE files
-        "./src/**/*.{vue,js,ts}",
+        "./report/src/**/*.{vue,js,ts}",
+        "./base/src/**/*.{vue,js,ts}",
         // BE files
         // TODO - update paths when deploying
-        "../datapane-hosted/dp-server/src/dp/apps/dp_core/templates/**/*.html",
-        "../datapane-hosted/dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
-        "../datapane-hosted/dp-server/src/dp/apps/dp_comments/templates/**/*.html",
-        "../datapane-hosted/dp-server/src/dp/apps/dp_org/templates/**/*.html",
-        "../datapane-hosted/dp-server/src/dp/apps/dp_public/templates/**/*.html",
-        "../datapane-hosted/dp-server/templates/**/*.html",
+        "../dp-server/src/dp/apps/dp_core/templates/**/*.html",
+        "../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
+        "../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
+        "../dp-server/src/dp/apps/dp_org/templates/**/*.html",
+        "../dp-server/src/dp/apps/dp_public/templates/**/*.html",
+        "../dp-server/templates/**/*.html",
         "./node_modules/@variantjs/**/*.ts",
     ],
     safelist: [
