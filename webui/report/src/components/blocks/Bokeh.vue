@@ -1,0 +1,85 @@
+<script setup lang="ts">
+import { onUnmounted, inject, onMounted } from "vue";
+import { v4 as uuid4 } from "uuid";
+import * as Bokeh from "@bokeh/bokehjs";
+
+const docIds: any[] = [];
+const divId = uuid4();
+
+const singleBlockEmbed = inject("singleBlockEmbed");
+
+const p = defineProps<{ plotJson: any; responsive: boolean }>();
+
+const makeResponsive = (json: any) => {
+    /**
+     * make the plot respond to the dimensions of its container
+     * if the responsive property is set
+     */
+    const plotJson = json.doc.roots.references.find(
+        (r: any) => r.type === "Plot"
+    );
+    if (plotJson) {
+        plotJson.attributes.sizing_mode = singleBlockEmbed
+            ? "stretch_both"
+            : "stretch_width";
+    }
+};
+
+const cleanupDoc = (doc: any, docTimestamp: string) => {
+    /**
+     * remove any global Documents by checking their uuids
+     */
+    if ((doc as any).uuid === docTimestamp) {
+        doc.clear();
+        const i = Bokeh.documents.indexOf(doc);
+        if (i > -1) {
+            Bokeh.documents.splice(i, 1);
+        }
+    }
+};
+
+const addPlotToDom = async () => {
+    /**
+     * mount a Bokeh plot to the block element
+     */
+    try {
+        p.responsive && makeResponsive(p.plotJson);
+        const plotViews = await Bokeh.embed.embed_item(
+            p.plotJson as any,
+            divId
+        );
+        // Generate uuids for Bokeh Documents so they can be referenced on dismount
+        plotViews.forEach((pv: any) => {
+            const docId = uuid4();
+            (pv.model.document as any).uuid = docId;
+            docIds.push(docId);
+        });
+    } catch (e) {
+        console.error("An error occurred while rendering a Bokeh chart");
+    }
+};
+
+onMounted(() => {
+    addPlotToDom();
+});
+
+onUnmounted(() => {
+    // cleanup -- https://github.com/bokeh/bokeh/issues/5355#issuecomment-423580351
+    for (const doc of Bokeh.documents) {
+        for (const docTimestamp of docIds) {
+            cleanupDoc(doc, docTimestamp);
+        }
+    }
+});
+</script>
+
+<template>
+    <div
+        data-cy="block-bokeh"
+        :id="divId"
+        :class="[
+            'bk-root m-auto flex justify-center items-center w-full',
+            { 'w-full': p.responsive, 'h-iframe': singleBlockEmbed },
+        ]"
+    />
+</template>
