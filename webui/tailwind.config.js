@@ -103,6 +103,7 @@ module.exports = {
         // FE files
         "./report/src/**/*.{vue,js,ts}",
         "./base/src/**/*.{vue,js,ts}",
+        "../fe-components/src/**/*.{js,ts,tsx}",
         // BE files
         // TODO - update paths when deploying
         "../dp-server/src/dp/apps/dp_core/templates/**/*.html",
