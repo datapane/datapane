@@ -112,7 +112,6 @@ export class ReportStore {
     };
 
     public constructor(reportProps: ReportProps) {
-        console.log(reportProps);
         this.webUrl = reportProps.report.web_url;
         this.isOrg = reportProps.isOrg;
         this.isLightProse = reportProps.report.output_is_light_prose;
