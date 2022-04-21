@@ -9,7 +9,10 @@ import { ref, provide, computed, ComputedRef, onMounted } from "vue";
 import { createGridKey } from "./utils";
 import { LayoutBlock } from "../data-model/blocks";
 import { setTheme } from "../theme";
-import { trackLocalReportView, trackReportView } from "../../../dp-track";
+import {
+    trackLocalReportView,
+    trackReportView,
+} from "../../../shared/dp-track";
 import { ReportProps } from "../data-model/types";
 
 // Vue can't use a ts interface as props

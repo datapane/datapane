@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DPClipboard } from "../../../../../DPClipboard";
+import { DPClipboard } from "../../../../../shared/DPClipboard";
 import { Section } from "../../../shared/shared";
 import { ExportType } from "../../../data-model/blocks";
 import DataTag from "./DataTag.vue";
