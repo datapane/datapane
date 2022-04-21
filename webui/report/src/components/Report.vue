@@ -10,8 +10,18 @@ import { createGridKey } from "./utils";
 import { LayoutBlock } from "../data-model/blocks";
 import { setTheme } from "../theme";
 import { trackLocalReportView, trackReportView } from "../../../dp-track";
+import { ReportProps } from "../data-model/types";
 
-const p = defineProps<{ reportProps: any }>();
+// Vue can't use a ts interface as props
+// see https://github.com/vuejs/core/issues/4294
+const p = defineProps<{
+    isOrg: ReportProps["isOrg"];
+    mode: ReportProps["mode"];
+    disableTrackViews?: ReportProps["disableTrackViews"];
+    htmlHeader?: ReportProps["htmlHeader"];
+    report: ReportProps["report"];
+}>();
+
 const pageNumber = ref(0);
 
 onMounted(() => {
@@ -19,11 +29,10 @@ onMounted(() => {
     if (window.dpLocal && window.dpLocalViewEvent) {
         trackLocalReportView();
     } else {
-        if (p.reportProps.disableTrackViews) {
+        if (p.disableTrackViews) {
             return;
         }
-        const { report } = p.reportProps;
-        const { web_url, id, published, username, num_blocks } = report;
+        const { web_url, id, published, username, num_blocks } = p.report;
         trackReportView({
             id: id,
             web_url: web_url,
@@ -36,9 +45,9 @@ onMounted(() => {
 });
 
 // Set up deserialised report object and embed properties
-const store = new ReportStore(p.reportProps);
+const store = new ReportStore(p);
 const { report, singleBlockEmbed } = store.state;
-const multiBlockEmbed = p.reportProps.mode === "EMBED" && !singleBlockEmbed;
+const multiBlockEmbed = p.mode === "EMBED" && !singleBlockEmbed;
 
 provide("singleBlockEmbed", singleBlockEmbed);
 
@@ -47,15 +56,14 @@ const rootGroup: ComputedRef<LayoutBlock> = computed(
 );
 
 // HTML header is taken from the report object, unless overwritten via props
-const htmlHeader =
-    p.reportProps.htmlHeader || p.reportProps.report.output_style_header;
+const htmlHeader = p.htmlHeader || p.report.output_style_header;
 
 const htmlHeaderRef = (node: any) => {
     /**
      * Set report theme on HTML header node load
      */
     if (node !== null) {
-        setTheme(p.reportProps.report.output_is_light_prose);
+        setTheme(p.report.output_is_light_prose);
     } else {
         console.error("Unable to find HTML header node");
     }
@@ -90,8 +98,8 @@ const handlePageChange = (newPageNumber: number) =>
         <div
             :class="{
                 'flex flex-col justify-end bg-dp-background': true,
-                'pb-10': p.reportProps.isOrg && multiBlockEmbed,
-                'pb-6': !p.reportProps.isOrg && multiBlockEmbed,
+                'pb-10': p.isOrg && multiBlockEmbed,
+                'pb-6': !p.isOrg && multiBlockEmbed,
             }"
         >
             <div className="sm:hidden p-2">

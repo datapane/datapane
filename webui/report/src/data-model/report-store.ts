@@ -27,6 +27,7 @@ import {
 import convert from "xml-js";
 import * as maps from "./test-maps";
 import { DataTableBlock } from "./datatable/datatable-block";
+import { ReportProps } from "./types";
 
 type BlockTest = {
     class_: typeof Block;
@@ -110,7 +111,8 @@ export class ReportStore {
         codeBlocks: 0,
     };
 
-    public constructor(reportProps: any) {
+    public constructor(reportProps: ReportProps) {
+        console.log(reportProps);
         this.webUrl = reportProps.report.web_url;
         this.isOrg = reportProps.isOrg;
         this.isLightProse = reportProps.report.output_is_light_prose;

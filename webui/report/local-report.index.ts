@@ -19,7 +19,7 @@ window.addEventListener("DOMContentLoaded", () => {
         },
     };
 
-    const app = createApp(Report, { reportProps });
+    const app = createApp(Report, reportProps);
 
     // Register WCs as standard Vue components in local mode
     app.component("dpx-code-block", CodeBlock);
