@@ -19,7 +19,7 @@ declare global {
 }
 
 const mountReport = (reportProps: any) => {
-    const app = createApp(Report, { reportProps });
+    const app = createApp(Report, reportProps);
     app.mount("#report");
     return app;
 };
