@@ -38,7 +38,7 @@ module.exports = defineConfig({
                     if (assetInfo.name == "style.css") {
                         return "local-report-base.css";
                     }
-                    return assetInfo.name;
+                    return `${assetInfo.name}`;
                 },
             },
         },

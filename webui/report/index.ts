@@ -6,18 +6,6 @@ import "highlight.js/styles/stackoverflow-light.css";
 
 customElements.define("x-table-block", defineCustomElement(TableBlock));
 
-declare global {
-    interface Window {
-        dpLocal: boolean;
-        reportProps?: any;
-        posthog: any;
-        hasPosthog: any;
-        dpAuthorId: string;
-        dpReportId: string;
-        dpLocalViewEvent: any;
-    }
-}
-
 const mountReport = (reportProps: any) => {
     const app = createApp(Report, reportProps);
     app.mount("#report");

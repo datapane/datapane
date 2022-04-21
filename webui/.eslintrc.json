@@ -2,6 +2,7 @@
     "env": {
         "browser": true,
         "es6": true,
+        "node": true,
         "vue/setup-compiler-macros": true
     },
     "parser": "vue-eslint-parser",
