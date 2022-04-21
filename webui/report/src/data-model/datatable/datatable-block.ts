@@ -118,14 +118,14 @@ export class DataTableBlock extends AssetBlock {
 
     public streamContents = async (): Promise<DatasetResponse> => {
         /**
-         *
+         * Fetch dataset and convert to arrow format
          */
         const opts: AxiosRequestConfig = {
             responseType: "arraybuffer",
         };
         const { apiResponseToArrow } = await import("./arrow-utils");
         const arrayBuffer = await this.fetchDataset(opts);
-        return await apiResponseToArrow(arrayBuffer);
+        return apiResponseToArrow(arrayBuffer);
     };
 
     public downloadLocal = async (): Promise<void> => {
@@ -158,6 +158,9 @@ export class DataTableBlock extends AssetBlock {
     };
 
     public getCsvText = async (): Promise<string> => {
+        /**
+         * Return dataset contents as CSV string
+         */
         let csvText = "";
         try {
             const exportPlugin = await this.getExportPlugin();
@@ -172,6 +175,9 @@ export class DataTableBlock extends AssetBlock {
     };
 
     private async getExportPlugin(): Promise<any> {
+        /**
+         * Get revogrid export plugin from its HTML element root
+         */
         if (this._revogridExportPlugin) {
             return this._revogridExportPlugin;
         }
@@ -183,6 +189,7 @@ export class DataTableBlock extends AssetBlock {
         if (grid) {
             const plugins = await grid.getPlugins();
             for (let p of plugins) {
+                // Find export plugin by checking relevant properties
                 if ((p as any).exportFile && (p as any).exportString) {
                     this._revogridExportPlugin = p;
                     return this._revogridExportPlugin;
