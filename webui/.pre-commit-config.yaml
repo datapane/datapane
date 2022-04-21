@@ -104,7 +104,7 @@ repos:
         #exclude: '^(dp-server|tasks|email-templates)/'
         #files: \.(js|jsx|ts|tsx)$
         # only run for JS files in fe-components
-        files: ^src/\S+\.(js|ts|vue)$
+        files: ^(report|base)/\S+\.(js|ts|vue)$
         types: [text, file, non-executable]
         additional_dependencies:
           - eslint@6.8.0
