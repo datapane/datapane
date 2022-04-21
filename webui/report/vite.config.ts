@@ -29,8 +29,6 @@ module.exports = defineConfig({
     build: {
         outDir: "./dist/report/",
         lib: {
-            // build is empty if I don't add this build.lib config
-            // TODO - Make issue on vite repo
             entry: path.resolve(__dirname, "index.ts"),
             fileName: "index",
             formats: ["es"],

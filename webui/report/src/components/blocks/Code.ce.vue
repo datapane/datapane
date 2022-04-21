@@ -27,7 +27,6 @@ onUnmounted(() => {
 
 <template>
     <div class="relative">
-        <!-- TODO - prevent flicker on load -->
         <link v-if="!dpLocal" rel="stylesheet" href="/static/base/style.css" />
         <button
             class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
