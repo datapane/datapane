@@ -110,6 +110,7 @@ export class Group {
     public columns: number;
     public label?: string;
     public name = "Group";
+    public refId = uuidv4();
 
     public constructor(o: {
         children: BlockTree[];
@@ -126,6 +127,7 @@ export class Toggle {
     public children: BlockTree[];
     public label?: string;
     public name = "Toggle";
+    public refId = uuidv4();
 
     public constructor(o: { children: BlockTree[]; label?: string }) {
         this.children = o.children;
@@ -138,6 +140,7 @@ export class Select {
     public label?: string;
     public type: string;
     public name = "Select";
+    public refId = uuidv4();
 
     public constructor(o: {
         children: BlockTree[];

@@ -32,7 +32,7 @@ const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
         :select="p.tree"
         v-slot="slotProps"
     >
-        <grid-generator :key="slotProps.tree" :tree="slotProps.tree" />
+        <grid-generator :key="slotProps.tree.refId" :tree="slotProps.tree" />
     </select-layout>
     <toggle-layout v-else-if="isToggle(p.tree)" :label="p.tree.label">
         <grid-generator

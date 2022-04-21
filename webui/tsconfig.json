@@ -14,9 +14,14 @@
         "types": ["vite/client"]
     },
     "include": [
-        "report/src/**/*.ts",
-        "report/src/**/*.d.ts",
-        "report/src/**/*.vue"
+        "*.ts",
+        "*.d.ts",
+        "report/**/*.ts",
+        "report/**/*.d.ts",
+        "report/**/*.vue",
+        "base/**/*.ts",
+        "base/**/*.d.ts",
+        "base/**/*.vue"
     ],
     "references": [{ "path": "./tsconfig.node.json" }]
 }
