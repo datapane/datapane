@@ -1,4 +1,4 @@
-import environment from "./report/src/environment";
+import environment from "../report/src/environment";
 import urljoin from "url-join";
 import posthog from "posthog-js";
 import FastMutex from "fast-mutex";

@@ -2,7 +2,7 @@
 import { onUnmounted, onMounted, ref, computed } from "vue";
 import "highlight.js/lib/common";
 import hljsVuePlugin from "@highlightjs/vue-plugin";
-import { DPClipboard } from "../../../../DPClipboard";
+import { DPClipboard } from "../../../../shared/DPClipboard";
 const highlightjs = hljsVuePlugin.component;
 
 const p = defineProps<{ language: string; code: string }>();
