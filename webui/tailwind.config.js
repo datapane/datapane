@@ -7,7 +7,6 @@ module.exports = {
     darkMode: "class",
     theme: {
         fontFamily: {
-            // TODO - move to extends?
             ...fontFamily,
             "dp-prose": "var(--dp-font-family)",
         },
@@ -105,7 +104,6 @@ module.exports = {
         "./base/src/**/*.{vue,js,ts}",
         "../fe-components/src/**/*.{js,ts,tsx}",
         // BE files
-        // TODO - update paths when deploying
         "../dp-server/src/dp/apps/dp_core/templates/**/*.html",
         "../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
         "../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
@@ -115,32 +113,12 @@ module.exports = {
         "./node_modules/@variantjs/**/*.ts",
     ],
     safelist: [
-        // TODO - remove redundant items
-        { pattern: /bp3-.*/ },
-        { pattern: /DayPicker.*/ },
         { pattern: /grid-cols-.*/ },
         { pattern: /grid-rows-.*/ },
         { pattern: /grid-flow-.*/ },
-        { pattern: /dp-btn-.*/ },
-        "text-teal-400",
-        "text-orange-400",
-        "text-blue-400",
-        "text-green-400",
-        "text-indigo-400",
-        "text-red-400",
-        "mb-3",
-        "bg-green-100",
-        "bg-green-800",
-        "bg-red-100",
-        "bg-red-800",
         "max-w-screen-xl",
         "max-w-3xl",
         "max-w-full",
-        "w-full",
-        "h-full",
         "max-w-none",
-        "absolute",
-        "top-0",
-        "left-0",
     ],
 };

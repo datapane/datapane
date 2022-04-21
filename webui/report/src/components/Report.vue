@@ -67,8 +67,6 @@ const htmlHeaderRef = (node: any) => {
      */
     if (node !== null) {
         setTheme(p.report.output_is_light_prose);
-    } else {
-        console.error("Unable to find HTML header node");
     }
 };
 

@@ -7,6 +7,7 @@ declare global {
         dpAuthorId: string;
         dpReportId: string;
         dpLocalViewEvent: any;
+        Alpine: any;
     }
 }
 
