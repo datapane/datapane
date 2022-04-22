@@ -8,6 +8,7 @@ import "codemirror/theme/eclipse.css";
 
 const p = defineProps<{
     query: string;
+    errors?: string;
 }>();
 
 const emit = defineEmits(["query-change", "run-query", "clear-query"]);
@@ -49,6 +50,9 @@ const onQueryChange = (query: string) => emit("query-change", query);
                 </dp-button>
             </div>
         </div>
+    </div>
+    <div v-if="p.errors" class="w-full bg-red-100" data-cy="alasql-error-msg">
+        {{ p.errors }}
     </div>
 </template>
 
