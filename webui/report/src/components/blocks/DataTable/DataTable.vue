@@ -234,7 +234,7 @@ const runQuery = () => {
     queryErrors.value = null;
 
     try {
-        const alasqlQuery = query.value.replace(/\$table/g, "?");
+        const alasqlQuery = query.value?.replace(/\$table/g, "?");
         const queryData = alasql(alasqlQuery, [p.data]);
         const querySchema = queryData.length ? buildSchema(queryData) : [];
         queryResult.value = { data: queryData, schema: querySchema };
@@ -250,7 +250,6 @@ const onQueryChange = (newQuery: string) => {
 const clearQuery = () => {
     queryResult.value = null;
     queryErrors.value = null;
-    query.value = DEFAULT_QUERY;
 };
 </script>
 
@@ -276,8 +275,8 @@ const clearQuery = () => {
         />
         <query-area
             v-if="queryOpen"
-            :query="query"
             :errors="queryErrors"
+            :initialQuery="query"
             @query-change="onQueryChange"
             @run-query="runQuery"
             @clear-query="clearQuery"
