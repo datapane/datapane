@@ -2,9 +2,7 @@
 import { defineEmits } from "vue";
 import DpButton from "../../../shared/DPButton.vue";
 import codemirror from "codemirror-editor-vue3";
-import "codemirror/lib/codemirror.css";
 import "codemirror/mode/sql/sql.js";
-import "codemirror/theme/eclipse.css";
 
 const p = defineProps<{
     query: string;
