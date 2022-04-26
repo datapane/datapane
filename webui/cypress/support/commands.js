@@ -37,7 +37,7 @@ Cypress.Commands.add("dpLogin", (opts = { isStaff: false }) => {
         url: "accounts/login/",
         form: true,
         body: {
-            login: Cypress.env(opts.isStaff ? "staffUsername" : "testUsername"),
+            login: Cypress.env(opts.isStaff ? "staffEmail" : "testEmail"),
             password: Cypress.env(
                 opts.isStaff ? "staffPassword" : "testPassword"
             ),
