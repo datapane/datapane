@@ -24,6 +24,7 @@ module.exports = defineConfig({
                 // shim jquery to window object for bokehjs
                 jQuery: "window.jQuery",
             },
+            preventAssignment: true,
         }),
     ],
     build: {
