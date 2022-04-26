@@ -2,17 +2,18 @@
     "viewportWidth": 1680,
     "viewportHeight": 1050,
     "defaultCommandTimeout": 8000,
-    "baseUrl": "http://localhost:8090",
+    "baseUrl": "https://overwrite-me.com",
     "includeShadowDom": true,
     "video": false,
     "env": {
-        "testUsername": "datapane-test",
+        "testEmail": "test@datapane.com",
         "testPassword": "",
-        "staffUsername": "datapane",
+        "staffEmail": "support@datapane.com",
         "staffPassword": "",
-        "builderReportId": "",
-        "styleReportId": "",
-        "paramsAppId": "",
-        "noParamsAppId": ""
+        "builderReportURL": "",
+        "styleReportURL": "",
+        "paramsAppURL": "",
+        "noParamsAppURL": "",
+        "fileURL": ""
     }
 }

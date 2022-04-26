@@ -2,17 +2,13 @@
 
 // URLs
 
-const APPS_BASE = `u/datapane-test/apps/`;
-const REPORTS_BASE = `u/datapane-test/reports/`;
-const FILE_BASE = `u/datapane-test/files/`;
-
 export const URLS = {
-    PARAMS_APP: `${APPS_BASE}${Cypress.env("paramsAppId")}/`,
-    NO_PARAMS_APP: `${APPS_BASE}${Cypress.env("noParamsAppId")}/`,
-    SCHEDULE: `${APPS_BASE}${Cypress.env("paramsAppId")}/schedules/create/`,
-    FILE: `${FILE_BASE}${Cypress.env("fileId")}/`,
-    STYLE_REPORT: `${REPORTS_BASE}${Cypress.env("styleReportId")}/`,
-    BUILDER_REPORT: `${REPORTS_BASE}${Cypress.env("builderReportId")}/`,
+    PARAMS_APP: `${Cypress.env("paramsAppURL")}`,
+    NO_PARAMS_APP: `${Cypress.env("noParamsAppURL")}`,
+    SCHEDULE: `${Cypress.env("paramsAppURL")}schedules/create/`,
+    FILE: `${Cypress.env("fileURL")}`,
+    STYLE_REPORT: `${Cypress.env("styleReportURL")}`,
+    BUILDER_REPORT: `${Cypress.env("builderReportURL")}`,
 };
 
 export const HTML_HEADER = `<style type="text/css">
