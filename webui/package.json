@@ -5,7 +5,7 @@
     "scripts": {
         "build:base": "vite build --config base/vite.config.ts",
         "build:report": "vite build --config report/vite.config.ts",
-        "build:local-report": "vite build --config report/local-report.vite.config.ts",
+        "build:local-report": "node --max_old_space_size=16384 node_modules/.bin/vite build --config report/local-report.vite.config.ts",
         "build": "npm run build:base && npm run build:report && npm run build:local-report",
         "dev:report": "vite build --mode development --config base/vite.config.ts && vite build --watch --mode development --config report/vite.config.ts",
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/integration/public/*\"",
