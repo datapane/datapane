@@ -15,5 +15,6 @@ const html = ref<string | null>(null);
         v-if="html"
         :html="html"
         :single-block-embed="singleBlockEmbed"
+        class="w-full"
     />
 </template>

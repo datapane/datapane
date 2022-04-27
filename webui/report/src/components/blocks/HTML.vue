@@ -28,14 +28,14 @@ const iframeDoc: ComputedRef<string> = computed(() => {
 });
 
 onMounted(() => {
-    iframeResize({ checkOrigin: false }, `#${iframeId}`);
+    iframeResize({ checkOrigin: false, warningTimeout: 10000 }, `#${iframeId}`);
 });
 </script>
 
 <template>
     <iframe
         :srcdoc="iframeDoc"
-        :sandbox="p.sandbox"
+        :sandbox="p.sandbox || ''"
         :id="iframeId"
         width="100%"
         data-cy="block-user-iframe"

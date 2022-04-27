@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
-const p = defineProps<{ html: string; singleBlockEmbed: string }>();
+const p = defineProps<{
+    html: string;
+    singleBlockEmbed: string;
+    class: string;
+}>();
 
 const singleBlockEmbed = computed(() => JSON.parse(p.singleBlockEmbed));
 const { dpLocal } = window;
