@@ -78,7 +78,6 @@ repos:
         exclude: 'package.*\.json'
       # check for dangling symlinks
       - id: check-symlinks
-        exclude: '^(fe-components/.env|dp-server/static-fe-bundles|dp-server/templates/herald/html|datapane/src/datapane/resources/local_report/local-report-base).*$'
       # ensure links to vcs sites are permalinks
       - id: check-vcs-permalinks
       # ensure no private keys are being commited
