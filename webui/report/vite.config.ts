@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import replace from "@rollup/plugin-replace";
 import path from "path";
 
-module.exports = defineConfig({
+module.exports = defineConfig(({ mode }) => ({
     css: {
         postcss: {},
     },
@@ -37,10 +37,13 @@ module.exports = defineConfig({
         rollupOptions: {
             output: {
                 paths: {
-                    vue: "https://unpkg.com/vue@3.2.29/dist/vue.esm-browser.js",
+                    vue:
+                        mode === "development"
+                            ? "/static/vue.esm-browser.js"
+                            : "/static/vue.esm-browser.prod.js",
                 },
             },
             external: ["vue"],
         },
     },
-});
+}));

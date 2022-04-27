@@ -7,7 +7,7 @@
         "build:report": "vite build --config report/vite.config.ts",
         "build:local-report": "vite build --config report/local-report.vite.config.ts",
         "build": "npm run build:base && npm run build:report && npm run build:local-report",
-        "dev:report": "vite build --watch --mode development --config report/vite.config.ts",
+        "dev:report": "vite build --mode development --config base/vite.config.ts && vite build --watch --mode development --config report/vite.config.ts",
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/integration/public/*\"",
         "test:org": "node_modules/.bin/cypress run --spec \"cypress/integration/org/*\"",
         "test:open": "node_modules/.bin/cypress open --browser electron",

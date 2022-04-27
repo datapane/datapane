@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { defineEmits } from "vue";
-
 const p = defineProps<{ labels: string[]; pageNumber: number }>();
-
 const emit = defineEmits(["page-change"]);
 </script>
 

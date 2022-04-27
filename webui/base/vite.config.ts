@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
 
-module.exports = defineConfig({
+module.exports = defineConfig(({ mode }) => ({
     plugins: [
         vue({
             template: {
@@ -34,10 +34,13 @@ module.exports = defineConfig({
                 entryFileNames: "[name].[format].js",
                 assetFileNames: "[name].[ext]",
                 paths: {
-                    vue: "https://unpkg.com/vue@3.2.29/dist/vue.esm-browser.js",
+                    vue:
+                        mode === "development"
+                            ? "/static/vue.esm-browser.js"
+                            : "/static/vue.esm-browser.prod.js",
                 },
             },
             external: ["vue"],
         },
     },
-});
+}));

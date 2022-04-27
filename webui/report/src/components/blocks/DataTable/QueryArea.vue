@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineEmits, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import DpButton from "../../../shared/DPButton.vue";
 import "codemirror/mode/sql/sql.js";
 import "codemirror/addon/display/autorefresh.js";
