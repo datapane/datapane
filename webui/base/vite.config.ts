@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import vueESM from "../shared/rollup-plugin-vue-esm";
 import path from "path";
 
 module.exports = defineConfig(({ mode }) => ({
@@ -41,6 +42,7 @@ module.exports = defineConfig(({ mode }) => ({
                 },
             },
             external: ["vue"],
+            plugins: [vueESM()],
         },
     },
 }));
