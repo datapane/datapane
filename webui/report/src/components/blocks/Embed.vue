@@ -31,7 +31,7 @@ const iframeDoc: ComputedRef<string> = computed(() => {
 });
 
 onMounted(() => {
-    iframeResize({ checkOrigin: false }, `#${iframeId}`);
+    iframeResize({ checkOrigin: false, warningTimeout: 10000 }, `#${iframeId}`);
 });
 </script>
 
