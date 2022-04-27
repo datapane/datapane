@@ -175,7 +175,7 @@ export class Block {
         this.refId = uuidv4();
         this.count = count;
         this.caption = caption;
-        this.componentProps = { caption: this.caption, count: this.count };
+        this.componentProps = {};
 
         if (attributes) {
             this.label = attributes.label;
