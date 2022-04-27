@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { defineEmits } from "vue";
 const p = defineProps<{ pageNumber: number; numPages: number }>();
-
 const emit = defineEmits(["page-change"]);
 
 const scrollToTop = () => {

@@ -4,8 +4,8 @@ import * as marked from "marked";
 import hljs from "highlight.js";
 
 (marked as any).setOptions({
-    highlight: function (code: string, lang: string) {
-        return hljs.highlight(lang, code).value;
+    highlight: function (code: string, language: string) {
+        return hljs.highlight(code, { language }).value;
     },
 });
 
