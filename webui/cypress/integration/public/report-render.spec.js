@@ -21,15 +21,15 @@ describe("Report rendering", () => {
             .within(() => {
                 // Tab 0 state
                 cy.get("[data-cy=block-shadow]").should("not.exist");
-                cy.get("[data-cy=block-vega]").should("be.visible");
-                cy.get("[data-cy=tab-1]").click();
+                cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
+                cy.scrollToFirst("[data-cy=tab-1]").click();
                 // Tab 1 state
-                cy.get("[data-cy=block-shadow]").should("be.visible");
+                cy.scrollToFirst("[data-cy=block-shadow]").should("be.visible");
                 cy.get("[data-cy=block-vega]").should("not.exist");
-                cy.get("[data-cy=tab-0]").click();
+                cy.scrollToFirst("[data-cy=tab-0]").click();
                 // Tab 0 state
                 cy.get("[data-cy=block-shadow]").should("not.exist");
-                cy.get("[data-cy=block-vega]").should("be.visible");
+                cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
             });
     });
 
