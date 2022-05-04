@@ -30,6 +30,8 @@ export type Elem = {
 
 export type BlockTree = LayoutBlock | Block;
 
+type AssetResource = Promise<string | object>;
+
 /* Helper functions */
 
 export const decodeBase64Asset = (src: string): string => {
@@ -69,8 +71,6 @@ const decodeBase64AssetUtf8 = (src: string) => {
     const decoder = new TextDecoder(); // default is utf-8
     return decoder.decode(bytes);
 };
-
-type AssetResource = Promise<string | object>;
 
 export class Report {
     public children: Page[];
@@ -279,6 +279,9 @@ export class BigNumberBlock extends Block {
 /* Asset blocks */
 
 export abstract class AssetBlock extends Block {
+    /**
+     * Blocks whose data should be fetched on load rather than in-lined in the XML CDATA
+     */
     public src: string;
     public type: string;
 
@@ -362,7 +365,7 @@ export class EmbedBlock extends AssetBlock {
 export class FileBlock extends AssetBlock {
     public component = markRaw(VFileBlock);
 
-    private filename: string;
+    private readonly filename: string;
 
     public constructor(elem: Elem, caption?: string, count?: number) {
         super(elem, caption, count);

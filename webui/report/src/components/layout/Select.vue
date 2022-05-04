@@ -1,27 +1,36 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, ComputedRef } from "vue";
 import { BlockTree, Select } from "../../data-model/blocks";
 import MultiSelect from "vue-multiselect";
 import "vue-multiselect/dist/dist/vue-multiselect.esm.css";
 
 const p = defineProps<{ select: Select }>();
+const tabNumber = ref(0);
 
-const getSectionType = (): string => {
+const sectionType: ComputedRef<string> = computed(() => {
     const { type, children } = p.select;
     if (type) return type;
     return children.length < 5 ? "tabs" : "dropdown";
-};
+});
 
-const labels: string[] = p.select.children.map(
-    (child: BlockTree, idx) => child.label || `Section ${idx + 1}`
+const labels: ComputedRef<string[]> = computed(() =>
+    p.select.children.map(
+        (child: BlockTree, idx) => child.label || `Section ${idx + 1}`
+    )
 );
 
-const tabNumber = ref(0);
+const tabNumbers: ComputedRef<number[]> = computed(() =>
+    labels.value.map((_, idx) => idx)
+);
+
+// The subtree which should be rendered by the select block
 const currentTree = computed(() => p.select.children[tabNumber.value]);
-const sectionType = getSectionType();
-const tabNumbers = labels.map((_, idx) => idx);
-const customLabel = (tabNumber: number) => labels[tabNumber];
+
+// Used by `vue-multiselect` to overwrite the default behaviour of displaying tab number only
+const multiSelectCustomLabel = (tabNumber: number) => labels.value[tabNumber];
+// Used by `vue-multiselect` to set tab number on change
 const setTabNumber = (val: number) => (tabNumber.value = val);
+
 const setTabNumberFromEvent = (ev: Event) =>
     void setTabNumber(+(ev.target as HTMLSelectElement).value);
 </script>
@@ -48,7 +57,7 @@ const setTabNumberFromEvent = (ev: Event) =>
                 :preselect-first="true"
                 :clear-on-select="false"
                 :allow-empty="false"
-                :custom-label="customLabel"
+                :custom-label="multiSelectCustomLabel"
             />
         </div>
         <div :class="['hidden', { 'sm:block': sectionType === 'tabs' }]">

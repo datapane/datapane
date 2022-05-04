@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const p = defineProps<{ columns: number; singleBlockEmbed: boolean }>();
+import { inject } from "vue";
+
+const p = defineProps<{ columns: number }>();
+
+const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
+
 const gridLayoutStyle =
     +p.columns > 0
         ? { gridTemplateColumns: `repeat(${p.columns}, minmax(0, 1fr))` }

@@ -1,3 +1,5 @@
+import { Report } from "./blocks";
+
 export type IReport = {
     document: any;
     web_url: string;
@@ -16,3 +18,10 @@ export type ReportProps = {
     htmlHeader?: string;
     report: IReport;
 };
+
+export type ReportStoreState = {
+    report: Report;
+    singleBlockEmbed: boolean;
+};
+
+export type AppViewMode = "VIEW" | "EDIT" | "EMBED";
