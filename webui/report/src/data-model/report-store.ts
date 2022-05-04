@@ -27,20 +27,13 @@ import {
 import convert from "xml-js";
 import * as maps from "./test-maps";
 import { DataTableBlock } from "./datatable/datatable-block";
-import { ReportProps } from "./types";
+import { AppViewMode, ReportProps, ReportStoreState } from "./types";
 
 type BlockTest = {
     class_: typeof Block;
     test: (elem: Elem) => boolean;
     opts?: any;
 };
-
-export type State = {
-    report: Report;
-    singleBlockEmbed: boolean;
-};
-
-export type AppViewMode = "VIEW" | "EDIT" | "EMBED";
 
 const wrapInGroup = (elems: Elem[]): Elem[] => [
     {
@@ -98,7 +91,7 @@ export class ReportStore {
     /**
      * deserializes and stores the Report object, and related metadata
      */
-    public state: State;
+    public state: ReportStoreState;
 
     private readonly webUrl: string;
     private readonly isLightProse: boolean;
@@ -148,7 +141,7 @@ export class ReportStore {
 
     private updateFigureCount(elemName: string): number {
         /**
-         * Updates and returns the relevant count
+         * Updates and returns the relevant count to be displayed in block captions
          */
         let count = 0;
         if (elemName === "Plot") {
@@ -165,7 +158,7 @@ export class ReportStore {
 
     private deserialize(elem: Elem): Report {
         /**
-         * Convert a serialised JSON object to a deserialized tree of `Block` objects
+         * Converts a serialised JSON object to a deserialized tree of `Block` objects
          */
         const attributes = getAttributes(elem);
         const pages: Page[] = [];
@@ -213,9 +206,6 @@ export class ReportStore {
     };
 
     private deserializeToggle = (elem: Elem): Toggle => {
-        /**
-         * Deserializes a toggle elem into an array of BlockTrees
-         */
         const attributes = getAttributes(elem);
         return new Toggle({
             children: this.deserializeChildren(elem),
@@ -224,9 +214,6 @@ export class ReportStore {
     };
 
     private deserializeSelect = (elem: Elem): Select => {
-        /**
-         * Deserializes a select elem into (Group | Block)[]
-         */
         const attributes = getAttributes(elem);
         return new Select({
             children: this.deserializeChildren(elem),
@@ -253,6 +240,9 @@ export class ReportStore {
     }
 
     private deserializeBlock(elem: Elem): Block {
+        /**
+         * Deserialize leaf block node into relevant `Block` class
+         */
         const count = this.updateFigureCount(elem.name);
         const caption = getAttributes(elem).caption;
 
