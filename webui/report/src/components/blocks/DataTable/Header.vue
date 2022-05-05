@@ -27,7 +27,7 @@ const withErrHandling = function (f: Function): any {
     };
 };
 
-const actionSections: Section[] = [
+const localActionSections: Section[] = [
     {
         title: "Current State",
         options: [
@@ -43,6 +43,9 @@ const actionSections: Section[] = [
             },
         ],
     },
+];
+
+const remoteActionSections: Section[] = [
     {
         title: "Original Data",
         options: [
@@ -60,7 +63,10 @@ const actionSections: Section[] = [
     },
 ];
 
-const showActions = !window.dpLocal && !p.previewMode;
+const actionSections: Section[] = [
+    ...localActionSections,
+    ...(window.dpLocal ? [] : remoteActionSections),
+];
 </script>
 
 <template>
@@ -72,7 +78,7 @@ const showActions = !window.dpLocal && !p.previewMode;
                 <data-tag :value="p.cells" icon="fa-th-large" unit="cells" />
             </div>
             <div
-                v-if="showActions"
+                v-if="!p.previewMode"
                 class="min-w-0 flex items-center pr-2 sm:divide-x flex-wrap"
             >
                 <div class="pr-2 sm:flex hidden space-x-2">
