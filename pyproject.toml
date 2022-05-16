@@ -6,7 +6,7 @@ authors = ["Datapane Team <dev@datapane.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://www.datapane.com"
-repository = "https://www.github/datapane/datapane"
+repository = "https://github.com/datapane/datapane"
 documentation = "https://docs.datapane.com"
 
 
