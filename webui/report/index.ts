@@ -6,10 +6,18 @@ import "highlight.js/styles/stackoverflow-light.css";
 
 customElements.define("x-table-block", defineCustomElement(TableBlock));
 
+const parseElementProps = (elId: string): any => {
+    const propsEl = document.getElementById(elId);
+    if (!propsEl || !propsEl.textContent) {
+        throw "Couldn't find props JSON element";
+    }
+    return JSON.parse(propsEl.textContent);
+};
+
 const mountReport = (reportProps: any) => {
     const app = createApp(Report, reportProps);
     app.mount("#report");
     return app;
 };
 
-export { mountReport };
+export { mountReport, parseElementProps };
