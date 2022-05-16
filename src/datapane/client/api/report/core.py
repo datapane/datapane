@@ -159,11 +159,9 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        # template.html inlines the report doc with backticks so we need to escape any inside the doc
-        report_doc_esc = report_doc.replace("`", r"\`")
         report_id = uuid4().hex
         r = self.template.render(
-            report_doc=report_doc_esc,
+            report_doc=report_doc,
             report_width=formatting.width.value,
             report_name=name,
             report_author=author,

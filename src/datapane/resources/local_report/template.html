@@ -19,24 +19,17 @@
       {% include "local-report-base.css" %}
     </style>
     <script>
+      const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
+      const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
+      window.reportProps = { report, htmlHeader };
+
+    </script>
+    <script type="module">
       {{ include_raw("local-report-base.js") }}
     </script>
   </head>
   <body>
-    <div id="report-root" class="w-full pb-12"></div>
-    <script>
-      const report = { document: `{{ report_doc|e }}`, width: "{{ report_width }}" };
-      const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
-
-      const { React, ReactDOM, ReportComponent } = DPLIB["local-report-base"];
-      const ReportFactory = React.createElement.bind(null, ReportComponent);
-
-      ReactDOM.render(
-        ReportFactory({ report, htmlHeader, isLightProse: {{ is_light_prose|tojson }} }),
-        document.querySelector("#report-root")
-      );
-    </script>
-
+    <div id="report" class="w-full pb-12"></div>
     <div style="position: fixed; bottom: 0; width: 100%; z-index: 3;">
       <nav class="bg-gray-200 border-t border-gray-300">
         <div class="relative flex items-center justify-between h-12">
