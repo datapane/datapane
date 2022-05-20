@@ -20,19 +20,12 @@ plot1 = (
 report = dp.Report(
     dp.Text(
         """
-![Imgur](https://i.imgur.com/S3MGxWd.png)
 ## Introduction
 
-Datapane is a Python library for building interactive reports from data components like pandas DataFrames, Altair/ Plotly/Matplotlib charts, and Markdown.
+Datapane is an SDK which makes it fast and simple to generate data reports, dashboards, and apps from Python.
 
 Reports can be exported as standalone HTML documents (this guide itself is a Datapane report 😉), or hosted on our platform, where they can be shared via a link or embedded in your application.
-## Explainer Video
 """
-    ),
-    dp.HTML(
-        """
-<script src="https://fast.wistia.com/embed/medias/xekc17kmgs.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:62.5% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_xekc17kmgs videoFoam=true" style="height:100%;position:relative;width:100%"><div class="wistia_swatch" style="height:100%;left:0;opacity:0;overflow:hidden;position:absolute;top:0;transition:opacity 200ms;width:100%;"><img src="https://fast.wistia.com/embed/medias/xekc17kmgs/swatch" style="filter:blur(5px);height:100%;object-fit:contain;width:100%;" alt="" aria-hidden="true" onload="this.parentNode.style.opacity=1;" /></div></div></div></div>
-    """
     ),
     dp.Text(
         """
@@ -142,12 +135,13 @@ Running that code generates the following report: """
         """
 These are great ways to add interactivity to your report with minimal effort. Spice things up even further by adding pages, HTML blocks, images and more.
 
-## Sharing Reports
+## Hosting Reports
 
-### Sign up for Datapane Studio
+### Sign up for Datapane Cloud
 
-In addition to saving documents locally, you can use [Datapane Studio](https://datapane.com/explore) to host and share your reports.
+In addition to saving documents locally, you can use [Datapane Cloud](https://datapane.com/product/cloud) to host and share your reports.
 
+- Create private workspaces to share your reports securely
 - Embed reports in places like Medium, Notion, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
 - Viewers can explore and download your data with additional DataTable analysis features
 
@@ -162,7 +156,7 @@ To get your free API key, run the following command:
         """
 Once you've completed signup, your API key will be stored in your environment (you can also see it in your [profile](https://datapane.com/settings/).
 
-Now, just change `report.save` to `report.upload` in your code and your report will be pushed to Datapane.com: """
+Now, just change `report.save` to `report.upload` in your code and your report will be pushed to Datapane Cloud: """
     ),
     dp.Code(
         """
@@ -174,30 +168,17 @@ report.upload(name="Hello world")"""
         """
 This will generate a report URL which you can send to someone else or paste into another platform for embedding.
 
-### Datapane Teams
-
-[Datapane Teams](https://docs.datapane.com/datapane-teams/) is our plan for organizations, which adds the following features on top of Studio: 
-
-- Share unlimited reports privately with your company or external clients
-- Manage users, groups and permissions
-- Deploy Jupyter Notebooks and scripts as apps, with inputs that can be run by your team interactively to dynamically create results
-- Schedule reports to automatically update
-
-Datapane Teams is offered as both a managed SaaS service and an on-prem install. For more information, see [the documentation](https://docs.datapane.com/datapane-teams/tut-deploying-a-script). You can find pricing [here](https://datapane.com/pricing).
-
 ## Next Steps
 
-- [Sign up for a Datapane Studio account](https://datapane.com/accounts/signup/)
+- [Sign up for a Datapane Cloud account](https://datapane.com/accounts/signup/)
 - [Read the documentation](https://docs.datapane.com)
 - [Browse the API docs](https://datapane.github.io/datapane/)
-- [Browse samples and demos](https://github.com/datapane/gallery/)
 - [Join the community on GitHub Discussions](https://github.com/datapane/datapane/discussions)"""
     ),
 )
 
 report.save(
     path="hello.html",
-    formatting=dp.ReportFormatting(width=dp.ReportWidth.NARROW),
     open=True,
 )
 
