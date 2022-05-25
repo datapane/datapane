@@ -15,7 +15,7 @@
         "storybook": "start-storybook -p 6006"
     },
     "dependencies": {
-        "@bokeh/bokehjs": "^2.4.2",
+        "@bokeh/bokehjs": "~2.4.2",
         "@highlightjs/vue-plugin": "^2.1.0",
         "@popperjs/core": "^2.11.2",
         "@revolist/revogrid": "^3.0.98",
