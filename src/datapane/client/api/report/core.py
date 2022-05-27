@@ -271,15 +271,16 @@ class Report(DPObjectRef):
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
-        check_empty: bool = True,
+        validate: bool = True,
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
         report_doc, attachments = self._to_xml(embedded, title, description, author)
 
         # post_process and validate
         processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
-        validate_report_doc(xml_doc=processed_report_doc)
-        self._report_status_checks(processed_report_doc, embedded, check_empty)
+        if validate:
+            validate_report_doc(xml_doc=processed_report_doc)
+            self._report_status_checks(processed_report_doc, embedded)
 
         # convert to string
         report_str = etree.tounicode(processed_report_doc)
@@ -287,7 +288,7 @@ class Report(DPObjectRef):
         # log.debug(report_str)
         return (report_str, attachments)
 
-    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool, check_empty: bool):
+    def _report_status_checks(self, processed_report_doc: etree._ElementTree, embedded: bool):
         # check for any unsupported local features, e.g. DataTable
         # NOTE - we could eventually have different validators for local and uploaded reports
         if embedded:
@@ -296,7 +297,7 @@ class Report(DPObjectRef):
         # Report checks
         # TODO - validate at least a single element
         asset_blocks = processed_report_doc.xpath("count(/Report/Pages/Page/*)")
-        if asset_blocks == 0 and check_empty:
+        if asset_blocks == 0:
             raise InvalidReportError("Empty report - must contain at least one asset/block")
         elif c.config.is_public:
             # only nudge public users
