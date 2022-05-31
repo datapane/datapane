@@ -3,6 +3,7 @@ import VHTMLBlock from "../components/blocks/HTML.vue";
 import VFileBlock from "../components/blocks/File.vue";
 import VEmbedBlock from "../components/blocks/Embed.vue";
 import VFoliumBlock from "../components/blocks/Folium.connector.vue";
+import VPlotapiBlock from "../components/blocks/Plotapi.connector.vue";
 import VFormulaBlock from "../components/blocks/Formula.connector.vue";
 import VCodeBlock from "../components/blocks/Code.connector.vue";
 import VBokehBlock from "../components/blocks/Bokeh.connector.vue";
@@ -322,6 +323,11 @@ export class TableBlock extends AssetBlock {
 
 export class FoliumBlock extends AssetBlock {
     public component = markRaw(VFoliumBlock);
+    public captionType = "Plot";
+}
+
+export class PlotapiBlock extends AssetBlock {
+    public component = markRaw(VPlotapiBlock);
     public captionType = "Plot";
 }
 

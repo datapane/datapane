@@ -53,6 +53,10 @@ export const jsonIsIFrameHTML = (json: any): boolean => {
     return jsonType(json) === "application/vnd.folium+html";
 };
 
+export const jsonIsPlotapi = (json: any): boolean => {
+    return jsonType(json) === "application/vnd.plotapi+html";
+};
+
 export const jsonIsBokeh = (json: any): boolean => {
     return jsonType(json) === "application/vnd.bokeh.show+json";
 };
