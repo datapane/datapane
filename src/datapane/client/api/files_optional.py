@@ -4,7 +4,7 @@ from packaging.specifiers import SpecifierSet
 from datapane.common import log
 
 # NOTE - need to update this and keep in sync with JS
-BOKEH_V_SPECIFIER = SpecifierSet("~=2.2.0")
+BOKEH_V_SPECIFIER = SpecifierSet("~=2.4.2")
 PLOTLY_V_SPECIFIER = SpecifierSet(">=4.0.0")
 FOLIUM_V_SPECIFIER = SpecifierSet(">=0.12.0")
 
