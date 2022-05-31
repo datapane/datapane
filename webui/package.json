@@ -3,9 +3,9 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "build:base": "vite build --config base/vite.config.ts",
-        "build:report": "node --max_old_space_size=16384 vite build --config report/vite.config.ts",
-        "build:local-report": "node --max_old_space_size=16384 vite build --config report/local-report.vite.config.ts",
+        "build:base": "node_modules/.bin/vite build --config base/vite.config.ts",
+        "build:report": "node --max_old_space_size=16384 node_modules/.bin/vite build --config report/vite.config.ts",
+        "build:local-report": "node --max_old_space_size=16384 node_modules/.bin/vite build --config report/local-report.vite.config.ts",
         "build": "npm run build:base && npm run build:report && npm run build:local-report",
         "dev:report": "vite build --mode development --config base/vite.config.ts && vite build --watch --mode development --config report/vite.config.ts",
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/integration/public/*\"",
