@@ -8,8 +8,8 @@ describe("Changing a report's style", () => {
         // Change to accent-green bg-black theme
         cy.visit("/org-settings-visual");
         cy.get("#djHideToolBarButton").click();
-        cy.get("[name=visual__html_header]").clear().type(HTML_HEADER);
-        cy.get("[name=visual__light_text]").check();
+        cy.get("[name=html_header]").clear().type(HTML_HEADER);
+        cy.get("[name=light_text]").check();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
@@ -44,7 +44,7 @@ describe("Changing a report's style", () => {
         // Change to global light prose
         cy.visit("/org-settings-visual");
         cy.get("#djHideToolBarButton").click();
-        cy.get("[name=visual__light_text]").check();
+        cy.get("[name=light_text]").check();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
@@ -74,7 +74,7 @@ describe("Changing a report's style", () => {
         // Delete global header
         cy.visit("/org-settings-visual");
         cy.get("#djHideToolBarButton").click();
-        cy.get("[name=visual__html_header]").clear();
+        cy.get("[name=html_header]").clear();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
