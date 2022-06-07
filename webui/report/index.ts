@@ -14,8 +14,8 @@ const parseElementProps = (elId: string): any => {
     return JSON.parse(propsEl.textContent);
 };
 
-const mountReport = (reportProps: any) => {
-    const app = createApp(Report, reportProps);
+const mountReport = (props: any) => {
+    const app = createApp(Report, props);
     app.mount("#report");
     return app;
 };

@@ -97,11 +97,13 @@ module.exports = {
         require("@tailwindcss/forms"),
         require("@tailwindcss/typography"),
         require("@tailwindcss/aspect-ratio"),
+        require("@formkit/themes/tailwindcss"),
     ],
     content: [
         // FE files
         "./report/src/**/*.{vue,js,ts}",
         "./base/src/**/*.{vue,js,ts}",
+        "./params-component/src/**/*.{vue,js,ts}",
         "./node_modules/@variantjs/**/*.ts",
 
         // BE files

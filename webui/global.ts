@@ -8,6 +8,7 @@ declare global {
         dpReportId: string;
         dpLocalViewEvent: any;
         Alpine: any;
+        $testResources: any;
     }
 }
 
