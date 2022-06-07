@@ -31,6 +31,7 @@ _double_ext_map = {
     ".bokeh.json": "application/vnd.bokeh.show+json",
     ".pl.json": "application/vnd.plotly.v1+json",
     ".fl.html": "application/vnd.folium+html",
+    ".plotapi.html": "application/vnd.plotapi+html",
     ".tbl.html": "application/vnd.datapane.table+html",
     ".tar.gz": "application/x-tgz",
 }

@@ -66,3 +66,13 @@ except ImportError:
 
     class Map:
         pass
+
+
+# Plotapi (we don't check version as export to HTML string)
+try:
+    from plotapi import Visualisation
+
+except ImportError:
+
+    class Visualisation:
+        pass

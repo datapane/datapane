@@ -718,7 +718,7 @@ class Attachment(AssetBlock):
 
 class Plot(AssetBlock):
     """
-    Plot blocks store a Python-based plot object, including ones created by Altair, Plotly, Matplotlib, Bokeh, and Folium,
+    Plot blocks store a Python-based plot object, including ones created by Altair, Plotly, Matplotlib, Bokeh, Folium, and PlotAPI,
     for interactive display in your report when viewed in the browser.
     """
 

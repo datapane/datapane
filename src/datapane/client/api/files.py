@@ -15,7 +15,7 @@ from datapane.common import log
 
 from .. import DPError
 from .common import DPTmpFile
-from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure
+from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, Visualisation
 from .report.blocks import Attachment, DataBlock, DataTable, Plot, Table, Text
 
 T = TypeVar("T")
@@ -240,6 +240,16 @@ class FoliumPlot(PlotAsset):
         f.write(html)
 
 
+class PlotapiPlot(PlotAsset):
+    mimetype = "application/vnd.plotapi+html"
+    ext = ".plotapi.html"
+    obj_type = Visualisation
+
+    def write_file(self, f: BinaryIO, chart: Visualisation):
+        html: str = chart.to_string()
+        f.write(html)
+
+
 ################################################################################
 # register all the plot types
 plots = [
@@ -257,6 +267,7 @@ plots = [
     MatplotAxesPlot,
     MatplotNDArrayPlot,
     FoliumPlot,
+    PlotapiPlot
 ]
 
 

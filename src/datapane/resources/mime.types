@@ -8,6 +8,7 @@ application/vnd.vegalite.v3+json    vl3.json
 application/vnd.vegalite.v4+json    vl4.json
 application/vnd.plotly.v1+json    pl.json
 application/vnd.folium+html    fl.html
+application/vnd.plotapi+html    plotapi.html
 
 # images - already handled
 
