@@ -46,7 +46,7 @@ export class Coerce {
         this.coerceRow = R.compose((row) => {
             const val = row[field.name];
             if (val) {
-                row[field.name] = parseFloat(val.toPrecision(4));
+                row[field.name] = parseFloat(val);
             }
             return row;
         }, this.coerceRow);
