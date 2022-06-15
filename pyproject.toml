@@ -100,8 +100,11 @@ datapane = "datapane.client.__main__:main"
 dp-runner = "datapane.runner.__main__:main"
 
 [tool.black]
+# The same config should be duplicated in other pyproject.toml files so that
+# black always finds it.
 line-length = 120
 target-version = ['py38']
+include = '\.pyi?$'
 
 # FOR PEP-517/518
 [build-system]
