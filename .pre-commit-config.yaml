@@ -13,12 +13,20 @@ repos:
   #    - id: add-trailing-comma
   #      args: [--py36-plus]
   # Run flake8 & isort on files using .flake8 and .isort.cfg config
+  - repo: https://github.com/pycqa/isort
+    # (we prefer isort to flake8-isort because it sorts things for you rather than just checking)
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)
+        # The following seems to be necessary for isort to get imports grouped correctly,
+        # possibly related to https://github.com/PyCQA/isort/issues/1872
+        entry: isort --sp .isort.cfg
   - repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
       - id: flake8
-        additional_dependencies: ["flake8-isort >= 3.0.0", "flake8-no-implicit-concat >= 0.1.3", "flake8_tuple >= 0.4.1"]
-        #, "flake8-annotations >= 2.7.0"]
+        additional_dependencies: ["flake8-no-implicit-concat >= 0.3.3", "flake8_tuple >= 0.4.1"]
   # Black Python formatter
   - repo: https://github.com/ambv/black
     rev: 22.3.0
