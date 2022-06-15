@@ -1,4 +1,3 @@
-# flake8: noqa F401
 import json
 import os
 from pathlib import Path
@@ -15,7 +14,8 @@ try:
 
     exit(1)
 except ImportError:
-    import dp_app
+    import dp_app  # noqa: F401
+
 
 print("ran app")
 # check env values and params

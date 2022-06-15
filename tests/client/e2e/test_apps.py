@@ -1,4 +1,3 @@
-# flake8: noqa isort:skip
 import tarfile
 import time
 from pathlib import Path

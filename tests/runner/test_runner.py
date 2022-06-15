@@ -1,4 +1,3 @@
-# flake8: noqa isort:skip
 import os
 import subprocess
 import sys

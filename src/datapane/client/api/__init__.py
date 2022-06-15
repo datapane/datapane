@@ -43,7 +43,6 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
 
 """
 
-# flake8: noqa F401
 # Internal API re-exports
 import warnings
 
@@ -76,3 +75,52 @@ from .report.core import FontChoice, PageLayout, Report, ReportFormatting, Repor
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup
+
+__all__ = [
+    "warnings",
+    "init",
+    "IncompatibleVersionError",
+    "builtins",
+    "HTTPError",
+    "Resource",
+    "DPObjectRef",
+    "HTML",
+    "Attachment",
+    "BigNumber",
+    "Code",
+    "DataTable",
+    "Divider",
+    "Embed",
+    "Empty",
+    "Formula",
+    "Group",
+    "Media",
+    "Page",
+    "Plot",
+    "Select",
+    "SelectType",
+    "Table",
+    "Text",
+    "Toggle",
+    "FontChoice",
+    "PageLayout",
+    "Report",
+    "ReportFormatting",
+    "ReportWidth",
+    "TextAlignment",
+    "Params",
+    "Result",
+    "_report",
+    "_reset_runtime",
+    "by_datapane",
+    "App",
+    "Environment",
+    "File",
+    "Run",
+    "Schedule",
+    "hello_world",
+    "login",
+    "logout",
+    "ping",
+    "signup",
+]

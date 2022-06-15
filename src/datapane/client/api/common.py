@@ -23,7 +23,7 @@ import requests
 from furl import furl
 from munch import Munch, munchify
 from packaging.version import Version
-from requests import HTTPError, Response  # noqa: F401
+from requests import HTTPError, Response
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import _TEST_ENV, __version__
@@ -32,7 +32,10 @@ from datapane.client.utils import IncompatibleVersionError, ReportTooLargeError,
 from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
-__all__ = []
+__all__ = [
+    "HTTPError",
+    "Response",
+]
 
 ################################################################################
 # Tmpfile handling

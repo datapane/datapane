@@ -97,7 +97,7 @@ class Bundler(SdistBuilder):
 
     # TODO - this should be handled by recursive globbing when added to flit
     def drop_unrequired_files(self, f: str) -> bool:
-        return any((d in f for d in DROP_DIRS))
+        return any(d in f for d in DROP_DIRS)
 
     def apply_includes_excludes(self, files) -> t.List[str]:
         """Modify upstream to drop files from hardcoded drop filters"""
