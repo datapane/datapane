@@ -184,7 +184,7 @@ def ast_validation(node):
 class OverriddenBuiltins(dict):
     def __getitem__(self, name):
         if name in ENVIRON_CONFIG["banned_builtins"]:
-            raise RuntimeError("Illegal builtin {}".format(name))
+            raise RuntimeError(f"Illegal builtin {name}")
         return super().__getitem__(name)
 
 

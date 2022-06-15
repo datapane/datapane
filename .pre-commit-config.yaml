@@ -22,6 +22,10 @@ repos:
         # The following seems to be necessary for isort to get imports grouped correctly,
         # possibly related to https://github.com/PyCQA/isort/issues/1872
         entry: isort --sp .isort.cfg
+  - repo: https://github.com/ikamensh/flynt/
+    rev: '0.76'
+    hooks:
+      - id: flynt
   - repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
