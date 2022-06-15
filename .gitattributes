@@ -1,8 +1,6 @@
 # large text files
 *.csv filter=lfs diff=lfs merge=lfs text
 *.psv filter=lfs diff=lfs merge=lfs text
-package-lock.json filter=lfs diff=lfs merge=lfs text
-poetry.lock filter=lfs diff=lfs merge=lfs text
 
 # binaries
 *.csv.gz filter=lfs diff=lfs merge=lfs -text
