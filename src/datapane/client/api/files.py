@@ -267,7 +267,7 @@ plots = [
     MatplotAxesPlot,
     MatplotNDArrayPlot,
     FoliumPlot,
-    PlotapiPlot
+    PlotapiPlot,
 ]
 
 
