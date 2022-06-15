@@ -6,8 +6,8 @@ from typing import ContextManager
 import pytest
 
 from datapane.client.api import HTTPError
-from datapane.client.api.dp_object import U
 from datapane.client.api.builtins import gen_df, gen_plot  # noqa
+from datapane.client.api.dp_object import U
 
 code: str = """
 print("hello world")

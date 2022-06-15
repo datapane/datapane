@@ -154,10 +154,10 @@ def build_demo_report() -> Report:
     """
 
     import altair as alt  # noqa
+    import folium  # noqa
     import matplotlib.pyplot as plt  # noqa
     import plotly.graph_objects as go  # noqa
     from bokeh.plotting import figure  # noqa
-    import folium  # noqa
 
     def gen_bokeh(**kw):
         p = figure(title="simple line example", x_axis_label="x", y_axis_label="y", **kw)

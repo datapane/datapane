@@ -1,7 +1,8 @@
 # Based on the example from hello.py
 import altair as alt
-import datapane as dp
 from vega_datasets import data
+
+import datapane as dp
 
 source = data.cars()
 

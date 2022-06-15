@@ -21,26 +21,23 @@ ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
 _USING_CONDA = os.path.exists(os.path.join(sys.prefix, "conda-meta", "history"))
 
 
-# Other useful re-exports
-from .common.utils import enable_logging, log, _setup_dp_logging
-
 # Public API re-exports
 from .client.api import (
+    HTML,
+    App,
     Attachment,
-    Media,
     BigNumber,
     Code,
     DataTable,
     Divider,
     Embed,
     Empty,
+    Environment,
     File,
-    Group,
     FontChoice,
     Formula,
-    HTML,
+    Group,
     Media,
-    Text,
     Page,
     PageLayout,
     Params,
@@ -51,24 +48,25 @@ from .client.api import (
     Result,
     Run,
     Schedule,
-    App,
     Select,
     SelectType,
     Table,
     Text,
     TextAlignment,
     Toggle,
-    Environment,
+    builtins,
     by_datapane,
-    signup,
+    hello_world,
     login,
     logout,
     ping,
-    hello_world,
-    builtins,
+    signup,
 )
 from .client.config import init
-from .common.dp_types import DPMode, set_dp_mode, get_dp_mode
+from .common.dp_types import DPMode, get_dp_mode, set_dp_mode
+
+# Other useful re-exports
+from .common.utils import _setup_dp_logging, enable_logging, log
 
 script_name = sys.argv[0]
 script_exe = Path(script_name).stem
@@ -85,8 +83,8 @@ else:
 if get_dp_mode() == DPMode.LIBRARY:
     init()
     # parse any commandline params
-    from .client.utils import parse_command_line
     from .client.api.runtime import Params
+    from .client.utils import parse_command_line
 
     config = parse_command_line()
     Params.replace(config)

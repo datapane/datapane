@@ -1,26 +1,26 @@
 # flake8: noqa isort:skip
 import os
+import subprocess
 import sys
 from pathlib import Path
 from unittest import mock
-import subprocess
 
 import pytest
 
 if not (sys.platform == "linux" and sys.version_info.minor >= 7):
     pytest.skip("skipping linux-only 3.7+ tests", allow_module_level=True)
 
-import datapane as dp
 import typing as t
+
+import datapane as dp
+from datapane.client.api.common import DPTmpFile
 from datapane.client.api.runtime import _report
-from datapane.client.apps import build_bundle, DatapaneCfg
-from datapane.common.config import RunnerConfig
+from datapane.client.apps import DatapaneCfg, build_bundle
 from datapane.common import SDict, SSDict
+from datapane.common.config import RunnerConfig
 from datapane.runner import __main__ as m
 from datapane.runner.exec_script import exec_mod
 from datapane.runner.typedefs import RunResult
-
-from datapane.client.api.common import DPTmpFile
 
 # disabled for now - may re-enable when we support local
 # running/rendering with our runner calling into user code

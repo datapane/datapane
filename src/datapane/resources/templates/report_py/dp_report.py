@@ -1,7 +1,8 @@
 # Sample Datapane Report - {{ name }}
 
-import pandas as pd
 import altair as alt
+import pandas as pd
+
 import datapane as dp
 
 # download data & group by manufacturer

@@ -47,34 +47,32 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
 # Internal API re-exports
 import warnings
 
+from ..config import init
+from ..utils import IncompatibleVersionError
+from . import builtins
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .report.blocks import (
+    HTML,
     Attachment,
     BigNumber,
     Code,
-    Group,
     DataTable,
     Divider,
     Embed,
     Empty,
-    Media,
     Formula,
-    HTML,
+    Group,
     Media,
     Page,
     Plot,
     Select,
     SelectType,
-    Text,
     Table,
+    Text,
     Toggle,
 )
 from .report.core import FontChoice, PageLayout, Report, ReportFormatting, ReportWidth, TextAlignment
-from .runtime import Params, Result, by_datapane, _reset_runtime, _report
+from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup
-from ..utils import IncompatibleVersionError
-from ..config import init
-
-from . import builtins

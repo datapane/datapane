@@ -9,7 +9,7 @@ import datapane as dp
 from datapane.client import apps as sc
 from datapane.client.api import HTTPError
 
-from .common import deletable, gen_name, check_name
+from .common import check_name, deletable, gen_name
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
