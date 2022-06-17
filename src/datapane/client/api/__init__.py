@@ -46,9 +46,7 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
 # Internal API re-exports
 import warnings
 
-from ..config import init
 from ..utils import IncompatibleVersionError
-from . import builtins
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .report.blocks import (
@@ -75,6 +73,9 @@ from .report.core import FontChoice, PageLayout, Report, ReportFormatting, Repor
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import App, Environment, File, Run, Schedule
 from .user import hello_world, login, logout, ping, signup
+
+from ..config import init  # isort:skip  otherwise circular import issue
+from . import builtins  # isort:skip
 
 __all__ = [
     "warnings",

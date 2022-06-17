@@ -20,6 +20,9 @@ ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
 _USING_CONDA = os.path.exists(os.path.join(sys.prefix, "conda-meta", "history"))
 
 
+# Other useful re-exports
+from .common.utils import _setup_dp_logging, enable_logging, log  # isort:skip  otherwise circular import issue
+
 # Public API re-exports
 from .client.api import (
     HTML,
@@ -63,9 +66,6 @@ from .client.api import (
 )
 from .client.config import init
 from .common.dp_types import DPMode, get_dp_mode, set_dp_mode
-
-# Other useful re-exports
-from .common.utils import _setup_dp_logging, enable_logging, log
 
 __all__ = [
     "HTML",
