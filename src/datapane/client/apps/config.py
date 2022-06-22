@@ -170,6 +170,7 @@ def extract_py_notebook(in_file: Path) -> str:
     # convert it
     conv = nbconvert.PythonExporter(config=c)
     (body, resources) = conv.from_notebook_node(notebook)
+    body = body.rstrip() + "\n"  # Conversion oddity normalized
     # (body, resources) = conv.from_filename(str(in_file))
     # write the notebook
     # writer = nbconvert.writers.FilesWriter()
@@ -178,7 +179,9 @@ def extract_py_notebook(in_file: Path) -> str:
     # TODO - use nbconvert jinja support once v6 supports custom templates properly
     # postprocess body
     # we need to mock get_ipython as nbconvert doesn't comment it out
-    header = """# inject get_ipython mock for magic functions
+    header = """# flake8: noqa:F401 isort:skip_file
+# fmt:off
+# inject get_ipython mock for magic functions
 from unittest.mock import Mock
 get_ipython = Mock()
 """
