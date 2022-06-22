@@ -16,7 +16,7 @@ repos:
     rev: v2.34.0
     hooks:
       - id: pyupgrade
-        entry: pyupgrade --py3-plus --py36-plus --keep-runtime-typing
+        entry: pyupgrade --py3-plus --py36-plus --py37-plus --keep-runtime-typing
   # Run flake8 & isort on files using .flake8 and .isort.cfg config
   - repo: https://github.com/pycqa/isort
     # (we prefer isort to flake8-isort because it sorts things for you rather than just checking)
