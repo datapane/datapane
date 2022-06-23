@@ -1,0 +1,15 @@
+site_name: Datapane Docs
+
+theme:
+  name: material
+
+plugins:
+  - mknotebooks
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
