@@ -1,151 +1,79 @@
+import datapane as dp
+
 import altair as alt
 from vega_datasets import data
 
-import datapane as dp
+df = data.iris()
+fig = alt.Chart(df).mark_point().encode(x="petalLength:Q", y="petalWidth:Q", color="species:N")
 
-source = data.cars()
-
-plot1 = (
-    alt.Chart(source)
-    .mark_circle(size=60)
-    .encode(
-        x="Horsepower",
-        y="Miles_per_Gallon",
-        color="Origin",
-        tooltip=["Name", "Origin", "Horsepower", "Miles_per_Gallon"],
-    )
-    .interactive()
-)
 
 report = dp.Report(
     dp.Text(
         """
-## Introduction
+# Hello world
 
-Datapane is an SDK which makes it fast and simple to generate data reports, dashboards, and apps from Python.
+Welcome to [Datapane](https://datapane.com)! Built for data developers, Datapane makes it simple to create beautiful reports from anywhere we can run Python.
 
-Reports can be exported as standalone HTML documents (this guide itself is a Datapane report 😉), or hosted on our platform, where they can be shared via a link or embedded in your application.
-"""
+Reports can be exported as standalone HTML documents or hosted on Datapane Cloud, where they can be shared via a link or embedded.
+
+This [_Hello world_](https://github.com/datapane/datapane/blob/master/src/datapane/resources/templates/hello/hello.py) page itself was generated with Datapane!
+        """
     ),
     dp.Text(
         """
-## Hello world
+## Our first Report
 
-Let's start with a minimal example to understand the basic flow (feel free to copy-paste this code and follow along in your IDE or notebook).  Imagine you have an existing notebook where you've analysed and charted some data:
-"""
+Let’s create a simple report! In this scenario, we have a dataset and visualization that we need to share with our colleagues.
+        """
     ),
     dp.Code(
         """
 import altair as alt
 from vega_datasets import data
 
-source = data.cars()
-
-plot1 = alt.Chart(source).mark_circle(size=60).encode(
-  x='Horsepower',
-  y='Miles_per_Gallon',
-  color='Origin',
-  tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
-).interactive()"""
+df = data.iris()
+fig = (
+    alt.Chart(df)
+    .mark_point()
+    .encode(x="petalLength:Q", y="petalWidth:Q", color="species:N")
+)
+        """
     ),
     dp.Text(
         """
-To share this with someone non-technical, you'd typically send them a raw notebook file or put screenshots in a presentation. Instead, let's build an interactive report using Datapane - just add the following lines:
-"""
+        Datapane makes generating a report simple – all it takes is the following.
+        """
     ),
     dp.Code(
         """
 import datapane as dp
 
 report = dp.Report(
-    dp.Plot(plot1),
-    dp.DataTable(source)
+    dp.Plot(fig),
+    dp.DataTable(df)
 )
 
-report.save(path="Hello_world.html")"""
+report.save(path="my_report.html")
+        """
     ),
     dp.Text(
         """
-After we import the library, we create a report object, wrap our chart in a Plot block, dataframe in a DataTable block, then save as a standalone HTML document. Now users can open this report in their browser and interact with these objects:
-"""
+This will generate an HTML file, `my_report.html`, containing our interactive report:
+        """
     ),
-    dp.Plot(plot1),
-    dp.DataTable(source),
+    dp.Plot(fig),
+    dp.DataTable(df),
     dp.Text(
         """
-## A more complex example
+We can now open our standalone HTML report with a web browser and email it to our colleagues who can do the same. 
 
-Datapane also has a lot of pre-built components for layout and interactivity, which can help you present more complex data. Let's explore some of these:
-"""
-    ),
-    dp.Code(
-        """
-import altair as alt
-from vega_datasets import data
-import datapane as dp
+But what if we want to send a link to our report or embed it instead?
 
-source = data.cars()
+## Datapane Cloud makes it simple to share
 
-plot1 = alt.Chart(source).mark_circle(size=60).encode(
-  x='Horsepower',
-  y='Miles_per_Gallon',
-  color='Origin',
-  tooltip=['Name', 'Origin', 'Horsepower', 'Miles_per_Gallon']
-).interactive()
+Datapane Cloud is free! Share reports privately, or embed them into platforms like Salesforce and Medium.
 
-report = dp.Report(
-  dp.Formula("x^2 + y^2 = z^2"),
-  dp.Group(
-      dp.BigNumber(
-          heading="Number of percentage points",
-          value="84%",
-          change="2%",
-          is_upward_change=True
-      ),
-      dp.BigNumber(
-          heading="Simple Statistic",
-          value=100
-      ), columns=2
-  ),
-  dp.Select(
-      dp.Plot(plot1, label="Chart"),
-      dp.DataTable(source, label="Data")
-  ),
-)
-
-report.save(path="Layout_example.html")"""
-    ),
-    dp.Text(
-        """
-The syntax is pretty similar, except Select and Group blocks allow you to nest other blocks inside. This is helpful when you need a non-linear or dashboard layout.
-
-Running that code generates the following report: """
-    ),
-    dp.Formula("x^2 + y^2 = z^2"),
-    dp.Group(
-        dp.BigNumber(heading="Number of percentage points", value="84%", change="2%", is_upward_change=True),
-        dp.BigNumber(heading="Simple Statistic", value=100),
-        columns=2,
-    ),
-    dp.Select(
-        dp.Plot(plot1, label="Chart"),
-        dp.DataTable(source, label="Data"),
-    ),
-    dp.Text(
-        """
-These are great ways to add interactivity to your report with minimal effort. Spice things up even further by adding pages, HTML blocks, images and more.
-
-## Hosting Reports
-
-### Sign up for Datapane Cloud
-
-In addition to saving documents locally, you can use [Datapane Cloud](https://datapane.com/product/cloud) to host and share your reports.
-
-- Create private workspaces to share your reports securely
-- Embed reports in places like Medium, Notion, or your own website (see [here](https://docs.datapane.com/reports/embedding-reports-in-social-platforms))
-- Viewers can explore and download your data with additional DataTable analysis features
-
-To get your free API key, run the following command:
+To get a free API key, run the following command:
 """
     ),
     dp.Select(
@@ -154,26 +82,28 @@ To get your free API key, run the following command:
     ),
     dp.Text(
         """
-Once you've completed signup, your API key will be stored in your environment (you can also see it in your [profile](https://datapane.com/settings/).
-
-Now, just change `report.save` to `report.upload` in your code and your report will be pushed to Datapane Cloud: """
+Once we've completed signup, [the API key](https://datapane.com/settings/) will be stored in the current environment.
+        """
     ),
     dp.Code(
         """
-# report.save(path="Hello_world.html")
-
-report.upload(name="Hello world")"""
+report.upload(name="My report")
+        """
     ),
     dp.Text(
         """
-This will generate a report URL which you can send to someone else or paste into another platform for embedding.
+By using `upload()` in place of `save()`, our report is uploaded to Datapane Cloud and a shareable link is generated. 
 
-## Next Steps
+We can now send this link to our colleagues or use it to embed our report on another platform.
 
-- [Sign up for a Datapane Cloud account](https://datapane.com/accounts/signup/)
+## Next steps
+
+There's so much more we can do with Datapane!
 - [Read the documentation](https://docs.datapane.com)
-- [Browse the API docs](https://datapane.github.io/datapane/)
-- [Join the community on GitHub Discussions](https://github.com/datapane/datapane/discussions)"""
+- [Explore our community spaces](https://datapane.com/community)
+- [We're open-source – browse the Datapane repo](https://github.com/datapane/datapane)
+- [Sign up for a Datapane Cloud account](https://datapane.com/accounts/signup/)
+"""
     ),
 )
 
@@ -183,4 +113,4 @@ report.save(
 )
 
 # You can also upload your report to a Datapane Server by logging in then running the following
-# report.upload(name="hello")
+# report.upload(name="hello-world", open=True)
