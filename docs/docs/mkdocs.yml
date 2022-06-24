@@ -1,4 +1,7 @@
 site_name: Datapane Docs 
+repo_url: https://github.com/datapane/datapane
+repo_name: datapane/datapane
+copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 extra_css:
   - stylesheets/extra.css
@@ -41,6 +44,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra:
+  generator: false
   social:
     - icon: fontawesome/brands/github 
       link: https://github.com/datapane/datapane
