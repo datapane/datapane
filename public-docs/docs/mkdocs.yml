@@ -1,16 +1,35 @@
-site_name: Datapane Docs 
-repo_url: https://github.com/datapane/datapane
+site_name: Datapane Docs
 repo_name: datapane/datapane
+repo_url: https://github.com/datapane/datapane
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
-extra_css:
-  - stylesheets/extra.css
+nav:
+  - Overview: index.md
+  - Concepts:
+    - concepts/index.md
+    - ""
+  - Tutorials:
+    - ""
+  - Guides:
+    - ""
+  - Reference:
+    - ""
 
 theme:
   name: material
-  logo: asset/img/logo.png
-  palette:
+  logo: img/logo.png
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - navigation.indexes
+    # - navigation.tabs
+    # - navigation.tabs.sticky
+    #- navigation.expand
 
+  #   - navigation.instant
+  palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -24,7 +43,13 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: img/favicon.png
 
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - mknotebooks
@@ -33,7 +58,7 @@ plugins:
   # Currently a sponsor-only feature
   # - social:
   #     cards_color:
-  #       fill: "#131329" 
+  #       fill: "#131329"
   #       text: "#F2F2FD"
 
 markdown_extensions:
@@ -46,11 +71,11 @@ markdown_extensions:
 extra:
   generator: false
   social:
-    - icon: fontawesome/brands/github 
+    - icon: fontawesome/brands/github
       link: https://github.com/datapane/datapane
-    - icon: fontawesome/brands/discourse 
+    - icon: fontawesome/brands/discourse
       link: https://forum.datapane.com/
-    - icon: fontawesome/brands/discord 
+    - icon: fontawesome/brands/discord
       link: https://chat.datapane.com/
-    - icon: fontawesome/brands/twitter 
+    - icon: fontawesome/brands/twitter
       link: https://twitter.com/datapaneapp
