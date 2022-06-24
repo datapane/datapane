@@ -25,6 +25,13 @@ theme:
 
 plugins:
   - mknotebooks
+  - search:
+      lang: en
+  # Currently a sponsor-only feature
+  # - social:
+  #     cards_color:
+  #       fill: "#131329" 
+  #       text: "#F2F2FD"
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -33,3 +40,13 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/datapane/datapane
+    - icon: fontawesome/brands/discourse 
+      link: https://forum.datapane.com/
+    - icon: fontawesome/brands/discord 
+      link: https://chat.datapane.com/
+    - icon: fontawesome/brands/twitter 
+      link: https://twitter.com/datapaneapp
