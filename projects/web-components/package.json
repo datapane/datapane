@@ -15,7 +15,8 @@
         "test:org": "node_modules/.bin/cypress run --spec \"cypress/e2e/org/*\"",
         "test:open": "node_modules/.bin/cypress open --browser electron",
         "typecheck": "node_modules/.bin/vue-tsc --noEmit",
-        "storybook": "start-storybook -p 6006"
+        "storybook": "start-storybook -p 6006",
+        "build:storybook": "node --max_old_space_size=16384 node_modules/.bin/build-storybook -o dist/storybook"
     },
     "dependencies": {
         "@bokeh/bokehjs": "~2.4.2",
@@ -39,7 +40,6 @@
         "he": "^1.2.0",
         "highlight.js": "^11.4.0",
         "htmx.org": "^1.7.0",
-        "http-proxy-middleware": "^2.0.4",
         "iframe-resizer": "^4.3.2",
         "jquery": "^3.6.0",
         "katex": "^0.16.0",
@@ -64,6 +64,7 @@
     },
     "devDependencies": {
         "@babel/core": "^7.17.8",
+        "@mdx-js/react": "^2.1.2",
         "@rollup/plugin-replace": "^4.0.0",
         "@storybook/addon-actions": "^6.4.19",
         "@storybook/addon-essentials": "^6.4.19",
