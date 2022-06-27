@@ -28,3 +28,11 @@ md-nav__title {
   --md-primary-fg-color: #7571F1;
   --md-accent-fg-color: #7CDDFA;
 }
+
+.org {
+  color: #4340B1;
+}
+
+.input code, .input pre {
+  background-color: var(--md-code-bg-color) !important;
+}

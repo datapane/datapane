@@ -4,14 +4,21 @@ repo_url: https://github.com/datapane/datapane
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
-  - Overview: index.md
+  - Overview: "index.md"
   - Concepts:
-    - concepts/index.md
-    - ""
+    - Datapane CLI: "concepts/datapane.md"
+    - Datapane Cloud: "concepts/datapane-jl.ipynb"
+    - Datapane Teams: ""
+    - Reports: ""
+    - Blocks: ""
+    - Functions: ""
+
   - Tutorials:
-    - ""
+    - Install Datapane: ""
+    - Create a report: ""
+    - Upload a report to the cloud: ""
   - Guides:
-    - ""
+    - "guides/how-to-do-something.md"
   - Reference:
     - ""
 
@@ -52,9 +59,19 @@ extra_css:
   - stylesheets/extra.css
 
 plugins:
-  - mknotebooks
+  - mknotebooks:
+      tag_remove_configs:
+        remove_cell_tags:
+          - remove_cell
+        remove_all_outputs_tags:
+          - remove_all_output
+        remove_single_output_tags:
+          - remove_single_output
+        remove_input_tags:
+          - remove_input
   - search:
       lang: en
+  #- tags
   # Currently a sponsor-only feature
   # - social:
   #     cards_color:
@@ -67,6 +84,19 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - meta
+  - admonition
+  - abbr
+  - def_list
+  - footnotes
+  - attr_list
+  #- md_in_html
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
 
 extra:
   generator: false
