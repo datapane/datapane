@@ -5,10 +5,14 @@ description = "Datapane Docs"
 authors = ["Datapane <info@datapane.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.11.0"
 jupyterlab = "^3.4.3"
 mkdocs-material = "^8.3.7"
 mknotebooks = "^0.7.1"
+pyppeteer = "^1.0.2"
+datapane = "^0.14.0"
+nest-asyncio = "^1.5.5"
+dpdocsutils = {path = "dpdocsutils"}
 
 [tool.poetry.dev-dependencies]
 
