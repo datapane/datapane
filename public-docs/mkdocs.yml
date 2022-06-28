@@ -4,23 +4,24 @@ repo_url: https://github.com/datapane/datapane
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
-  - Overview: "index.md"
+  - Introduction: "index.md"
+  - Quickstart: "quickstart.ipynb"
   - Concepts:
-    - Datapane CLI: "concepts/datapane.md"
-    - Datapane Cloud: "concepts/datapane-jl.ipynb"
-    - Datapane Teams: ""
-    - Reports: ""
-    - Blocks: ""
-    - Functions: ""
+      - Datapane CLI: "concepts/datapane.md"
+      - Datapane Cloud: "concepts/datapane-jl.ipynb"
+      - Datapane Teams: ""
+      - Reports: ""
+      - Blocks: ""
+      - Functions: ""
 
   - Tutorials:
-    - Install Datapane: ""
-    - Create a report: ""
-    - Upload a report to the cloud: ""
+      - Install Datapane: ""
+      - Create a report: ""
+      - Upload a report to the cloud: ""
   - Guides:
-    - "guides/how-to-do-something.md"
+      - "guides/how-to-do-something.md"
   - Reference:
-    - ""
+      - ""
 
 theme:
   name: material
@@ -31,11 +32,7 @@ theme:
     - navigation.tracking
     - toc.follow
     - navigation.indexes
-    # - navigation.tabs
-    # - navigation.tabs.sticky
-    #- navigation.expand
-
-  #   - navigation.instant
+    - content.tabs.link
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -43,7 +40,6 @@ theme:
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
@@ -60,6 +56,7 @@ extra_css:
 
 plugins:
   - mknotebooks:
+      enable_default_jupyter_cell_styling: false
       tag_remove_configs:
         remove_cell_tags:
           - remove_cell
@@ -84,19 +81,20 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - meta
   - admonition
   - abbr
   - def_list
   - footnotes
   - attr_list
-  #- md_in_html
+  - md_in_html
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
-
 
 extra:
   generator: false
