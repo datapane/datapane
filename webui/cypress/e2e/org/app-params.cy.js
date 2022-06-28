@@ -38,7 +38,7 @@ describe("Using an app's parameters", () => {
         cy.get("label:contains('__LIST__REQUIRED__')")
             .siblings()
             .as("siblings")
-            .find(".bp3-tag-remove")
+            .find(".bp4-tag-remove")
             .click();
         checkErrorExists();
     });
