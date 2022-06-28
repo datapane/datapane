@@ -1,17 +1,31 @@
-# Welcome to MkDocs
+# Welcome to the Datapane documentation!
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+<div class="result" markdown>
+<div class="grid cards" markdown>
 
-## Commands
+-   :material-lightbulb-on-10:{ .lg .middle } __Concepts__
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+    ---
 
-## Project layout
+    [:octicons-arrow-right-24: Read explanations of Datapane-specific concepts](#)
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+-   :material-format-list-numbered:{ .lg .middle } __Tutorials__
+
+    ---
+
+    [:octicons-arrow-right-24: Learn how to use Datapane through short exercises](#)
+
+-   :material-navigation-variant-outline:{ .lg .middle } __Guides__
+
+    ---
+
+    [:octicons-arrow-right-24: Follow how-to guides that solve real-world problems](#)
+
+-   :material-view-list:{ .lg .middle } __Reference__
+
+    ---
+
+    [:octicons-arrow-right-24: View the technical descriptions of the API and how to operate it](#)
+
+</div>
+</div>
