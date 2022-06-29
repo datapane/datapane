@@ -99,3 +99,39 @@ repos:
       # disallow directly committing to the specified branches
       # - id: no-commit-to-branch
       #  args: [--branch, master]
+
+  # JS formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v2.2.1"
+    hooks:
+      - id: prettier
+        exclude_types: [yaml]
+        exclude: '^(dp-server|.github|datapane/src/datapane/resources|email-templates)/.+$'
+        args: [--with-node-modules]
+  # JS linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: "v7.20.0"
+    hooks:
+      - id: eslint
+        #exclude: '^(dp-server|tasks|email-templates)/'
+        #files: \.(js|jsx|ts|tsx)$
+        # only run for JS files in fe-components
+        files: ^(report|base)/\S+\.(js|ts|vue)$
+        types: [text, file, non-executable]
+        additional_dependencies:
+          - eslint@6.8.0
+          - babel-eslint@10.0.1
+          - "@typescript-eslint/eslint-plugin@1.x"
+          - "@typescript-eslint/parser@1.9.0"
+          - typescript@3.x
+          - eslint-plugin-flowtype@2.50.3
+          - eslint-plugin-import@2.17.3
+          - tslint@5.20.0
+          - eslint-plugin-vue@v7.5.0
+          - "@typescript-eslint/eslint-plugin-tslint@2.4.0"
+  # sh shellcheck
+  - repo: https://github.com/detailyang/pre-commit-shell
+    rev: "v1.0.6"
+    hooks:
+      - id: shell-lint
+        args: []
