@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://datapane.com">Datapane.com</a> |
   <a href="https://docs.datapane.com">Docs</a> |
-  <a href="https://twitter.com/datapaneapp">Twitter</a> |
+      <a href="https://datapane.com/showcase">Examples</a> |
   <a href="https://forum.datapane.com">Forums</a>   | <a href="https://chat.datapane.com">Discord</a>
 </p>
 <p align='center'>
@@ -32,14 +32,14 @@ Love analyzing data in Python but struggle to share results and insights? Datapa
 
 <p align="center">
   <a href="https://datapane.com">
-    <img src="https://user-images.githubusercontent.com/3541695/176245723-3874bf39-b2c3-42e0-802c-6d8176e7b7d2.png"  width='75%'>
+    <img src="https://user-images.githubusercontent.com/3541695/176545400-919a327d-ddee-4755-b29f-bf85fbfdb4ef.png"  width='75%'>
   </a>
 </p>
 
 ### What makes Datapane special?
 
 - **Static generation:** Sharing a report shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
-- **API-first and programmatic:** Programmatically generate reports from inside of Spark, Airflow, or Jupyter. Schedule updates to build realtime dashboards.
+- **API-first and programmatic:** Programmatically generate reports from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
 - **Dynamic front-end components**: Say goodbye to writing HTML. Build reports from a set of interactive components, like DataTables, tabs, and selects.
 
 # Getting Started
@@ -52,14 +52,12 @@ The best way to install Datapane is through pip or conda.
 
 ```
 $ pip3 install -U datapane
-$ datapane hello-world
 ```
 
 #### conda
 
 ```
 $ conda install -c conda-forge "datapane>=0.14.0"
-$ datapane hello-world
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
@@ -72,11 +70,12 @@ Datapane also works well in hosted Jupyter environments such as Colab or Binder,
 
 ### 📊 Include plots and data
 
-Create a report from pandas DataFrames, plots from your favourite libraries, and text. 
+Create a report from pandas DataFrames, plots from your favorite libraries, and text. 
 
 <p>
     
 <img width='485px' align='left' alt="Simple Datapane report example with text, plot and table" src="https://user-images.githubusercontent.com/3541695/176251650-f49ea9f8-3cd4-4eda-8e78-ccba77e8e02f.png">
+
 <p>
 
 ```python
@@ -117,13 +116,14 @@ Add dropdowns, selects, grid, pages, and 10+ other blocks to make your reports d
 
 ...
 
-
 dp.Report(
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(
         dp.BigNumber(
             heading="Number of percentage points", 
-            value="84%", change="2%", is_upward_change=True
+            value="84%", 
+            change="2%", 
+            is_upward_change=True
         ),
         dp.BigNumber(
             heading="Simple Statistic", value=100
@@ -134,6 +134,7 @@ dp.Report(
         dp.DataTable(df, label="Data")
     ),
 ).save(path="Layout_example.html")
+
 ```
   
 </p>
@@ -174,7 +175,7 @@ dp.Report(
 
 # Demos and Examples
 
-Here a few samples of the top reports created by the Datapane community. To see more, check out our [gallery](https://datapane.com/gallery) section.
+Here a few samples of the top reports created by the Datapane community.
 
 - [Coindesk analysis](https://datapane.com/u/greg/reports/initial-coindesk-article-data/) by Greg Allan
 - [COVID-19 Trends by Quarter](https://datapane.com/u/keith8/reports/covid-19-trends-by-quarter/) by Keith Johnson
