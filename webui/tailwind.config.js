@@ -102,15 +102,16 @@ module.exports = {
         // FE files
         "./report/src/**/*.{vue,js,ts}",
         "./base/src/**/*.{vue,js,ts}",
-        "../fe-components/src/**/*.{js,ts,tsx}",
-        // BE files
-        "../dp-server/src/dp/apps/dp_core/templates/**/*.html",
-        "../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
-        "../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
-        "../dp-server/src/dp/apps/dp_org/templates/**/*.html",
-        "../dp-server/src/dp/apps/dp_public/templates/**/*.html",
-        "../dp-server/templates/**/*.html",
         "./node_modules/@variantjs/**/*.ts",
+
+        // BE files
+        "../../fe-components/src/**/*.{js,ts,tsx}",
+        "../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
+        "../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
+        "../../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
+        "../../dp-server/src/dp/apps/dp_org/templates/**/*.html",
+        "../../dp-server/src/dp/apps/dp_public/templates/**/*.html",
+        "../../dp-server/templates/**/*.html",
     ],
     safelist: [
         { pattern: /grid-cols-.*/ },
