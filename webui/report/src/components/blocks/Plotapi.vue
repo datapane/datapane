@@ -10,8 +10,10 @@ const iframeId = `iframe_${uuid4()}`;
 
 // Unescape script tags when embedding
 const iframeDoc: ComputedRef<string> = computed(() => {
-    return p.iframeContent
-        .replace("<body>", `<body><script>${contentWindowJs}<\/script>`)
+    return p.iframeContent.replace(
+        "<body>",
+        `<body><script>${contentWindowJs}<\/script>`
+    );
 });
 
 onMounted(() => {
