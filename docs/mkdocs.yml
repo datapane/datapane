@@ -20,9 +20,9 @@ nav:
       - Upload a report to the cloud: ""
       - Tables and data: "tutorials/tables-and-data.ipynb"
       - Plots and visualizations: "tutorials/plots-and-visualizations.ipynb"
-      - Text and HTML: ""
-      - Layout and pages: ""
-      - Media and embeds: ""
+      - Text and HTML: "tutorials/text-code-and-html.ipynb"
+      - Layout and pages: "tutorials/layout-and-customization.ipynb"
+      - Media and embeds: "tutorials/media-attachments-and-embeds.ipynb"
   - Guides:
       - "guides/how-to-do-something.md"
   - Reference:
