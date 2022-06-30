@@ -3,6 +3,7 @@ import subprocess
 import asyncio
 import nest_asyncio
 from pyppeteer import launch
+from IPython.display import IFrame
 
 nest_asyncio.apply()
 
@@ -27,3 +28,7 @@ def report_to_image(report_path, image_path, width, height):
     asyncio.get_event_loop().run_until_complete(
         screenshot_html(report_path, image_path, width, height)
     )
+
+
+def embed_local_report(report_path, width, height):
+    return IFrame(report_path, width=width, height=height)
