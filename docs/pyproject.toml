@@ -5,8 +5,8 @@ description = "Datapane Docs"
 authors = ["Datapane <info@datapane.com>"]
 
 [tool.poetry.dependencies]
+pyarrow = ">=6.0.0, < 7.0.0"
 python = ">=3.10,<3.11.0"
-datapane = {path = "/Users/shahin/Documents/datapane-hosted/datapane"} # until next release
 jupyterlab = "^3.4.3"
 mkdocs-material = "^8.3.7"
 mknotebooks = "^0.7.1"
@@ -17,9 +17,12 @@ altair = "^4.0.0"
 vega-datasets = ">=0.9.0,<1.0.0"
 matplotlib = "^3.0.0"
 plotly = ">=4.0.0,<6.0.0"
-bokeh = "2.2" # next release: bokeh = "~2.4.2"
+bokeh = "~2.4.2"
 folium = "0.12.*"
-plotapi = "^5.1.0"
+plotapi = "^5.0.0"
+seaborn = "^0.11.2"
+datapane = { path = "/Users/shahin/Documents/datapane-hosted/datapane/dist/datapane-0.14.0-py3-none-any.whl", develop = true }
+
 
 [tool.poetry.dev-dependencies]
 
