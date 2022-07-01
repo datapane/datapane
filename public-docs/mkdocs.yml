@@ -62,8 +62,8 @@ nav:
         - Authentication and sharing: "concepts/datapane-teams/authentication-and-sharing.md"
         - Managing users: "concepts/datapane-teams/managing-users.md"
       - Support policy: "concepts/support-policy.md"
-  - Reference:
-      - ""
+  - Reference: 
+    - API reference: "https://datapane.github.io/datapane/"
 
 theme:
   name: material
