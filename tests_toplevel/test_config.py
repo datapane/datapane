@@ -28,7 +28,7 @@ def mock_analytics(mock_click_path):
 
     with mock.patch("datapane.client.analytics.posthog", autospec=True) as posthog, mock.patch(
         "datapane.client.analytics._NO_ANALYTICS", False
-    ), mock.patch("datapane.client.api.user.ping", autospect=True) as ping:
+    ), mock.patch("datapane.client.api.user.ping", autospec=True) as ping:
         ping.return_value = "joebloggs@datapane.com"
         yield (posthog, mock_click_path)
 
