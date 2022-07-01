@@ -19,6 +19,7 @@ nav:
       - Layout and pages: "tutorials/blocks/layout-and-customization.ipynb"
       - Media and embeds: "tutorials/blocks/media-attachments-and-embeds.ipynb"
     - Datapane Cloud ☁️:
+      - tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
       - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
