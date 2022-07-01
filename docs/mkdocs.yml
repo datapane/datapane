@@ -6,26 +6,61 @@ copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. 
 nav:
   - Introduction: "index.md"
   - Quickstart: "quickstart.ipynb"
-  - Concepts:
-      - Reports: "concepts/reports.ipynb"
-      - Blocks: "concepts/blocks.ipynb"
-      - Functions: ""
-      - Datapane CLI: "concepts/datapane.md"
-      - Datapane Cloud: "concepts/datapane-jl.ipynb"
-      - Datapane Teams: ""
 
   - Tutorials:
-      - Install Datapane: ""
-      - Create a report: ""
-      - Upload a report to the cloud: ""
-      - Blocks types 🧱:
-        - Tables and data: "tutorials/tables-and-data.ipynb"
-        - Plots and visualizations: "tutorials/plots-and-visualizations.ipynb"
-        - Text and HTML: "tutorials/text-code-and-html.ipynb"
-        - Layout and pages: "tutorials/layout-and-customization.ipynb"
-        - Media and embeds: "tutorials/media-attachments-and-embeds.ipynb"
+    - The basics 🌱:
+      - Install Datapane: "tutorials/basics/install-datapane.md"
+      - Create a report: "tutorials/basics/create-a-report.ipynb"
+    - Blocks types 🧱:
+      - tutorials/blocks/index.ipynb
+      - Tables and data: "tutorials/blocks/tables-and-data.ipynb"
+      - Plots and visualizations: "tutorials/blocks/plots-and-visualizations.ipynb"
+      - Text and HTML: "tutorials/blocks/text-code-and-html.ipynb"
+      - Layout and pages: "tutorials/blocks/layout-and-customization.ipynb"
+      - Media and embeds: "tutorials/blocks/media-attachments-and-embeds.ipynb"
+    - Datapane Cloud ☁️:
+      - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
+      - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
+      - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
+      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
+      - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
+      - Files: "tutorials/datapane-cloud/files.md"
+    - Styling and editing 🎨:
+      - tutorials/styling/index.md
+      - Styling: "tutorials/styling/styling.md"
+      - Adding source code: "tutorials/styling/adding-source-code.md"
+      - Global styling: "tutorials/styling/global-styling.md"
+    - Automation 🤖:
+      - tutorials/automation/index.md
+    - Apps 📦:
+      - tutorials/apps/index.md
+      - Parameters and forms: 
+        - "tutorials/apps/parameters-and-forms/index.md"
+        - Configuration: "tutorials/apps/parameters-and-forms/configuration.md"
+        - Parameters: "tutorials/apps/parameters-and-forms/parameters.md"
+      - Scheduled report runs: "tutorials/apps/scheduling.md"
+      - Environments and variables: "tutorials/apps/variables.md"
+      - Configuration and dependencies: "tutorials/apps/configuration-and-dependencies.md"
+      - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
+
+
   - Guides:
-      - "guides/how-to-do-something.md"
+      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots.ipynb"
+      - Sentiment Analysis for textual data: "guides/sentiment-analysis-for-textual-data.ipynb"
+      - Accessing data in Python: "guides/accessing-data-in-python.ipynb"
+
+  - Explanations:
+      # - Reports: "concepts/reports.ipynb"
+      # - Blocks: "concepts/blocks.ipynb"
+      # - Functions: ""
+      # - Datapane CLI: "concepts/datapane.md"
+      # - Datapane Cloud: "concepts/datapane-jl.ipynb"
+      - Datapane Teams: 
+        - "concepts/datapane-teams/index.md"
+        - Deployment and hosting: "concepts/datapane-teams/deployment-and-hosting.md"
+        - Authentication and sharing: "concepts/datapane-teams/authentication-and-sharing.md"
+        - Managing users: "concepts/datapane-teams/managing-users.md"
+      - Support policy: "concepts/support-policy.md"
   - Reference:
       - ""
 
@@ -39,6 +74,7 @@ theme:
     - toc.follow
     - navigation.indexes
     - content.tabs.link
+    #- toc.integrate
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
