@@ -3,6 +3,11 @@
 ## Plot
 [:octicons-organization-16: Enterprise feature](){.org}
 
+[Media and embeds](media-attachments-and-embeds.ipynb){ .md-button }
+
+
+
+
 - [x] Lorem ipsum dolor sit amet, consectetur adipiscing elit
 - [ ] Vestibulum convallis sit amet nisi a tincidunt
     * [x] In hac habitasse platea dictumst

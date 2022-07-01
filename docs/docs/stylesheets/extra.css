@@ -33,6 +33,10 @@ md-nav__title {
   color: #4340B1;
 }
 
+.beta {
+  color: #E7088E !important;
+}
+
 /* Input cells */
 .input code, .input pre {
   background-color: var(--md-code-bg-color) !important;
