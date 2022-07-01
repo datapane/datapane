@@ -70,10 +70,10 @@ Datapane also works well in hosted Jupyter environments such as Colab or Binder,
 
 ### 📊 Include plots and data
 
-Create a report from pandas DataFrames, plots from your favorite libraries, and text. 
+Create a report from pandas DataFrames, plots from your favorite libraries, and text.
 
 <p>
-    
+
 <img width='485px' align='left' alt="Simple Datapane report example with text, plot and table" src="https://user-images.githubusercontent.com/3541695/176251650-f49ea9f8-3cd4-4eda-8e78-ccba77e8e02f.png">
 
 <p>
@@ -88,8 +88,8 @@ fig = (
     alt.Chart(df)
     .mark_point()
     .encode(
-      x="petalLength:Q", 
-      y="petalWidth:Q", 
+      x="petalLength:Q",
+      y="petalWidth:Q",
       color="species:N"
     )
 )
@@ -99,16 +99,16 @@ report = dp.Report(
 )
 report.save(path="my_report.html")
 ```
-  
+
 </p>
 
 ### 🎛 Layout using interactive blocks
-Add dropdowns, selects, grid, pages, and 10+ other blocks to make your reports dynamic. 
+Add dropdowns, selects, grid, pages, and 10+ other blocks to make your reports dynamic.
 
 <p>
-    
+
 <img width='485px' align='left' alt="Complex layout" src="https://user-images.githubusercontent.com/3541695/176288321-44f7e76f-5032-434b-a3b0-ed7e3911b5d5.png">
-    
+
 <p >
 
 ```python
@@ -120,9 +120,9 @@ dp.Report(
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(
         dp.BigNumber(
-            heading="Number of percentage points", 
-            value="84%", 
-            change="2%", 
+            heading="Number of percentage points",
+            value="84%",
+            change="2%",
             is_upward_change=True
         ),
         dp.BigNumber(
@@ -136,7 +136,7 @@ dp.Report(
 ).save(path="Layout_example.html")
 
 ```
-  
+
 </p>
 </p>
 
@@ -165,7 +165,7 @@ In addition to saving documents locally or hosting them yourself, you can host a
 To get your API key, [create a free account](https://datapane.com/accounts/signup/).
 
 Next, in your Python notebook or script, change the `save` function to `upload`:
-  
+
 ```python
 dp.Report(
  ...
