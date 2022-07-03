@@ -1,7 +1,7 @@
 """Dataset Format handling"""
 import abc
 import enum
-from typing import IO, BinaryIO, Dict, Type, Union
+from typing import IO, Dict, Type, Union, cast
 
 import pandas as pd
 import pyarrow as pa
@@ -14,7 +14,7 @@ from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME
 from .utils import guess_encoding
 
 
-def write_table(table: pa.Table, sink: Union[str, BinaryIO]):
+def write_table(table: pa.Table, sink: Union[str, IO[bytes]]):
     """Write an arrow table to a file"""
     writer = RecordBatchFileWriter(sink, table.schema)
     writer.write(table)
@@ -49,11 +49,13 @@ class ArrowFormat(DFFormatter):
     ext = ARROW_EXT
     enum = "ARROW"
 
+    @staticmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
         df = pa.ipc.open_file(fn).read_pandas()
         str_to_arrow_str(df)
         return df
 
+    @staticmethod
     def save_file(fn: PathOrFile, df: pd.DataFrame):
         df = process_df(df)
         # NOTE - can pass expected schema and columns for output df here
@@ -62,12 +64,13 @@ class ArrowFormat(DFFormatter):
 
 
 class CSVFormat(DFFormatter):
-    content_type = "text/csv"
+    content_type = MIME("text/csv")
     ext = ".csv"
     enum = "CSV"
 
+    @staticmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
-
+        fn = cast(str, fn)
         try:
             return pd.read_csv(fn, engine="c", sep=",")
         except UnicodeDecodeError:
@@ -81,18 +84,21 @@ class CSVFormat(DFFormatter):
                 encoding = guess_encoding(fn)
                 return pd.read_csv(fn, engine="python", sep=None, encoding=encoding)
 
+    @staticmethod
     def save_file(fn: PathOrFile, df: pd.DataFrame):
         df.to_csv(fn, index=False)
 
 
 class ExcelFormat(DFFormatter):
-    content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    content_type = MIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     ext = ".xlsx"
     enum = "EXCEL"
 
+    @staticmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
         return pd.read_excel(fn, engine="openpyxl")
 
+    @staticmethod
     def save_file(fn: PathOrFile, df: pd.DataFrame):
         df.to_excel(fn, index=False, engine="openpyxl")
 
