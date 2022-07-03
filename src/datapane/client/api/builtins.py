@@ -81,9 +81,9 @@ def build_md_report(
 
     """
     try:
-        b_text = b.Text(file=text_or_file) if Path(text_or_file).exists() else b.Text(text=text_or_file)
+        b_text = b.Text(file=text_or_file) if Path(text_or_file).exists() else b.Text(text=t.cast(str, text_or_file))
     except OSError:
-        b_text = b.Text(text=text_or_file)
+        b_text = b.Text(text=t.cast(str, text_or_file))
 
     group = b_text.format(*args, **kwargs)
     return Report(b.Page(group))
@@ -159,18 +159,18 @@ def build_demo_report() -> Report:
     import plotly.graph_objects as go  # noqa
     from bokeh.plotting import figure  # noqa
 
-    def gen_bokeh(**kw):
+    def _gen_boke(**kw):
         p = figure(title="simple line example", x_axis_label="x", y_axis_label="y", **kw)
         p.line([1, 2, 3, 4, 5], [6, 7, 2, 4, 5], legend_label="Temp.", line_width=2)
         return p
 
-    def gen_plotly():
+    def _gen_plotly():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[0, 1, 2, 3, 4, 5], y=[1.5, 1, 1.3, 0.7, 0.8, 0.9]))
         fig.add_trace(go.Bar(x=[0, 1, 2, 3, 4, 5], y=[1, 0.5, 0.7, -1.2, 0.3, 0.4]))
         return fig
 
-    def gen_matplotlib():
+    def _gen_matplotlib():
         # pd.set_option("plotting.backend", "matplotlib")
         fig, ax = plt.subplots()
         df = gen_df()
@@ -178,7 +178,7 @@ def build_demo_report() -> Report:
         # gen_df().plot.scatter("x", "y", ax=ax)
         return fig
 
-    def gen_html(w: int = 30, h: int = 30):
+    def _gen_html(w: int = 30, h: int = 30):
         return b.HTML(
             f"""
     <div style="width: {w}rem; height: {h}rem; background-color: rgba(0, 0, 255, 0.2); position: relative">
@@ -188,14 +188,14 @@ def build_demo_report() -> Report:
     </div>"""
         )
 
-    def color_large_vals(s):
+    def _color_large_vals(s: t.Any):
         return ["background-color: rgba(255, 0, 0, 0.3)" if val > 800 else "" for val in s]
 
-    def gen_folium():
+    def _gen_folium():
         return folium.Map(location=[45.372, -121.6972], zoom_start=12, tiles="Stamen Terrain")
 
     df1 = gen_table_df(10)
-    styler1 = df1.style.apply(color_large_vals, axis=1).hide_index()
+    styler1 = df1.style.apply(_color_large_vals, axis=1).hide_index()
 
     def _vega_sine():
         x = np.arange(100)
@@ -254,7 +254,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
     """
     logo = ir.files("datapane.resources.templates") / "datapane-logo.png"
     other = b.Group(
-        b.Media(file=logo),
+        b.Media(file=str(logo)),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),
         b.Formula(r"\frac{1}{\sqrt{x^2 + 1}}", caption="Simple formula"),
         columns=0,
@@ -381,10 +381,10 @@ dp.Attachment(data=[1,2,3])
 
     plots = b.Group(
         b.Plot(vega_sine, name="vega", caption="Altair Plot"),
-        b.Plot(gen_bokeh(), name="bokeh", caption="Bokeh Plot"),
-        b.Plot(gen_matplotlib(), name="matplotlib", caption="Matplotlib Plot"),
-        b.Plot(gen_plotly(), name="plotly", caption="Plotly Plot"),
-        b.Plot(gen_folium(), name="folium", caption="Folium Plot"),
+        b.Plot(_gen_boke(), name="bokeh", caption="Bokeh Plot"),
+        b.Plot(_gen_matplotlib(), name="matplotlib", caption="Matplotlib Plot"),
+        b.Plot(_gen_plotly(), name="plotly", caption="Plotly Plot"),
+        b.Plot(_gen_folium(), name="folium", caption="Folium Plot"),
         name="plots_group",
         columns=2,
     )
@@ -407,7 +407,7 @@ dp.Attachment(data=[1,2,3])
         columns=2,
     )
     media = b.Group(
-        b.Media(file=logo, name="logo_img"),
+        b.Media(file=str(logo), name="logo_img"),
         b.Attachment(data=[1, 2, 3]),
         columns=2,
     )
