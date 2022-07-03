@@ -9,9 +9,10 @@ from pathlib import Path
 SDict = t.Dict[str, t.Any]
 SSDict = t.Dict[str, str]
 SList = t.List[str]
-JSON = t.Union[str, int, float, bool, None, t.Mapping[str, "JSON"], t.List["JSON"]]
+# NOTE - mypy cannot handle recursive types like this currently. Will review in the future
+JSON = t.Union[str, int, float, bool, None, t.Mapping[str, "JSON"], t.List["JSON"]]  # type: ignore
 JDict = SDict  # should be JSON
-JList = t.List[JSON]
+JList = t.List[JSON]  # type: ignore
 MIME = t.NewType("MIME", str)
 URL = t.NewType("URL", str)
 HTML = t.NewType("HTML", str)
