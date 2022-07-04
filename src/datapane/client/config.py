@@ -89,9 +89,11 @@ class Config:
 
         # load config obj from file
         c_yaml["from_file"] = True
+        # NOTE - type checker doesn't like us setting class variables on instance
+        # don't think this will cause issues
         config = dacite.from_dict(Config, c_yaml)
-        config._env = env
-        config._path = config_f
+        Config._env = env
+        Config._path = config_f
         log.debug(f"Loaded client environment from {config._path}")
 
         # check if stored file is out of date
@@ -113,8 +115,10 @@ class Config:
         assert env or self._path
 
         if env:
-            self._env = env
-            self._path = self.get_config_file(env)
+            # NOTE - type checker doesn't like us setting class variables on instance
+            # don't think this will cause issues
+            Config._env = env
+            Config._path = self.get_config_file(env)
 
         with self._path.open("w") as f:
             yaml.safe_dump(dc.asdict(self), f)
