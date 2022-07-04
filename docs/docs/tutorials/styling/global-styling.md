@@ -6,11 +6,11 @@ This section describes how to add custom colours and fonts to your report.
 
 Datapane Teams allows you to define a global style block which will apply to all of your reports. In this block you can \(re\)define the default font, background colour and more. 
 
-![Example of a styled report](../.gitbook/assets/screenshot-2021-07-05-at-12.03.44.png)
+![Example of a styled report](../../img/tutorials/styling-whitelabelling-1.png)
 
 To use this feature, you'll need to have Admin Access. Head over to Settings -&gt; Visual Settings, and scroll to the Styling section, where you'll see a block of HTML/CSS which looks like this: 
 
-```markup
+```html
 <style type="text/css">
     :root {
       --dp-accent-color: #fff;
@@ -27,7 +27,7 @@ You can edit this block to add your brand colours, load in a custom font or even
 
 If you have a brand font, you can load it in as follows: 
 
-```markup
+```html
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
 
 <style type="text/css">
@@ -46,7 +46,7 @@ Note that this will only apply to the headings and prose - UI text in DataTables
 
 Anything you add under the `<style>` block will be added to the top of your report as a default header. You can use this to load in a custom image, text or analytics script as follows:
 
-```markup
+```html
 <style type="text/css">    
 :root {
   --dp-accent-color: #4E46E5;
@@ -66,4 +66,3 @@ To use our Whitelabel feature, simply add a company logo under Settings - Visual
 * Login pages
 * Shared reports
 * Shared report embeds
-

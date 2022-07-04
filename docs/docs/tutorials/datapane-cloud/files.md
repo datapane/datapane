@@ -4,9 +4,11 @@ description: You can store common files and datasets on Datapane to use in your 
 
 # Files
 
-{% hint style="success" %}
-Please see the [File API Reference](https://datapane.github.io/datapane/teams.html#datapane.client.api.teams.Blob) for more details.
-{% endhint %}
+[:octicons-organization-16: Teams feature](){.org}
+
+!!! info 
+    
+    Please see the [File API Reference](https://datapane.github.io/datapane/teams.html#datapane.client.api.teams.Blob) for more details.
 
 It is often necessary to make use of non-code assets such as datasets, models, or files when generating reports. In many situations, deploying these alongside your script is not ideal.
 
@@ -15,10 +17,6 @@ It is often necessary to make use of non-code assets such as datasets, models, o
 3. If they are **large**, and re-uploading them each time you deploy your script is cumbersome.
 
 For these use-cases, Datapane provides a File API which allows you to upload files from any Python or CLI environment, and access them inside your scripts or through the CLI. See the Python [API Docs](https://datapane.github.io/datapane/teams.html#datapane.client.api.teams.Blob) for more information on using Files.
-
-{% hint style="info" %}
-This feature is only available on Datapane Teams plans at present
-{% endhint %}
 
 ## **CLI**
 
@@ -74,13 +72,13 @@ Download a DataFrame, file, or object. All download operations have the followin
 | `name`    | The name of your file               | True     |
 | `project` | The project to upload the file to.  | False    |
 
-{% hint style="warning" %}
-If you want other people inside your organization to run your apps which access a file which you created, you must specify yourself as the `owner` in this method. When someone runs your app, it runs under their name, and if you do not set an explicitly specify the `owner` , it will try and look for the file under their name and fail.
+!!! warning
 
-```python
-dp.File.get(name='foo', owner='john')
-```
-{% endhint %}
+    If you want other people inside your organization to run your apps which access a file which you created, you must specify yourself as the `owner` in this method. When someone runs your app, it runs under their name, and if you do not set an explicitly specify the `owner` , it will try and look for the file under their name and fail.
+
+    ```python
+    dp.File.get(name='foo', owner='john')
+    ```
 
 ```python
 import datapane as dp
