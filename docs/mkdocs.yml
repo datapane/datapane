@@ -4,7 +4,7 @@ repo_url: https://github.com/datapane/datapane
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
-  - Introduction: "index.md"
+  - Introduction: "index.ipynb"
   - Quickstart: "quickstart.ipynb"
 
   - Tutorials:
