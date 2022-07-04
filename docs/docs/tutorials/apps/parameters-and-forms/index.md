@@ -1,10 +1,7 @@
----
-description: >-
-  Apps can be parameterised, allowing them to dynamically generate reports
-  through web forms or the API.
----
-
 # Parameters and Forms
+
+Apps can be parameterised, allowing them to dynamically generate reports
+through web forms or the API.
 
 ## Overview
 
@@ -18,12 +15,11 @@ Following the previous example, the dataset we are pulling includes a few other 
 
 Based on this, we are going to add two parameters: `plot_field` and `continents` to the `parameters` section of our `datapane.yaml`. To configure what the end-user's form looks like, we can choose the type of widget. For the above, we're choosing a `enum` (which provides a dropdown select menu where the user must select one option), and a `list` (which allows the user to choose or more choices from a predefined list). We can also set the default parameters for each input and a description.
 
-{% hint style="info" %}
-Full details of parameter configuration and available fields are provided in the [API reference](parameters.md#parameter-form-fields).
-{% endhint %}
+!!! info
+    
+    Full details of parameter configuration and available fields are provided in the [API reference](parameters.md#parameter-form-fields).
 
-{% code title="datapane.yaml" %}
-```yaml
+``` yaml title="datapane.yaml"
 name: covid_script
 script: simple_script.py # this could also be ipynb if it was a notebook
   
@@ -50,12 +46,11 @@ parameters:
       - Asia
       - North America
 ```
-{% endcode %}
 
 You can then use the `Params` object as you would when running on your Datapane instance, and we can customise our data and graph based on those inputs.
 
-{% code title="simple_script.py" %}
-```python
+We'll place the folloding in a file named `simple_script.py`.
+
 import pandas as pd
 import altair as alt
 import datapane as dp
