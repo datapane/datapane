@@ -1,14 +1,14 @@
 # Styling and Editing
 
-{% hint style="info" %}
-You'll need to be logged into [Datapane.com](http://datapane.com) or your Teams instance to use this feature - it is not currently supported on the open-source version.
-{% endhint %}
+!!! info
+
+    You'll need to be logged into [Datapane.com](http://datapane.com) or your Teams instance to use this feature - it is not currently supported in the open-source version.
 
 ‌One of the challenges of building reports is the dependence on a Python environment. Datapane now allows you to create and edit reports directly on our server, meaning it's much easier to onboard non-technical users and make small changes to existing reports.
 
 Our web editor can be used on any of your existing reports - just click 'Edit' and you'll see a side-by-side view with the left hand side showing the report XML structure, and the right hand side showing a report preview. You can then edit the XML to update the report.&#x20;
 
-![](<../../.gitbook/assets/Screenshot 2021-11-23 at 15.29.42.png>)
+![](../../img/tutorials/styling-1.png)
 
 You can also create a report directly on Datapane.com by clicking the '[Create Report](https://datapane.com/report-from-template/)' button.&#x20;
 
@@ -22,7 +22,7 @@ You can enrich your report by adding special blocks (click 'Insert Blocks'). For
 
 When you click 'Preview', you'll see this display as follows:&#x20;
 
-![](../../.gitbook/assets/screenshot-2021-07-05-at-17.07.07.png)
+![](../../img/tutorials/styling-2.png)
 
 You can edit the content inside the blocks to add additional parameters like `name,`as well as block-specific parameters. For example, here's a group with 2 columns:&#x20;
 

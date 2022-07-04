@@ -7,52 +7,46 @@ Your Datapane app may have requirements on external libraries and require certai
 
 These are all configured in your `datapane.yaml`.
 
-{% hint style="info" %}
-For complex dependencies and internal libraries, we highly recommend creating a Docker container.
-{% endhint %}
+!!! info
+    
+    For complex dependencies and internal libraries, we highly recommend creating a Docker container.
 
 ## Python dependencies
 
 If we were building a reporting tool to pull down financial data, we may want to use the [yfinance](https://pypi.org/project/yfinance/) library in Python. To do this, we could add it to a `requirements` list in our `datapane.yaml`
 
-{% code title="datapane.yaml" %}
-```yaml
+```yaml title="datapane.yaml"
 ...
 
 requirements:
   - yfinance
 ```
-{% endcode %}
 
 ## Additional files and folders
 
 For more complex scripts, we may want to include a local Python folder or file. Imagine we have a separate Python file, `stock_scaler.py` which helps us scale the values of our stocks, and which we want to use in our script, or a folder of SQL scripts which we want to use in Python.
 
-```
+```shell
 ~/C/d/d/my-new-proj> ls
 dp-script.py datapane.yaml stock_scaler.py
 ```
 
 To include this in the deploy, we could add it to `include`&#x20;
 
-{% code title="datapane.yaml" %}
-```yaml
+```yaml title="datapane.yaml"
 ...
 
 include:
   - stock_scaler.py
 ```
-{% endcode %}
 
 We can then import it in our script as follows:&#x20;
 
-{% code title="dp_script.py" %}
-```python
+```python title="dp_script.py"
 import stock_scalar
 
 ...
 ```
-{% endcode %}
 
 ## Docker dependencies
 
@@ -91,7 +85,7 @@ dnspython ~= 2.0.0
 sh ~= 1.13.0
 ```
 
-If you want your app to run in your own Docker container, you can specify your own by creating an [Environment](variables.md). Although you can use any base for your Docker image, we recommend inheriting from ours. To do this, create a Docker image that inherits from the our base images (such as `datapane/dp-runner-py38`) and add your required dependencies - see [https://hub.docker.com/u/datapane](https://hub.docker.com/u/datapane) for all our images.
+If you want your app to run in your own Docker container, you can specify your own by creating an [Environment](/tutorials/apps/variables). Although you can use any base for your Docker image, we recommend inheriting from ours. To do this, create a Docker image that inherits from the our base images (such as `datapane/dp-runner-py38`) and add your required dependencies - see [https://hub.docker.com/u/datapane](https://hub.docker.com/u/datapane) for all our images.
 
 If you build this and push it to Dockerhub, you can then specify it in your `datapane.yaml` as follows:
 
@@ -101,6 +95,6 @@ environment: my-environment
 
 When you run an app, it will run inside this Docker container. Note that the first run may take a bit longer, as it needs to pull the image from DockerHub. Once it pulls it once, it's cached for future runs.
 
-{% hint style="info" %}
-We support both public and private Docker images, so you can add private internal libraries, for instance, to your Docker image. You can add your registry credentials to your Datapane Server from the server settings page.
-{% endhint %}
+!!! info
+    
+    We support both public and private Docker images, so you can add private internal libraries, for instance, to your Docker image. You can add your registry credentials to your Datapane Server from the server settings page.

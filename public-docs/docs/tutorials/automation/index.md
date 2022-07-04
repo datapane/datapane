@@ -1,14 +1,12 @@
----
-description: Automating report creation, including via GitHub Actions
----
-
 # Automation
+
+Automating report creation, including via GitHub Actions.
 
 ## Introduction
 
 Once you have a report you're happy with, you often need to generate it automatically; for instance, to run on a schedule, or to be triggered through an API. To make this easier, Datapane provides a GitHub action which allows you to run your Python script automatically to generate and publish a new report.
 
-{% embed url="https://github.com/marketplace/actions/datapane-build" %}
+[Datapane Build](https://github.com/marketplace/actions/datapane-build){ .md-button }
 
 To learn more about GitHub actions, [see the documentation](https://docs.github.com/en/free-pro-team@latest/actions).
 
@@ -23,9 +21,9 @@ _Datapane Teams_ also provides a [script runner](../datapane-teams/script-and-ju
 
 ## Configuring your job
 
-{% hint style="info" %}
-This tutorial presumes you have a basic understanding of how to use GitHub actions. For more information, please refer to GitHub's documentation.
-{% endhint %}
+!!! info 
+    
+    This tutorial presumes you have a basic understanding of how to use GitHub actions. For more information, please refer to GitHub's documentation.
 
 Your GitHub action requires access to your Datapane API token, which you can find on your [settings page](https://datapane.com/settings) once you have logged in to Datapane. This should not be stored in plain text, and should be added to your repository's [secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets) section.
 
@@ -97,17 +95,17 @@ Once you have committed your manual run, you can run it in the following ways:
 
 **Trigger by Github UI**
 
-{% hint style="info" %}
-For more information, see GH [docs](https://docs.github.com/en/free-pro-team@latest/actions/managing-workflow-runs/manually-running-a-workflow#running-a-workflow-on-github) for running a parameterised datapane workflow using the GH Action UI.
-{% endhint %}
+!!! info
+    
+    For more information, see GH [docs](https://docs.github.com/en/free-pro-team@latest/actions/managing-workflow-runs/manually-running-a-workflow#running-a-workflow-on-github) for running a parameterised datapane workflow using the GH Action UI.
 
 GitHub's action UI provides an interface for running your action with parameters.&#x20;
 
 **Trigger by API/Webhook**
 
-{% hint style="info" %}
-For more information, see GitHub [docs](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-workflow-dispatch-event) for running a parameterised datapane workflow via an API Call.
-{% endhint %}
+!!! info
+    
+    For more information, see GitHub [docs](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-workflow-dispatch-event) for running a parameterised datapane workflow via an API Call.
 
 To trigger your report generation through an API, you need to send a POST request to `/repos/{owner}/{repo}/actions/workflows/{workflow_name}/dispatches`. For instance, for a repo called `acme/reporting`, with a workflow as above called `financial_report` you could trigger it as follows:
 

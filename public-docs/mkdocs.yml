@@ -8,7 +8,7 @@ nav:
   - Quickstart: "quickstart.ipynb"
 
   - Tutorials:
-    - The basics 🌱:
+    - Getting started 🌱:
       - Install Datapane: "tutorials/basics/install-datapane.md"
       - Create a report: "tutorials/basics/create-a-report.ipynb"
     - Blocks types 🧱:
@@ -27,20 +27,20 @@ nav:
       - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
       - Files: "tutorials/datapane-cloud/files.md"
     - Styling and editing 🎨:
-      - tutorials/styling/index.md
-      - Styling: "tutorials/styling/styling.md"
-      - Adding source code: "tutorials/styling/adding-source-code.md"
+      - tutorials/styling/index.ipynb
+      - Styling: "tutorials/styling/styling.ipynb"
+      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
       - Global styling: "tutorials/styling/global-styling.md"
     - Automation 🤖:
       - tutorials/automation/index.md
     - Apps 📦:
-      - tutorials/apps/index.md
+      - tutorials/apps/index.ipynb  
       - Parameters and forms: 
-        - "tutorials/apps/parameters-and-forms/index.md"
+        - "tutorials/apps/parameters-and-forms/index.ipynb"
         - Configuration: "tutorials/apps/parameters-and-forms/configuration.md"
         - Parameters: "tutorials/apps/parameters-and-forms/parameters.md"
       - Scheduled report runs: "tutorials/apps/scheduling.md"
-      - Environments and variables: "tutorials/apps/variables.md"
+      - Environments and variables: "tutorials/apps/variables.ipynb"
       - Configuration and dependencies: "tutorials/apps/configuration-and-dependencies.md"
       - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
 
