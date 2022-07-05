@@ -45,7 +45,7 @@ nav:
       - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
 
   - Guides:
-      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots.ipynb"
+      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
       - Sentiment Analysis for textual data: "guides/sentiment-analysis-for-textual-data.ipynb"
       - Accessing data in Python: "guides/accessing-data-in-python.ipynb"
 
