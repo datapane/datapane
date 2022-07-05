@@ -1,4 +1,4 @@
-import Report from "../components/Report.vue";
+import Report from "../components/ReportComponent.vue";
 
 const REPORT_PROPS = {
     htmlHeader: `<style>:root {
