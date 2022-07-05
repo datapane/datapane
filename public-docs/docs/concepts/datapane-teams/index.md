@@ -27,5 +27,5 @@ Datapane is not intended to be a drop-and-drop dashboard builder, and most compa
 
 ## Support
 
-For a full explanation of the various kinds of enterprise support available, read our [support-policy.md](../../resources/support-policy.md "mention").&#x20;
+For a full explanation of the various kinds of enterprise support available, read our [support policy](/concepts/support-policy/).&#x20;
 
