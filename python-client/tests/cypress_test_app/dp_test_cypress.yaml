@@ -1,0 +1,54 @@
+name: params test
+script: dp_test_cypress.py
+
+# Script parameters
+parameters:
+  - name: __LIST__
+    type: list
+    default: ['item1']
+  - name: __LIST__REQUIRED__
+    type: list
+    required: true
+    default: ['item1']
+  - name: __LIST__CHOICES__
+    type: list
+    choices: ['item1', 'item2']
+  - name: __STRING__REQUIRED__
+    type: string
+    required: true
+    default: 'str'
+  - name: __STRING__
+    type: string
+    default: abc
+  - name: __BOOL__
+    type: boolean
+  - name: __INT__
+    type: integer
+  - name: __INT__REQUIRED__
+    type: integer
+    default: 0
+    required: true
+  - name: __INT__BOUNDED__
+    type: integer
+    min: 0
+    max: 10
+  - name: __INT__UPPERBOUND__
+    type: integer
+    max: 10
+  - name: __ENUM__
+    type: enum
+    choices: ['item1', 'item2']
+  - name: __DATETIME__
+    type: datetime
+  - name: __DATE__
+    type: date
+  - name: __TIME__
+    type: time
+  - name: __FLOAT__
+    type: float
+  - name: __FLOAT__REQUIRED__
+    type: float
+    required: true
+    default: 0
+  - name: __FILE__
+    type: file

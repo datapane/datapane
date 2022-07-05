@@ -1,0 +1,26 @@
+# Additional mime-type we support for assets
+# MIME type                 Extension
+# plots
+application/vnd.bokeh.show+json     bokeh.json
+application/vnd.vegalite.v4+json    vl.json
+application/vnd.vegalite.v2+json    vl2.json
+application/vnd.vegalite.v3+json    vl3.json
+application/vnd.vegalite.v4+json    vl4.json
+application/vnd.plotly.v1+json    pl.json
+application/vnd.folium+html    fl.html
+application/vnd.plotapi+html    plotapi.html
+
+# images - already handled
+
+# misc
+# datafiles - handled directly as it's own type
+application/vnd.apache.arrow+binary    arrow
+application/vnd.nstack.table+html     tbl.html
+# Jupyter notebooks
+application/x-ipynb+json     ipynb
+# Pickled objects
+application/vnd.pickle+binary     pkl
+application/x-pywheel+zip     whl
+application/x-tgz     tgz
+# base64'd objects
+application/base64     b64

@@ -1,0 +1,6 @@
+name: dp_test_app
+
+parameters: [
+  {"name": "p1", "type": "string", "default": "hello"},
+  {"name": "p2", "type": "integer", "required": true, "default": 4}
+]

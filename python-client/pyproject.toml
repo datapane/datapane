@@ -1,0 +1,112 @@
+[tool.poetry]
+name = "datapane"
+version = "0.14.0"
+description = "Datapane client library and CLI tool"
+authors = ["Datapane Team <dev@datapane.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://www.datapane.com"
+repository = "https://github.com/datapane/datapane"
+documentation = "https://docs.datapane.com"
+
+
+keywords = ["data", "analysis", "jupyter", "pandas", "altair"]
+classifiers = [
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: Apache Software License",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+]
+
+#packages = [
+#    { include = "datapane", from = "src" }
+#]
+
+# extra files (allows overriding gitignore)
+include = ["NOTICE", "src/**/local-report-base.*"]  # "README.md", "LICENSE"]
+
+[tool.poetry.dependencies]
+python = ">=3.7.1, < 3.11.0"
+
+# DS
+# numpy = "^1.21.2"
+pandas = "^1.1.0"
+pyarrow = ">=3.0.0, < 7.0.0"
+
+# viz - only altair is required
+altair = "^4.0.0"
+vega-datasets = ">=0.9.0,<1.0.0"
+matplotlib = { version = "^3.0.0", optional = true }
+plotly = { version = ">=4.0.0,<6.0.0", optional = true }
+bokeh = { version = "~2.4.2", optional = true }  # stuck on 2.2 on JS side for now
+folium = { version = "0.12.*", optional = true }
+plotapi = { version = "^5.0.0", optional = true }
+# ipython = "^7.7.0" # needed for nbconvert?
+
+# cloud support
+flit-core = { version = "~3.0.0", optional = true }
+
+# misc
+# TODO - check for appdir releases
+# appdirs = "^1.4.3"
+boltons = ">=20.0.0,<22.0.0"
+chardet = ">=3.0.4,<5.0.0"
+click = ">=7.1.0, <9.0.0"
+click-spinner = "^0.1.8"
+colorlog = ">= 4.1.0, <7.0.0"
+dacite = "^1.0.2"
+datacommons = "^1.4.3"
+datacommons-pandas = "^0.0.3"
+dominate = "^2.4.0"  # latest on conda
+furl = "^2.0.0"
+glom = "^20.5.0"
+# httpx = "^0.7.5"
+importlib_resources = ">=3.0.0,<6.0.0"
+Jinja2 = ">=2.11.0,<3.1.0"  # includes markupsafe dep
+jsonschema = ">=3.2.0,<5.0.0"
+lxml = "^4.0.0"
+micawber = ">=0.5.0"
+munch = "^2.3.0"
+nbconvert = ">=5.6.1,<7.0.0"
+packaging = ">=20.0.0,<22.0.0"
+posthog = "^1.4.0"
+pydantic = "^1.6.0"
+PyYAML = "^6.0.0"
+requests = "^2.19.0"
+requests-toolbelt = "^0.9.1"
+stringcase = "^1.2.0"
+tabulate = "^0.8.0"
+toolz = "^0.11.0"
+validators = ">=0.18.0,<0.19.0"
+
+[tool.poetry.extras]
+plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi"]
+cloud = ["flit-core"]
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.0.0"
+pytest-datadir = "^1.3.1"
+pytest-timeout = "^2.0.1"
+jupyterlab = "^3.0.0"
+openpyxl = "^3.0.0"
+pdoc3 = "^0.10.0"
+
+[tool.poetry.scripts]
+datapane = "datapane.client.__main__:main"
+dp-runner = "datapane.runner.__main__:main"
+
+[tool.black]
+# The same config should be duplicated in other pyproject.toml files so that
+# black always finds it.
+line-length = 120
+target-version = ['py38']
+include = '\.pyi?$'
+
+# FOR PEP-517/518
+[build-system]
+requires = ["poetry>=1.1.0,<1.2.0"]
+build-backend = "poetry.core.masonry.api"

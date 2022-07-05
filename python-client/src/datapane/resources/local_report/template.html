@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://kit.fontawesome.com/256c714d9a.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700|Inconsolata|Karla|Rubik&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      window.dpLocal = true;
+      {% if events %}
+        window.dpLocalViewEvent = {{events|tojson}};
+        window.dpReportId = "{{report_id}}";
+        window.dpAuthorId = "{{author_id}}";
+      {% endif %}
+    </script>
+    <style>
+      {% include "local-report-base.css" %}
+    </style>
+    <script>
+      const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
+      const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
+      window.reportProps = { report, htmlHeader };
+
+    </script>
+    <script type="module">
+      {{ include_raw("local-report-base.js") }}
+    </script>
+  </head>
+  <body>
+    <div id="report" class="w-full pb-12"></div>
+    <div style="position: fixed; bottom: 0; width: 100%; z-index: 3;">
+      <nav class="bg-gray-200 border-t border-gray-300">
+        <div class="relative flex items-center justify-between h-12">
+          <div class="flex-shrink pl-4 flex items-center">
+            <span class="ml-2 text-gray-700 text-sm text-truncate pr-2">
+              <span class="font-semibold">{{report_name}}</span> {% if report_author %} by {{report_author}}{% else %} created {% endif %} on <script>document.write(new Date("{{report_date}}").toLocaleString());</script>
+            </span>
+          </div>
+          <div class="inline-flex flex-shrink-0"/>
+          <div class="flex-shrink pr-4 flex items-center">
+            <a href="https://datapane.com/?utm_medium=local&utm_content=mainlogo" target="_blank" class="flex-shrink-0">
+              <img class="block h-7 w-auto" src="{{dp_logo|safe}}" alt="logo" title="Built in Python with Datapane">
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </body>
+</html>

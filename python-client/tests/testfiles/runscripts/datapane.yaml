@@ -1,0 +1,4 @@
+name: dp Test app
+script: dp_app.py
+parameters:
+  - {"name":"p1", "type": "string"}

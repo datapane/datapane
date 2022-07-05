@@ -1,0 +1,19 @@
+name: DP Test Mod
+script: dp_test_mod.py
+source_url: https://github.com/datapane/datapane-demos
+parameters:
+  - {"name":"p1", "type": "string"}
+  - {"name":"p2", "type": "integer", "required": True}
+  - {"name":"p3", "type": "boolean", "default": True}
+  - {"name":"p4", "type": "file"}
+include:
+  - dp_app.py
+  - c.json
+requirements:
+  - pytil  # hack package to test installing works at runtime
+pre_commands:
+  - echo hello
+  - echo world
+post_commands:
+  - echo goodbye
+  - echo world
