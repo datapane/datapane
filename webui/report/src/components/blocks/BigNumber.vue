@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
+import BigNumberArrow from "./BigNumberArrow.vue";
 
 const p = defineProps<{
     heading: string;
@@ -9,20 +9,18 @@ const p = defineProps<{
     prevValue?: string;
     change?: string;
 }>();
-
-const bgColor: ComputedRef<string> = computed(() =>
-    p.isPositiveIntent ? "green" : "red"
-);
 </script>
 
 <template>
     <div
         data-cy="block-bignumber"
-        class="rounded-lg bg-white overflow-hidden border border-gray-300 md:grid-cols-3 w-full"
+        class="rounded-lg bg-white overflow-hidden border border-gray-300 w-full"
     >
         <div class="px-4 py-5 sm:p-6">
             <dl>
-                <dt class="text-base leading-6 font-normal text-gray-900">
+                <dt
+                    class="text-base leading-6 font-normal text-gray-900 truncate"
+                >
                     {{ p.heading }}
                 </dt>
                 <dd
@@ -38,24 +36,19 @@ const bgColor: ComputedRef<string> = computed(() =>
                         >
                             from {{ p.prevValue }}
                         </span>
-                    </div>
-                    <div
-                        v-if="p.change"
-                        :class="[
-                            `inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium leading-5 bg-${bgColor}-100 text-${bgColor}-800 md:mt-2 lg:mt-0`,
-                        ]"
-                    >
-                        <i
-                            :class="[
-                                'mr-1 fa',
-                                {
-                                    'fa-arrow-up': p.isUpwardChange,
-                                    'fa-arrow-down': !p.isUpwardChange,
-                                },
-                            ]"
+                        <big-number-arrow
+                            class="hidden lg:hidden sm:inline-flex ml-2"
+                            :is-positive-intent="p.isPositiveIntent"
+                            :is-upward-change="p.isUpwardChange"
+                            :change="p.change"
                         />
-                        {{ p.change }}
                     </div>
+                    <big-number-arrow
+                        class="inline-flex lg:inline-flex sm:hidden"
+                        :is-positive-intent="p.isPositiveIntent"
+                        :is-upward-change="p.isUpwardChange"
+                        :change="p.change"
+                    />
                 </dd>
             </dl>
         </div>

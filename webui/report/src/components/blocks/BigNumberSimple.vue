@@ -13,7 +13,7 @@ const p = defineProps<{
         <div class="px-4 py-5 sm:p-6">
             <dl>
                 <dt
-                    class="text-sm leading-5 font-medium text-gray-500 truncate"
+                    class="text-base leading-6 font-normal text-gray-900 truncate"
                 >
                     {{ p.heading }}
                 </dt>

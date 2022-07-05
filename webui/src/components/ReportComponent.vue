@@ -103,7 +103,7 @@ const handlePageChange = (newPageNumber: number) =>
                 'pb-6': !p.isOrg && multiBlockEmbed,
             }"
         >
-            <div className="sm:hidden p-2">
+            <div className="sm:hidden p-2" v-if="pageLabels.length > 1">
                 <mobile-pages
                     :labels="pageLabels"
                     :page-number="pageNumber"
