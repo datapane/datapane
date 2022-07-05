@@ -37,7 +37,7 @@ class DPObjectRef:
     endpoint: str
     res: Resource
 
-    _url: URL = "<local resource>"
+    _url: URL = URL("<local resource>")
     _dto: t.Optional[Munch] = None
 
     list_fields: t.List[str] = ["name", "web_url", "project"]
@@ -67,9 +67,8 @@ class DPObjectRef:
     def url(self, id_or_url: URL):
         # build a url to the resource on the api server
         _id: str
-        id_or_url = str(id_or_url)
         if self.endpoint in id_or_url:
-            url = id_or_url
+            url = str(id_or_url)
             if not url.startswith("http"):
                 url = f"https://{url}"
             if not v.url(url):
@@ -81,9 +80,9 @@ class DPObjectRef:
 
         rel_obj_url = up.urljoin(self.endpoint, f"{_id}/")
         self.res = Resource(endpoint=rel_obj_url)
-        self._url = self.res.url
+        self._url = URL(self.res.url)
 
-    def __init__(self, dto: Optional[JSON] = None):
+    def __init__(self, dto: Optional[Munch] = None):
         # Save a server-round trip if we already have the DTO
         if dto:
             self.dto = dto
@@ -126,18 +125,18 @@ class DPObjectRef:
             The object if found
         """
         x = cls()
-        x.url = id_or_url
+        x.url = URL(id_or_url)
         x.refresh()
         return x
 
     @classmethod
     def post_with_files(
-        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **kwargs
+        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **kwargs: JSON
     ) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList
-            files: FileList = dict(uploaded_file=[file])
+            files = dict(uploaded_file=[file])
 
         res = Resource(cls.endpoint).post_files(files, overwrite=overwrite, **kwargs)
         return cls(dto=res)
@@ -147,7 +146,7 @@ class DPObjectRef:
         res = Resource(cls.endpoint).post(overwrite=overwrite, **kwargs)
         return cls(dto=res)
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr):  # noqa: ANN001
         if self.has_dto and not attr.startswith("__"):
             log.debug(f"Proxying '{attr}' lookup to DTO")
             return getattr(self._dto, attr)
@@ -168,7 +167,7 @@ class DPObjectRef:
             x.extend(self.dto.keys())
         return x
 
-    def _repr_pretty_(self, p, cycle):
+    def _repr_pretty_(self, p, cycle):  # noqa: ANN001
         name = self.__class__.__name__
         if self.has_dto:
             p.text(f"Uploaded {name} - view at {self.web_url}")
@@ -202,7 +201,7 @@ class DPObjectRef:
         """
         endpoint: t.Optional[str] = cls.endpoint
 
-        def process_field(v):
+        def process_field(v: t.Union[t.Dict, str]) -> str:
             if isinstance(v, dict):
                 return json.dumps(v, indent=True)
             return v

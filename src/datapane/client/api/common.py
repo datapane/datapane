@@ -237,7 +237,7 @@ class Resource:
             r = self.session.post(self.url, data=e, headers=extra_headers, timeout=self.timeout)
         return _process_res(r)
 
-    def get(self, empty_ok: bool = False, **params) -> JSON:
+    def get(self, empty_ok: bool = False, **params) -> Munch:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
         return _process_res(r, empty_ok=empty_ok)
 
