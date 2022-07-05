@@ -19,7 +19,6 @@ import sys
 import time
 import typing as t
 import webbrowser
-from importlib.abc import Traversable
 
 import click_spinner
 import importlib_resources as ir
@@ -109,7 +108,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
 
 def _run_script(script: str):
     """Run the template script and copy it locally to cwd"""
-    script_path: Traversable = ir.files("datapane.resources.templates.hello") / script
+    script_path = ir.files("datapane.resources.templates.hello") / script
     shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
 
@@ -188,6 +187,6 @@ def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
                     else:
                         time.sleep(5)
                 # NOTE mypy thinks this unreachable but it is...
-                return api_key  # type: ignore
+                return api_key
         except KeyboardInterrupt:
             sys.exit(1)
