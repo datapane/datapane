@@ -110,7 +110,7 @@ class ReportFormatting:
 
 
 @contextfunction
-def include_raw(ctx, name):
+def include_raw(ctx, name) -> Markup:  # noqa: ANN001
     """Normal jinja2 {% include %} doesn't escape {{...}} which appear in React's source code"""
     env = ctx.environment
     # Escape </script> to prevent 3rd party JS terminating the local report bundle.
@@ -190,7 +190,7 @@ class Report(DPObjectRef):
 
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
-    _preview_file: str = DPTmpFile(f"{uuid4().hex}.html")
+    _preview_file = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "project"]
 
     endpoint: str = "/reports/"
@@ -308,7 +308,7 @@ class Report(DPObjectRef):
                 )
 
     @property
-    def edit_url(self):
+    def edit_url(self) -> str:
         return f"{self.web_url}edit/"
 
     ############################################################################
@@ -330,7 +330,7 @@ class Report(DPObjectRef):
         # process params
         tags = tags or []
 
-        formatting_kwargs = {}
+        formatting_kwargs: t.Dict[str, t.Any] = {}
         if formatting:
             formatting_kwargs.update(
                 width=formatting.width.value,
@@ -432,7 +432,7 @@ class Report(DPObjectRef):
         Use the blocks dict parameter to add a dynamically generated set of named blocks, useful when working in Jupyter
 
         Args:
-            *arg_blocks: List of blocks to add to document, these must be wrapped, e.g. using dp.DataTable(df) instead of df
+            *arg_blocks: List of blocks to add
             blocks: Allows providing the document blocks as a single list/dictionary of named blocks
             open: Open the report in your browser for editing after updating
             **kw_blocks: Keyword argument set of blocks, whose block name will be that given in the keyword
@@ -486,7 +486,6 @@ class Report(DPObjectRef):
 
         if open:
             webbrowser.open_new_tab(self.edit_url)
-        return self
 
     ############################################################################
     # Local saved reports
@@ -556,7 +555,7 @@ class Report(DPObjectRef):
     @capture_event("CLI Report Preview")
     def preview(
         self,
-        open: True,
+        open: bool,
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         """Preview the report in a new browser window.

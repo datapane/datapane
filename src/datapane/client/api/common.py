@@ -181,7 +181,7 @@ class Resource:
         r = self.session.post(self.url, headers=extra_headers, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
 
-    def post_files(self, files: FileList, overwrite: bool = False, **data: JSON) -> JSON:
+    def post_files(self, files: FileList, overwrite: bool = False, **data: JSON) -> Munch:
         # upload files using custom json-data protocol
         # build the fields
         file_header = {"Content-Encoding": "gzip"}
