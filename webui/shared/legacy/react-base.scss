@@ -1,0 +1,128 @@
+/**
+  * Styles used by FE component
+ */
+@import "codemirror/lib/codemirror.css";
+@import "codemirror/theme/eclipse.css";
+@import "codemirror/addon/hint/show-hint.css";
+
+.CodeMirror-foldmarker {
+    font-family: arial;
+}
+.CodeMirror-foldgutter {
+    width: 1rem;
+}
+.CodeMirror-foldgutter-open,
+.CodeMirror-foldgutter-folded {
+    color: #555;
+    cursor: pointer;
+}
+.CodeMirror-foldgutter-open:after {
+    padding-left: 0.2rem;
+    content: "\25BE";
+}
+.CodeMirror-foldgutter-folded:after {
+    padding-left: 0.2rem;
+    content: "\25B8";
+}
+
+.web-editor {
+    .react-codemirror2 {
+        @apply h-full;
+    }
+}
+
+.query-container {
+    .react-codemirror2 {
+        @apply w-full flex-auto resize-none border-gray-200 h-12;
+    }
+}
+
+.CodeMirror-placeholder {
+    opacity: 0.7;
+}
+
+.CodeMirror {
+    font-family: "Roboto Mono", monospace !important;
+    height: 100% !important;
+}
+
+.CodeMirror-wrap pre {
+    word-break: break-word;
+}
+
+/* Misc React global styles */
+
+html {
+    overflow: auto !important;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+revo-grid {
+    background-color: white !important;
+}
+
+// Fix for flex-containers to allow <pre> tags with overflow-x -- see https://weblog.west-wind.com/posts/2016/feb/15/flexbox-containers-pre-tags-and-managing-overflow
+.dp-pre-container {
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Support text wrapping in pre tag, otherwise pre content overflows container. */
+.wrap-pre {
+    white-space: pre-wrap; /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+.datapane-tooltip-max-width {
+    max-width: 25em;
+}
+
+/* Disable default select arrow in favour of Tailwind's */
+select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    text-indent: 1px !important;
+    text-overflow: "" !important;
+}
+
+/* Allow text-wrap in a table cell on hover */
+.hover-expand-content:hover {
+    max-width: initial;
+    white-space: initial;
+    @apply bg-yellow-50;
+}
+
+.h-iframe {
+    /*
+     * 100vh : iframe height
+     * 2.5rem : footer height
+     */
+    height: calc(100vh - 2.5rem) !important;
+}
+
+/* SandDance component styles */
+.sanddance-explorer {
+    height: 100%;
+}
+
+.ms-OverflowSet-item {
+    border-bottom: 1px solid #ccc;
+}
+
+i.desc,
+i.asc {
+    padding-right: 0.3rem;
+}
+
+.prose img {
+    @apply mx-auto;
+}
