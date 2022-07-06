@@ -28,6 +28,7 @@ pandas-datareader = "^0.10.0"
 datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
 pytrends = "^4.8.0"
+nltk = "^3.7"
 
 
 [tool.poetry.dev-dependencies]
