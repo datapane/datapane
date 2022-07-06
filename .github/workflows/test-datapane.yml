@@ -61,3 +61,18 @@ jobs:
           poetry run python -m pytest -v --ignore=tests/client/e2e/ tests --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
           # run top-level CLI tests (junit tests not captured yet)
           poetry run python -m pytest -v tests_toplevel --junitxml=${{github.workspace}}/test-reports/datapane-local-toplevel-${{ matrix.os }}-${{ matrix.python-version }}.xml
+  datapane-type-checking:
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run mypy
+        run: |
+          pip install "poetry>=1.1.0,<1.2.0"
+          poetry config virtualenvs.in-project true
+          poetry install
+          poetry run python -m mypy src
