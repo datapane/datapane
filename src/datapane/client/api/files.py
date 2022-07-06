@@ -85,7 +85,7 @@ class PathWrapper(BaseAsset[Path]):
 
 ################################################################################
 # Table Assets
-class BaseTable(Generic[U], BaseAsset):
+class BaseTable(BaseAsset, Generic[U]):
     mimetype = "application/vnd.datapane.table+html"
     ext = ".tbl.html"
     TABLE_CELLS_LIMIT: int = 5000
