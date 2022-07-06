@@ -144,7 +144,7 @@ def setup_script(s: api.App, env_dir: Path):
     # install deps
     if s.requirements:
         pip_args = [sys.executable, "-m", "pip", "install"]
-        if os.getuid() != 0 and not in_venv():
+        if os.getuid() != 0 and not in_venv():  # type: ignore [attr-defined]
             # we're a normal/non-root user outside a venv
             pip_args.append("--user")
         pip_args.extend(s.requirements)
