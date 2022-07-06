@@ -4,7 +4,8 @@ version = "0.14.0"
 description = "Datapane client library and CLI tool"
 authors = ["Datapane Team <dev@datapane.com>"]
 license = "Apache-2.0"
-readme = "README.md"
+# TODO: poetry doesn't support out-of-tree files for sdist well, so build will fail here
+readme = "../../README.md"
 homepage = "https://www.datapane.com"
 repository = "https://github.com/datapane/datapane"
 documentation = "https://docs.datapane.com"
