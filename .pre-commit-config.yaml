@@ -1,7 +1,12 @@
 # pre-commit config file (https://pre-commit.com/
 fail_fast: true
 # global excludes - exclude generated files, e.g. django migrations
-exclude: '^(src/datapane/resources/templates/|tests/client/scripts/test_config/|tests/testfiles/)'
+exclude: |
+  (?x)^(
+    projects/python-client/src/datapane/resources/templates/
+    |projects/python-client/tests/client/scripts/test_config/
+    |projects/python-client/tests/testfiles/
+  )
 default_language_version:
   python: python3
 # default_stages: [commit, push]
@@ -89,7 +94,7 @@ repos:
         exclude: 'package.*\.json'
       # check for dangling symlinks
       - id: check-symlinks
-        exclude: '^(src/datapane/resources/local_report/local-report-base.*)$'
+        exclude: '^(projects/python-client/src/datapane/resources/local_report/local-report-base.*)$'
       # ensure links to vcs sites are permalinks
       - id: check-vcs-permalinks
       # ensure no private keys are being commited
@@ -106,14 +111,13 @@ repos:
     hooks:
       - id: prettier
         exclude_types: [yaml]
-        exclude: '^(dp-server|.github|datapane/src/datapane/resources|email-templates)/.+$'
+        exclude: '^(.github|projects/python-client/src/datapane/resources|email-templates)/.+$'
         args: [--with-node-modules]
   # JS linting
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: "v7.20.0"
     hooks:
       - id: eslint
-        #exclude: '^(dp-server|tasks|email-templates)/'
         #files: \.(js|jsx|ts|tsx)$
         files: ^webui/(report|base|alpine-stores|params-component)/\S+\.(js|ts|vue)$
         types: [text, file, non-executable]
