@@ -110,4 +110,5 @@ jobs:
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
           poetry install
+          poetry run python -m mypy --install-types
           poetry run python -m mypy src
