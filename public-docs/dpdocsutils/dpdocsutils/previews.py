@@ -32,15 +32,15 @@ def report_to_image(report_path, image_path, width, height):
     )
 
 
-def embed_local_report(report_path, width, height, iframe=True):
+def embed_local_report(report_path, width, height, iframe=False):
     if iframe:
         return IFrame(report_path, width=width, height=height)
     else:
         width = 700
         report_filename = Path(report_path).name
-        image_filename = report_filename.replace(".html", ".png")
+        image_filename = report_filename.replace(".html", "-preview.png")
         report_to_image(report_filename, image_filename, width, height)
 
-        image_path = report_path.replace(".html", ".png")
+        image_path = report_path.replace(".html", "-preview.png")
         return display(HTML(f'<a href="{report_path}"><img src="{image_path}"></a>'))
 
