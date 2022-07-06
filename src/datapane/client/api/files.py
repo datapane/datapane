@@ -51,32 +51,35 @@ class BaseAsset(Generic[T], abc.ABC):
         return self.block_type(x)  # type: ignore
 
 
-class BasePickleWriter(BaseAsset[Any]):
+class BasePickleWriter(BaseAsset):
     """Creates a pickle file from any object"""
 
     mimetype = "application/vnd.pickle+binary"
     block_type = Attachment
     ext = ".pkl"
     file_mode = "wb"
+    obj_type = Any
 
     def write_file(self, f: IO, x: Any):
         pickle.dump(x, f)
 
 
-class StringWrapper(BaseAsset[str]):
+class StringWrapper(BaseAsset):
     """Creates a Json for a string File, or Markdown for a Block"""
 
     mimetype = "application/json"
     block_type = Text
     ext = ".json"
+    obj_type = str
 
     def write_file(self, f: IO, x: str):
         json.dump(json.loads(x), f)
 
 
-class PathWrapper(BaseAsset[Path]):
+class PathWrapper(BaseAsset):
     """Creates an Attachment block around Path objects"""
 
+    obj_type = Path
     block_type = Attachment
 
     def to_block(self, x: Path) -> DataBlock:
