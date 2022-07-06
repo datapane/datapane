@@ -73,6 +73,8 @@ jobs:
       - name: Run mypy
         run: |
           pip install "poetry>=1.1.0,<1.2.0"
+          pwd
+          ls
           poetry config virtualenvs.in-project true
-          poetry install
+          poetry install -E mypy
           poetry run python -m mypy src
