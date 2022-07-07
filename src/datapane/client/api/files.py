@@ -4,10 +4,9 @@ import os
 import pickle
 from functools import singledispatch
 from pathlib import Path
-from typing import IO, Any, Generic, List, Optional, Type, TypeVar
+from typing import IO, TYPE_CHECKING, Any, Generic, List, Optional, Type, TypeVar
 
 from altair.utils import SchemaBase
-from bokeh.model import Model
 from numpy import ndarray
 from pandas import DataFrame
 from pandas.io.formats.style import Styler
@@ -18,6 +17,9 @@ from .. import DPError
 from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, Visualisation
 from .report.blocks import Attachment, DataBlock, DataTable, Plot, Table, Text
+
+if TYPE_CHECKING:
+    from bokeh.model import Model
 
 T = TypeVar("T")
 U = TypeVar("U", DataFrame, Styler)
@@ -195,7 +197,7 @@ class BokehBasePlot(PlotAsset):
     mimetype = "application/vnd.bokeh.show+json"
     ext = ".bokeh.json"
 
-    def write_file(self, f: IO, app: Model):
+    def write_file(self, f: IO, app: "Model"):
         from bokeh.embed import json_item
 
         json.dump(json_item(app), f)
