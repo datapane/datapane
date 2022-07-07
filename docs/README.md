@@ -27,7 +27,7 @@ The new Datapane documentation.
 
 3. Mark the cell with the metadata tag `remove_input` so we only see the output.
 
-# Hiding input and/or output.
+# Hiding input and/or output
 
 Use metadata to show or hide input/output cells in notebooks.
 - `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
