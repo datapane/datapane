@@ -22,7 +22,7 @@ The new Datapane documentation.
 
     ```python
     from dpdocsutils import previews
-    previews.embed_local_report('/quickstart.html', width="100%", height=900)
+    previews.embed_local_report('/tutorials/basics/simple-report.html', width="100%", height=400)
     ```
 
 3. Mark the cell with the metadata tag `remove_input` so we only see the output.
