@@ -1,6 +1,11 @@
 # datapane-docs-beta
 The new Datapane documentation.
 
+# Requirements
+
+1. `poetry`, e.g. `brew install poetry`.
+2. `chromium` that can be resolved through `which chromium`, e.g. `brew install chromium`.
+
 # Generating the docs
 
 1. Run `./nbbuild.sh` to execute all Jupyter notebooks and generate Datapane reports and image previews.
