@@ -100,13 +100,13 @@ module.exports = {
         require("@formkit/themes/tailwindcss"),
     ],
     content: [
-        // FE files
+        // JS bundles
         "./report/src/**/*.{vue,js,ts}",
         "./base/src/**/*.{vue,js,ts}",
         "./params-component/src/**/*.{vue,js,ts}",
         "./node_modules/@variantjs/**/*.ts",
 
-        // BE files
+        // Template files
         "../../fe-components/src/**/*.{js,ts,tsx}",
         "../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
         "../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
@@ -114,6 +114,9 @@ module.exports = {
         "../../dp-server/src/dp/apps/dp_org/templates/**/*.html",
         "../../dp-server/src/dp/apps/dp_public/templates/**/*.html",
         "../../dp-server/templates/**/*.html",
+
+        // Local report
+        "../src/datapane/resources/local_report/template.html",
     ],
     safelist: [
         { pattern: /grid-cols-.*/ },
