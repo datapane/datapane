@@ -18,8 +18,6 @@ vars:
 
 env:
 
-dotenv: ['.env']
-
 tasks:
   install:
     desc: "Install dependencies ready for development on the codebase"
