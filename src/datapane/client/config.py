@@ -91,8 +91,8 @@ class Config:
         c_yaml["from_file"] = True
         # NOTE - type checker doesn't like us setting class variables on instance
         config = dacite.from_dict(Config, c_yaml)
-        config._env = env  # type: ignore
-        config._path = config_f  # type: ignore
+        config._env = env
+        config._path = config_f
         log.debug(f"Loaded client environment from {config._path}")
         # check if stored file is out of date
         config.upgrade_config_format()
@@ -119,7 +119,10 @@ class Config:
             self._path = self.get_config_file(env)
 
         with self._path.open("w") as f:
-            yaml.safe_dump(dc.asdict(self), f)
+            config_dictionary = dc.asdict(self)
+            path = config_dictionary.get("_path", None)
+            config_dictionary["_path"] = None if path is None else str(path)
+            yaml.safe_dump(config_dictionary, f)
 
     def remove(self):
         self._path.unlink()
