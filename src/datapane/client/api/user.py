@@ -109,7 +109,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
 def _run_script(script: str):
     """Run the template script and copy it locally to cwd"""
     script_path = ir.files("datapane.resources.templates.hello") / script
-    shutil.copyfile(script_path, script_path.name)
+    shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
 
 
