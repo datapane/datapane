@@ -299,13 +299,6 @@ class Report(DPObjectRef):
         asset_blocks = processed_report_doc.xpath("count(/Report/Pages/Page/*)")
         if asset_blocks == 0:
             raise InvalidReportError("Empty report - must contain at least one asset/block")
-        elif c.config.is_public:
-            # only nudge public users
-            if asset_blocks < 4:
-                display_msg(
-                    "Your report only contains a single element - did you know you can include additional plots, tables and text in a single report? More info {url:l}",
-                    url="https://docs.datapane.com/reports/blocks/layout-pages-and-selects",
-                )
 
     @property
     def edit_url(self):
@@ -414,9 +407,8 @@ class Report(DPObjectRef):
             webbrowser.open_new_tab(self.web_url)
 
         display_msg(
-            "Report successfully uploaded. View and share your report {web_url:l}, or edit your report {edit_url:l}.",
+            "Report successfully uploaded. View and share your report at {web_url:l}.",
             web_url=self.web_url,
-            edit_url=self.edit_url,
         )
 
     def update_assets(
@@ -479,9 +471,8 @@ class Report(DPObjectRef):
         self.refresh()
 
         display_msg(
-            "Successfully updated report assets  - you can edit and format {edit_url:l}, and view the final report {web_url:l}",
+            "Report assets successfully updated. View and share your report at {web_url:l}.",
             web_url=self.web_url,
-            edit_url=self.edit_url,
         )
 
         if open:
@@ -510,14 +501,7 @@ class Report(DPObjectRef):
             formatting=formatting,
         )
 
-        if c.config.is_anonymous:
-            display_msg(
-                "Report saved to ./{path}. To upload and share your report, create a free Datapane account by running `{signup:cmd}`.",
-                path=path,
-                signup="datapane signup",
-            )
-        else:
-            display_msg(f"Report saved to ./{path}")
+        display_msg(f"Report saved to ./{path}")
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
@@ -545,13 +529,6 @@ class Report(DPObjectRef):
 
         report_id = self._save(path, open, name, author, formatting)
         capture("CLI Report Save", report_id=report_id)
-
-        # feedback form
-        if random.random() < 0.1:
-            display_msg(
-                "How is your experience of Datapane? Please take two minutes to answer our anonymous product survey {url:l}",
-                url="https://bit.ly/3lWjRlr",
-            )
 
     @capture_event("CLI Report Preview")
     def preview(

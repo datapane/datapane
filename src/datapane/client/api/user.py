@@ -121,15 +121,13 @@ def signup():
     # login and re-init against the signed-up server
     login(token, server=config.server)
 
-    display_msg("\nRunning `./world.py` and uploading the Datapane report to your newly created account.\n")
-
-    # run the world script
-    _run_script("world.py")
-
-    # success_msg("Report uploaded, opening in your browser")
     display_msg(
         "\nLearn more about uploading and sharing reports {learn_url:l}.",
         learn_url="https://docs.datapane.com/reports/publishing-and-sharing",
+    )
+
+    display_msg(
+        "\nWe’d also love to invite you to our community spaces for a chat (https://chat.datapane.com), forum discussion (https://forum.datapane.com), and open source collaboration (https://github.com/datapane/datapane)."
     )
 
 
@@ -142,7 +140,9 @@ def hello_world():
 
     _run_script("hello.py")
 
-    display_msg("\nNext, run `{signup:cmd}` to create a free account and upload a report.", signup="datapane signup")
+    display_msg(
+        "\nWe’d also love to invite you to our community spaces for a chat (https://chat.datapane.com), forum discussion (https://forum.datapane.com), and open source collaboration (https://github.com/datapane/datapane)."
+    )
 
 
 def token_connect(open_url: str, action: str, server: str):
