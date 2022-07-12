@@ -4,7 +4,6 @@ Datapane Reports Object
 Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
-import random
 import typing as t
 import webbrowser
 from base64 import b64encode
