@@ -107,7 +107,6 @@ module.exports = {
         "./node_modules/@variantjs/**/*.ts",
 
         // Template files
-        "../../fe-components/src/**/*.{js,ts,tsx}",
         "../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
         "../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
         "../../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
