@@ -159,7 +159,7 @@ def build_demo_report() -> Report:
     import plotly.graph_objects as go  # noqa
     from bokeh.plotting import figure  # noqa
 
-    def _gen_boke(**kw):
+    def _gen_bokeh(**kw):
         p = figure(title="simple line example", x_axis_label="x", y_axis_label="y", **kw)
         p.line([1, 2, 3, 4, 5], [6, 7, 2, 4, 5], legend_label="Temp.", line_width=2)
         return p
@@ -381,7 +381,7 @@ dp.Attachment(data=[1,2,3])
 
     plots = b.Group(
         b.Plot(vega_sine, name="vega", caption="Altair Plot"),
-        b.Plot(_gen_boke(), name="bokeh", caption="Bokeh Plot"),
+        b.Plot(_gen_bokeh(), name="bokeh", caption="Bokeh Plot"),
         b.Plot(_gen_matplotlib(), name="matplotlib", caption="Matplotlib Plot"),
         b.Plot(_gen_plotly(), name="plotly", caption="Plotly Plot"),
         b.Plot(_gen_folium(), name="folium", caption="Folium Plot"),

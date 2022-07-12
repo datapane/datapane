@@ -10,7 +10,7 @@ import os
 import pprint
 import typing as t
 from pathlib import Path
-from typing import Optional, Type
+from typing import Optional, Type, cast
 from urllib import parse as up
 
 import pandas as pd
@@ -68,7 +68,7 @@ class DPObjectRef:
         # build a url to the resource on the api server
         _id: str
         if self.endpoint in id_or_url:
-            url = str(id_or_url)
+            url = cast(str, id_or_url)
             if not url.startswith("http"):
                 url = f"https://{url}"
             if not v.url(url):

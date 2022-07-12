@@ -51,8 +51,8 @@ class Config:
 
     from_file: dc.InitVar[bool] = False
 
-    _env: t.ClassVar[Optional[str]]
-    _path: t.ClassVar[Optional[Path]]
+    _env: Optional[str] = None
+    _path: Optional[Path] = None
 
     def __post_init__(self, from_file: bool):
         self.server = self.server.rstrip("/")  # server should be a valid origin
@@ -90,12 +90,10 @@ class Config:
         # load config obj from file
         c_yaml["from_file"] = True
         # NOTE - type checker doesn't like us setting class variables on instance
-        # don't think this will cause issues
         config = dacite.from_dict(Config, c_yaml)
-        Config._env = env
-        Config._path = config_f
+        config._env = env  # type: ignore
+        config._path = config_f  # type: ignore
         log.debug(f"Loaded client environment from {config._path}")
-
         # check if stored file is out of date
         config.upgrade_config_format()
 
@@ -117,8 +115,8 @@ class Config:
         if env:
             # NOTE - type checker doesn't like us setting class variables on instance
             # don't think this will cause issues
-            Config._env = env
-            Config._path = self.get_config_file(env)
+            self._env = env
+            self._path = self.get_config_file(env)
 
         with self._path.open("w") as f:
             yaml.safe_dump(dc.asdict(self), f)

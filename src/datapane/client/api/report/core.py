@@ -26,7 +26,7 @@ from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
-from datapane.common import dict_drop_empty, log, timestamp
+from datapane.common import SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
 from .blocks import (
@@ -330,7 +330,7 @@ class Report(DPObjectRef):
         # process params
         tags = tags or []
 
-        formatting_kwargs: t.Dict[str, t.Any] = {}
+        formatting_kwargs: SDict = {}
         if formatting:
             formatting_kwargs.update(
                 width=formatting.width.value,
