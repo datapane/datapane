@@ -89,6 +89,7 @@ class Config:
 
         # load config obj from file
         c_yaml["from_file"] = True
+
         # NOTE - type checker doesn't like us setting class variables on instance
         config = dacite.from_dict(Config, c_yaml)
         config._env = env
@@ -120,8 +121,8 @@ class Config:
 
         with self._path.open("w") as f:
             config_dictionary = dc.asdict(self)
-            path = config_dictionary.get("_path", None)
-            config_dictionary["_path"] = None if path is None else str(path)
+            config_dictionary["_path"] = None
+            config_dictionary["_env"] = None
             yaml.safe_dump(config_dictionary, f)
 
     def remove(self):
