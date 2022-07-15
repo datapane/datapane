@@ -107,15 +107,15 @@ module.exports = {
         "./node_modules/@variantjs/**/*.ts",
 
         // Template files
-        "../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
-        "../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
-        "../../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
-        "../../dp-server/src/dp/apps/dp_org/templates/**/*.html",
-        "../../dp-server/src/dp/apps/dp_public/templates/**/*.html",
-        "../../dp-server/templates/**/*.html",
+        "../../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
+        "../../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
+        "../../../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
+        "../../../dp-server/src/dp/apps/dp_org/templates/**/*.html",
+        "../../../dp-server/src/dp/apps/dp_public/templates/**/*.html",
+        "../../../dp-server/templates/**/*.html",
 
         // Local report
-        "../src/datapane/resources/local_report/template.html",
+        "../../src/datapane/resources/local_report/template.html",
     ],
     safelist: [
         { pattern: /grid-cols-.*/ },
