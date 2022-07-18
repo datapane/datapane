@@ -1,0 +1,37 @@
+name: Base Python
+description: Base Setup for Python Tools for Datapane
+author: Datapane
+
+
+inputs:
+  python-version:
+    description: 'Version of Python to install'
+    required: true
+
+  poetry-version:
+    description: 'Version of Poetry to install'
+    default: '1.1.14'
+    required: false
+
+
+outputs: {}
+
+
+runs:
+  using: composite
+
+  steps:
+    - name: 'Install Poetry v${{ inputs.poetry-version }}'
+      uses: .github/actions/poetry-install
+      with:
+        poetry-version: '${{ inputs.poetry-version }}'
+
+    - name: 'Install Python v${{ inputs.python-version }}'
+      uses: actions/setup-python@v4
+      id: install
+      with:
+        python-version: '${{ inputs.python-version }}'
+        # Github caches venvs, however this is problematic as:
+        #  - poetry doesn't handle venv changes for deps checked out via Git
+        #  - Caching doesn't take into consideration multiple venvs
+        #cache: poetry

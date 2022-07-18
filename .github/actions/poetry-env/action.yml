@@ -1,0 +1,78 @@
+name: 'Poetry Env'
+description: 'A Wrapper for configuring a Poetry Environment'
+author: 'Datapane'
+
+inputs:
+  working-directory:
+    description: 'The directory to configure'
+    default: '.'
+    required: false
+
+  python-version:
+    description: 'The python version to use for the env. Usually the output of setup-python'
+    required: true
+
+  install-deps:
+    description: 'Whether to install your dependencies automatically'
+    default: 'true'
+    required: false
+
+  activate:
+    description: 'Activate the Virtual Env for subsequent steps'
+    default: 'false'
+    required: false
+
+outputs: {}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Ensure Poetry is available
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if ( ! command -v poetry > /dev/null ) {
+          echo '::error title=Poetry Not Found::Did you remember to use the "base-python" or "poetry-install" action?'
+        }
+
+    - name: Ensure the Working Directory is a Poetry Project
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if ( ! test -f 'poetry.lock' ) {
+          echo '::error title=Not a Poetry Project::Did not find a Poetry Project under ${{ inputs.working-directory }}'
+        }
+
+    - name: Configure Poetry Env
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        poetry env use '${{ inputs.python-version }}'
+        # Don't do this, as we're not caching venvs due to bugs
+        # poetry config virtualenvs.in-project
+
+    - name: Poetry Config
+      id: local-poetry-config
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        venv_path="$(poetry env info -p)"
+
+        echo "::set-output name=venv-path::${venv_path}"
+
+
+    - name: Install Dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      if: inputs.install-deps == 'true'
+      run: |
+        poetry install
+
+    - name: Activate the Venv
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      if: inputs.activate == 'true'
+      run: |
+        echo 'VIRTUAL_ENV=${{ steps.local-poetry-config.outputs.venv-path }}' >> "$GITHUB_ENV"
+        echo '${{ steps.local-poetry-config.outputs.venv-path }}/bin' >> "$GITHUB_PATH"
