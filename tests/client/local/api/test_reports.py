@@ -1,7 +1,5 @@
 """Tests for the API that can run locally (due to design or mocked out)"""
 import os
-import typing as t
-from contextlib import suppress
 from pathlib import Path
 
 import pandas as pd
@@ -14,7 +12,7 @@ from lxml.etree import DocumentInvalid
 import datapane as dp
 from datapane.client.api.report.blocks import BaseElement
 from datapane.client.api.report.core import BuilderState
-from datapane.client.utils import DPError, InvalidTokenError
+from datapane.client.utils import DPError
 from datapane.common.report import load_doc, validate_report_doc
 
 from ...e2e.common import gen_df, gen_plot
@@ -294,54 +292,3 @@ def test_local_report_with_files(datadir: Path, monkeypatch):
     monkeypatch.chdir(datadir)
     report = gen_report_complex_with_files(datadir, local_report=True)
     report.save(path="test_out.html", name="Even better report")
-
-
-################################################################################
-# Report Update Assets block convertor
-def test_update_assets_api():
-    """
-    Test update assets API and id/naming handling
-    NOTE - bit hacky as we wait for the exception then run the rest of the report checks
-    """
-
-    def _assert_res(tr: dp.Report, expected_num_assets: int, names: t.Optional[t.List[str]] = None):
-        report_str, _ = tr._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
-        r = load_doc(report_str)
-        assert r.xpath("count(//Group[1]/*)") == expected_num_assets
-        if names:
-            assert r.xpath("//Group[1]/*/@name") == names
-
-    report = dp.Report("Empty Text")
-
-    # Errors
-    with pytest.raises((AssertionError, InvalidTokenError)):
-        report.update_assets("Text-3")
-    with pytest.raises((AssertionError, InvalidTokenError)):
-        report.update_assets(gen_df())
-    with pytest.raises(DPError):
-        report.update_assets()
-    with pytest.raises((AssertionError, InvalidTokenError)):
-        report.update_assets(dp.Text("Text-arg-1"))
-
-    # basic
-    with suppress(AttributeError, InvalidTokenError):
-        report.update_assets(dp.Text("Text-4", name="test"))
-    _assert_res(report, 1)
-
-    # arg/kwarg naming tests
-    with suppress(AttributeError, InvalidTokenError):
-        report.update_assets(
-            dp.Text("Text-arg-2", name="text-arg-2"),
-            t1="Text-1",
-            t2=dp.Text("Text-2"),
-            t3=dp.Text("Text-3", name="overwritten"),
-        )
-    _assert_res(report, 4, ["text-arg-2", "t1", "t2", "t3"])
-
-    # dict/list test
-    with suppress(AttributeError, InvalidTokenError):
-        report.update_assets(blocks=dict(t1="text-1", t2=dp.Text("Text-2"), t3=dp.Text("Text-3", name="overwritten")))
-    _assert_res(report, 3, ["t1", "t2", "t3"])
-    with suppress(AttributeError, InvalidTokenError):
-        report.update_assets(blocks=[dp.Text("Text-2", name="text-2"), dp.Text("Text-3", name="text-3")])
-    _assert_res(report, 2, ["text-2", "text-3"])
