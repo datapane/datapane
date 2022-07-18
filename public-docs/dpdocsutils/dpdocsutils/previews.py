@@ -16,7 +16,10 @@ async def screenshot_html(report_path, image_path, width, height):
     )
     browser = await launch(headless=True, executablePath=chromium_path)
     page = await browser.newPage()
-    await page.goto(f"file://{os. getcwd()}/{report_path}")
+    await page.goto(
+        f"file://{os. getcwd()}/{report_path}",
+        {"waitUntil": "networkidle0", "timeout": 60000},
+    )
     await page.setViewport({"deviceScaleFactor": 2, "width": width, "height": height})
     await page.screenshot(
         {
