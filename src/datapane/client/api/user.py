@@ -127,7 +127,10 @@ def signup():
     )
 
     display_msg(
-        "\nWe’d also love to invite you to our community spaces for a chat (https://chat.datapane.com), forum discussion (https://forum.datapane.com), and open source collaboration (https://github.com/datapane/datapane)."
+        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
+        chat_url="https://chat.datapane.com",
+        forum_url="https://forum.datapane.com",
+        github_url="https://github.com/datapane/datapane",
     )
 
 
@@ -141,7 +144,10 @@ def hello_world():
     _run_script("hello.py")
 
     display_msg(
-        "\nWe’d also love to invite you to our community spaces for a chat (https://chat.datapane.com), forum discussion (https://forum.datapane.com), and open source collaboration (https://github.com/datapane/datapane)."
+        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
+        chat_url="https://chat.datapane.com",
+        forum_url="https://forum.datapane.com",
+        github_url="https://github.com/datapane/datapane",
     )
 
 
