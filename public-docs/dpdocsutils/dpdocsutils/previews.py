@@ -12,7 +12,8 @@ nest_asyncio.apply()
 
 async def screenshot_html(report_path, image_path, width, height):
     # Pyppeteer doesn't package an M1 version of Chromium for MacOS yet, allow for using the system package.
-    chromium_path = shutil.which('chromium')  # or None
+    # 'chromium' is for MacOS, 'chromium-browser' is for Fedora.
+    chromium_path = shutil.which('chromium') or shutil.which('chromium-browser')  # or None
 
     browser = await launch(headless=True, executablePath=chromium_path)
     page = await browser.newPage()
