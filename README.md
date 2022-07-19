@@ -46,7 +46,7 @@ Love analyzing data in Python but struggle to share results and insights? Datapa
 
 Want a head start? Check out our _Datapane in 3 minutes_ video:
 
-[![Datapane in 3 minutes](https://img.youtube.com/vi/_KS_yZBI71s/0.jpg)](https://www.youtube.com/watch?v=_KS_yZBI71s)
+https://user-images.githubusercontent.com/15690380/179759362-e577a4f8-d1b7-4b8d-9190-0c13d5015728.mp4
 
 ## Installing Datapane
 
