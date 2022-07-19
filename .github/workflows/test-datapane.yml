@@ -1,10 +1,14 @@
 name: Test [Datapane]
 
 on:
-  # Run on any push to master and all PRs (any branch)
+  # Run on any push to master and all PRs (any branch) that cover the python-client
   push:
     branches: [ master ]
+    paths:
+      - 'projects/python-client/**'
   pull_request:
+    paths:
+      - 'projects/python-client/**'
 
 jobs:
   datapane-multi-env:
