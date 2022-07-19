@@ -4,9 +4,8 @@ If you want to share your report on the web, _Datapane Cloud_ provides a free AP
 
 In addition, you can embed your uploaded report into social platforms, like Reddit and Medium, where your readers can explore your data and plots interactively without leaving your content, like this:
 
-
 !!! info
-    
+
     Your free Cloud account comes with an unlimited number of public reports, and 5 private reports so you can test it within your organization. If you need more private reports, [contact us](mailto:support@datapane.com) or try our Enterprise product (read on)
 
 # Datapane Teams
@@ -17,7 +16,7 @@ In addition to providing secure, authenticated report sharing, _Datapane Teams_ 
 
 Other features include:
 
-* APIs to utilise blobs and secrets in your scripts
-* [Whitelabel embedding](/tutorials/styling/global-styling/) of Datapane reports in your own products
-* [Groups and secure-sharing features](/concepts/datapane-teams/authentication-and-sharing/) to control access and share reports with external clients
-* and [many more](/concepts/datapane-teams/)
+-   APIs to utilise blobs and secrets in your scripts
+-   [Whitelabel embedding](/tutorials/styling/global-styling/) of Datapane reports in your own products
+-   [Groups and secure-sharing features](/concepts/datapane-teams/authentication-and-sharing/) to control access and share reports with external clients
+-   and [many more](/concepts/datapane-teams/)

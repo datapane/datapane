@@ -4,9 +4,8 @@ Datapane allows secure, authenticated sharing of reports, scripts, blobs, and se
 
 For more information on getting started, please see our tutorial sections on [Datapane CLI installation](/tutorials/basics/install-datapane/) and [authenticating with your Datapane server](/tutorials/datapane-cloud/authenticate-datapane/#datapane-teams).
 
-
 !!! info
-    
+
     Each Datapane instance exists as a separate database tenancy, so accounts are not shared between instances. You cannot use the same account to authenticate across multiple instances (including Datapane Community).
 
 ## Access Tokens
@@ -28,7 +27,7 @@ To share a report with a specific group of people on your Datapane Server, your 
 ![](../../img/concepts/authentication-and-sharing-2.png)
 
 !!! warning
-    
+
     Datapane Servers come with a default project. All reports and scripts are shared with the `default` group automatically. If you do not want specific internal or external users to view these reports, **do not add them to the `default` project**.
 
 You can also change the project of a report via the web UI (as per the first image above).
