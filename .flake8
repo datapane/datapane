@@ -1,7 +1,0 @@
-[flake8]
-select = E, F, I, W504, NIC, T801, ANN001, ANN201, ANN206, ANN205, ANN206, TAE
-ignore = E203, E402, E501, W503
-max-complexity=10
-max-line-length=100
-exclude = .git, .venv
-per-file-ignores = src/datapane/client/commands.py:F811

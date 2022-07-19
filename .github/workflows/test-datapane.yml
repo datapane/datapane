@@ -42,9 +42,9 @@ jobs:
       - name: Cache .venv
         uses: actions/cache@v2
         with:
-          path: .venv
-          key: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+          path: projects/python-client/.venv
+          key: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('projects/python-client/poetry.lock') }}
+          restore-keys: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
       - name: Cache pip dir (${{ env.PIP_DIR }})
         uses: actions/cache@v2
         with:
@@ -52,6 +52,7 @@ jobs:
           key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
           restore-keys: datapane-pip-${{ runner.os }}-
       - name: Run Tests
+        working-directory: ./projects/python-client/
         run: |
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true

@@ -25,8 +25,8 @@ jobs:
       - name: Cache .venv
         uses: actions/cache@v2
         with:
-          path: .venv
-          key: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
+          path: projects/python-client/.venv
+          key: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('projects/python-client/poetry.lock') }}
           restore-keys: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
       - name: Cache pip dir (${{ env.PIP_DIR }})
         uses: actions/cache@v2
@@ -35,10 +35,10 @@ jobs:
           key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
           restore-keys: datapane-pip-${{ runner.os }}-
       - name: Build Docs
+        working-directory: ./projects/python-client/
         run: |
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
-          # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install
           # --config 'lunr_search={"fuzziness": 1, "index_docstrings": True}'
           poetry run pdoc --html --config show_source_code=False --config list_class_variables_in_index=False --config sort_identifiers=False --config 'google_analytics="UA-167952366-2"' --config show_inherited_members=True -f --output-dir ./docs1 datapane.client.api
@@ -50,7 +50,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./projects/python-client/docs
           # force_orphan: true
           # user_name: 'github-actions[bot]'
           # user_email: 'github-actions[bot]@users.noreply.github.com'
