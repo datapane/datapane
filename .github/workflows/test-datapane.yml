@@ -56,10 +56,10 @@ jobs:
         run: |
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
-          # Run the type checker
-          poetry run python -m mypy src
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install -E plotting -E cloud
+          # Run the type checker
+          poetry run python -m mypy projects/python-client/src/datapane/
           # run CLI tests (junit tests not captured yet)
           poetry run python -m pytest -v --ignore=tests/client/e2e/ tests --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
           # run top-level CLI tests (junit tests not captured yet)
