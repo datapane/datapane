@@ -44,6 +44,10 @@ Love analyzing data in Python but struggle to share results and insights? Datapa
 
 # Getting Started
 
+Want a head start? Check out our _Datapane in 3 minutes_ video:
+
+[![Datapane in 3 minutes](https://img.youtube.com/vi/_KS_yZBI71s/0.jpg)](https://www.youtube.com/watch?v=_KS_yZBI71s)
+
 ## Installing Datapane
 
 The best way to install Datapane is through pip or conda.
