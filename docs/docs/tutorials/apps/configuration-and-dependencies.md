@@ -2,13 +2,13 @@
 
 Your Datapane app may have requirements on external libraries and require certain environment values. Datapane supports the ability to,
 
-* add local folders and files, which you can deploy alongside your app
-* include `pip` requirements, which are made available to your app when it is run on Datapane
+-   add local folders and files, which you can deploy alongside your app
+-   include `pip` requirements, which are made available to your app when it is run on Datapane
 
 These are all configured in your `datapane.yaml`.
 
 !!! info
-    
+
     For complex dependencies and internal libraries, we highly recommend creating a Docker container.
 
 ## Python dependencies
@@ -16,10 +16,9 @@ These are all configured in your `datapane.yaml`.
 If we were building a reporting tool to pull down financial data, we may want to use the [yfinance](https://pypi.org/project/yfinance/) library in Python. To do this, we could add it to a `requirements` list in our `datapane.yaml`
 
 ```yaml title="datapane.yaml"
-...
-
+---
 requirements:
-  - yfinance
+    - yfinance
 ```
 
 ## Additional files and folders
@@ -34,10 +33,9 @@ dp-script.py datapane.yaml stock_scaler.py
 To include this in the deploy, we could add it to `include`&#x20;
 
 ```yaml title="datapane.yaml"
-...
-
+---
 include:
-  - stock_scaler.py
+    - stock_scaler.py
 ```
 
 We can then import it in our script as follows:&#x20;
@@ -96,5 +94,5 @@ environment: my-environment
 When you run an app, it will run inside this Docker container. Note that the first run may take a bit longer, as it needs to pull the image from DockerHub. Once it pulls it once, it's cached for future runs.
 
 !!! info
-    
+
     We support both public and private Docker images, so you can add private internal libraries, for instance, to your Docker image. You can add your registry credentials to your Datapane Server from the server settings page.
