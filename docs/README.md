@@ -4,12 +4,17 @@ The new Datapane documentation.
 
 # Requirements
 
-1. `poetry`, e.g. `brew install poetry`.
-2. `chromium` that can be resolved through `which chromium`, e.g. `brew install chromium`.
+1. `poetry`, as per [their instructions](https://python-poetry.org/docs/master/#installing-with-the-official-installer)
+2. `chromium`, through your package manager:
+
+    _we will pick up `chromium` or `chromium-browser` from your `$PATH`_
+
+    - MacOS: `brew install chromium`
+    - Fedora: `sudo dnf install chromium`
 
 # Generating the docs
 
-1. Run `./nbbuild.sh` to execute all Jupyter notebooks and generate Datapane reports and image previews.
+1. Run `poetry run ./nbbuild.sh` to execute all Jupyter notebooks and generate Datapane reports and image previews.
 2. Run `poetry run mkdocs build` to generate static site in `site/`.
 
 `poetry run mkdocs serve` can be used to serve locally.
