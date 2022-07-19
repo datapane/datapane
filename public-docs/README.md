@@ -1,4 +1,5 @@
 # datapane-docs-beta
+
 The new Datapane documentation.
 
 # Requirements
@@ -22,7 +23,8 @@ The new Datapane documentation.
     ```
 
 2. Use `dpdocsutils` to:
-    - embed the interactive report (`iframe=True`), 
+
+    - embed the interactive report (`iframe=True`),
     - or insert a generated preview image that hyperlinks to the interactive report (`iframe=False`, default)
 
     ```python
@@ -35,6 +37,7 @@ The new Datapane documentation.
 # Hiding input and/or output
 
 Use metadata to show or hide input/output cells in notebooks.
-- `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
-- `remove_all_output`, e.g. for the cells outputting information after calling `.save()` or `.upload()`.
-- `remove_cell`, e.g. when you want something executed without displaying input or output.
+
+-   `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
+-   `remove_all_output`, e.g. for the cells outputting information after calling `.save()` or `.upload()`.
+-   `remove_cell`, e.g. when you want something executed without displaying input or output.

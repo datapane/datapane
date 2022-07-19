@@ -14,8 +14,8 @@ Application frameworks such as Dash and Streamlit are for building realtime, syn
 
 Datapane's reporting and script automation APIs work differently, and which is most suitable depends on your use-case.
 
-* Datapane's _Report API_ sits inside your existing environment -- such as Jupyter, Airflow, Colab, etc. -- and allows you to create and upload reports from plots and data in these environments. The report which is created does not require you to deploy your source code or run a Python server, and thus can be easily embedded, shared, emailed, etc. Each time you upload the report, it sends up only the plots and data, and creates a new version snapshot.
-* For reporting use-cases, Datapane's _App API_ allows you to deploy your existing Jupyter Notebook or Python scripts: you don't build an application or manage the infrastructure. Your apps are run in a **serverless**, event-driven model in response to auto-generated forms, external API calls, or on a schedule, in order to automatically generate reports. This is suitable for allowing data science teams to deploy their notebooks and scripts so that stakeholders can generate and refresh reports in their web-browser; it is also often used to generate new reports on a cadence (e.g. a weekly analytics report which is emailed to the team), in response to API-events, or via other applications -- such as Slack, Microsoft Teams, or Salesforce integrations.
+-   Datapane's _Report API_ sits inside your existing environment -- such as Jupyter, Airflow, Colab, etc. -- and allows you to create and upload reports from plots and data in these environments. The report which is created does not require you to deploy your source code or run a Python server, and thus can be easily embedded, shared, emailed, etc. Each time you upload the report, it sends up only the plots and data, and creates a new version snapshot.
+-   For reporting use-cases, Datapane's _App API_ allows you to deploy your existing Jupyter Notebook or Python scripts: you don't build an application or manage the infrastructure. Your apps are run in a **serverless**, event-driven model in response to auto-generated forms, external API calls, or on a schedule, in order to automatically generate reports. This is suitable for allowing data science teams to deploy their notebooks and scripts so that stakeholders can generate and refresh reports in their web-browser; it is also often used to generate new reports on a cadence (e.g. a weekly analytics report which is emailed to the team), in response to API-events, or via other applications -- such as Slack, Microsoft Teams, or Salesforce integrations.
 
 ### Tableau, Looker, and other traditional BI tools
 
@@ -28,4 +28,3 @@ Datapane is not intended to be a drop-and-drop dashboard builder, and most compa
 ## Support
 
 For a full explanation of the various kinds of enterprise support available, read our [support policy](/concepts/support-policy/).&#x20;
-

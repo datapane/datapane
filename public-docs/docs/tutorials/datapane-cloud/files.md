@@ -6,8 +6,8 @@ description: You can store common files and datasets on Datapane to use in your 
 
 [:octicons-organization-16: Teams feature](){.org}
 
-!!! info 
-    
+!!! info
+
     Please see the [File API Reference](https://datapane.github.io/datapane/teams.html#datapane.client.api.teams.Blob) for more details.
 
 It is often necessary to make use of non-code assets such as datasets, models, or files when generating reports. In many situations, deploying these alongside your script is not ideal.
@@ -67,10 +67,10 @@ f = dp.File.upload_obj([1,2,3], name='my_list')
 
 Download a DataFrame, file, or object. All download operations have the following parameters:
 
-| Parameter | Description                         | Required |
-| --------- | ----------------------------------- | -------- |
-| `name`    | The name of your file               | True     |
-| `project` | The project to upload the file to.  | False    |
+| Parameter | Description                        | Required |
+| --------- | ---------------------------------- | -------- |
+| `name`    | The name of your file              | True     |
+| `project` | The project to upload the file to. | False    |
 
 !!! warning
 

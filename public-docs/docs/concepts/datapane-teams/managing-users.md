@@ -3,7 +3,7 @@
 You can invite team members to your instance so your whole team has access to a shared environment for reports and scripts.&#x20;
 
 !!! info
-    
+
     Datapane doesn't charge on a per-seat or per-user basis, so you can add as many people to your instance as you like!
 
 ### Inviting Users
@@ -27,5 +27,5 @@ The default project is automatically created by the server and is for internal u
 If you need to delete a user, click on the 'Advanced Settings' button next to the user's name. This will take you to the Django Admin Panel. We recommend unchecking the box under Permissions -> 'Active' instead of deleting the user permanently, as this will trigger a cascading deletion of all the objects and reports that user ever created.&#x20;
 
 !!! info
-    
+
     Deactivated users won't be able to log into your instance, or upload any further reports and scripts.&#x20;

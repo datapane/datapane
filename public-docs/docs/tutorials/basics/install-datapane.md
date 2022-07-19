@@ -12,7 +12,6 @@ Datapane's Python library and CLI can be installed using either `conda` or `pip`
 
 If you use `conda`, you can install it with:
 
-
 === "Bash"
 
     ``` bash
@@ -32,7 +31,6 @@ If you use `conda`, you can install it with:
 ## pip
 
 If you use `pip`, you can install it with:
-
 
 === "Bash"
 
@@ -76,9 +74,8 @@ $ conda update datapane OR conda update --all
 ## Windows Tips and Troubleshooting
 
 !!! info
-    
-    Having problems running on Windows? Please read on...
 
+    Having problems running on Windows? Please read on...
 
 We generally recommend installing via `conda` over `pip` on Windows as it's easier to install all the required dependencies.
 
@@ -117,6 +114,6 @@ Consider adding this directory to PATH or, if you prefer to suppress this warnin
 
 To fix this, adjust your `%PATH%` to include your specific `Scripts` path as mentioned in the `pip` warning (see [https://datatofish.com/add-python-to-windows-path/](https://github.com/datapane/datapane-docs/tree/5f551e8c5b2748f0785683bbd62cb59f1dfe46ca/tutorials/here/README.md) for more detailed instructions). Alternatively, you can try running the datapane client directly, using the command `python3.exe -m datapane.client` instead.
 
-!!! info 
+!!! info
 
     If you are still having problems installing, please ask on the [Datapane Forum](https://forum.datapane.com) or [Datapane Chat](https://chat.datapane.com), and someone will come to help you.

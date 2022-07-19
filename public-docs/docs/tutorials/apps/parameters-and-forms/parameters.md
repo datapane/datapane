@@ -8,13 +8,13 @@ description: Parameters customise your script and can turn it into a web form
 
 When you define your list of parameters, all can include the following options.
 
-| Field        | Required | Description                                                                                                                         |
-| ------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| name         | True     | The name of the parameter. This must be a combination of lower case letters, numbers, and dashes and must be unique to your script. |
-| type         | True     | The type of the parameter (see options below)                                                                                       |
-| description  | False    | A description which is presented to the user when they run your form.                                                               |
-| required     | False    | Whether your parameter is required or optional. Defaults to true.                                                                   |
-| default      | False    | A default value for your parameter.                                                                                                 |
+| Field       | Required | Description                                                                                                                         |
+| ----------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| name        | True     | The name of the parameter. This must be a combination of lower case letters, numbers, and dashes and must be unique to your script. |
+| type        | True     | The type of the parameter (see options below)                                                                                       |
+| description | False    | A description which is presented to the user when they run your form.                                                               |
+| required    | False    | Whether your parameter is required or optional. Defaults to true.                                                                   |
+| default     | False    | A default value for your parameter.                                                                                                 |
 
 ### Parameter Form Fields
 

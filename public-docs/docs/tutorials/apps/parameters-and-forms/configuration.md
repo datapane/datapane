@@ -1,6 +1,6 @@
 # Configuration
 
-Configuration for your Datapane Python script. 
+Configuration for your Datapane Python script.
 
 Inside your `datapane.yaml`, you can set the following fields.
 
@@ -25,7 +25,7 @@ String (allowed characters are `[a-z0-9-_]`)
 The name of your script, which appears on the web UI.&#x20;
 
 !!! info
-    
+
     Deploying multiple scripts with the same name increments the version number automatically
 
 ## `pre_commands`
@@ -39,7 +39,7 @@ A list of bash commands.
 A list of bash commands which will run before your script is executed. This is frequently used to do things like installing pip dependencies from a local folder deployed with `include`, or pull data from git.&#x20;
 
 !!! info
-    
+
     These will run each time your script runs, so could add some latency. For more complex dependencies, we recommend building a Docker container.
 
 ## `include`
@@ -53,7 +53,7 @@ A list of relative paths or folders
 Local files or folders to include in your script. These will be available in the current working directory when your script runs, so can be used to upload local libraries, source files, SQL, etc.
 
 !!! info
-    
+
     For larger files and binary objects, we recommend using the Blob API
 
 ## `exclude`
@@ -77,10 +77,10 @@ A list of objects
 A list of parameters which are turned into web forms and passed into your code at runtime. Comprised of a list of objects, i.e.
 
 ```yaml
-parameters: 
-  - name: my_param
-    type: string
-    default: foo
+parameters:
+    - name: my_param
+      type: string
+      default: foo
 ```
 
 For full documentation on parameters, please see the respective documentation:
@@ -97,8 +97,8 @@ A list of pip-compliant packages
 
 A list of packages you want installed before your script runs. These can be anything that would normally be in a `requirements.txt`.&#x20;
 
-!!! info 
-    
+!!! info
+
     These parameters are installed on each script run, so you if have many of them, this can cause a delay in execution. If you need to re-use the same parameters repeatedly, or have more complex requirements, we recommend adding your requirements to a Docker image and specifying with `container_image_name`
 
 #### Value

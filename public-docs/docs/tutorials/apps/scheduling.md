@@ -14,24 +14,24 @@ $ datapane schedule create <script name> <crontab> [-p <parameters>]
 
 `create` takes three parameters:
 
-* `app`: the name of the app to run
-* `cron`: crontab representing the schedule interval. Note that schedules will be run in UTC, not the user's local timezone.
-* `parameters` (optional): if your app requires parameters, a key/value list of parameters to use when running the app on schedule
+-   `app`: the name of the app to run
+-   `cron`: crontab representing the schedule interval. Note that schedules will be run in UTC, not the user's local timezone.
+-   `parameters` (optional): if your app requires parameters, a key/value list of parameters to use when running the app on schedule
 
 !!! info
-    
+
     If you need help generating a crontab, please use a website such as [https://crontab.guru/](https://crontab.guru/).
 
 If we wanted to run our COVID app every day at 9am, we could use the following command:
 
 ```shell
-$ datapane schedule create your-username/covid_script "0 9 * * MON" 
+$ datapane schedule create your-username/covid_script "0 9 * * MON"
 ```
 
 Optionally, we could also include any input parameters using `-p`
 
 ```shell
-$ datapane schedule create[your-username]/covid_script "0 9 * * MON" -p '{"continents": ["Europe"], "field_to_plot": "gdp_per_capita"}' 
+$ datapane schedule create[your-username]/covid_script "0 9 * * MON" -p '{"continents": ["Europe"], "field_to_plot": "gdp_per_capita"}'
 ```
 
 If we wanted to find out what active schedules we have, we can use the `list` command:

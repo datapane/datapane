@@ -46,4 +46,3 @@ def embed_local_report(report_path, width, height, iframe=False):
 
         image_path = report_path.replace(".html", "-preview.png")
         return display(HTML(f'<a href="{report_path}"><img src="{image_path}"></a>'))
-
