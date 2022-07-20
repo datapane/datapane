@@ -37,17 +37,17 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        if ( ! command -v poetry > /dev/null ) {
+        if ( ! command -v poetry > /dev/null ); then
           echo '::error title=Poetry Not Found::Did you remember to use the "base-python" or "poetry-install" action?'
-        }
+        fi
 
     - name: Ensure the Working Directory is a Poetry Project
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        if ( ! test -f 'poetry.lock' ) {
+        if ( ! test -f 'poetry.lock' ); then
           echo '::error title=Not a Poetry Project::Did not find a Poetry Project under ${{ inputs.working-directory }}'
-        }
+        fi
 
     - name: Configure Poetry Env
       shell: bash
