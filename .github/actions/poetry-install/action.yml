@@ -22,6 +22,7 @@ runs:
       shell: bash
       if: runner.os != 'Windows'
       run: |
+
         echo "$(python3 -m site --user-base)/bin" >> "$GITHUB_PATH"
     - name: Configure local binary support Windows
       # This is where Poetry installs to for Windows
@@ -37,17 +38,18 @@ runs:
         import sys
         print(f"::set-output name=python-version::{sys.hexversion}")
 
-    - name: Poetry Install Cache
-      id: cache-poetry-install
-      # Only supports the linux paths currently
-      if: runner.os == 'Linux'
-      uses: actions/cache@v3
-      with:
-        path: ~/.local/share/pypoetry
-        key: cache-poetry-install-v1-${{ runner.os }}-${{ steps.preinstall.outputs.python-version }}-${{ inputs.poetry-version }}
+    # TODO: when caching, we need to relink the binary. don't do it for now.
+    # - name: Poetry Install Cache
+    #   id: cache-poetry-install
+    #   # Only supports the linux paths currently
+    #   if: runner.os == 'Linux'
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: ~/.local/share/pypoetry
+    #     key: cache-poetry-install-v2-${{ runner.os }}-${{ steps.preinstall.outputs.python-version }}-${{ inputs.poetry-version }}
 
     - name: Install Poetry
-      if: steps.cache-poetry-install.outputs.cache-hit != 'true'
+      # if: steps.cache-poetry-install.outputs.cache-hit != 'true'
       # We use the system python for poetry setup, as setup-python can depend on poetry existing9
       shell: bash
       run: |
