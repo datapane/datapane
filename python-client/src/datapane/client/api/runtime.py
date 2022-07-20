@@ -15,14 +15,14 @@ from datapane.client.apps import DATAPANE_YAML, DatapaneCfg
 from datapane.common import NPath, SDict, log
 
 if t.TYPE_CHECKING:
-    from .report import Report
+    from .report.core import Report
 
 ###############################################################################
 # top level functions here - move to runner?
 # TODO - make thread/context safe and determine a better approach for vars
 # TODO - add API tests
 
-__all__ = []
+__all__ = []  # type: ignore
 
 
 # we're running the datapane runner (also checked by __name__ == "__datapane__" in user script)

@@ -55,7 +55,7 @@ except ImportError:
     SdistBuilder = Mock
 
 
-def preprocess_src_dir(dp_config: DatapaneCfg) -> Path:
+def preprocess_src_dir(dp_config: DatapaneCfg) -> t.Optional[Path]:
     """Preprocess source-dir as needed"""
     old_mod = dp_config.proj_dir / dp_config.script
 
@@ -73,6 +73,8 @@ def preprocess_src_dir(dp_config: DatapaneCfg) -> Path:
         dp_config.script = Path(new_mod.name)
         return new_mod
 
+    return None
+
 
 # Flit sdist builder wrapper
 class Module:
@@ -88,10 +90,10 @@ DROP_DIRS = [f"{d}{osp.sep}" for d in DROP_DIRS_INIT]
 
 
 class Bundler(SdistBuilder):
-    def __init__(self, cfgdir: Path, module: Module, include_patterns=(), exclude_patterns=()):
+    def __init__(self, cfgdir: Path, module: Module, include_patterns: t.Tuple = (), exclude_patterns: t.Tuple = ()):
         self.cfgdir = cfgdir
         self.module = module
-        self.extra_files = []
+        self.extra_files = []  # type: ignore
         self.includes = FilePatterns(include_patterns, str(cfgdir))
         self.excludes = FilePatterns(exclude_patterns, str(cfgdir))
 
@@ -99,7 +101,7 @@ class Bundler(SdistBuilder):
     def drop_unrequired_files(self, f: str) -> bool:
         return any(d in f for d in DROP_DIRS)
 
-    def apply_includes_excludes(self, files) -> t.List[str]:
+    def apply_includes_excludes(self, files: t.List) -> t.List[str]:
         """Modify upstream to drop files from hardcoded drop filters"""
         files = super().apply_includes_excludes(files)
         reduced_files = {f for f in files if not self.drop_unrequired_files(f)}
@@ -111,7 +113,9 @@ class Bundler(SdistBuilder):
         return sorted(reduced_files)
 
     def build(self, target: Path):
-        with tarfile.TarFile.open(target, mode="w:gz", compresslevel=6, format=tarfile.PAX_FORMAT) as tf:
+        # NOTE mypy seems unhappy with the keyword compresslevel however I think it's because an optional
+        # argument for certain modes. Looking at the docs this is valid
+        with tarfile.TarFile.open(target, mode="w:gz", compresslevel=6, format=tarfile.PAX_FORMAT) as tf:  # type: ignore
             files_to_add: t.List[str] = self.apply_includes_excludes(self.select_files())
 
             for relpath in files_to_add:
@@ -128,7 +132,7 @@ class Bundler(SdistBuilder):
 
 
 @contextmanager
-def build_bundle(dp_config: DatapaneCfg, use_git: bool = False) -> t.ContextManager[Path]:
+def build_bundle(dp_config: DatapaneCfg, use_git: bool = False) -> t.Generator[Path, None, None]:
     """
     Build a local sdist-bundle on the client for uploading
     currently requires version and docstring

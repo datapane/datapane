@@ -433,7 +433,7 @@ class Text(EmbeddedTextBlock):
         """
 
         splits = re.split(r"\{\{(\w*)\}\}", self.content)
-        args = deque(args)
+        deque_args = deque(args)
         blocks = []
 
         for (i, x) in enumerate(splits):
@@ -444,7 +444,7 @@ class Text(EmbeddedTextBlock):
                     if x:
                         blocks.append(wrap_block(kwargs[x]))
                     else:
-                        blocks.append(wrap_block(args.popleft()))
+                        blocks.append(wrap_block(deque_args.popleft()))
                 except (IndexError, KeyError):
                     raise DPError(f"Unknown/missing object '{x}' referenced in Markdown format")
 

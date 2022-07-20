@@ -19,12 +19,12 @@ import sys
 import time
 import typing as t
 import webbrowser
-from pathlib import Path
 
 import click_spinner
 import importlib_resources as ir
 import requests
 from furl import furl
+from munch import Munch
 
 from datapane import __version__
 
@@ -97,7 +97,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     headers = {"Authorization": f"Token {config.token}", "Datapane-API-Version": __version__}
     q_params = dict(cli_id=config.session_id) if cli_login else {}
     r = requests.get(str(f), headers=headers, params=q_params)
-    response = _process_res(r)
+    response: Munch = _process_res(r)
     email = response.email
 
     if verbose:
@@ -108,9 +108,9 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
 
 def _run_script(script: str):
     """Run the template script and copy it locally to cwd"""
-    script_path: Path = ir.files("datapane.resources.templates.hello") / script
-    shutil.copyfile(script_path, script_path.name)
-    runpy.run_path(script_path, run_name="__datapane__")
+    script_path = ir.files("datapane.resources.templates.hello") / script
+    shutil.copyfile(str(script_path), script_path.name)
+    runpy.run_path(str(script_path), run_name="__datapane__")
 
 
 @capture_event("CLI Signup")
@@ -151,7 +151,7 @@ def hello_world():
     )
 
 
-def token_connect(open_url: str, action: str, server: str):
+def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
     """
     Create a signup token, and prompt the user to login/signup while polling for completion.
     Then log the user into the CLI with the retrieved API token
@@ -159,12 +159,17 @@ def token_connect(open_url: str, action: str, server: str):
 
     def create_token(s: requests.Session) -> str:
         create_endpoint = furl(path="/api/api-signup-tokens/", origin=server).url
-        r = s.post(create_endpoint)
-        return _process_res(r).key
+        req = s.post(create_endpoint)
+        res: Munch = _process_res(req)
+        return res.key
 
     def poll_token(s: requests.Session, endpoint: str) -> t.Optional[str]:
-        r = s.get(endpoint)
-        return None if r.status_code == 204 else _process_res(r).api_key
+        r: requests.Response = s.get(endpoint)
+        if r.status_code == 204:
+            return None
+        else:
+            processed_res: Munch = _process_res(r)
+            return processed_res.api_key
 
     with requests.Session() as s:
         signup_token = create_token(s)
@@ -179,13 +184,15 @@ def token_connect(open_url: str, action: str, server: str):
         poll_endpoint = furl(path=f"/api/api-signup-tokens/{signup_token}/", origin=server).url
         api_key = None
         try:
-            with click_spinner.spinner():
+            # NOTE mypy flags this usage as incorrect but is fine according to the docs
+            with click_spinner.spinner():  # type: ignore
                 while api_key is None:
                     r = poll_token(s, poll_endpoint)
                     if r:
                         api_key = r
                     else:
                         time.sleep(5)
+                # NOTE mypy thinks this unreachable but it is...
                 return api_key
         except KeyboardInterrupt:
             sys.exit(1)

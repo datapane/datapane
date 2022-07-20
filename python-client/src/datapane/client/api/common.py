@@ -70,7 +70,7 @@ class DPTmpFile:
     def __enter__(self) -> "DPTmpFile":
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
+    def __exit__(self, exc_type, exc_value, exc_traceback):  # noqa: ANN001
         log.debug(f"Removing {self.name}")
         if self.file.exists():
             self.file.unlink()  # (missing_ok=True)
@@ -151,7 +151,7 @@ class Resource:
     # keep session as classvar to share across all DP accesses - however will be
     # tied to current instance config
     session = requests.Session()
-    timeout = None if _TEST_ENV else (6.10, 54)
+    timeout = None if _TEST_ENV else (6.10, 54)  # type: ignore
 
     def __init__(self, endpoint: str):
         # drop /api if exists
@@ -166,10 +166,10 @@ class Resource:
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the basic instance
         basic_endpoints = ["files", "oembed", "reports", "settings", "users", "api-signup-tokens"]
-        url = furl(url)
-        url_parts = url.path.segments
+        parsed_url: furl = furl(url)
+        url_parts = parsed_url.path.segments
         if (
-            url.host in ["datapane.com"]  # , "localhost"] - we want to access OrgSolo locally
+            parsed_url.host in ["datapane.com"]  # , "localhost"] - we want to access OrgSolo locally
             and url_parts[0] == "api"
             and url_parts[1] not in basic_endpoints
         ):
@@ -181,12 +181,12 @@ class Resource:
         r = self.session.post(self.url, headers=extra_headers, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
 
-    def post_files(self, files: FileList, overwrite: bool = False, **data: JSON) -> JSON:
+    def post_files(self, files: FileList, overwrite: bool = False, **data: JSON) -> Munch:
         # upload files using custom json-data protocol
         # build the fields
         file_header = {"Content-Encoding": "gzip"}
 
-        def mk_file_fields(field_name: str, f: Path):
+        def _mk_file_fields(field_name: str, f: Path):
             # compress the file, in-place
             # TODO - disable compression where unneeded, e.g. .gz, .zip, .png, etc
             with compress_file(f) as f_gz:
@@ -195,7 +195,7 @@ class Resource:
                     (f.name, open(f_gz, "rb"), guess_type(f), file_header),
                 )
 
-        fields = [mk_file_fields(k, x) for (k, v) in files.items() for x in v]
+        fields = [_mk_file_fields(k, x) for (k, v) in files.items() for x in v]
         fields.append(("json_data", json.dumps(data)))
 
         e = MultipartEncoder(fields=fields)
@@ -237,7 +237,7 @@ class Resource:
             r = self.session.post(self.url, data=e, headers=extra_headers, timeout=self.timeout)
         return _process_res(r)
 
-    def get(self, empty_ok: bool = False, **params) -> JSON:
+    def get(self, empty_ok: bool = False, **params) -> Munch:
         r = self.session.get(self.url, params=params, timeout=self.timeout)
         return _process_res(r, empty_ok=empty_ok)
 
@@ -251,7 +251,7 @@ class Resource:
         _process_res(r, empty_ok=True)
 
     @contextmanager
-    def nest_endpoint(self, endpoint: str) -> t.ContextManager["Resource"]:
+    def nest_endpoint(self, endpoint: str) -> t.Generator["Resource", None, None]:
         """Returns a context manager allowing recursive nesting in endpoints"""
         a = copy(self)
         a.url = up.urljoin(a.url, endpoint)
@@ -263,7 +263,9 @@ class Resource:
 def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = None) -> NPath:
     """Download a file to `cwd`, using `fn` if provided, else Content-Disposition, else tmpfile"""
     if isinstance(download_url, str):
-        download_url: furl = furl(download_url)
+        download_url: furl = furl(download_url)  # type: ignore [no-redef]
+
+    download_url = t.cast(furl, download_url)
 
     if download_url.host is None:
         # assume the url is relative to the dp server
@@ -280,8 +282,8 @@ def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = N
             else:
                 f, fn = mkstemp()
                 os.close(f)
-        with open(fn, "wb") as f:
+        with open(fn, "wb") as ffile:
             # shutil.copyfileobj(r.raw, f)
             for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
-                f.write(chunk)
+                ffile.write(chunk)
     return fn

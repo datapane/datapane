@@ -69,23 +69,23 @@ def drop_privileges(out_dir: Path, uid_name: str = "nobody", gid_name: str = "no
     import subprocess
 
     # from: https://stackoverflow.com/questions/2699907/dropping-root-permissions-in-python
-    if os.getuid() != 0:
+    if os.getuid() != 0:  # type: ignore [attr-defined]
         return
 
     try:
         # Get the uid/gid from the name
-        running_uid = pwd.getpwnam(uid_name).pw_uid
-        running_gid = grp.getgrnam(gid_name).gr_gid
+        running_uid = pwd.getpwnam(uid_name).pw_uid  # type: ignore [attr-defined]
+        running_gid = grp.getgrnam(gid_name).gr_gid  # type: ignore [attr-defined]
 
         # chown the output dir
         subprocess.run(["chown", "-R", f"{uid_name}:{gid_name}", str(out_dir)], check=True)
 
         # Remove group privileges
-        os.setgroups([])
+        os.setgroups([])  # type: ignore [attr-defined]
 
         # Try setting the new uid/gid
-        os.setgid(running_gid)
-        os.setuid(running_uid)
+        os.setgid(running_gid)  # type: ignore [attr-defined]
+        os.setuid(running_uid)  # type: ignore [attr-defined]
 
         # Ensure a very conservative umask
         os.umask(0o77)

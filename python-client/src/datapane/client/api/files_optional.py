@@ -21,10 +21,10 @@ try:
     from matplotlib.figure import Axes, Figure
 except ImportError:
 
-    class Axes:
+    class Axes:  # type: ignore
         pass
 
-    class Figure:
+    class Figure:  # type: ignore
         pass
 
 
@@ -37,10 +37,10 @@ try:
     _check_version("Bokeh", v.Version(bokeh.__version__), BOKEH_V_SPECIFIER)
 except ImportError:
 
-    class BLayout:
+    class BLayout:  # type: ignore
         pass
 
-    class BFigure:
+    class BFigure:  # type: ignore
         pass
 
 
@@ -52,7 +52,7 @@ try:
     _check_version("Plotly", v.Version(plotly.__version__), PLOTLY_V_SPECIFIER)
 except ImportError:
 
-    class PFigure:
+    class PFigure:  # type: ignore
         pass
 
 
@@ -64,7 +64,7 @@ try:
     _check_version("Folium", v.Version(folium.__version__), FOLIUM_V_SPECIFIER)
 except ImportError:
 
-    class Map:
+    class Map:  # type: ignore
         pass
 
 
@@ -74,5 +74,5 @@ try:
 
 except ImportError:
 
-    class Visualisation:
+    class Visualisation:  # type: ignore
         pass

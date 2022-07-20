@@ -86,7 +86,7 @@ class GlobalCommandHandler(click.Group):
                 failure_msg(add_help_text(str(e)), do_exit=True)
 
 
-def recursive_help(cmd, parent=None):
+def recursive_help(cmd, parent=None):  # noqa: ANN001
     ctx = click.core.Context(cmd, info_name=cmd.name, parent=parent)
     print(cmd.get_help(ctx))
     print()
@@ -107,7 +107,7 @@ def recursive_help(cmd, parent=None):
 @click.option("--env", default=c.DEFAULT_ENV, help="Alternate config environment to use.")
 @click.version_option(version=f"{__version__} ({__rev__})")
 @click.pass_context
-def cli(ctx, verbose: int, env: str):
+def cli(ctx: click.core.Context, verbose: int, env: str):
     """Datapane CLI Tool"""
     global EXTRA_OUT
     EXTRA_OUT = verbose > 0
@@ -126,7 +126,7 @@ def cli(ctx, verbose: int, env: str):
 @click.option("--token", default=None, help="API Token to the Datapane server.")
 @click.option("--server", default=c.DEFAULT_SERVER, help="Datapane API Server URL.")
 @click.pass_obj
-def login(obj: DPContext, token, server):
+def login(obj: DPContext, token: str, server: str):
     """Login to a server with the given API token."""
     api.login(token, server, env=obj.env)
     # click.launch(f"{server}/settings/")
@@ -226,7 +226,7 @@ def write_templates(scaffold_name: str, context: SDict):
     # copy the scaffolds into the service
     def copy_scaffold() -> List[Path]:
         dir_path = ir.files("datapane.resources.templates") / scaffold_name
-        copy_tree(dir_path, ".")
+        copy_tree(str(dir_path), ".")
         return [Path(x.name) for x in dir_path.iterdir()]
 
     # run the scripts
@@ -266,9 +266,9 @@ def deploy(
     overwrite: Optional[bool],
 ):
     """Package and deploy a Python script or Jupyter notebook as a Datapane App bundle"""
-    script = script and Path(script)
-    config = config and Path(config)
-    init_kwargs = dict(name=name, script=script, config_file=config, environment=environment, project=project)
+    script_path = script and Path(script)
+    config_path = config and Path(config)
+    init_kwargs = dict(name=name, script=script_path, config_file=config_path, environment=environment, project=project)
     kwargs = dict_drop_empty(init_kwargs, none_only=True)
 
     # if not (script or config or sc.DatapaneCfg.exists()):
@@ -289,7 +289,7 @@ def deploy(
         success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
 
 
-@app.command()
+@app.command()  # type: ignore[no-redef]
 @click.argument("name")
 @click.option("--project")
 def download(name: str, project: str):
@@ -299,7 +299,7 @@ def download(name: str, project: str):
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
 
-@app.command()
+@app.command()  # type: ignore[no-redef]
 @click.argument("name")
 @click.option("--project")
 def delete(name: str, project: str):
@@ -336,7 +336,7 @@ def run(
     with api_error_handler("Error running app"):
         r = app.run(parameters=params, cache=cache)
     if wait:
-        with click_spinner.spinner():
+        with click_spinner.spinner():  # type: ignore[call-arg]
             while not r.is_complete():
                 time.sleep(5)
                 r.refresh()
@@ -397,7 +397,7 @@ def report_init(name: str, format: str):
     success_msg("Created sample report `dp_report`, edit as needed and run")
 
 
-@report.command()
+@report.command()  # type: ignore[no-redef]
 @click.argument("name")
 @click.option("--project")
 def delete(name: str, project: str):
@@ -445,8 +445,8 @@ def create(name: str, environment: Tuple[str], docker_image: str, project: str, 
     DOCKER IMAGE: docker image to be used inside apps
     PROJECT: Project name (optional and only applicable for teams)
     """
-    environment = process_cmd_param_vals(environment)
-    api.Environment.create(name, environment, docker_image, project, overwrite)
+    proccessed_environment = process_cmd_param_vals(environment)
+    api.Environment.create(name, proccessed_environment, docker_image, project, overwrite)
     success_msg(f"Created environment: {name}")
 
 
@@ -459,7 +459,7 @@ def environment_list():
 @environment.command()
 @click.argument("name", required=True)
 @click.option("--project")
-def get(name, project):
+def get(name: str, project: str):
     """Get environment value using environment name"""
     res = api.Environment.get(name, project=project)
     environment = "\n".join([f"{k}={v}" for k, v in res.environment.items()])
@@ -469,7 +469,7 @@ def get(name, project):
     print(f"\nDocker Image - {res.docker_image}")
 
 
-@environment.command()
+@environment.command()  # type: ignore[no-redef]
 @click.argument("name")
 @click.option("--project")
 def delete(name: str, project: str):
@@ -486,7 +486,7 @@ def schedule():
     ...
 
 
-@schedule.command()
+@schedule.command()  # type: ignore[no-redef]
 @click.option("--parameter", "-p", multiple=True)
 @click.argument("name", required=True)
 @click.argument("cron", required=True)
@@ -544,7 +544,7 @@ def schedule_list():
 #     print_table([res.dto], "Schedule")
 
 
-@schedule.command()
+@schedule.command()  # type: ignore[no-redef]
 @click.argument("id", required=True)
 def delete(id: str):
     """Delete a schedule by its id/url"""
