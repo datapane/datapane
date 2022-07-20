@@ -33,7 +33,7 @@ jobs:
         with:
           lfs: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: .github/actions/base-python
+        uses: ./.github/actions/base-python
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -45,7 +45,7 @@ jobs:
           which python
 
       - name: Configure Poetry Environment
-        uses: .github/actions/poetry-env
+        uses: ./.github/actions/poetry-env
         with:
           working-directory: ./projects/python-client/
           python-version: ${{ matrix.python-version }}

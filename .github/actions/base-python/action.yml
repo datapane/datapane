@@ -22,7 +22,7 @@ runs:
 
   steps:
     - name: 'Install Poetry v${{ inputs.poetry-version }}'
-      uses: .github/actions/poetry-install
+      uses: ./.github/actions/poetry-install
       with:
         poetry-version: '${{ inputs.poetry-version }}'
 
