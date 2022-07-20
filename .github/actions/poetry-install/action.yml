@@ -17,15 +17,22 @@ runs:
   using: composite
 
   steps:
-    - name: Configure local binary support
-      # This is where Poetry installs to
+    - name: Configure local binary support Nix
+      # This is where Poetry installs to for Nix
       shell: bash
+      if: runner.os != 'Windows'
       run: |
-        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        echo "$(python3 -m site --user-base)/bin" >> "$GITHUB_PATH"
+    - name: Configure local binary support Windows
+      # This is where Poetry installs to for Windows
+      shell: bash
+      if: runner.os == 'Windows'
+      run: |
+        echo "$(python3 -m site --user-base)/Scripts" >> "$GITHUB_PATH"
 
     - name: gather preinstall data
       id: preinstall
-      shell: python
+      shell: python3 {0}
       run: |
         import sys
         print(f"::set-output name=python-version::{sys.hexversion}")
