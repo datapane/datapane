@@ -20,6 +20,11 @@ tasks:
       - cmd: poetry run ./nbbuild.sh
       - cmd: poetry run mkdocs build
 
+  serve:
+    desc: "Serve the site locally"
+    cmds:
+      - cmd: poetry run mkdocs serve
+
   deploy:
     desc: "Deploy the package"
     cmds:
