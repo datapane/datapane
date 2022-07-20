@@ -4,3 +4,7 @@ includes:
   python-client:
     taskfile: projects/python-client
     dir: projects/python-client
+
+  docs:
+    taskfile: docs
+    dir: docs
