@@ -6,9 +6,13 @@ on:
     branches: [ master ]
     paths:
       - 'projects/python-client/**'
+      - '.github/actions/**'
+      - '.github/workflows/test-datapane.yml'
   pull_request:
     paths:
       - 'projects/python-client/**'
+      - '.github/actions/**'
+      - '.github/workflows/test-datapane.yml'
 
 jobs:
   datapane-multi-env:
