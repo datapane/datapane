@@ -50,14 +50,14 @@ jobs:
           working-directory: ./projects/python-client/
           python-version: ${{ matrix.python-version }}
           install-args: -E plotting -E cloud
+          activate: true
 
       - name: Run Tests
         working-directory: ./projects/python-client/
         run: |
-          pip install "poetry>=1.1.0,<1.2.0"
-          poetry config virtualenvs.in-project true
-          # rmdir --ignore-fail-on-non-empty -v .venv
-          poetry install -E plotting -E cloud
+          echo "$PATH"
+          echo "$(command -v python)"
+
           # Run the type checker
           poetry run python -m mypy src/
           # run CLI tests (junit tests not captured yet)
