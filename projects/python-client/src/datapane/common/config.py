@@ -30,18 +30,19 @@ class RunnerConfig:
     def _format(self, format: str, v: Any) -> Any:
         """Convert a config object using the specified formats"""
         if v is not None:
+            utc_t: str = ""
             if format == "date":
                 try:
                     return datetime.date.fromisoformat(v)
                 except ValueError:
                     # if the date contains time component parse it and return the date
-                    utc_t: str = v.replace("Z", "+00:00")
+                    utc_t = v.replace("Z", "+00:00")
                     return datetime.datetime.fromisoformat(utc_t).date()
             elif format == "time":
-                utc_t: str = v.replace("Z", "+00:00")
+                utc_t = v.replace("Z", "+00:00")
                 return datetime.time.fromisoformat(utc_t)
             elif format == "date-time":
-                utc_t: str = v.replace("Z", "+00:00")
+                utc_t = v.replace("Z", "+00:00")
                 return datetime.datetime.fromisoformat(utc_t)
             else:
                 log.debug(f"Unknown config format {format}")

@@ -12,7 +12,7 @@ import time
 import typing as t
 from contextlib import contextmanager
 from pathlib import Path
-from tempfile import NamedTemporaryFile, TemporaryDirectory, mkstemp
+from tempfile import NamedTemporaryFile, TemporaryDirectory, _TemporaryFileWrapper, mkstemp
 
 import chardet
 import importlib_resources as ir
@@ -20,7 +20,7 @@ from chardet.universaldetector import UniversalDetector
 
 from .dp_types import MIME, DPMode, NPath, SDict, get_dp_mode
 
-mimetypes.init(files=[ir.files("datapane.resources") / "mime.types"])
+mimetypes.init(files=[str(ir.files("datapane.resources") / "mime.types")])
 
 # TODO - hardcode as temporary fix until mimetypes double extension issue is sorted
 _double_ext_map = {
@@ -125,7 +125,7 @@ def enable_logging():
 
 
 @contextmanager
-def log_command(command: str) -> t.ContextManager[None]:
+def log_command(command: str) -> t.Generator[None, None, None]:
     """Log an internal process"""
     log.info(f"Starting {command}")
     yield
@@ -135,7 +135,7 @@ def log_command(command: str) -> t.ContextManager[None]:
 @contextmanager
 def create_temp_file(
     suffix: str, prefix: str = "datapane-temp-", mode: str = "w+b"
-) -> t.ContextManager[NamedTemporaryFile]:
+) -> t.Generator[_TemporaryFileWrapper, None, None]:
     """Creates a NamedTemporaryFile that doesn't disappear on .close()"""
     temp_file = NamedTemporaryFile(suffix=suffix, prefix=prefix, mode=mode, delete=False)
     try:
@@ -145,7 +145,7 @@ def create_temp_file(
 
 
 @contextmanager
-def temp_fname(suffix: str, prefix: str = "datapane-temp-", keep: bool = False) -> t.ContextManager[str]:
+def temp_fname(suffix: str, prefix: str = "datapane-temp-", keep: bool = False) -> t.Generator[str, None, None]:
     """Wrapper to generate a temporary filename only that is deleted on leaving context"""
     # TODO - return Path
     (in_f, in_f_name) = mkstemp(suffix=suffix, prefix=prefix)
@@ -158,7 +158,7 @@ def temp_fname(suffix: str, prefix: str = "datapane-temp-", keep: bool = False) 
 
 
 @contextmanager
-def unix_compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
+def unix_compress_file(f_name: NPath, level: int = 6) -> t.Generator[str, None, None]:
     """(UNIX only) Return path to a compressed version of the input filename"""
     subprocess.run(["gzip", "-kf", f"-{level}", f_name], check=True)
     f_name_gz = f"{f_name}.gz"
@@ -169,7 +169,7 @@ def unix_compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
 
 
 @contextmanager
-def unix_decompress_file(f_name: NPath) -> t.ContextManager[str]:
+def unix_decompress_file(f_name: NPath) -> t.Generator[str, None, None]:
     """(UNIX only) Return path to a compressed version of the input filename"""
     subprocess.run(["gunzip", "-kf", f_name], check=True)
     f_name_gz = f"{f_name}.gz"
@@ -180,7 +180,7 @@ def unix_decompress_file(f_name: NPath) -> t.ContextManager[str]:
 
 
 @contextmanager
-def compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
+def compress_file(f_name: NPath, level: int = 6) -> t.Generator[str, None, None]:
     """(X-Plat) Return path to a compressed version of the input filename"""
     f_name_gz = f"{f_name}.gz"
     with open(f_name, "rb") as f_in, gzip.open(f_name_gz, "wb", compresslevel=level) as f_out:
@@ -194,7 +194,7 @@ def compress_file(f_name: NPath, level: int = 6) -> t.ContextManager[str]:
 
 
 @contextmanager
-def temp_workdir() -> t.ContextManager[None]:
+def temp_workdir() -> t.Generator[str, None, None]:
     """Set working dir to a tempdir for duration of context"""
     with TemporaryDirectory() as tmp_dir:
         curdir = os.getcwd()
@@ -206,7 +206,7 @@ def temp_workdir() -> t.ContextManager[None]:
 
 
 @contextmanager
-def pushd(directory: NPath, pre_create: bool = False, post_remove: bool = False) -> t.ContextManager[None]:
+def pushd(directory: NPath, pre_create: bool = False, post_remove: bool = False) -> t.Generator[None, None, None]:
     """Switch dir and push it onto the (call-)stack"""
     directory = Path(directory)
     cwd = os.getcwd()

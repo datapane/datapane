@@ -79,7 +79,7 @@ class DatapaneCfg:
             assert config.parent == self.script.parent == Path("."), "All files must be in the main project directory"
         # we must be in the project dir for now
         # TODO - move this logic to create_initial
-        self.proj_dir = self.script.resolve(strict=False).parent
+        self.proj_dir = self.script.resolve(strict=False).parent  # type: ignore
         assert os.getcwd() == os.path.abspath(self.proj_dir), "Please run from source directory"
 
         # # config and script dir must be in same dir

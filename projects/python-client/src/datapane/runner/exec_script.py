@@ -85,7 +85,7 @@ def in_venv() -> bool:
 
 
 @contextmanager
-def script_env(env_dir: Path, env: SSDict) -> t.ContextManager[None]:
+def script_env(env_dir: Path, env: SSDict) -> t.Generator[None, None, None]:
     """
     Change the local dir and add to site-path so relative files and imports work
     TODO
@@ -144,7 +144,7 @@ def setup_script(s: api.App, env_dir: Path):
     # install deps
     if s.requirements:
         pip_args = [sys.executable, "-m", "pip", "install"]
-        if os.getuid() != 0 and not in_venv():
+        if os.getuid() != 0 and not in_venv():  # type: ignore [attr-defined]
             # we're a normal/non-root user outside a venv
             pip_args.append("--user")
         pip_args.extend(s.requirements)
@@ -172,7 +172,7 @@ def exec_mod(script_path: Path, init_state: Optional[SDict] = None) -> SDict:
     return res_scope
 
 
-def ast_validation(node):
+def ast_validation(node: ast.AST):
     for n in ast.walk(node):
         # TODO: implement check for import statements
         if isinstance(n, ast.Import):
@@ -182,19 +182,19 @@ def ast_validation(node):
 
 
 class OverriddenBuiltins(dict):
-    def __getitem__(self, name):
+    def __getitem__(self, name):  # noqa: ANN001
         if name in ENVIRON_CONFIG["banned_builtins"]:
             raise RuntimeError(f"Illegal builtin {name}")
         return super().__getitem__(name)
 
 
-def override_builtins(importer):
+def override_builtins(importer) -> OverriddenBuiltins:  # noqa: ANN001
     b = OverriddenBuiltins(builtins.__dict__)
     b["__import__"] = importer
     return b
 
 
-def importer(name, *x, **y):
+def importer(name, *x, **y):  # noqa: ANN001, ANN201
     rootpkg = name.split(".")[0]
     if rootpkg not in ("runner",):  # TODO: module check
         return builtins.__import__(name, *x, **y)

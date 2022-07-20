@@ -20,7 +20,7 @@ from typing import Optional
 
 from datapane import __version__
 from datapane.client.apps import DatapaneCfg
-from datapane.common import JSON, PKL_MIMETYPE, ArrowFormat, NPath, SDict, SList, SSDict
+from datapane.common import PKL_MIMETYPE, ArrowFormat, NPath, SDict, SList, SSDict
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
 from datapane.common.utils import get_app_file_params
 
@@ -94,7 +94,7 @@ class File(DPObjectRef):
         return cls.post_with_files(file=Path(fn), **kwargs)
 
     @classmethod
-    def upload_obj(cls, data: t.Any, **kwargs: JSON) -> File:
+    def upload_obj(cls, data: t.Any, **kwargs) -> File:
         """
         Create a file containing the contents of the Python object provided,
         the object may be pickled or converted to JSON before storing.
@@ -129,10 +129,11 @@ class File(DPObjectRef):
         Args:
             fn: Path representing the location to save the file
         """
-        fn = Path(fn)
+        fn = t.cast(Path, fn)
 
         def get_export_format() -> DFFormatterCls:
-            ext = fn.suffix
+            filename = t.cast(Path, fn)
+            ext = filename.suffix
             if ext not in df_ext_map:
                 raise DPError(
                     f"Extension {ext} not valid for exporting table. Must be one of {', '.join(df_ext_map.keys())}"
@@ -250,7 +251,7 @@ class App(DPObjectRef):
             for name, fn_remote in user_file_params.items():
                 if fn_remote:
                     extension = f".{fn_remote.split('.')[-1]}"
-                    fn_tmp: NPath = stack.enter_context(DPTmpFile(extension))
+                    fn_tmp: DPTmpFile = stack.enter_context(DPTmpFile(extension))
                     fn_downloaded: NPath = do_download_file(fn_remote, fn_tmp.full_name)
                     params[name] = Path(fn_downloaded)
                 else:
@@ -258,12 +259,12 @@ class App(DPObjectRef):
 
             run(self, params, env)
 
-    def run(self, parameters=None, cache=True) -> Run:
+    def run(self, parameters: t.Dict[str, t.Any] = None, cache: bool = True) -> Run:
         """(remote) run the given app (cloning if needed?)"""
         parameters = parameters or dict()
         return Run.post(app=self.url, parameter_vals=parameters, cache=cache)
 
-    def local_run(self, parameters=None) -> Run:
+    def local_run(self, parameters=None) -> Run:  # noqa: ANN001
         """(local) run the given app"""
         # NOTE -is there a use-case for this?
         raise NotImplementedError()
@@ -297,5 +298,7 @@ class Schedule(DPObjectRef):
     def create(cls, app: App, cron: str, parameters: SDict) -> Schedule:
         return cls.post(app=app.url, cron=cron, parameter_vals=parameters)
 
-    def update(self, cron: str = None, parameters: SDict = None) -> None:
+    # NOTE - mypy doesn't like this method because the signature is different from super type
+    # potentially we may need to change it
+    def update(self, cron: str = None, parameters: SDict = None) -> None:  # type: ignore
         super().update(cron=cron, parameter_vals=parameters)

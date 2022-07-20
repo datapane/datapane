@@ -63,7 +63,7 @@ def failure_msg(msg: str, do_exit: bool = False):
 def is_jupyter() -> bool:
     """Checks if inside ipython shell inside browser"""
     try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # noqa: F821
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # type: ignore [name-defined]  # noqa: F821
     except Exception:
         return False
 
@@ -118,7 +118,7 @@ def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
                 except ValueError:
                     return x
 
-    def split_param(xs: Tuple[str]) -> Iterator[t.Tuple[str, str]]:
+    def split_param(xs: Tuple[str, ...]) -> Iterator[t.Tuple[str, str]]:
         err_msg = "'{}', should be name=value"
         for x in xs:
             try:

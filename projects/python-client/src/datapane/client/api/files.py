@@ -4,7 +4,7 @@ import os
 import pickle
 from functools import singledispatch
 from pathlib import Path
-from typing import IO, Any, BinaryIO, Generic, Optional, TextIO, Type, TypeVar
+from typing import IO, TYPE_CHECKING, Any, Generic, List, Optional, Type, TypeVar
 
 from altair.utils import SchemaBase
 from numpy import ndarray
@@ -17,6 +17,9 @@ from .. import DPError
 from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, Visualisation
 from .report.blocks import Attachment, DataBlock, DataTable, Plot, Table, Text
+
+if TYPE_CHECKING:
+    from bokeh.model import Model
 
 T = TypeVar("T")
 U = TypeVar("U", DataFrame, Styler)
@@ -36,8 +39,8 @@ class BaseAsset(Generic[T], abc.ABC):
         fn = DPTmpFile(self.ext)
         # fn = Path(file_name).with_suffix(self.ext)
         # add UTF-8 encoding if a text file
-        f_kwargs = {} if "b" in self.file_mode else dict(encoding="utf-8")
-        with fn.file.open(self.file_mode, **f_kwargs) as f:
+        encoding = None if "b" in self.file_mode else "utf-8"
+        with fn.file.open(mode=self.file_mode, encoding=encoding) as f:
             self.write_file(f, x)
         # NOTE - used to set mime-type as extended-file attrib using xttrs here
         return fn
@@ -47,19 +50,19 @@ class BaseAsset(Generic[T], abc.ABC):
         raise NotImplementedError("")
 
     def to_block(self, x: T) -> DataBlock:
-        return self.block_type(x)
+        return self.block_type(x)  # type: ignore
 
 
 class BasePickleWriter(BaseAsset):
     """Creates a pickle file from any object"""
 
     mimetype = "application/vnd.pickle+binary"
-    obj_type = Any
     block_type = Attachment
     ext = ".pkl"
     file_mode = "wb"
+    obj_type = Any
 
-    def write_file(self, f: TextIO, x: Any):
+    def write_file(self, f: IO, x: Any):
         pickle.dump(x, f)
 
 
@@ -67,11 +70,11 @@ class StringWrapper(BaseAsset):
     """Creates a Json for a string File, or Markdown for a Block"""
 
     mimetype = "application/json"
-    obj_type = str
     block_type = Text
     ext = ".json"
+    obj_type = str
 
-    def write_file(self, f: TextIO, x: Any):
+    def write_file(self, f: IO, x: str):
         json.dump(json.loads(x), f)
 
 
@@ -81,13 +84,13 @@ class PathWrapper(BaseAsset):
     obj_type = Path
     block_type = Attachment
 
-    def to_block(self, x: T) -> DataBlock:
+    def to_block(self, x: Path) -> DataBlock:
         return Attachment(file=x)
 
 
 ################################################################################
 # Table Assets
-class BaseTable(BaseAsset):
+class BaseTable(BaseAsset, Generic[U]):
     mimetype = "application/vnd.datapane.table+html"
     ext = ".tbl.html"
     TABLE_CELLS_LIMIT: int = 5000
@@ -194,7 +197,7 @@ class BokehBasePlot(PlotAsset):
     mimetype = "application/vnd.bokeh.show+json"
     ext = ".bokeh.json"
 
-    def write_file(self, f: TextIO, app):
+    def write_file(self, f: IO, app: "Model"):
         from bokeh.embed import json_item
 
         json.dump(json_item(app), f)
@@ -215,7 +218,7 @@ class AltairPlot(PlotAsset):
     ext = ".vl.json"
     obj_type = SchemaBase
 
-    def write_file(self, f: TextIO, chart: SchemaBase):
+    def write_file(self, f: IO, chart: SchemaBase):
         json.dump(chart.to_dict(), f)
 
 
@@ -226,7 +229,7 @@ class PlotlyPlot(PlotAsset):
     ext = ".pl.json"
     obj_type = PFigure
 
-    def write_file(self, f: TextIO, chart: PFigure):
+    def write_file(self, f: IO, chart: PFigure):
         json.dump(chart.to_json(), f)
 
 
@@ -235,7 +238,7 @@ class FoliumPlot(PlotAsset):
     ext = ".fl.html"
     obj_type = Map
 
-    def write_file(self, f: BinaryIO, m: Map):
+    def write_file(self, f: IO, m: Map):
         html: str = m.get_root().render()
         f.write(html)
 
@@ -245,14 +248,14 @@ class PlotapiPlot(PlotAsset):
     ext = ".plotapi.html"
     obj_type = Visualisation
 
-    def write_file(self, f: BinaryIO, chart: Visualisation):
+    def write_file(self, f: IO, chart: Visualisation):
         html: str = chart.to_string()
         f.write(html)
 
 
 ################################################################################
 # register all the plot types
-plots = [
+plots: List = [
     StringWrapper,
     PathWrapper,
     # dataframes / tables
