@@ -1,4 +1,4 @@
-name: Install Poetry
+name: Setup Poetry
 description: Action for installing Poetry correctly
 author: Datapane
 
