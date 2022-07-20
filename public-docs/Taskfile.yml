@@ -1,0 +1,27 @@
+version: "3"
+
+includes:
+
+env:
+
+tasks:
+  install:
+    desc: "Install dependencies ready for development on the codebase"
+    run: once
+    cmds:
+      - cmd: poetry install
+
+  test:
+    desc: "Run self-contained tests"
+
+  build:
+    desc: "Build a package ready for a deploy"
+    cmds:
+      - cmd: poetry run ./nbbuild.sh
+      - cmd: poetry run mkdocs build
+
+  deploy:
+    desc: "Deploy the package"
+    cmds:
+      # wrangler pages doesn't support a config file yet
+      - cmd: wrangler pages publish --project-name datapane-docs site
