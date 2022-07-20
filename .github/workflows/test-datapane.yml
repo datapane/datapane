@@ -25,36 +25,28 @@ jobs:
       - name: Enable symlinks on Windows
         run: git config --global core.symlinks true
         if: startsWith(runner.os, 'Windows')
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           lfs: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: .github/actions/base-python
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Dump Runner Info
         env:
           RUNNER_CONTEXT: ${{ toJson(runner) }}
         run: |
           echo "${RUNNER_CONTEXT}"
           which python
-      - name: set pip cache dir
-        run: python -c 'from pip._internal.locations import USER_CACHE_DIR; print(f"PIP_DIR={USER_CACHE_DIR}")' >> ${GITHUB_ENV}
-      - name: set python version
-        run: python -c 'import sys; print(f"PYTHON_VERSION={sys.hexversion}")' >> ${GITHUB_ENV}
-      # TODO - cache the poetry pypi cache dir? (tho as we cache the venv is it needed?)
-      - name: Cache .venv
-        uses: actions/cache@v2
+
+      - name: Configure Poetry Environment
+        uses: .github/actions/poetry-env
         with:
-          path: projects/python-client/.venv
-          key: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('projects/python-client/poetry.lock') }}
-          restore-keys: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
-      - name: Cache pip dir (${{ env.PIP_DIR }})
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.PIP_DIR }}
-          key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
-          restore-keys: datapane-pip-${{ runner.os }}-
+          working-directory: ./projects/python-client/
+          python-version: ${{ matrix.python-version }}
+          install-args: -E plotting -E cloud
+
       - name: Run Tests
         working-directory: ./projects/python-client/
         run: |

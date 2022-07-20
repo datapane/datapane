@@ -23,12 +23,21 @@ runs:
       run: |
         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-    - name: Poetry Install Cache Nix
+    - name: gather preinstall data
+      id: preinstall
+      shell: python
+      run: |
+        import sys
+        print(f"::set-output name=python-version::{sys.hexversion}")
+
+    - name: Poetry Install Cache
       id: cache-poetry-install
+      # Only supports the linux paths currently
+      if: runner.os == 'Linux'
       uses: actions/cache@v3
       with:
         path: ~/.local/share/pypoetry
-        key: cache-poetry-install-${{ runner.os }}-${{ inputs.poetry-version }}
+        key: cache-poetry-install-v1-${{ runner.os }}-${{ steps.preinstall.outputs.python-version }}-${{ inputs.poetry-version }}
 
     - name: Install Poetry
       if: steps.cache-poetry-install.outputs.cache-hit != 'true'

@@ -35,3 +35,11 @@ runs:
         #  - poetry doesn't handle venv changes for deps checked out via Git
         #  - Caching doesn't take into consideration multiple venvs
         #cache: poetry
+
+    - name: 'Summary'
+      shell: bash
+      run: |
+        echo 'Configured Python: ${{ steps.install.outputs.python-version }}'
+        echo "path: $(command -v python)"
+        echo 'details::'
+        python -VV

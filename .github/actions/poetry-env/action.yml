@@ -17,6 +17,11 @@ inputs:
     default: 'true'
     required: false
 
+  install-args:
+    description: "Extra arguments to pass for the install, such as '-E plotting'"
+    default: ''
+    required: false
+
   activate:
     description: 'Activate the Virtual Env for subsequent steps'
     default: 'false'
@@ -49,8 +54,8 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         poetry env use '${{ inputs.python-version }}'
-        # Don't do this, as we're not caching venvs due to bugs
-        # poetry config virtualenvs.in-project
+        # Don't do this, as we're not caching venvs due to bugs (should be fixed in 1.2)
+        # poetry config virtualenvs.in-project true
 
     - name: Poetry Config
       id: local-poetry-config
@@ -67,7 +72,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       if: inputs.install-deps == 'true'
       run: |
-        poetry install
+        poetry install ${{ inputs.install-args }}
 
     - name: Activate the Venv
       shell: bash
