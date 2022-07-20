@@ -187,6 +187,13 @@ class DPObjectRef:
         self.res.delete()
         log.debug(f"Deleted object {self.url}")
 
+    def update(self, **kwargs):
+        # filter None values
+        kwargs = {k: v for (k, v) in kwargs.items() if v is not None}
+        self.res.patch(**kwargs)
+        self.refresh()
+        log.debug(f"Updated object {self.url}")
+
     @classmethod
     def list(cls) -> t.Iterable[SDict]:
         """
