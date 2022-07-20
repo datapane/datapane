@@ -1,0 +1,92 @@
+@media screen and (max-width: 76.1875em) {
+    .md-nav--primary .md-nav__title[for="__drawer"] {
+        --tw-gradient-to: #09091a;
+        --tw-gradient-from: #131329;
+        --tw-gradient-stops: var(--tw-gradient-from),
+            var(--tw-gradient-to, rgb(19 19 41 / 0));
+        background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+    }
+}
+
+md-nav__title {
+    display: none;
+}
+
+.md-header {
+    --tw-gradient-to: #09091a;
+    --tw-gradient-from: #131329;
+    --tw-gradient-stops: var(--tw-gradient-from),
+        var(--tw-gradient-to, rgb(19 19 41 / 0));
+    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+}
+
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #5b57d7;
+    --md-accent-fg-color: #805df7;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #7571f1;
+    --md-accent-fg-color: #805df7;
+}
+
+.org {
+    color: #4340b1;
+}
+
+.beta {
+    color: #e7088e !important;
+}
+
+/* Input cells */
+.input code,
+.input pre {
+    background-color: var(--md-code-bg-color) !important;
+}
+
+/* Output cells */
+.output code,
+.output pre {
+    background-color: white !important;
+}
+
+.output .md-clipboard {
+    display: none !important;
+}
+
+/* Grid feature */
+.md-typeset .grid ul {
+    grid-gap: 0.4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    margin: 1em 0;
+}
+
+.md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
+.md-typeset .grid > .card {
+    border: 0.05rem solid var(--md-default-fg-color--lightest);
+    border-radius: 0.1rem;
+    display: block;
+    margin: 0;
+    padding: 0.8rem;
+    -webkit-transition: border 0.25s, box-shadow 0.25s;
+    transition: border 0.25s, box-shadow 0.25s;
+}
+
+.md-typeset .result {
+    border: 0.05remsolidvar (--md-code-bg-color);
+    border-bottom-left-radius: 0.1rem;
+    border-bottom-right-radius: 0.1rem;
+    border-top-width: 0.1rem;
+    margin-top: -1.125em;
+    overflow: visible;
+    padding: 0 1em;
+}
+
+.md-typeset .lg {
+    font-size: 1.4em;
+}
+
+.md-typeset .middle {
+    vertical-align: middle;
+}

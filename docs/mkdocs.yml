@@ -1,0 +1,152 @@
+site_name: Datapane Docs
+repo_name: datapane/datapane
+repo_url: https://github.com/datapane/datapane
+copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
+
+nav:
+  - Introduction: "index.ipynb"
+  - Quickstart: "quickstart.ipynb"
+
+  - Tutorials:
+    - Getting started 🌱:
+      - Install Datapane: "tutorials/basics/install-datapane.md"
+      - Create a report: "tutorials/basics/create-a-report.ipynb"
+    - Blocks types 🧱:
+      - tutorials/blocks/index.ipynb
+      - Tables and data: "tutorials/blocks/tables-and-data.ipynb"
+      - Plots and visualizations: "tutorials/blocks/plots-and-visualizations.ipynb"
+      - Text and HTML: "tutorials/blocks/text-code-and-html.ipynb"
+      - Layout and pages: "tutorials/blocks/layout-and-customization.ipynb"
+      - Media and embeds: "tutorials/blocks/media-attachments-and-embeds.ipynb"
+    - Datapane Cloud ☁️:
+      - tutorials/datapane-cloud/index.md
+      - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
+      - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
+      - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
+      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
+      - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
+      - Files: "tutorials/datapane-cloud/files.md"
+    - Styling and editing 🎨:
+      - tutorials/styling/index.ipynb
+      - Styling: "tutorials/styling/styling.ipynb"
+      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
+      - Global styling: "tutorials/styling/global-styling.md"
+    - Automation 🤖:
+      - tutorials/automation/index.md
+    - Apps 📦:
+      - tutorials/apps/index.ipynb
+      - Parameters and forms:
+        - "tutorials/apps/parameters-and-forms/index.ipynb"
+        - Configuration: "tutorials/apps/parameters-and-forms/configuration.md"
+        - Parameters: "tutorials/apps/parameters-and-forms/parameters.md"
+      - Scheduled report runs: "tutorials/apps/scheduling.md"
+      - Environments and variables: "tutorials/apps/variables.ipynb"
+      - Configuration and dependencies: "tutorials/apps/configuration-and-dependencies.md"
+      - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
+
+  - Guides:
+      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
+      - Sentiment Analysis for textual data: "guides/sentiment-analysis-for-textual-data/sentiment-analysis-for-textual-data.ipynb"
+      - Accessing data in Python: "guides/accessing-data-in-python/accessing-data-in-python.ipynb"
+
+  - Explanations:
+      # - Reports: "concepts/reports.ipynb"
+      # - Blocks: "concepts/blocks.ipynb"
+      # - Functions: ""
+      # - Datapane CLI: "concepts/datapane.md"
+      # - Datapane Cloud: "concepts/datapane-jl.ipynb"
+      - Datapane Teams:
+        - "concepts/datapane-teams/index.md"
+        - Deployment and hosting: "concepts/datapane-teams/deployment-and-hosting.md"
+        - Authentication and sharing: "concepts/datapane-teams/authentication-and-sharing.md"
+        - Managing users: "concepts/datapane-teams/managing-users.md"
+      - Support policy: "concepts/support-policy.md"
+
+  - Reference:
+    - API reference: "https://datapane.github.io/datapane/"
+
+theme:
+  name: material
+  logo: img/logo.png
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - navigation.indexes
+    - content.tabs.link
+    #- toc.integrate
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: img/favicon.png
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - mknotebooks:
+      enable_default_jupyter_cell_styling: false
+      tag_remove_configs:
+        remove_cell_tags:
+          - remove_cell
+        remove_all_outputs_tags:
+          - remove_all_output
+        remove_single_output_tags:
+          - remove_single_output
+        remove_input_tags:
+          - remove_input
+  - search:
+      lang: en
+  #- tags
+  # Currently a sponsor-only feature
+  # - social:
+  #     cards_color:
+  #       fill: "#131329"
+  #       text: "#F2F2FD"
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - meta
+  - admonition
+  - abbr
+  - def_list
+  - footnotes
+  - attr_list
+  - md_in_html
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/datapane/datapane
+    - icon: fontawesome/brands/discourse
+      link: https://forum.datapane.com/
+    - icon: fontawesome/brands/discord
+      link: https://chat.datapane.com/
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/datapaneapp

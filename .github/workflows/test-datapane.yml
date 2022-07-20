@@ -1,10 +1,14 @@
 name: Test [Datapane]
 
 on:
-  # Run on any push to master and all PRs (any branch)
+  # Run on any push to master and all PRs (any branch) that cover the python-client
   push:
     branches: [ master ]
+    paths:
+      - 'projects/python-client/**'
   pull_request:
+    paths:
+      - 'projects/python-client/**'
 
 jobs:
   datapane-multi-env:
@@ -42,9 +46,9 @@ jobs:
       - name: Cache .venv
         uses: actions/cache@v2
         with:
-          path: .venv
-          key: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: datapane-venv-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
+          path: projects/python-client/.venv
+          key: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('projects/python-client/poetry.lock') }}
+          restore-keys: datapane-venv-v2-${{ runner.os }}-${{ env.PYTHON_VERSION }}-
       - name: Cache pip dir (${{ env.PIP_DIR }})
         uses: actions/cache@v2
         with:
@@ -52,11 +56,14 @@ jobs:
           key: datapane-pip-${{ runner.os }}-${{ env.PYTHON_VERSION }}
           restore-keys: datapane-pip-${{ runner.os }}-
       - name: Run Tests
+        working-directory: ./projects/python-client/
         run: |
           pip install "poetry>=1.1.0,<1.2.0"
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install -E plotting -E cloud
+          # Run the type checker
+          poetry run python -m mypy src/
           # run CLI tests (junit tests not captured yet)
           poetry run python -m pytest -v --ignore=tests/client/e2e/ tests --junitxml=${{github.workspace}}/test-reports/datapane-local-${{ matrix.os }}-${{ matrix.python-version }}.xml
           # run top-level CLI tests (junit tests not captured yet)

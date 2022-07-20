@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "path": "./",
+            "name": "datapane"
+        },
+        {
+            "path": "projects/python-client",
+            "name": "python-client"
+        },
+        {
+            "path": "projects/web-components",
+            "name": "web-components"
+        },
+    ],
+    "settings": {
+        "files.exclude": {
+            "projects/python-client": true,
+            "projects/web-components": true
+        }
+    },
+}
