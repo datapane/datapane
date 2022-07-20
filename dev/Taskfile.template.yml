@@ -1,0 +1,21 @@
+version: "3"
+
+includes:
+
+env:
+
+tasks:
+  install:
+    desc: "Install dependencies ready for development on the codebase"
+    run: once
+    cmds:
+      - cmd: echo "no-op"
+
+  test:
+    desc: "Run self-contained tests"
+
+  build:
+    desc: "Build a package ready for a deploy"
+
+  deploy:
+    desc: "Deploy the package"
