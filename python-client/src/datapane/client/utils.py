@@ -13,27 +13,27 @@ from datapane.common import DPError, JDict
 ################################################################################
 # Built-in exceptions
 class IncompatibleVersionError(DPError):
-    ...
+    pass
 
 
 class UnsupportedResourceError(DPError):
-    ...
+    pass
 
 
 class ReportTooLargeError(DPError):
-    ...
+    pass
 
 
 class InvalidTokenError(DPError):
-    ...
+    pass
 
 
 class UnsupportedFeatureError(DPError):
-    ...
+    pass
 
 
 class InvalidReportError(DPError):
-    ...
+    pass
 
 
 class MissingCloudPackagesError(DPError):
