@@ -22,6 +22,7 @@ runs:
 
   steps:
     - name: 'Install Poetry v${{ inputs.poetry-version }}'
+      id: setup-poetry
       uses: ./.github/actions/setup-poetry
       with:
         poetry-version: '${{ inputs.poetry-version }}'
@@ -43,3 +44,21 @@ runs:
         echo "path: $(command -v python)"
         echo 'details::'
         python -VV
+
+    # TODO: move this back to ../setup-poetry once GHA is fixed
+    #       Basically, can't use the Cache action from a nested composite yet.
+    #  ref: https://github.com/actions/runner/issues/2009
+    #
+    - name: Cache Poetry Cache
+      id: cache-poetry-cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          # as far as I can tell, caching the pypoetry artifacts themselves are safe, it's only src packages we are concerned about.
+          ${{ steps.setup-poetry.outputs.cache-dir }}
+
+          # We explicitly don't cache the global venvs due to poetry not updating git dependencies correctly
+          # We also can't just cache everything as the cache will end up including out-of-scope venvs (multi-project setup)
+          # This is fine to leave in even if the venvs aren't in the cache directory. Effectively a no-op.
+          !${{ steps.setup-poetry.outputs.virtualenvs-path }}
+        key: cache-poetry-cache-v1-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.poetry-version }}

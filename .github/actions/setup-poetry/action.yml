@@ -10,7 +10,18 @@ inputs:
     required: false
 
 
-outputs: {}
+outputs:
+  poetry-version:
+    description: The installed version of poetry specified
+    value: '${{ inputs.poetry-version }}'
+
+  cache-dir:
+    description: The Cache Directory that Poetry will use
+    value: '${{ steps.poetry-config.outputs.cache-dir }}'
+
+  virtualenvs-path:
+    description: The path where Poetry will place Virtual Venvs
+    value: '${{ steps.poetry-config.outputs.virtualenvs-path }}'
 
 
 runs:
@@ -66,18 +77,4 @@ runs:
 
         echo "::set-output name=cache-dir::${cache_dir}"
         echo "::set-output name=virtualenvs-path::${venvs_dir}"
-
-
-    - name: Cache Poetry Cache
-      id: cache-poetry-cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          # as far as I can tell, caching the pypoetry artifacts themselves are safe, it's only src packages we are concerned about.
-          ${{ steps.poetry-config.outputs.cache-dir }}
-
-          # We explicitly don't cache the global venvs due to poetry not updating git dependencies correctly
-          # We also can't just cache everything as the cache will end up including out-of-scope venvs (multi-project setup)
-          # This is fine to leave in even if the venvs aren't in the cache directory. Effectively a no-op.
-          !${{ steps.poetry-config.outputs.virtualenvs-path }}
-        key: cache-poetry-cache-v1-${{ runner.os }}-${{ steps.preinstall.outputs.python-version }}-${{ inputs.poetry-version }}
+        echo "::set-output name=version::${{ inputs.poetry-version }}"
