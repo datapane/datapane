@@ -23,7 +23,7 @@ def test_report_simple():
     report = gen_report_simple()
     report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
-        ...
+        pass
 
 
 def test_report_update_metadata():
@@ -74,14 +74,14 @@ def test_report_with_single_file(datadir: Path):
     report.save(str(datadir / "test_report.html"))
     report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
-        ...
+        pass
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
     report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
-        ...
+        pass
 
 
 def test_report_update_with_files(datadir: Path):
@@ -131,7 +131,7 @@ def test_demo_report():
     report = dp.builtins.build_demo_report()
     report.upload(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
-        ...
+        pass
 
 
 def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):

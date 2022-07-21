@@ -33,12 +33,12 @@ class DFFormatter(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
-        ...
+        pass
 
     @staticmethod
     @abc.abstractmethod
     def save_file(fn: PathOrFile, df: pd.DataFrame):
-        ...
+        pass
 
 
 DFFormatterCls = Type[DFFormatter]

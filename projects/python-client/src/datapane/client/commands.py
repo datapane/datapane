@@ -165,7 +165,7 @@ def hello_world():
 @cli.group()
 def file():
     """Commands to work with Files"""
-    ...
+    pass
 
 
 @file.command()
@@ -211,7 +211,7 @@ def file_list():
 @cli.group()
 def app():
     """Commands to work with Apps"""
-    ...
+    pass
 
 
 def write_templates(scaffold_name: str, context: SDict):
@@ -361,7 +361,7 @@ def run(
 @cli.group()
 def report():
     """Commands to work with Reports"""
-    ...
+    pass
 
 
 # NOTE - CLI Report creation disabled for now until we have a replacement for Asset
@@ -427,7 +427,7 @@ def report_list():
 @cli.group()
 def environment():
     """Commands to work with Environments"""
-    ...
+    pass
 
 
 @environment.command()
@@ -483,7 +483,7 @@ def delete(name: str, project: str):
 @cli.group()
 def schedule():
     """Commands to work with Schedules"""
-    ...
+    pass
 
 
 @schedule.command()

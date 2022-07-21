@@ -135,7 +135,7 @@ class BaseElement(ABC):
 
     @abstractmethod
     def _to_xml(self, s: BuilderState) -> BuilderState:
-        ...
+        pass
 
 
 Block = t.Union["Group", "Select", "DataBlock", "Empty"]
@@ -367,7 +367,7 @@ class DataBlock(BaseElement):
     ..note:: This class is not used directly.
     """
 
-    ...
+    pass
 
 
 class EmbeddedTextBlock(DataBlock):
