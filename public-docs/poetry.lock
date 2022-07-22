@@ -333,45 +333,50 @@ version = "0.14.0"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
-python-versions = ">=3.7.1,<3.11.0"
+python-versions = ">=3.7.1, < 3.11.0"
+develop = true
 
 [package.dependencies]
-altair = ">=4.0.0,<5.0.0"
+altair = "^4.0.0"
 boltons = ">=20.0.0,<22.0.0"
 chardet = ">=3.0.4,<5.0.0"
-click = ">=7.1.0,<9.0.0"
-click-spinner = ">=0.1.8,<0.2.0"
-colorlog = ">=4.1.0,<7.0.0"
-dacite = ">=1.0.2,<2.0.0"
-datacommons = ">=1.4.3,<2.0.0"
-datacommons-pandas = ">=0.0.3,<0.0.4"
-dominate = ">=2.4.0,<3.0.0"
-furl = ">=2.0.0,<3.0.0"
-glom = ">=20.5.0,<21.0.0"
+click = ">=7.1.0, <9.0.0"
+click-spinner = "^0.1.8"
+colorlog = ">= 4.1.0, <7.0.0"
+dacite = "^1.0.2"
+datacommons = "^1.4.3"
+datacommons-pandas = "^0.0.3"
+dominate = "^2.4.0"
+furl = "^2.0.0"
+glom = "^20.5.0"
 importlib_resources = ">=3.0.0,<6.0.0"
 Jinja2 = ">=2.11.0,<3.1.0"
 jsonschema = ">=3.2.0,<5.0.0"
-lxml = ">=4.0.0,<5.0.0"
+lxml = "^4.0.0"
 micawber = ">=0.5.0"
-munch = ">=2.3.0,<3.0.0"
+munch = "^2.3.0"
 nbconvert = ">=5.6.1,<7.0.0"
 packaging = ">=20.0.0,<22.0.0"
-pandas = ">=1.1.0,<2.0.0"
-posthog = ">=1.4.0,<2.0.0"
-pyarrow = ">=3.0.0,<7.0.0"
-pydantic = ">=1.6.0,<2.0.0"
-PyYAML = ">=6.0.0,<7.0.0"
-requests = ">=2.19.0,<3.0.0"
-requests-toolbelt = ">=0.9.1,<0.10.0"
-stringcase = ">=1.2.0,<2.0.0"
-tabulate = ">=0.8.0,<0.9.0"
-toolz = ">=0.11.0,<0.12.0"
+pandas = "^1.1.0"
+posthog = "^1.4.0"
+pyarrow = ">=3.0.0, < 7.0.0"
+pydantic = "^1.6.0"
+PyYAML = "^6.0.0"
+requests = "^2.19.0"
+requests-toolbelt = "^0.9.1"
+stringcase = "^1.2.0"
+tabulate = "^0.8.0"
+toolz = "^0.11.0"
 validators = ">=0.18.0,<0.19.0"
 vega-datasets = ">=0.9.0,<1.0.0"
 
 [package.extras]
-plotting = ["matplotlib (>=3.0.0,<4.0.0)", "plotly (>=4.0.0,<6.0.0)", "bokeh (>=2.2.0,<2.3.0)", "folium (>=0.12.0,<0.13.0)"]
+plotting = ["matplotlib (>=3.0.0,<4.0.0)", "bokeh (>=2.4.2,<2.5.0)", "plotly (>=4.0.0,<6.0.0)", "folium (>=0.12.0,<0.13.0)", "plotapi (>=5.0.0,<6.0.0)"]
 cloud = ["flit-core (>=3.0.0,<3.1.0)"]
+
+[package.source]
+type = "directory"
+url = "../projects/python-client"
 
 [[package]]
 name = "debugpy"
@@ -1976,7 +1981,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11.0"
-content-hash = "4ef06929da931c56d06ac2ac22e8a0cb6abea3825d35f86314aaf57ed9bc0728"
+content-hash = "a1e62a7b79c67f5049ad59133030f81216c9d93db116965fe3ae8661211c051e"
 
 [metadata.files]
 altair = [
@@ -2172,10 +2177,7 @@ datacommons-pandas = [
     {file = "datacommons_pandas-0.0.3-py3-none-any.whl", hash = "sha256:e44709c7b732b1d8b0adea5e6cd2febb4bee5cfefb9d73d6338d8d4046a74532"},
     {file = "datacommons_pandas-0.0.3.tar.gz", hash = "sha256:2cc4db8e6d79c72fd46fa860f6489778f059c500c1c75b66288487dd7b0c139c"},
 ]
-datapane = [
-    {file = "datapane-0.14.0-py3-none-any.whl", hash = "sha256:15fca51f87b65e1227cf1fe648387cbeecbcc81d2a71566f3bcaecb82e83de07"},
-    {file = "datapane-0.14.0.tar.gz", hash = "sha256:7c05b62092d34263e73880a6b461d1873db57828a8a49904774becc2e12f632e"},
-]
+datapane = []
 debugpy = [
     {file = "debugpy-1.6.2-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:77a47d596ce8c69673d5f0c9876a80cb5a6cbc964f3b31b2d44683c7c01b6634"},
     {file = "debugpy-1.6.2-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:726e5cc0ed5bc63e821dc371d88ddae5cba85e2ad207bf5fefc808b29421cb4c"},
