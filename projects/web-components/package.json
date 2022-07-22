@@ -58,6 +58,7 @@
         "vega-embed": "^6.20.8",
         "vega-lite": "^5.2.0",
         "vue": "^3.2.25",
+        "vue-eslint-parser": "^9.0.3",
         "vue-multiselect": "^3.0.0-alpha.2",
         "whatwg-fetch": "^3.6.2",
         "xml-js": "^1.6.11"
@@ -97,7 +98,6 @@
         "tailwindcss": "^3.0.23",
         "typescript": "^4.5.4",
         "vite": "^2.8.0",
-        "vue-eslint-parser": "^9.0.3",
         "vue-loader": "^16.8.3",
         "vue-tsc": "^0.38.1"
     }
