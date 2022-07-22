@@ -15,7 +15,8 @@
         "test:org": "node_modules/.bin/cypress run --spec \"cypress/e2e/org/*\"",
         "test:open": "node_modules/.bin/cypress open --browser electron",
         "typecheck": "node_modules/.bin/vue-tsc --noEmit",
-        "storybook": "start-storybook -p 6006"
+        "storybook": "start-storybook -p 6006",
+        "build:storybook": "node --max_old_space_size=16384 node_modules/.bin/build-storybook -o dist/storybook"
     },
     "dependencies": {
         "@bokeh/bokehjs": "~2.4.2",
@@ -39,7 +40,6 @@
         "he": "^1.2.0",
         "highlight.js": "^11.4.0",
         "htmx.org": "^1.7.0",
-        "http-proxy-middleware": "^2.0.4",
         "iframe-resizer": "^4.3.2",
         "jquery": "^3.6.0",
         "katex": "^0.16.0",
@@ -58,12 +58,14 @@
         "vega-embed": "^6.20.8",
         "vega-lite": "^5.2.0",
         "vue": "^3.2.25",
+        "vue-eslint-parser": "^9.0.3",
         "vue-multiselect": "^3.0.0-alpha.2",
         "whatwg-fetch": "^3.6.2",
         "xml-js": "^1.6.11"
     },
     "devDependencies": {
         "@babel/core": "^7.17.8",
+        "@mdx-js/react": "^2.1.2",
         "@rollup/plugin-replace": "^4.0.0",
         "@storybook/addon-actions": "^6.4.19",
         "@storybook/addon-essentials": "^6.4.19",
@@ -96,7 +98,6 @@
         "tailwindcss": "^3.0.23",
         "typescript": "^4.5.4",
         "vite": "^2.8.0",
-        "vue-eslint-parser": "^9.0.3",
         "vue-loader": "^16.8.3",
         "vue-tsc": "^0.38.1"
     }

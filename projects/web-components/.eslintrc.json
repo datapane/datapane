@@ -32,6 +32,7 @@
     ],
     "rules": {
         "@typescript-eslint/interface-name-prefix": ["off", "never"],
+        "@typescript-eslint/camelcase": ["off"],
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "double"],
         "semi": ["error", "always"],

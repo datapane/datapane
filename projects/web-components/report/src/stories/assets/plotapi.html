@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Plotapi - Chord
+This package enables the generation of Chord diagrams. They can be saved
+directly to HTML files or displayed in a Jupyter Notebook output cell.
+
+Copyright 2021, Plotapi
+http:
+https:
+
+Copyright 2021, Dr. Shahin Rostami
+http:
+-->
+        <!--LICENSE
+Chord (https:
+Copyright (C) 2021  Dr. Shahin Rostami
+-->
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <title>Plotapi - Chord Diagram</title>
+
+        <link
+            href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap"
+            rel="stylesheet"
+            type="text/css"
+        />
+
+        <link
+            rel="stylesheet"
+            href="https://plotapi.com/static/css/tippy.translucent.css"
+        />
+
+        <style>
+            .tippy-content {
+                font-family: "Lato", sans-serif !important;
+            }
+
+            #plotapi-chart-24dcb8bd,
+            #featured-plotapi-chart-24dcb8bd {
+                font-size: 16px;
+                font-family: "Lato", sans-serif !important;
+                text-align: center;
+                fill: #454545;
+            }
+
+            #plotapi-chart-24dcb8bd svg,
+            #featured-plotapi-chart-24dcb8bd svg {
+                max-width: 700px;
+            }
+
+            .details_thumbs-plotapi-chart-24dcb8bd {
+                margin: 5px;
+                max-width: 85px;
+                padding: 0;
+                display: inline-block;
+            }
+
+            .details_thumbs-plotapi-chart-24dcb8bd img {
+                max-width: 85px;
+            }
+
+            .details_thumbs-plotapi-chart-24dcb8bd figcaption {
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .hidden_chord {
+                display: none;
+            }
+
+            .arc_numbers {
+                paint-order: stroke;
+                stroke: #454545;
+                stroke-width: 2px;
+                font-weight: bold;
+                fill: #fff;
+                font-size: 10px;
+            }
+
+            @media (min-width: 600px) {
+                #plotapi-chart-24dcb8bd svg,
+                #featured-plotapi-chart-24dcb8bd svg {
+                    font-size: 20px;
+                }
+
+                .arc_numbers {
+                    font-size: 14px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="plotapi-chart-24dcb8bd" class="chord plotapi-container"></div>
+        <script>
+            !(function () {
+                var b = "undefined" != typeof IPython,
+                    a = {
+                        d3: "https://plotapi.com/static/js/d3.v7.min",
+                        chord: "https://plotapi.com/static/js/d3-chord",
+                        "@popperjs/core":
+                            "https://plotapi.com/static/js/popper.min",
+                        tippy: "https://plotapi.com/static/js/tippy.min",
+                    };
+                if (b)
+                    require.config({ paths: a }),
+                        require(["d3", "tippy", "chord", "pako"], function (
+                            a,
+                            b,
+                            d,
+                            c
+                        ) {
+                            (window.d3 = a),
+                                (window.tippy = b),
+                                (window.pako = c),
+                                e();
+                        });
+                else {
+                    var d = Object.values(a);
+                    function c(b) {
+                        var a = document.createElement("script");
+                        (a.type = "text/javascript"),
+                            (a.src = d[b] + ".js"),
+                            (a.onload = function () {
+                                b < d.length - 1 ? c(b + 1) : e();
+                            }),
+                            document.body.appendChild(a);
+                    }
+                    c(0);
+                }
+                function e() {
+                    (margin = { left: 100, top: 100, right: 100, bottom: 100 }),
+                        (width =
+                            Math.min(window.innerWidth, 700) -
+                            margin.left -
+                            margin.right),
+                        (height =
+                            Math.min(window.innerWidth, 700) -
+                            margin.top -
+                            margin.bottom),
+                        (Names = [
+                            "Action",
+                            "Adventure",
+                            "Comedy",
+                            "Drama",
+                            "Fantasy",
+                            "Thriller",
+                        ]),
+                        (matrix = [
+                            [0, 5, 6, 4, 7, 4],
+                            [5, 0, 5, 4, 6, 5],
+                            [6, 5, 0, 4, 5, 5],
+                            [4, 4, 4, 0, 5, 5],
+                            [7, 6, 5, 5, 0, 4],
+                            [4, 5, 5, 5, 4, 0],
+                        ]),
+                        (details = []),
+                        (details_thumbs = []),
+                        (conjunction = "and"),
+                        (innerRadius = 0.45 * Math.min(width, height)),
+                        (outerRadius = 1.1 * innerRadius),
+                        (offset = 0);
+                    var e,
+                        f,
+                        g,
+                        h,
+                        m,
+                        n,
+                        o = d3
+                            .scaleSequential(d3.interpolateRainbow)
+                            .domain([0, matrix.length]),
+                        a = chord(!1, !1)
+                            .padAngle(0.01)
+                            .sortChords(d3.descending)(matrix),
+                        i = d3
+                            .arc()
+                            .innerRadius(1.01 * innerRadius)
+                            .outerRadius(outerRadius)
+                            .startAngle(p)
+                            .endAngle(q),
+                        j = d3
+                            .ribbon()
+                            .radius(innerRadius)
+                            .startAngle(p)
+                            .endAngle(q),
+                        b = d3
+                            .select("#plotapi-chart-24dcb8bd")
+                            .append("svg")
+                            .attr(
+                                "viewBox",
+                                "0 0 " +
+                                    (width + margin.left + margin.right) +
+                                    " " +
+                                    (height + margin.top + margin.bottom)
+                            )
+                            .attr("class", "plotapi-plot")
+                            .attr("preserveAspectRatio", "xMinYMin meet")
+                            .append("g")
+                            .attr(
+                                "transform",
+                                "translate(" +
+                                    (width / 2 + margin.left) +
+                                    "," +
+                                    (height / 2 + margin.top) +
+                                    ") rotate(0)"
+                            );
+                    function k(a) {
+                        return (
+                            "linkGrad-plotapi-chart-24dcb8bd-" +
+                            a.source.index +
+                            "-" +
+                            a.target.index
+                        );
+                    }
+                    var c = b
+                        .append("defs")
+                        .selectAll("linearGradient")
+                        .data(a)
+                        .enter()
+                        .append("linearGradient")
+                        .attr("id", k)
+                        .attr("gradientUnits", "userSpaceOnUse")
+                        .attr("x1", function (a, b) {
+                            return a.source.index == a.target.index
+                                ? 0
+                                : innerRadius *
+                                      Math.cos(
+                                          (a.source.endAngle -
+                                              a.source.startAngle) /
+                                              2 +
+                                              a.source.startAngle -
+                                              Math.PI / 2
+                                      );
+                        })
+                        .attr("y1", function (a, b) {
+                            return (
+                                innerRadius *
+                                Math.sin(
+                                    (a.source.endAngle - a.source.startAngle) /
+                                        2 +
+                                        a.source.startAngle -
+                                        Math.PI / 2
+                                )
+                            );
+                        })
+                        .attr("x2", function (a, b) {
+                            return (
+                                innerRadius *
+                                Math.cos(
+                                    (a.target.endAngle - a.target.startAngle) /
+                                        2 +
+                                        a.target.startAngle -
+                                        Math.PI / 2
+                                )
+                            );
+                        })
+                        .attr("y2", function (a, b) {
+                            return (
+                                innerRadius *
+                                Math.sin(
+                                    (a.target.endAngle - a.target.startAngle) /
+                                        2 +
+                                        a.target.startAngle -
+                                        Math.PI / 2
+                                )
+                            );
+                        });
+                    c
+                        .append("stop")
+                        .attr("offset", "0%")
+                        .attr("stop-color", function (a) {
+                            return o(a.source.index);
+                        }),
+                        c
+                            .append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", function (a) {
+                                return o(a.target.index);
+                            });
+                    var d = b
+                        .selectAll("g.group")
+                        .data(a.groups)
+                        .enter()
+                        .append("g")
+                        .attr("class", "group")
+                        .on("mouseover", r(0.1, 1, Names))
+                        .on("mouseout", r(0.8, 0.8, Names));
+                    function p(a) {
+                        return a.startAngle + offset;
+                    }
+                    function q(a) {
+                        return a.endAngle + offset;
+                    }
+                    function r(a, b, c) {
+                        return function (c, d) {
+                            d3
+                                .select(this.ownerSVGElement)
+                                .selectAll("path.chord")
+                                .filter(function (a) {
+                                    return (
+                                        a.source.index !== d.index &&
+                                        a.target.index !== d.index
+                                    );
+                                })
+                                .transition()
+                                .style("opacity", a),
+                                d3
+                                    .select(this.ownerSVGElement)
+                                    .selectAll("path.chord")
+                                    .filter(function (a) {
+                                        return (
+                                            a.source.index == d.index ||
+                                            a.target.index == d.index
+                                        );
+                                    })
+                                    .transition()
+                                    .style("opacity", b);
+                        };
+                    }
+                    async function l() {
+                        for (
+                            let a = 0;
+                            a <
+                            d3
+                                .selectAll("#plotapi-chart-24dcb8bd .group")
+                                .nodes().length;
+                            a++
+                        )
+                            await new Promise((a) =>
+                                setTimeout(a, 555.5555555555555)
+                            ),
+                                d3
+                                    .select(
+                                        d3
+                                            .selectAll(
+                                                "#plotapi-chart-24dcb8bd .group"
+                                            )
+                                            .nodes()[a]
+                                    )
+                                    .dispatch("mouseover");
+                        await new Promise((a) =>
+                            setTimeout(a, 555.5555555555555)
+                        ),
+                            d3
+                                .select(
+                                    d3
+                                        .selectAll(
+                                            "#plotapi-chart-24dcb8bd .group"
+                                        )
+                                        .nodes()[0]
+                                )
+                                .dispatch("mouseout");
+                    }
+                    d
+                        .append("path")
+                        .style("fill", function (a) {
+                            return o(a.index);
+                        })
+                        .attr("d", i)
+                        .each(function (c, d) {
+                            c.angle = (c.startAngle + c.endAngle) / 2 + offset;
+                            var a = /(^.+?)L/.exec(
+                                d3.select(this).attr("d")
+                            )[1];
+                            if (
+                                ((a = a.replace(/,/g, " ")),
+                                !(
+                                    c.angle > 1.5 * Math.PI ||
+                                    c.angle < 0.5 * Math.PI
+                                ))
+                            ) {
+                                var e = /M(.*?)A/,
+                                    f = /A(.*?)0 0 1/,
+                                    g = /0 0 1 (.*?)$/.exec(a)[1],
+                                    h = e.exec(a)[1],
+                                    i = f.exec(a)[1];
+                                a = "M" + g + "A" + i + "0 0 0 " + h;
+                            }
+                            b.append("path")
+                                .attr("class", "hiddenArcs")
+                                .attr("id", "arc-plotapi-chart-24dcb8bd-" + d)
+                                .attr("d", a)
+                                .style("fill", "none");
+                        }),
+                        d
+                            .append("text")
+                            .attr("class", "titles")
+                            .attr("dy", function (a, b) {
+                                return a.angle > 1.5 * Math.PI ||
+                                    a.angle < 0.5 * Math.PI
+                                    ? -10
+                                    : 25;
+                            })
+                            .append("textPath")
+                            .attr("startOffset", "50%")
+                            .style("text-anchor", "middle")
+                            .attr("xlink:href", function (b, a) {
+                                return "#arc-plotapi-chart-24dcb8bd-" + a;
+                            })
+                            .style("fill", function (b, a) {
+                                return o(a);
+                            })
+                            .text(function (b, a) {
+                                return Names[a];
+                            }),
+                        b
+                            .selectAll("path.chord")
+                            .data(a)
+                            .enter()
+                            .append("path")
+                            .attr("class", function (a) {
+                                return "chord";
+                            })
+                            .style("fill", function (a) {
+                                return "url(#" + k(a) + ")";
+                            })
+                            .style("opacity", 0.8)
+                            .attr("d", j)
+                            .on(
+                                "mouseover",
+                                ((e = Names),
+                                (f = conjunction),
+                                (g = details),
+                                (h = details_thumbs),
+                                function (d, a) {
+                                    if (
+                                        (d3
+                                            .select(this.ownerSVGElement)
+                                            .selectAll("path.chord")
+                                            .transition()
+                                            .style("opacity", 0.1),
+                                        d3
+                                            .select(this)
+                                            .transition()
+                                            .style("opacity", 1),
+                                        (num_instances = Number(
+                                            a.source.value
+                                        )),
+                                        (tippy_content =
+                                            "<span style='font-weight:900'>" +
+                                            e[a.target.index] +
+                                            "</span> "),
+                                        e[a.source.index] != e[a.target.index]
+                                            ? ((tippy_content =
+                                                  tippy_content +
+                                                  f +
+                                                  " <span style='font-weight:900'>" +
+                                                  e[a.source.index] +
+                                                  "</span>"),
+                                              (tippy_content +=
+                                                  "<br>occur together in <span style='font-weight:900'>"))
+                                            : (tippy_content += "<br>"),
+                                        (tippy_content =
+                                            tippy_content +
+                                            num_instances +
+                                            "</span> instances"),
+                                        Array.isArray(g) &&
+                                            g.length &&
+                                            Array.isArray(h) &&
+                                            h.length)
+                                    ) {
+                                        if (
+                                            Array.isArray(
+                                                g[a.source.index][
+                                                    a.target.index
+                                                ]
+                                            ) &&
+                                            g[a.source.index][a.target.index]
+                                                .length &&
+                                            Array.isArray(
+                                                h[a.source.index][
+                                                    a.target.index
+                                                ]
+                                            ) &&
+                                            h[a.source.index][a.target.index]
+                                                .length
+                                        ) {
+                                            for (
+                                                var c = "", b = 0;
+                                                b <
+                                                g[a.source.index][
+                                                    a.target.index
+                                                ].length;
+                                                b++
+                                            )
+                                                c +=
+                                                    "<figure class='details_thumbs-plotapi-chart-24dcb8bd'><img src=" +
+                                                    h[a.source.index][
+                                                        a.target.index
+                                                    ][b] +
+                                                    "><figcaption>" +
+                                                    g[a.source.index][
+                                                        a.target.index
+                                                    ][b] +
+                                                    "</figcaption></figure>";
+                                            tippy_content =
+                                                tippy_content +
+                                                "<br><br><center><span><em>" +
+                                                c +
+                                                "</em></span></center>";
+                                        }
+                                    } else if (Array.isArray(g) && g.length)
+                                        Array.isArray(
+                                            g[a.source.index][a.target.index]
+                                        ) &&
+                                            g[a.source.index][a.target.index]
+                                                .length &&
+                                            (tippy_content =
+                                                tippy_content +
+                                                "<br><br><span><em>" +
+                                                (details_content = g[
+                                                    a.source.index
+                                                ][a.target.index].join(", ")) +
+                                                "</em></span>");
+                                    else if (
+                                        Array.isArray(h) &&
+                                        h.length &&
+                                        Array.isArray(
+                                            h[a.source.index][a.target.index]
+                                        ) &&
+                                        h[a.source.index][a.target.index].length
+                                    ) {
+                                        for (
+                                            var c = "", b = 0;
+                                            b <
+                                            h[a.source.index][a.target.index]
+                                                .length;
+                                            b++
+                                        )
+                                            c +=
+                                                "<figure class='details_thumbs-plotapi-chart-24dcb8bd'><img src=" +
+                                                h[a.source.index][
+                                                    a.target.index
+                                                ][b] +
+                                                "></figure>";
+                                        tippy_content =
+                                            tippy_content +
+                                            "<br><br><center><span><em>" +
+                                            c +
+                                            "</em></span></center>";
+                                    }
+                                    null == this._tippy &&
+                                        tippy(this, {
+                                            allowHTML: !0,
+                                            followCursor: !0,
+                                            content: tippy_content,
+                                            size: "large",
+                                            arrow: !0,
+                                            maxWidth: 350,
+                                            theme: "translucent",
+                                        });
+                                })
+                            )
+                            .on("mouseout", function (a, b) {
+                                d3.select(this.ownerSVGElement)
+                                    .selectAll("path.chord")
+                                    .transition()
+                                    .style("opacity", 0.8);
+                            }),
+                        l(),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd svg")
+                            .append("svg:a")
+                            .attr("xlink:href", "https://plotapi.com")
+                            .attr("target", "_blank")
+                            .append("image")
+                            .attr(
+                                "xlink:href",
+                                "https://plotapi.com/gallery/icon/plotapi.svg"
+                            )
+                            .attr("width", 20)
+                            .attr("height", 20)
+                            .attr("x", width + margin.left + margin.right - 20)
+                            .attr("y", 0)
+                            .style("opacity", 0)
+                            .attr("id", "plotapi-chart-24dcb8bd_icon"),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd_icon")
+                            .append("title")
+                            .text("Produced with Plotapi"),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd_icon")
+                            .on("mouseover", function (a, b) {
+                                d3.select("#plotapi-chart-24dcb8bd_icon").style(
+                                    "opacity",
+                                    1
+                                );
+                            }),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd_icon")
+                            .on("mouseout", function (a, b) {
+                                d3.select("#plotapi-chart-24dcb8bd_icon").style(
+                                    "opacity",
+                                    0.6
+                                );
+                            }),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd svg")
+                            .on("mouseenter", function () {
+                                d3.select("#plotapi-chart-24dcb8bd_icon").style(
+                                    "opacity",
+                                    0.6
+                                );
+                            }),
+                        d3
+                            .select("#plotapi-chart-24dcb8bd svg")
+                            .on("mouseleave", function () {
+                                d3.select("#plotapi-chart-24dcb8bd_icon").style(
+                                    "opacity",
+                                    0
+                                );
+                            });
+                }
+            })();
+        </script>
+    </body>
+</html>
