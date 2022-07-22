@@ -1,19 +1,13 @@
 import DataTable from "../components/blocks/DataTable/DataTable.vue";
+import { makeTemplate } from "./utils";
 
 export default {
     title: "DataTable",
     component: DataTable,
 };
 
-const Template = (args) => ({
-    components: { DataTable },
-    setup() {
-        return { args };
-    },
-    template: "<data-table v-bind='args' />",
-});
+export const Primary = makeTemplate(DataTable);
 
-export const Primary = Template.bind({});
 Primary.args = {
     cells: 600,
     deferLoad: false,
