@@ -13,6 +13,7 @@ $ datapane logout
 
 """
 
+import os
 import runpy
 import shutil
 import sys
@@ -23,11 +24,13 @@ import webbrowser
 import click_spinner
 import importlib_resources as ir
 import requests
+from dulwich import porcelain, errors, client
 from furl import furl
 from munch import Munch
 
 from datapane import __version__
 
+from .. import DPError
 from .. import config as c
 from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
@@ -113,6 +116,62 @@ def _run_script(script: str):
     runpy.run_path(str(script_path), run_name="__datapane__")
 
 
+def _run_template(template_path: str):
+    """Run the template script"""
+    # store the cwd before we change it
+    old_cwd = os.getcwd()
+    # change cwd to support relative paths in template script
+    os.chdir(template_path)
+    runpy.run_path(
+        "template.py",
+        run_name="__datapane__",
+    )
+    os.chdir(old_cwd)
+
+
+def _download_template(url: str):
+    """Download the template from a repository url, and delete the .git directory
+
+    Returns:
+        The path of the cloned template repository
+    """
+
+    url = _check_repo_url(url)
+
+    # Shallowest clone of the template repo
+    template_repo = porcelain.clone(url, depth=1)
+
+    # Remove .git directory
+    shutil.rmtree(template_repo.controldir())
+
+    return template_repo.path
+
+
+def _check_repo_url(url: str):
+    """Check if the template repository exists. Supports first or third-party templates.
+
+    Returns:
+        The absolute uri of the template repository.
+    """
+    # Check if remote is a git repo
+    try:
+        porcelain.ls_remote(url)
+    except:
+        try:
+            # Try appending the supplied url to the datapane organization
+            full_url = f"https://github.com/datapane/{url}"
+            # Check if remote is a first-party datapane repo
+            # that has been located with a relative path.
+            porcelain.ls_remote(full_url)
+        except (errors.NotGitRepository, client.HTTPUnauthorized) as e:
+            raise DPError(f"{url} is not a valid template repository.")
+        else:
+            # Update the URL with absolute URI
+            url = full_url
+        pass
+    return url
+
+
 @capture_event("CLI Signup")
 def signup():
     """Signup and link your account to the Datapane CLI automatically"""
@@ -150,14 +209,16 @@ def hello_world():
         github_url="https://github.com/datapane/datapane",
     )
 
+
 @capture_event("CLI Template")
 def template(url: str):
-    """Create and run a template report, and open in the browser"""
-    display_msg(
-        f"Retrieving and running `{url}` - running this code generates a Datapane report. You can edit the script and run it again to change the generated report.\n"
-    )
+    """Retrieve and run a template report, and open in the browser"""
+    display_msg(f"Retrieving and running the template at `{url}`.\n")
 
-    #_run_script("template.py")
+    template_path = _download_template(url)
+    _run_template(template_path)
+
+    display_msg(f"\nYou can edit `template.py` and run it from {template_path} change the generated report.")
 
     display_msg(
         "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
