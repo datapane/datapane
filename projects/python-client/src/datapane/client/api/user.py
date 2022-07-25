@@ -6,7 +6,6 @@ It's possible to authenticate within Python, however we also provide (and recomm
 via the CLI, as it's easier to automate.
 
 ```
-$ datapane signup
 $ datapane login --token ...
 $ datapane logout
 ```
@@ -33,7 +32,7 @@ from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "signup", "hello_world"]
+__all__ = ["login", "logout", "ping", "hello_world"]
 
 
 def login(
@@ -111,27 +110,6 @@ def _run_script(script: str):
     script_path = ir.files("datapane.resources.templates.hello") / script
     shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
-
-
-@capture_event("CLI Signup")
-def signup():
-    """Signup and link your account to the Datapane CLI automatically"""
-    config = c.get_config()
-    token = token_connect("/accounts/signup/", action="signup", server=config.server)
-    # login and re-init against the signed-up server
-    login(token, server=config.server)
-
-    display_msg(
-        "\nLearn more about uploading and sharing reports {learn_url:l}.",
-        learn_url="https://docs.datapane.com/reports/publishing-and-sharing",
-    )
-
-    display_msg(
-        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
-        chat_url="https://chat.datapane.com",
-        forum_url="https://forum.datapane.com",
-        github_url="https://github.com/datapane/datapane",
-    )
 
 
 @capture_event("CLI Hello World")
