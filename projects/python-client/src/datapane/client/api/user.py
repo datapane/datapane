@@ -33,7 +33,7 @@ from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "signup", "hello_world"]
+__all__ = ["login", "logout", "ping", "signup", "hello_world", "template"]
 
 
 def login(
@@ -142,6 +142,22 @@ def hello_world():
     )
 
     _run_script("hello.py")
+
+    display_msg(
+        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
+        chat_url="https://chat.datapane.com",
+        forum_url="https://forum.datapane.com",
+        github_url="https://github.com/datapane/datapane",
+    )
+
+@capture_event("CLI Template")
+def template():
+    """Create and run a template report, and open in the browser"""
+    display_msg(
+        "Retrieving and running `./template.py` - running this code generates a Datapane report. You can edit the script and run it again to change the generated report.\n"
+    )
+
+    #_run_script("template.py")
 
     display_msg(
         "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",

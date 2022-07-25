@@ -160,6 +160,12 @@ def hello_world():
     api.hello_world()
 
 
+@cli.command()
+def template():
+    """Retrieve and run a template report, and open in the browser"""
+    api.template()
+
+
 ###############################################################################
 # Files
 @cli.group()
