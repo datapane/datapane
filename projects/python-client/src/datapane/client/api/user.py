@@ -122,10 +122,13 @@ def _run_template(template_path: str):
     old_cwd = os.getcwd()
     # change cwd to support relative paths in template script
     os.chdir(template_path)
-    runpy.run_path(
-        "template.py",
-        run_name="__datapane__",
-    )
+    try:
+        runpy.run_path(
+            "template.py",
+            run_name="__datapane__",
+        )
+    except ModuleNotFoundError as e:
+        raise DPError(f"Please install the following packages to run this template\n{e.name}") from e
     os.chdir(old_cwd)
 
 
@@ -218,7 +221,7 @@ def template(url: str):
     template_path = _download_template(url)
     _run_template(template_path)
 
-    display_msg(f"\nYou can edit `template.py` and run it from {template_path} change the generated report.")
+    display_msg(f"\nYou can edit `template.py` and run it from the new {template_path} directory to change the generated report.")
 
     display_msg(
         "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
