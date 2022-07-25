@@ -151,10 +151,10 @@ def hello_world():
     )
 
 @capture_event("CLI Template")
-def template():
+def template(url: str):
     """Create and run a template report, and open in the browser"""
     display_msg(
-        "Retrieving and running `./template.py` - running this code generates a Datapane report. You can edit the script and run it again to change the generated report.\n"
+        f"Retrieving and running `{url}` - running this code generates a Datapane report. You can edit the script and run it again to change the generated report.\n"
     )
 
     #_run_script("template.py")

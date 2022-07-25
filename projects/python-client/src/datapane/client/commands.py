@@ -161,9 +161,13 @@ def hello_world():
 
 
 @cli.command()
-def template():
-    """Retrieve and run a template report, and open in the browser"""
-    api.template()
+@click.argument("url", default=None)
+def template(url: str):
+    """Retrieve and run a template report, and open in the browser
+
+    URL is the location of the template repository. Relative locations can be used for first-party templates, e.g. `dp-template-classifier-dashboard`.
+    """
+    api.template(url)
 
 
 ###############################################################################
