@@ -146,10 +146,10 @@ def _download_template(url: str):
 
     # Check if target directory already exists
     target = url.split("/")[-1]
-    dir_exists = os.path.exists(target)
+    target_dir_exists = os.path.exists(target)
 
     # If directory exists, raise an error notifying the user
-    if dir_exists:
+    if target_dir_exists:
         raise DPError(f"Directory {target} already exists.")
 
     # Shallowest clone of the template repo
