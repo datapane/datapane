@@ -24,7 +24,7 @@ import webbrowser
 import click_spinner
 import importlib_resources as ir
 import requests
-from dulwich import porcelain, errors, client
+from dulwich import client, errors, porcelain
 from furl import furl
 from munch import Munch
 
@@ -170,7 +170,7 @@ def _check_repo_url(url: str):
     # Check if remote is a git repo
     try:
         porcelain.ls_remote(url)
-    except:
+    except (errors.NotGitRepository, client.HTTPUnauthorized):
         try:
             # Try appending the supplied url to the datapane organization
             full_url = f"https://github.com/datapane/{url}"
@@ -178,7 +178,7 @@ def _check_repo_url(url: str):
             # that has been located with a relative path.
             porcelain.ls_remote(full_url)
         except (errors.NotGitRepository, client.HTTPUnauthorized) as e:
-            raise DPError(f"{url} is not a valid template repository.")
+            raise DPError(f"{url} is not a valid template repository.") from e
         else:
             # Update the URL with absolute URI
             url = full_url

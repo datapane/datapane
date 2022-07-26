@@ -124,4 +124,5 @@ __all__ = [
     "logout",
     "ping",
     "signup",
+    "template",
 ]
