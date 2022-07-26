@@ -144,8 +144,16 @@ def _download_template(url: str):
 
     url = _check_repo_url(url)
 
+    # Check if target directory already exists
+    target = url.split("/")[-1]
+    dir_exists = os.path.exists(target)
+
+    # If directory exists, raise an error notifying the user
+    if dir_exists:
+        raise DPError(f"Directory {target} already exists.")
+
     # Shallowest clone of the template repo
-    template_repo = porcelain.clone(url, depth=1)
+    template_repo = porcelain.clone(url, target=target, depth=1)
 
     # Remove .git directory
     shutil.rmtree(template_repo.controldir())
