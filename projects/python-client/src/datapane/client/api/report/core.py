@@ -28,18 +28,7 @@ from datapane.client.utils import DPError, InvalidReportError, display_msg
 from datapane.common import SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 
-from .blocks import (
-    BaseElement,
-    Block,
-    BlockList,
-    BlockOrPrimitive,
-    BuilderState,
-    E,
-    Group,
-    Page,
-    PageOrPrimitive,
-    wrap_block,
-)
+from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
@@ -409,73 +398,6 @@ class Report(DPObjectRef):
             "Report successfully uploaded. View and share your report at {web_url:l}.",
             web_url=self.web_url,
         )
-
-    def update_assets(
-        self,
-        *arg_blocks: Block,
-        blocks: t.Union[BlockDict, BlockList] = None,
-        open: bool = False,
-        **kw_blocks: BlockOrPrimitive,
-    ) -> None:
-        """
-        Upload updated plots, text, tables, and files for a report.
-        Blocks can be created with the `name` parameter, if not set, one can be provided here using keyword args.
-        Use the blocks dict parameter to add a dynamically generated set of named blocks, useful when working in Jupyter
-
-        Args:
-            *arg_blocks: List of blocks to add
-            blocks: Allows providing the document blocks as a single list/dictionary of named blocks
-            open: Open the report in your browser for editing after updating
-            **kw_blocks: Keyword argument set of blocks, whose block name will be that given in the keyword
-
-        Returns:
-            None
-
-        ..tip:: Blocks can be passed using either arg parameters or the `blocks` kwarg as a dictionary, e.g.
-          `report.update_assets(my_plot=plot, my_table=table)` or `report.update_assets(blocks={"my_plot": plot, "my_table":table})`
-
-        ..tip:: Create a dictionary first to hold your blocks to edit them dynamically, for instance when using Jupyter, and use the `blocks` parameter
-        """
-        # set the blocks
-        def _conv_block(block: BlockOrPrimitive, name: t.Optional[str] = None) -> Block:
-            x = wrap_block(block)
-            x._set_name(name)
-            return x
-
-        _blocks: BlockList
-        if isinstance(blocks, dict):
-            _blocks = [_conv_block(b, n) for (n, b) in blocks.items()]
-        elif isinstance(blocks, list):
-            _blocks = [_conv_block(b, None) for b in blocks]
-        else:
-            # use arg and kw blocks
-            _blocks = [_conv_block(b, None) for b in arg_blocks]
-            _blocks.extend([_conv_block(b, n) for (n, b) in kw_blocks.items()])
-
-        # Validity checks
-        if not _blocks:
-            raise DPError("No blocks provided to update")
-        # TODO - use typeguard
-        assert all(isinstance(x, BaseElement) for x in _blocks), "Please use kwarg syntax to upload unwrapped asses"
-        assert all(x.name for x in _blocks), "Please ensure all blocks have a name parameter set, or use kwarg syntax"
-
-        # set the pages
-        self.pages = [Page(blocks=[Group(blocks=_blocks)])]
-
-        # generate the report and upload
-        report_str, attachments = self._gen_report(embedded=False)
-        files = dict(attachments=attachments)
-        # post to the custom endpoint
-        Resource(f"{self.url}update_assets/").post_files(files, document=report_str, name=self.name)
-        self.refresh()
-
-        display_msg(
-            "Report assets successfully updated. View and share your report at {web_url:l}.",
-            web_url=self.web_url,
-        )
-
-        if open:
-            webbrowser.open_new_tab(self.edit_url)
 
     ############################################################################
     # Local saved reports
