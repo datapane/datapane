@@ -26,9 +26,8 @@ nav:
       - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
       - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
       - Files: "tutorials/datapane-cloud/files.md"
-    - Styling and editing 🎨:
+    - Styling 🎨:
       - tutorials/styling/index.ipynb
-      - Styling: "tutorials/styling/styling.ipynb"
       - Adding source code: "tutorials/styling/adding-source-code.ipynb"
       - Global styling: "tutorials/styling/global-styling.md"
     - Automation 🤖:
