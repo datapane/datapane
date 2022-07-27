@@ -131,7 +131,7 @@ def hello_world():
 
 def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
     """
-    Create a login token, and prompt the user to login/signup while polling for completion.
+    Creates a login token, and prompt the user to login while polling for completion.
     Then log the user into the CLI with the retrieved API token.
 
     NOTE: throughout this function we refer to signup tokens however this function will
@@ -141,9 +141,10 @@ def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
     """
 
     def create_token(s: requests.Session) -> str:
-        create_endpoint = furl(path="/api/api-signup-tokens/", origin=server).url
+        create_endpoint = furl(path="/api/api-login-tokens/", origin=server).url
         req = s.post(create_endpoint)
         res: Munch = _process_res(req)
+        print(res)
         return res.key
 
     def poll_token(s: requests.Session, endpoint: str) -> t.Optional[str]:
@@ -155,16 +156,16 @@ def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
             return processed_res.api_key
 
     with requests.Session() as s:
-        signup_token = create_token(s)
-        signup_url = furl(path=open_url, origin=server).add({"signup_token": signup_token}).url
+        login_token = create_token(s)
+        url = furl(path=open_url, origin=server).add({"login_token": login_token}).url
 
         print(
-            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{signup_url}"
+            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
         )
-        webbrowser.open(url=signup_url, new=2)
+        webbrowser.open(url=url, new=2)
 
         # Declare the endpoint outside the poll_token function to save rebuilding on each poll
-        poll_endpoint = furl(path=f"/api/api-signup-tokens/{signup_token}/", origin=server).url
+        poll_endpoint = furl(path=f"/api/api-login-tokens/{login_token}/", origin=server).url
         api_key = None
         try:
             # NOTE mypy flags this usage as incorrect but is fine according to the docs
