@@ -135,6 +135,7 @@ repos:
            - tslint@5.20.0
            - eslint-plugin-vue@v7.5.0
            - "@typescript-eslint/eslint-plugin-tslint@2.4.0"
+           - "vue-eslint-parser"
   # sh shellcheck
   - repo: https://github.com/detailyang/pre-commit-shell
     rev: "v1.0.6"
