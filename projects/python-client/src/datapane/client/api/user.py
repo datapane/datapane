@@ -188,7 +188,7 @@ def _check_repo_url(url: URL):
             raise DPError(f"{url} is not a valid template repository.") from e
         else:
             # Update the URL with absolute URI
-            url = full_url
+            url = URL(full_url)
         pass
     return url
 
