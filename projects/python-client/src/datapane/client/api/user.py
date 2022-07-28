@@ -145,11 +145,13 @@ def _download_template(url: URL):
 
     url = _check_repo_url(url)
 
-    # Check if target directory already exists
+    # Check if target directory already exists. 
+    # This check is identical to the target check in `dulwich.porcelain.clone`:
+    # https://github.com/jelmer/dulwich/blob/78e6ae0960d79060d4ff19f0aa5dc4b32296116d/dulwich/porcelain.py#L439-L441
     target = url.split("/")[-1]
     target_dir_exists = os.path.exists(target)
 
-    # If directory exists, raise an error notifying the user
+    # Avoid overwriting user's data
     if target_dir_exists:
         raise DPError(f"Directory {target} already exists.")
 
