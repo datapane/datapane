@@ -234,12 +234,14 @@ def hello_world():
 
 
 @capture_event("CLI Template")
-def template(url: URL):
+def template(url: URL, execute: bool):
     """Retrieve and run a template report, and open in the browser"""
-    display_msg(f"Retrieving and running the template at `{url}`.\n")
+    display_msg(f"Retrieving{' and running ' if execute else ' '}the template at `{url}`.\n")
 
     template_path = _download_template(url)
-    _run_template(template_path)
+    
+    if execute:
+        _run_template(template_path)
 
     display_msg(
         f"\nYou can edit `template.py` and run it from the new {template_path} directory to change the generated report."
