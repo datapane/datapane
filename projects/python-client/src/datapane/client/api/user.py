@@ -20,6 +20,7 @@ import sys
 import time
 import typing as t
 import webbrowser
+from pathlib import Path
 
 import click_spinner
 import importlib_resources as ir
@@ -29,6 +30,7 @@ from furl import furl
 from munch import Munch
 
 from datapane import __version__
+from datapane.common import URL
 
 from .. import DPError
 from .. import config as c
