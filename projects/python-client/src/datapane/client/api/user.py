@@ -31,6 +31,7 @@ from munch import Munch
 
 from datapane import __version__
 from datapane.common import URL
+from datapane.common.utils import pushd
 
 from .. import DPError
 from .. import config as c
@@ -120,21 +121,19 @@ def _run_script(script: Path):
 
 def _run_template(template_path: Path):
     """Run the template script"""
-    # Store the cwd before we change it
-    old_cwd = os.getcwd()
-    # Change cwd to support relative paths in template script
-    os.chdir(template_path)
-
-    try:
-        runpy.run_path(
-            "template.py",
-            run_name="__datapane__",
-        )
-    # Notify the user of missing packages that are required by the template
-    except ModuleNotFoundError as e:
-        raise DPError(f"Please install the following packages to run this template\n{e.name}") from e
-
-    os.chdir(old_cwd)
+    # Use template_path as cwd to support relative paths in template script
+    with pushd(template_path):
+        # Try to run the template script.
+        try:
+            runpy.run_path(
+                "template.py",
+                run_name="__datapane__",
+            )
+        # Notify the user of missing packages that are required by the template
+        except ModuleNotFoundError as e:
+            raise DPError(
+                f"Please install the following packages to run this template\n{e.name}"
+            ) from e
 
 
 def _download_template(url: URL):
