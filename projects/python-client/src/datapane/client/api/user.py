@@ -111,14 +111,14 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     return email
 
 
-def _run_script(script: str):
+def _run_script(script: Path):
     """Run the template script and copy it locally to cwd"""
     script_path = ir.files("datapane.resources.templates.hello") / script
     shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
 
 
-def _run_template(template_path: str):
+def _run_template(template_path: Path):
     """Run the template script"""
     # Store the cwd before we change it
     old_cwd = os.getcwd()
@@ -137,7 +137,7 @@ def _run_template(template_path: str):
     os.chdir(old_cwd)
 
 
-def _download_template(url: str):
+def _download_template(url: URL):
     """Download the template from a repository url, and delete the .git directory
 
     Returns:
@@ -163,7 +163,7 @@ def _download_template(url: str):
     return template_repo.path
 
 
-def _check_repo_url(url: str):
+def _check_repo_url(url: URL):
     """Check if the template repository exists. Supports first or third-party templates.
 
     Returns:
@@ -227,7 +227,7 @@ def hello_world():
 
 
 @capture_event("CLI Template")
-def template(url: str):
+def template(url: URL):
     """Retrieve and run a template report, and open in the browser"""
     display_msg(f"Retrieving and running the template at `{url}`.\n")
 
