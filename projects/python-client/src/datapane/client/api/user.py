@@ -131,9 +131,7 @@ def _run_template(template_path: Path):
             )
         # Notify the user of missing packages that are required by the template
         except ModuleNotFoundError as e:
-            raise DPError(
-                f"Please install the following packages to run this template\n{e.name}"
-            ) from e
+            raise DPError(f"Please install the following packages to run this template\n{e.name}") from e
 
 
 def _download_template(url: URL):
@@ -145,7 +143,7 @@ def _download_template(url: URL):
 
     url = _check_repo_url(url)
 
-    # Check if target directory already exists. 
+    # Check if target directory already exists.
     # This check is identical to the target check in `dulwich.porcelain.clone`:
     # https://github.com/jelmer/dulwich/blob/78e6ae0960d79060d4ff19f0aa5dc4b32296116d/dulwich/porcelain.py#L439-L441
     target = url.split("/")[-1]
@@ -239,7 +237,7 @@ def template(url: URL, execute: bool):
     display_msg(f"Retrieving{' and running ' if execute else ' '}the template at `{url}`.\n")
 
     template_path = _download_template(url)
-    
+
     if execute:
         _run_template(template_path)
 
