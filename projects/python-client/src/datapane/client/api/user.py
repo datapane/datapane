@@ -131,20 +131,14 @@ def hello_world():
 
 def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
     """
-    Creates a login token, and prompt the user to login while polling for completion.
+    Creates a login token, and prompts the user to login while polling for completion.
     Then log the user into the CLI with the retrieved API token.
-
-    NOTE: throughout this function we refer to signup tokens however this function will
-    now only ever be used for logging a user in. Both login & signup use the same tokens and
-    endpoints as part their respective operations. Keeping the current name is just a convience
-    because we don't need to change any backend code and potentially break signup/login.
     """
 
     def create_token(s: requests.Session) -> str:
         create_endpoint = furl(path="/api/api-login-tokens/", origin=server).url
         req = s.post(create_endpoint)
         res: Munch = _process_res(req)
-        print(res)
         return res.key
 
     def poll_token(s: requests.Session, endpoint: str) -> t.Optional[str]:
