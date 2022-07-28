@@ -174,6 +174,12 @@ def _check_repo_url(url: URL):
     try:
         porcelain.ls_remote(url)
     except (errors.NotGitRepository, client.HTTPUnauthorized):
+        # A check for special characters (: and /) to avoid unknowns
+        # e.g., unintended repo download/execution
+        special_chars = [":", "/"]
+        if any(special_char in url for special_char in special_chars):
+            raise DPError(f"{url} is not a valid template repository.")
+
         try:
             # Try appending the supplied url to the datapane organization
             full_url = f"https://github.com/datapane/{url}"
