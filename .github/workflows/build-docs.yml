@@ -34,9 +34,10 @@ jobs:
 
       - name: Install Tools
         run: |
-          pipx install "poetry>=1.1.14,<1.2.0"
+          pipx install -f "poetry>=1.1.14,<1.2.0"
           poetry config virtualenvs.in-project true
-          sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+          # use /home/runner to workaround 'act' running as root for local development (HOME not available)
+          sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /home/runner/.local/bin
 
       - name: Dump Runner Info
         env:
@@ -45,8 +46,10 @@ jobs:
           echo "${RUNNER_CONTEXT}"
           which python
 
+
       - name: Install Docs Dependencies
         run: |
+          pushd docs; poetry env use 3.10; popd
           task docs:install
 
       - name: Build (+ Link) Local Report bundle
