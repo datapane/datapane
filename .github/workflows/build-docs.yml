@@ -1,0 +1,58 @@
+name: Build [Docs]
+
+on:
+  # Docs depends on all projects, so don't path limit it
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build:
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable symlinks on Windows
+        run: git config --global core.symlinks true
+        if: startsWith(runner.os, 'Windows')
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install Tools
+        run: |
+          pipx install "poetry>=1.1.14,<1.2.0"
+          poetry config virtualenvs.in-project true
+          sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
+      - name: Dump Runner Info
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: |
+          echo "${RUNNER_CONTEXT}"
+          which python
+
+      - name: Install Docs Dependencies
+        run: |
+          task docs:install
+
+      - name: Build (+ Link) Local Report bundle
+        run: |
+          task web-components:install:ci web-components:build:local-report link-local-report
+
+      - name: Build
+        run: |
+          task docs:build
