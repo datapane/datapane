@@ -56,6 +56,15 @@ jobs:
         run: |
           task web-components:install:ci web-components:build:local-report link-local-report
 
+      - name: Login to Datapane
+        working-directory: docs
+        run: |
+          # We're only pushing to the server as a side-effect, we never actually use what we push.
+          # TODO: Implement environment variables to avoid writing the token to disk.
+          poetry run datapane login --token '${{ secrets.DOCS_BUILD_DATAPANE_API_KEY }}'
+
       - name: Build
         run: |
           task docs:build
+
+permissions: {}
