@@ -67,4 +67,10 @@ jobs:
         run: |
           task docs:build
 
+      - name: Artifact Docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs-build
+          path: docs/site
+
 permissions: {}
