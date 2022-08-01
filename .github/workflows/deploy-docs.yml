@@ -1,0 +1,74 @@
+on:
+  workflow_run:
+    workflows:
+      - Build [Docs]
+    types:
+      - completed
+
+defaults:
+  run:
+    shell: bash
+
+# We use a separate workflow so we don't leak deployment keys in the PR workflows.
+# Keys are tied to the 'docs-deploy' environment, which can only be accessed on the 'master' branch.
+
+# IMPORTANT: You have to merge changes to this file to 'master' before they'll be executed.
+
+# NOTE: We do not checkout any repository (ours or theirs):
+#       - Avoids Remote Code Execution (if we check out their branch)
+#       - Avoids user confusion when changes they make are not reflected (such as changing the Taskfile.yml)
+#       - GitOps based tools (wrangler) need to be configured explicitly
+
+# secrets:
+# DOCS_CLOUDFLARE_PAGES_API_TOKEN::
+# - Grants edit access to Cloudflare Pages on the Datapane Account
+# - TTL of 2 months
+# - instructions here: https://developers.cloudflare.com/api/tokens/create/
+
+# Future:
+# - implement 'workflow_dispatch' so we can manually trigger deploys
+# - implement Github Deployments to associate a deployed page with a PR (better reviews)
+# - Pages Cleanup for merged PR
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclussion == 'success'
+    environment: docs-deploy
+
+    steps:
+      - name: Download Built Dodcs
+        # We're not using 'action/download-artifact' as it doesn't
+        # natively support cross-workflow downloads.
+        # https://github.com/actions/download-artifact/issues/172
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ context.payload.workflow_run.id }}
+          # always specify a path to prevent files getting written over
+          # https://www.legitsecurity.com/blog/github-actions-that-open-the-door-to-cicd-pipeline-attacks
+          path: ./work/site
+          name: docs-build
+
+      - name: Ensure site exists
+        working-directory: ./work
+        run: |
+          if ( ! test -f site/index.html ) {
+            echo '::error title=Docs Artifacts not found::Missing the built docs site'
+            exit 1
+          }
+
+      - name: Publish Docs
+        working-directory: ./work
+        run: |
+          npx wrangler pages publish \
+            --project-name datapane-docs \
+            --branch "$DOCS_BRANCH" \
+            --commit "$DOCS_COMMIT" \
+            site
+        env:
+          CLOUDFLARE_API_TOKEN: '${{ secrets.DOCS_CLOUDFLARE_PAGES_API_TOKEN }}'
+          # indirect access to prevent shell escape issues
+          DOCS_BRANCH: '${{ context.payload.workflow_run.head_branch }}'
+          DOCS_COMMIT: '${{ context.payload.workflow_run.head_sha }}'
+
+permissions: {}
