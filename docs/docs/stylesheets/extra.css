@@ -45,9 +45,8 @@ md-nav__title {
 }
 
 /* Output cells */
-.output code,
-.output pre {
-    background-color: white !important;
+.output code {
+    background-color: transparent !important;
 }
 
 .output .md-clipboard {
