@@ -65,7 +65,7 @@ jobs:
           npx wrangler pages publish \
             --project-name datapane-docs \
             --branch "$DOCS_BRANCH" \
-            --commit "$DOCS_COMMIT" \
+            --commit-hash "$DOCS_COMMIT" \
             site
         env:
           CLOUDFLARE_API_TOKEN: '${{ secrets.DOCS_CLOUDFLARE_PAGES_API_TOKEN }}'
