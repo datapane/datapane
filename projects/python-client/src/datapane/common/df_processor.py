@@ -111,9 +111,10 @@ def obj_to_str(df: pd.DataFrame):
 
 
 def bipartite_to_bool(df: pd.DataFrame):
-    """Converts biperatite {0, 1} columns to bool"""
-    # Get names of columns with only 2 unique values.
-    bipartite_columns = df.columns[df.dropna().nunique() == 2]
+    """Converts biperatite numeric {0, 1} columns to bool"""
+    # Get names of numeric columns with only 2 unique values.
+    df_num = df.select_dtypes("integer", exclude=["timedelta"])
+    bipartite_columns = df_num.columns[df_num.dropna().nunique() == 2]
 
     for column in bipartite_columns:
         series = df[column]
@@ -123,7 +124,7 @@ def bipartite_to_bool(df: pd.DataFrame):
         val_min, val_max = val_range[0], val_range[1]
 
         if val_min == 0 and val_max == 1:
-            df[column] = df[column].astype("bool")
+            df[column] = df[column].astype(bool)
 
 
 def str_to_arrow_str(df: pd.DataFrame):
@@ -242,3 +243,4 @@ def truncate_dataframe(
     if not isinstance(df.index, pd.RangeIndex):
         raise ValueError("Dataframe has unsupported index type")
     return df.truncate(before=0, after=max_rows - 1, copy=False)
+
