@@ -243,4 +243,3 @@ def truncate_dataframe(
     if not isinstance(df.index, pd.RangeIndex):
         raise ValueError("Dataframe has unsupported index type")
     return df.truncate(before=0, after=max_rows - 1, copy=False)
-
