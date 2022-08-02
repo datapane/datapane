@@ -69,6 +69,7 @@ jobs:
             site
         env:
           CLOUDFLARE_API_TOKEN: '${{ secrets.DOCS_CLOUDFLARE_PAGES_API_TOKEN }}'
+          CLOUDFLARE_ACCOUNT_ID: '${{ secrets.DOCS_CLOUDFLARE_PAGES_ACCOUNT_ID }}'
           # indirect access to prevent shell escape issues
           DOCS_BRANCH: '${{ github.event.workflow_run.head_branch }}'
           DOCS_COMMIT: '${{ github.event.workflow_run.head_sha }}'
