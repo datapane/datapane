@@ -54,10 +54,10 @@ jobs:
       - name: Ensure site exists
         working-directory: ./work
         run: |
-          if ( ! test -f site/index.html ) {
+          if ( ! test -f site/index.html ); then
             echo '::error title=Docs Artifacts not found::Missing the built docs site'
             exit 1
-          }
+          fi
 
       - name: Publish Docs
         working-directory: ./work
