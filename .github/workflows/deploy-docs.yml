@@ -1,7 +1,8 @@
 on:
   workflow_run:
     workflows:
-      - Build [Docs]
+      # have to escape square brackets due : https://github.com/actions/runner/issues/854#issuecomment-825907880
+      - Build \[Docs\]
     types:
       - completed
 
