@@ -1,0 +1,31 @@
+version: "3"
+
+includes:
+
+env:
+
+tasks:
+  install:
+    desc: "Install dependencies ready for development on the codebase"
+    run: once
+    cmds:
+      - npm install
+  install:ci:
+    desc: "Install dependencies for the CI environment"
+    cmds:
+      - npm clean-install
+
+  test:
+    desc: "Run self-contained tests"
+
+  build:
+    desc: "Build a package ready for a deploy"
+    cmds:
+      - npm run build
+  build:local-report:
+    desc: "Build local-report artifacts for inclusion in other projects"
+    cmds:
+      - npm run build:local-report
+
+  deploy:
+    desc: "Deploy the package"

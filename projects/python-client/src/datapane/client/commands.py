@@ -149,12 +149,6 @@ def ping():
 
 
 @cli.command()
-def signup():
-    """Signup and link your account to the Datapane CLI"""
-    api.signup()
-
-
-@cli.command()
 def hello_world():
     """Create and run an example report, and open in the browser"""
     api.hello_world()
