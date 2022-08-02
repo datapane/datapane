@@ -122,7 +122,7 @@ def bipartite_to_bool(df: pd.DataFrame):
         val_range = series.min(), series.max()
         val_min, val_max = val_range[0], val_range[1]
 
-        if(val_min == 0 and val_max == 1):
+        if val_min == 0 and val_max == 1:
             df[column] = df[column].astype("bool")
 
 
