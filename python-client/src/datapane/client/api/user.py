@@ -6,7 +6,6 @@ It's possible to authenticate within Python, however we also provide (and recomm
 via the CLI, as it's easier to automate.
 
 ```
-$ datapane signup
 $ datapane login --token ...
 $ datapane logout
 ```
@@ -33,7 +32,7 @@ from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "signup", "hello_world"]
+__all__ = ["login", "logout", "ping", "hello_world"]
 
 
 def login(
@@ -113,27 +112,6 @@ def _run_script(script: str):
     runpy.run_path(str(script_path), run_name="__datapane__")
 
 
-@capture_event("CLI Signup")
-def signup():
-    """Signup and link your account to the Datapane CLI automatically"""
-    config = c.get_config()
-    token = token_connect("/accounts/signup/", action="signup", server=config.server)
-    # login and re-init against the signed-up server
-    login(token, server=config.server)
-
-    display_msg(
-        "\nLearn more about uploading and sharing reports {learn_url:l}.",
-        learn_url="https://docs.datapane.com/reports/publishing-and-sharing",
-    )
-
-    display_msg(
-        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
-        chat_url="https://chat.datapane.com",
-        forum_url="https://forum.datapane.com",
-        github_url="https://github.com/datapane/datapane",
-    )
-
-
 @capture_event("CLI Hello World")
 def hello_world():
     """Create and run an example report, and open in the browser"""
@@ -153,12 +131,12 @@ def hello_world():
 
 def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
     """
-    Create a signup token, and prompt the user to login/signup while polling for completion.
-    Then log the user into the CLI with the retrieved API token
+    Creates a login token, and prompts the user to login while polling for completion.
+    Then log the user into the CLI with the retrieved API token.
     """
 
     def create_token(s: requests.Session) -> str:
-        create_endpoint = furl(path="/api/api-signup-tokens/", origin=server).url
+        create_endpoint = furl(path="/api/api-login-tokens/", origin=server).url
         req = s.post(create_endpoint)
         res: Munch = _process_res(req)
         return res.key
@@ -172,16 +150,16 @@ def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
             return processed_res.api_key
 
     with requests.Session() as s:
-        signup_token = create_token(s)
-        signup_url = furl(path=open_url, origin=server).add({"signup_token": signup_token}).url
+        login_token = create_token(s)
+        url = furl(path=open_url, origin=server).add({"login_token": login_token}).url
 
         print(
-            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{signup_url}"
+            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
         )
-        webbrowser.open(url=signup_url, new=2)
+        webbrowser.open(url=url, new=2)
 
         # Declare the endpoint outside the poll_token function to save rebuilding on each poll
-        poll_endpoint = furl(path=f"/api/api-signup-tokens/{signup_token}/", origin=server).url
+        poll_endpoint = furl(path=f"/api/api-login-tokens/{login_token}/", origin=server).url
         api_key = None
         try:
             # NOTE mypy flags this usage as incorrect but is fine according to the docs
