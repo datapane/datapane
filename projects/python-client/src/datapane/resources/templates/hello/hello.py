@@ -73,16 +73,16 @@ But what if we want to send a link to our report or embed it instead?
 
 Datapane Cloud is free! Share reports privately, or embed them into platforms like Salesforce and Medium.
 
-To get a free API key, run the following command:
+To sign up go to https://datapane.com/accounts/signup/ and then login by doing the following
 """
     ),
     dp.Select(
-        dp.Code("$ datapane signup", label="Terminal"),
-        dp.Code("!datapane signup", label="Python/Jupyter"),
+        dp.Code("$ datapane login", label="Terminal"),
+        dp.Code("!datapane login", label="Python/Jupyter"),
     ),
     dp.Text(
         """
-Once we've completed signup, [the API key](https://datapane.com/settings/) will be stored in the current environment.
+Once we've logged in, [the API key](https://datapane.com/settings/) will be stored in the current environment.
         """
     ),
     dp.Code(
