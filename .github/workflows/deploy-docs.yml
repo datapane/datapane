@@ -45,6 +45,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           run_id: ${{ github.event.workflow_run.id }}
+          workflow: build-docs.yml
           # always specify a path to prevent files getting written over
           # https://www.legitsecurity.com/blog/github-actions-that-open-the-door-to-cicd-pipeline-attacks
           path: ./work/site
