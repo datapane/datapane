@@ -53,9 +53,9 @@ Datapane will upgrade, administer, and maintain the server. Core data leaves the
 -   Updates and migrations managed by you
 -   Telemetry data leaves your infrastructure
 
-{% hint style="info" %}
-For instructions for self-hosting Datapane, please see [https://github.com/datapane/datapane-onpremise](https://github.com/datapane/datapane-onpremise)
-{% endhint %}
+!!! info
+
+    For instructions for self-hosting Datapane, please see [https://github.com/datapane/datapane-onpremise](https://github.com/datapane/datapane-onpremise)
 
 ### Overview
 
