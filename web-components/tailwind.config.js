@@ -115,7 +115,7 @@ module.exports = {
         "../../../dp-server/templates/**/*.html",
 
         // Local report
-        "../../src/datapane/resources/local_report/template.html",
+        "../python-client/src/datapane/resources/local_report/*.html",
     ],
     safelist: [
         { pattern: /grid-cols-.*/ },
