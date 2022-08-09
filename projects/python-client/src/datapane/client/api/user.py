@@ -146,7 +146,7 @@ def _download_template(url: URL):
     # Check if target directory already exists.
     # This check is identical to the target check in `dulwich.porcelain.clone`:
     # https://github.com/jelmer/dulwich/blob/78e6ae0960d79060d4ff19f0aa5dc4b32296116d/dulwich/porcelain.py#L439-L441
-    target = url.split("/")[-1]
+    target = url.rstrip('/').split("/")[-1]
     target_dir_exists = os.path.exists(target)
 
     # Avoid overwriting user's data
