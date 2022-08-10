@@ -13,11 +13,6 @@ nav:
       - Create a report: "tutorials/basics/create-a-report.ipynb"
     - Blocks types 🧱:
       - tutorials/blocks/index.ipynb
-      - Tables and data: "tutorials/blocks/tables-and-data.ipynb"
-      - Plots and visualizations: "tutorials/blocks/plots-and-visualizations.ipynb"
-      - Text and HTML: "tutorials/blocks/text-code-and-html.ipynb"
-      - Layout and pages: "tutorials/blocks/layout-and-customization.ipynb"
-      - Media and embeds: "tutorials/blocks/media-attachments-and-embeds.ipynb"
     - Datapane Cloud ☁️:
       - tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
@@ -51,8 +46,8 @@ nav:
         - Data Table: "catalogues/blocks/data-table.ipynb"
         - Table: "catalogues/blocks/table.ipynb"
       - Plots and visualizations:
-        - Plot: "catalogues/blocks/plot.ipynb"
-        - Map: "catalogues/blocks/map.ipynb"
+        - Plots: "catalogues/blocks/plot.ipynb"
+        - Maps: "catalogues/blocks/map.ipynb"
       - Text and HTML:
         - Text: "catalogues/blocks/text.ipynb"
         - Code: "catalogues/blocks/code.ipynb"
@@ -65,8 +60,8 @@ nav:
       # - Divider: "catalogues/blocks/divider.ipynb"
       # - Toggle: "catalogues/blocks/toggle.ipynb"
       - Media and embeds:
-        - Attachment: "catalogues/blocks/attachment.ipynb"
-        - Embed: "catalogues/blocks/embed.ipynb"
+        - Attachments: "catalogues/blocks/attachment.ipynb"
+        - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
     - Components 🗃: ""
     - Templates 📑: ""
