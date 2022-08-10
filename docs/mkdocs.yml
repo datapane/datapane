@@ -64,7 +64,8 @@ nav:
         - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
     - Components 🗃: ""
-    - Templates 📑: ""
+    - Templates 📑: 
+      - "catalogues/templates/index.ipynb"
 
   - Guides:
     - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
