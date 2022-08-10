@@ -54,9 +54,9 @@ nav:
         - Formula: "catalogues/blocks/formula.ipynb"
         - HTML: "catalogues/blocks/html.ipynb"
       - Layout and pages:
-        - Group: "catalogues/blocks/group.ipynb"
-        - Page: "catalogues/blocks/page.ipynb"
-        - Select: "catalogues/blocks/select.ipynb"
+        - Groups: "catalogues/blocks/group.ipynb"
+        - Pages: "catalogues/blocks/page.ipynb"
+        - Selects: "catalogues/blocks/select.ipynb"
       # - Divider: "catalogues/blocks/divider.ipynb"
       # - Toggle: "catalogues/blocks/toggle.ipynb"
       - Media and embeds:
