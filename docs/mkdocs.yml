@@ -73,11 +73,6 @@ nav:
     - Accessing data in Python: "guides/accessing-data-in-python/accessing-data-in-python.ipynb"
 
   - Explanations:
-    # - Reports: "concepts/reports.ipynb"
-    # - Blocks: "concepts/blocks.ipynb"
-    # - Functions: ""
-    # - Datapane CLI: "concepts/datapane.md"
-    # - Datapane Cloud: "concepts/datapane-jl.ipynb"
     - Datapane Teams:
       - "concepts/datapane-teams/index.md"
       - Deployment and hosting: "concepts/datapane-teams/deployment-and-hosting.md"
