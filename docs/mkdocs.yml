@@ -42,8 +42,8 @@ nav:
     - Blocks 🧱: 
       - "catalogues/blocks/index.ipynb"
       - Tables and data:
-        - Big Number: "catalogues/blocks/big-number.ipynb"
-        - Data Table: "catalogues/blocks/data-table.ipynb"
+        - Big Number: "catalogues/blocks/bignumber.ipynb"
+        - Data Table: "catalogues/blocks/datatable.ipynb"
         - Table: "catalogues/blocks/table.ipynb"
       - Plots and visualizations:
         - Plots: "catalogues/blocks/plot.ipynb"
