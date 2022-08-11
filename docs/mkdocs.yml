@@ -40,7 +40,7 @@ nav:
 
   - Catalogues:
     - "catalogues/index.ipynb"
-    - Blocks 🧱: 
+    - Blocks 🧱:
       - "catalogues/blocks/index.ipynb"
       - Tables and data:
         - Big Number: "catalogues/blocks/bignumber.ipynb"
@@ -65,7 +65,7 @@ nav:
         - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
     - Components 🗃: "catalogues/components/index.ipynb"
-    - Templates 📑: 
+    - Templates 📑:
       - "catalogues/templates/index.ipynb"
 
   - Guides:
