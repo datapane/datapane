@@ -72,7 +72,7 @@ from .report.blocks import (
 from .report.core import FontChoice, PageLayout, Report, ReportFormatting, ReportWidth, TextAlignment
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import App, Environment, File, Run, Schedule
-from .user import hello_world, login, logout, ping
+from .user import hello_world, login, logout, ping, template
 
 from ..config import init  # isort:skip  otherwise circular import issue
 from . import builtins  # isort:skip
@@ -123,4 +123,5 @@ __all__ = [
     "login",
     "logout",
     "ping",
+    "template",
 ]

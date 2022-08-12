@@ -31,7 +31,7 @@ class ModelRunError(Exception):
     error: str
     details: str
 
-    def __init__(self, details):
+    def __init__(self, details: str):
         self.details = details
 
     @classmethod

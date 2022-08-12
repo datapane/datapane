@@ -1,5 +1,4 @@
 import json
-import typing as t
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -7,11 +6,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import requests
-from glom import glom
 
 import datapane as dp
 from datapane.client import config as c
-from datapane.common import load_doc
 
 from ..local.api.test_reports import gen_report_complex_with_files, gen_report_simple
 from .common import check_name, deletable, gen_description, gen_df, gen_name, gen_plot
@@ -46,26 +43,20 @@ def test_report_update_metadata():
 
     report.upload(name, **props)
 
-    def check(x, y):
-        if isinstance(x, list) and isinstance(y, list):
-            assert sorted(x) == sorted(y)
-        else:
-            assert x == y
-
     with deletable(report):
         for (k, v) in props.items():
-            check(report.dto[k], v)
+            assert sorted(report.dto[k]) == sorted(v)
         orig_dto = deepcopy(report.dto)
 
         # overwrite and upload again, using defaults
         report.upload(name, overwrite=True)
         # check props haven't changed
         for (k, v) in props.items():
-            check(report.dto[k], v)
+            assert sorted(report.dto[k]) == sorted(v)
 
         # check other elements haven't changed?
         for x in same_props:
-            check(report.dto[x], orig_dto[x])
+            assert report.dto[x] == orig_dto[x]
 
 
 def test_report_with_single_file(datadir: Path):
@@ -92,39 +83,6 @@ def test_report_update_with_files(datadir: Path):
         report.upload(name=gen_name(), description="DESCRIPTION")
         doc_b = report.document
         assert doc_a == doc_b
-
-
-def test_report_update_assets(datadir: Path):
-    report = dp.Report(
-        dp.DataTable(gen_df(2501), name="df-block"), dp.DataTable(gen_df(2502)), dp.Empty(name="block1")  # unnamed
-    )
-    report.upload(name=gen_name(), description="DESCRIPTION")
-
-    def check_block_name(report, tag: str, rf_names: t.List[str]):
-        x = load_doc(report.document)
-        es = x.xpath("//*[@name='block1']")
-        assert es[0].tag == tag
-        assert len(es) == 1
-        assert x.xpath("count(/Report/Pages//*)") == 4
-        # ordering or report_files is non-deterministic
-        assert sorted(glom(report.report_files, ["name"])) == sorted(rf_names)
-
-    with deletable(report):
-        # add a df
-        report.update_assets(block1=gen_df(2503))
-        check_block_name(report, "DataTable", ["df-block", "", "block1"])
-        # add a plot
-        report.update_assets(block1=gen_plot())
-        doc_b = report.document
-        check_block_name(report, "Plot", ["df-block", "", "block1"])
-
-        # add additional blocks
-        # note - gen_plot is deterministic, hence is adding a new copy of same asset in CAS to asset-store only
-        report.update_assets(block2=gen_plot())
-        assert doc_b == report.document
-        check_block_name(report, "Plot", ["block2", "df-block", "", "block1"])
-
-        # ['df-block', '', 'block1', 'block2']
 
 
 def test_demo_report():
