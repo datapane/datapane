@@ -3,7 +3,7 @@ import platform
 from contextlib import suppress
 from functools import wraps
 from pathlib import Path
-from typing import Optional
+from typing import Any, Callable, Optional, TypeVar, cast
 
 import posthog
 
@@ -67,17 +67,21 @@ def identify(config: c.Config, **properties) -> None:
 #         return None
 #     identify(config.session_id)
 
+# From the mypy docs ...https://mypy.readthedocs.io/en/stable/generics.html#declaring-decorators
+F = TypeVar("F", bound=Callable[..., Any])
 
-def capture_event(name: str):
-    # Decorator used for capturing events without any properties
-    def decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
+
+def capture_event(name: str) -> Callable[[F], F]:
+    """Decorator to capture 'name' as analytics event when the function is called"""
+
+    def _decorator(func: F) -> F:
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
             try:
-                return f(*args, **kwargs)
+                return func(*args, **kwargs)
             finally:
                 capture(name)
 
-        return wrapper
+        return cast(F, _wrapper)
 
-    return decorator
+    return _decorator

@@ -1,5 +1,4 @@
 import json
-import typing as t
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -7,11 +6,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import requests
-from glom import glom
 
 import datapane as dp
 from datapane.client import config as c
-from datapane.common import load_doc
 
 from ..local.api.test_reports import gen_report_complex_with_files, gen_report_simple
 from .common import check_name, deletable, gen_description, gen_df, gen_name, gen_plot
@@ -46,26 +43,20 @@ def test_report_update_metadata():
 
     report.upload(name, **props)
 
-    def check(x, y):
-        if isinstance(x, list) and isinstance(y, list):
-            assert sorted(x) == sorted(y)
-        else:
-            assert x == y
-
     with deletable(report):
         for (k, v) in props.items():
-            check(report.dto[k], v)
+            assert sorted(report.dto[k]) == sorted(v)
         orig_dto = deepcopy(report.dto)
 
         # overwrite and upload again, using defaults
         report.upload(name, overwrite=True)
         # check props haven't changed
         for (k, v) in props.items():
-            check(report.dto[k], v)
+            assert sorted(report.dto[k]) == sorted(v)
 
         # check other elements haven't changed?
         for x in same_props:
-            check(report.dto[x], orig_dto[x])
+            assert report.dto[x] == orig_dto[x]
 
 
 def test_report_with_single_file(datadir: Path):
