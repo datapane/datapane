@@ -12,27 +12,33 @@ $ datapane logout
 
 """
 
+import os
 import runpy
 import shutil
 import sys
 import time
 import typing as t
 import webbrowser
+from pathlib import Path
 
 import click_spinner
 import importlib_resources as ir
 import requests
+from dulwich import client, errors, porcelain
 from furl import furl
 from munch import Munch
 
 from datapane import __version__
+from datapane.common import URL
+from datapane.common.utils import pushd
 
+from .. import DPError
 from .. import config as c
 from ..analytics import capture, capture_event
 from ..utils import display_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "hello_world"]
+__all__ = ["login", "logout", "ping", "hello_world", "template"]
 
 
 def login(
@@ -105,11 +111,85 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
     return email
 
 
-def _run_script(script: str):
+def _run_script(script: Path):
     """Run the template script and copy it locally to cwd"""
     script_path = ir.files("datapane.resources.templates.hello") / script
     shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
+
+
+def _run_template(template_path: Path):
+    """Run the template script"""
+    # Use template_path as cwd to support relative paths in template script
+    with pushd(template_path):
+        # Try to run the template script.
+        try:
+            runpy.run_path(
+                "template.py",
+                run_name="__datapane__",
+            )
+        # Notify the user of missing packages that are required by the template
+        except ModuleNotFoundError as e:
+            raise DPError(f"Please install the following packages to run this template\n{e.name}") from e
+
+
+def _download_template(url: URL):
+    """Download the template from a repository url, and delete the .git directory
+
+    Returns:
+        The path of the cloned template repository
+    """
+
+    url = _check_repo_url(url)
+
+    # Check if target directory already exists.
+    # This check is identical to the target check in `dulwich.porcelain.clone`:
+    # https://github.com/jelmer/dulwich/blob/78e6ae0960d79060d4ff19f0aa5dc4b32296116d/dulwich/porcelain.py#L439-L441
+    target = url.rstrip("/").split("/")[-1]
+    target_dir_exists = os.path.exists(target)
+
+    # Avoid overwriting user's data
+    if target_dir_exists:
+        raise DPError(f"Directory {target} already exists.")
+
+    # Shallowest clone of the template repo
+    template_repo = porcelain.clone(url, target=target, depth=1)
+
+    # Remove .git directory
+    shutil.rmtree(template_repo.controldir())
+
+    return template_repo.path
+
+
+def _check_repo_url(url: URL):
+    """Check if the template repository exists. Supports first or third-party templates.
+
+    Returns:
+        The absolute uri of the template repository.
+    """
+    # Check if remote is a git repo
+    try:
+        porcelain.ls_remote(url)
+    except (errors.NotGitRepository, client.HTTPUnauthorized):
+        # A check for special characters (: and /) to avoid unknowns
+        # e.g., unintended repo download/execution
+        special_chars = [":", "/"]
+        if any(special_char in url for special_char in special_chars):
+            raise DPError(f"{url} is not a valid template repository.")
+
+        try:
+            # Try appending the supplied url to the datapane organization
+            full_url = f"https://github.com/datapane/{url}"
+            # Check if remote is a first-party datapane repo
+            # that has been located with a relative path.
+            porcelain.ls_remote(full_url)
+        except (errors.NotGitRepository, client.HTTPUnauthorized) as e:
+            raise DPError(f"{url} is not a valid template repository.") from e
+        else:
+            # Update the URL with absolute URI
+            url = URL(full_url)
+        pass
+    return url
 
 
 @capture_event("CLI Hello World")
@@ -120,6 +200,28 @@ def hello_world():
     )
 
     _run_script("hello.py")
+
+    display_msg(
+        "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",
+        chat_url="https://chat.datapane.com",
+        forum_url="https://forum.datapane.com",
+        github_url="https://github.com/datapane/datapane",
+    )
+
+
+@capture_event("CLI Template")
+def template(url: URL, execute: bool):
+    """Retrieve and run a template report, and open in the browser"""
+    display_msg(f"Retrieving{' and running ' if execute else ' '}the template at `{url}`.\n")
+
+    template_path = _download_template(url)
+
+    if execute:
+        _run_template(template_path)
+
+    display_msg(
+        f"\nYou can edit `template.py` and run it from the new {template_path} directory to change the generated report."
+    )
 
     display_msg(
         "\nWe’d also love to invite you to our community spaces for a chat {chat_url:l}, forum discussion {forum_url:l}, and open source collaboration {github_url:l}.",

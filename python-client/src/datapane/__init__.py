@@ -62,6 +62,7 @@ from .client.api import (
     login,
     logout,
     ping,
+    template,
 )
 from .client.config import init
 from .common.dp_types import DPMode, get_dp_mode, set_dp_mode
@@ -104,6 +105,7 @@ __all__ = [
     "login",
     "logout",
     "ping",
+    "template",
     "_setup_dp_logging",
     "enable_logging",
     "log",

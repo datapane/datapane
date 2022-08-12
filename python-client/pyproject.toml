@@ -63,6 +63,7 @@ dacite = "^1.0.2"
 datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
 dominate = "^2.4.0"  # latest on conda
+dulwich = "^0.20.45"
 furl = "^2.0.0"
 glom = "^20.5.0"
 # httpx = "^0.7.5"
