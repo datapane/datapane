@@ -4,6 +4,9 @@ ignore = E203, E402, E501, W503
 max-complexity=10
 max-line-length=100
 exclude = .git, .venv
+suppress-none-returning = true
+max-annotations-complexity = 4
+mypy-init-return = true
 per-file-ignores =
     src/datapane/client/commands.py:F811
     tests/*,tests_toplevel/*:ANN001,ANN201,ANN206,ANN205,ANN206
