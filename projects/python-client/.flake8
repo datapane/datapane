@@ -8,3 +8,4 @@ per-file-ignores =
     src/datapane/client/commands.py:F811
     # duplicated, because pre-commit runs from root.
     projects/python-client/src/datapane/client/commands.py:F811
+    projects/python-client/tests/*:ANN

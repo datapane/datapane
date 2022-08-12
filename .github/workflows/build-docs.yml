@@ -1,0 +1,75 @@
+name: Build [Docs]
+
+on:
+  # Docs depends on all projects, so don't path limit it
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build:
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable symlinks on Windows
+        run: git config --global core.symlinks true
+        if: startsWith(runner.os, 'Windows')
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install Tools
+        run: |
+          pipx install -f "poetry>=1.1.14,<1.2.0"
+          poetry config virtualenvs.in-project true
+          # use /home/runner to workaround 'act' running as root for local development (HOME not available)
+          sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /home/runner/.local/bin
+
+      - name: Dump Runner Info
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: |
+          echo "${RUNNER_CONTEXT}"
+          which python
+
+      - name: Build (+ Link) Local Report bundle
+        run: |
+          task web-components:install:ci web-components:build:local-report link-local-report
+
+      - name: Install Docs Dependencies
+        run: |
+          pushd docs; poetry env use 3.10; popd
+          task docs:install
+
+      - name: Login to Datapane
+        working-directory: docs
+        run: |
+          # We're only pushing to the server as a side-effect, we never actually use what we push.
+          # TODO: Implement environment variables to avoid writing the token to disk.
+          poetry run datapane login --token '${{ secrets.DOCS_BUILD_DATAPANE_API_KEY }}'
+
+      - name: Build
+        run: |
+          task docs:build
+
+      - name: Artifact Docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs-build
+          path: docs/site
+
+permissions: {}

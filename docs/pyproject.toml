@@ -32,6 +32,8 @@ datapane = "^0.14.0"
 
 
 [tool.poetry.dev-dependencies]
+datapane = {path = "../projects/python-client", develop = true}
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

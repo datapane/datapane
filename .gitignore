@@ -30,3 +30,6 @@ test_proj*/
 test_report*/
 test_script*/
 .ipynb_checkpoints
+
+# macOS internals
+.DS_Store

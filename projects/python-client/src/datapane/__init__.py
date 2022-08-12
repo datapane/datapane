@@ -62,7 +62,6 @@ from .client.api import (
     login,
     logout,
     ping,
-    signup,
     template,
 )
 from .client.config import init
@@ -106,7 +105,6 @@ __all__ = [
     "login",
     "logout",
     "ping",
-    "signup",
     "template",
     "_setup_dp_logging",
     "enable_logging",

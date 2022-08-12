@@ -149,12 +149,6 @@ def ping():
 
 
 @cli.command()
-def signup():
-    """Signup and link your account to the Datapane CLI"""
-    api.signup()
-
-
-@cli.command()
 def hello_world():
     """Create and run an example report, and open in the browser"""
     api.hello_world()
@@ -176,7 +170,7 @@ def template(url: Path, execute: bool):
 @cli.group()
 def file():
     """Commands to work with Files"""
-    ...
+    pass
 
 
 @file.command()
@@ -222,7 +216,7 @@ def file_list():
 @cli.group()
 def app():
     """Commands to work with Apps"""
-    ...
+    pass
 
 
 def write_templates(scaffold_name: str, context: SDict):
@@ -372,7 +366,7 @@ def run(
 @cli.group()
 def report():
     """Commands to work with Reports"""
-    ...
+    pass
 
 
 # NOTE - CLI Report creation disabled for now until we have a replacement for Asset
@@ -438,7 +432,7 @@ def report_list():
 @cli.group()
 def environment():
     """Commands to work with Environments"""
-    ...
+    pass
 
 
 @environment.command()
@@ -494,7 +488,7 @@ def delete(name: str, project: str):
 @cli.group()
 def schedule():
     """Commands to work with Schedules"""
-    ...
+    pass
 
 
 @schedule.command()  # type: ignore[no-redef]

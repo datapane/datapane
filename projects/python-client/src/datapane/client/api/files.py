@@ -117,11 +117,11 @@ class BaseTable(BaseAsset, Generic[U]):
 
     @abc.abstractmethod
     def _get_df(self, obj: U) -> DataFrame:
-        ...
+        pass
 
     @abc.abstractmethod
     def render_html(self, obj: U) -> str:
-        ...
+        pass
 
 
 class StylerTable(BaseTable):

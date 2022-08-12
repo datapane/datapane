@@ -1,0 +1,85 @@
+on:
+  workflow_run:
+    workflows:
+      # have to escape square brackets due : https://github.com/actions/runner/issues/854#issuecomment-825907880
+      - Build \[Docs\]
+    types:
+      - completed
+
+defaults:
+  run:
+    shell: bash
+
+# We use a separate workflow so we don't leak deployment keys in the PR workflows.
+# Keys are tied to the 'docs-deploy' environment, which can only be accessed on the 'master' branch.
+
+# IMPORTANT: You have to merge changes to this file to 'master' before they'll be executed.
+
+# NOTE: We do not checkout any repository (ours or theirs):
+#       - Avoids Remote Code Execution (if we check out their branch)
+#       - Avoids user confusion when changes they make are not reflected (such as changing the Taskfile.yml)
+#       - GitOps based tools (wrangler) need to be configured explicitly
+
+# secrets:
+# DOCS_CLOUDFLARE_PAGES_API_TOKEN::
+# - Grants edit access to Cloudflare Pages on the Datapane Account
+# - TTL of 2 months
+# - instructions here: https://developers.cloudflare.com/api/tokens/create/
+
+# Future:
+# - implement 'workflow_dispatch' so we can manually trigger deploys
+# - implement Github Deployments to associate a deployed page with a PR (better reviews)
+# - Pages Cleanup for merged PR
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    environment: docs-deploy
+
+    steps:
+      - name: Download Built Dodcs
+        # We're not using 'action/download-artifact' as it doesn't
+        # natively support cross-workflow downloads.
+        # https://github.com/actions/download-artifact/issues/172
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          workflow: build-docs.yml
+          # always specify a path to prevent files getting written over
+          # https://www.legitsecurity.com/blog/github-actions-that-open-the-door-to-cicd-pipeline-attacks
+          path: ./work/site
+          name: docs-build
+
+      - name: Ensure site exists
+        working-directory: ./work
+        run: |
+          if ( ! test -f site/index.html ); then
+            echo '::error title=Docs Artifacts not found::Missing the built docs site'
+            exit 1
+          fi
+
+      - name: Publish Docs
+        working-directory: ./work
+        run: |
+          if ( test "${HEAD_REPO}" != "${BASE_REPO}" ); then
+            # Looks like a fork, don't let them touch the normal branches
+            _branch="${HEAD_REPO}/${DOCS_BRANCH}"
+          else
+            _branch="${DOCS_BRANCH}"
+          fi
+          npx wrangler pages publish \
+            --project-name datapane-docs \
+            --branch "$_branch" \
+            --commit-hash "$DOCS_COMMIT" \
+            site
+        env:
+          CLOUDFLARE_API_TOKEN: '${{ secrets.DOCS_CLOUDFLARE_PAGES_API_TOKEN }}'
+          CLOUDFLARE_ACCOUNT_ID: '${{ secrets.DOCS_CLOUDFLARE_PAGES_ACCOUNT_ID }}'
+          # indirect access to prevent shell escape issues
+          DOCS_BRANCH: '${{ github.event.workflow_run.head_branch }}'
+          DOCS_COMMIT: '${{ github.event.workflow_run.head_sha }}'
+          HEAD_REPO: '${{ github.event.workflow_run.head_repository.full_name }}'
+          BASE_REPO: '${{ github.event.repository.full_name }}'
+
+permissions: {}
