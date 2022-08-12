@@ -17,7 +17,7 @@ from tabulate import tabulate
 
 from datapane import __rev__, __version__
 from datapane.common import DPError, SDict, _setup_dp_logging, dict_drop_empty, log
-from datapane.common.dp_types import add_help_text
+from datapane.common.dp_types import URL, add_help_text
 
 from . import analytics, api, apps
 from . import config as c
@@ -157,7 +157,7 @@ def hello_world():
 @cli.command()
 @click.argument("url", default=None)
 @click.option("--execute/--no-execute", default=True)
-def template(url: Path, execute: bool):
+def template(url: URL, execute: bool):
     """Retrieve and run a template report, and open in the browser
 
     URL is the location of the template repository. Relative locations can be used for first-party templates, e.g. `dp-template-classifier-dashboard`.

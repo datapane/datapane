@@ -210,7 +210,9 @@ TRUNCATE_CELLS = 10000
 TRUNCATE_ROWS = 1000
 
 
-def truncate_dataframe(df: pd.DataFrame, max_rows=TRUNCATE_ROWS, max_cells=TRUNCATE_CELLS) -> pd.DataFrame:
+def truncate_dataframe(
+    df: pd.DataFrame, max_rows: int = TRUNCATE_ROWS, max_cells: int = TRUNCATE_CELLS
+) -> pd.DataFrame:
     """Truncate a pandas dataframe if needed"""
     rows, cols = df.shape
     # determine max rows to truncate df to based on max cells and df cols
