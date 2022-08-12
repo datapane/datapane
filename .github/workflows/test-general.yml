@@ -32,9 +32,7 @@ jobs:
           pip freeze --local
       - name: Run pre-commit (push)
         if: github.event_name == 'push'
-        run: SKIP=no-commit-to-branch pre-commit run --color=always
+        run: SKIP=no-commit-to-branch pre-commit run --show-diff-on-failure --color=always --all-files
       - name: Run pre-commit (PR)
         if: github.event_name == 'pull_request'
-        run: |
-          git fetch --depth=1 origin ${{ github.base_ref }}
-          git diff --name-only origin/${{ github.base_ref }} | xargs pre-commit run --show-diff-on-failure --color=always --files
+        run: pre-commit run --show-diff-on-failure --color=always --all-files
