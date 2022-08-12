@@ -94,39 +94,6 @@ def test_report_update_with_files(datadir: Path):
         assert doc_a == doc_b
 
 
-def test_report_update_assets(datadir: Path):
-    report = dp.Report(
-        dp.DataTable(gen_df(2501), name="df-block"), dp.DataTable(gen_df(2502)), dp.Empty(name="block1")  # unnamed
-    )
-    report.upload(name=gen_name(), description="DESCRIPTION")
-
-    def check_block_name(report, tag: str, rf_names: t.List[str]):
-        x = load_doc(report.document)
-        es = x.xpath("//*[@name='block1']")
-        assert es[0].tag == tag
-        assert len(es) == 1
-        assert x.xpath("count(/Report/Pages//*)") == 4
-        # ordering or report_files is non-deterministic
-        assert sorted(glom(report.report_files, ["name"])) == sorted(rf_names)
-
-    with deletable(report):
-        # add a df
-        report.update_assets(block1=gen_df(2503))
-        check_block_name(report, "DataTable", ["df-block", "", "block1"])
-        # add a plot
-        report.update_assets(block1=gen_plot())
-        doc_b = report.document
-        check_block_name(report, "Plot", ["df-block", "", "block1"])
-
-        # add additional blocks
-        # note - gen_plot is deterministic, hence is adding a new copy of same asset in CAS to asset-store only
-        report.update_assets(block2=gen_plot())
-        assert doc_b == report.document
-        check_block_name(report, "Plot", ["block2", "df-block", "", "block1"])
-
-        # ['df-block', '', 'block1', 'block2']
-
-
 def test_demo_report():
     report = dp.builtins.build_demo_report()
     report.upload(name=gen_name(), description="DESCRIPTION")
