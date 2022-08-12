@@ -42,7 +42,7 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: ["flake8-isort >= 3.0.0", "flake8-no-implicit-concat >= 0.1.3", "flake8_tuple >= 0.4.1", "flake8-annotations >= 2.9.0", "flake8-annotations-complexity >= 0.0.7"]
-        args: [--suppress-none-returning, --mypy-init-return, --max-annotations-complexity=4, --config=projects/python-client/.flake8]
+        args: [--config=projects/python-client/.flake8]
         files: ^projects/python-client/.*$ # Black Python formatter
   - repo: https://github.com/ambv/black
     rev: 22.3.0

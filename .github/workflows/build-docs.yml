@@ -46,15 +46,14 @@ jobs:
           echo "${RUNNER_CONTEXT}"
           which python
 
+      - name: Build (+ Link) Local Report bundle
+        run: |
+          task web-components:install:ci web-components:build:local-report link-local-report
 
       - name: Install Docs Dependencies
         run: |
           pushd docs; poetry env use 3.10; popd
           task docs:install
-
-      - name: Build (+ Link) Local Report bundle
-        run: |
-          task web-components:install:ci web-components:build:local-report link-local-report
 
       - name: Login to Datapane
         working-directory: docs

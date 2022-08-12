@@ -1,6 +1,7 @@
 site_name: Datapane Docs
 repo_name: datapane/datapane
-repo_url: https://github.com/datapane/datapane
+repo_url: https://github.com/datapane/datapane/
+edit_uri: 'edit/master/docs/docs/'
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
