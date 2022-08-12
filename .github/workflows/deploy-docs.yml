@@ -62,9 +62,15 @@ jobs:
       - name: Publish Docs
         working-directory: ./work
         run: |
+          if ( test "${HEAD_REPO}" != "${BASE_REPO}" ); then
+            # Looks like a fork, don't let them touch the normal branches
+            _branch="${HEAD_REPO}/${DOCS_BRANCH}"
+          else
+            _branch="${DOCS_BRANCH}"
+          fi
           npx wrangler pages publish \
             --project-name datapane-docs \
-            --branch "$DOCS_BRANCH" \
+            --branch "$_branch" \
             --commit-hash "$DOCS_COMMIT" \
             site
         env:
@@ -73,5 +79,7 @@ jobs:
           # indirect access to prevent shell escape issues
           DOCS_BRANCH: '${{ github.event.workflow_run.head_branch }}'
           DOCS_COMMIT: '${{ github.event.workflow_run.head_sha }}'
+          HEAD_REPO: '${{ github.event.workflow_run.head_repository.full_name }}'
+          BASE_REPO: '${{ github.event.repository.full_name }}'
 
 permissions: {}
