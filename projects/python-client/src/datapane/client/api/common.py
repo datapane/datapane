@@ -173,7 +173,7 @@ class Resource:
             and url_parts[0] == "api"
             and url_parts[1] not in basic_endpoints
         ):
-            raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane Teams.")
+            raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane Enterprise.")
 
     def post(self, params: t.Dict = None, overwrite: bool = False, **data: JSON) -> JSON:
         params = params or dict()

@@ -6,8 +6,6 @@ Datapane Teams includes features to automate your Python workflows and easily bu
 Generally objects are created on the server via the static methods (rather than the constructor),
 and the instance methods and fields are used to access values (e.g. `.name`) and behaviour (e.g. `delete()`) on already existing object.
 Objects can be looked up by name using `.get()` and by id using `.by_id()`.
-
-..note:: The objects in this module are available on the Starter and Pro Teams Plans
 """
 from __future__ import annotations
 
