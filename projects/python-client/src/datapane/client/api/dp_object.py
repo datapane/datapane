@@ -142,7 +142,7 @@ class DPObjectRef:
         return cls(dto=res)
 
     @classmethod
-    def post(cls: Type[U], overwrite: bool = False, **kwargs) -> U:
+    def post(cls: Type[U], overwrite: bool = False, **kwargs: JSON) -> U:
         res = Resource(cls.endpoint).post(overwrite=overwrite, **kwargs)
         return cls(dto=res)
 

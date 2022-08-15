@@ -273,8 +273,10 @@ def timestamp(x: t.Optional[datetime.datetime] = None) -> str:
     return f'{x.isoformat(timespec="seconds")}{"" if x.tzinfo else "Z"}'
 
 
-def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
+def dict_drop_empty(xs: t.Optional[t.Dict] = None, none_only: bool = False, **kwargs) -> t.Dict:
     """Return a new dict with the empty/falsey values removed"""
+    xs = {**(xs or {}), **kwargs}
+
     if none_only:
         return {k: v for (k, v) in xs.items() if v is not None}
     else:

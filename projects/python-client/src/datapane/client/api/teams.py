@@ -20,7 +20,7 @@ from datapane import __version__
 from datapane.client.apps import DatapaneCfg
 from datapane.common import PKL_MIMETYPE, ArrowFormat, NPath, SDict, SList, SSDict
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
-from datapane.common.utils import get_app_file_params
+from datapane.common.utils import dict_drop_empty, get_app_file_params
 
 from ..utils import DPError
 from .common import DPTmpFile, do_download_file
@@ -205,8 +205,15 @@ class Environment(DPObjectRef):
             An instance of the created `Environment` object
         """
         assert environment or docker_image, "environment or docker image must be set"
+
+        opt_fields = dict_drop_empty(none_only=True,
+                                     environment=environment,
+                                     docker_image=docker_image,
+                                     project=project,
+                                     )
+
         return cls.post(
-            name=name, environment=environment, docker_image=docker_image, project=project, overwrite=overwrite
+            name=name, overwrite=overwrite, **opt_fields
         )
 
 
@@ -224,9 +231,9 @@ class App(DPObjectRef):
     def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, overwrite: bool = False, **kwargs) -> App:
         # TODO - use DPTmpFile
         # merge all the params for the API-call
-        kwargs["api_version"] = __version__
-        new_kwargs = {**dp_cfg.to_dict(), **kwargs}
-        return cls.post_with_files(file=sdist, overwrite=overwrite, **new_kwargs)
+        merged_args = {**dp_cfg.to_dict(), **kwargs}
+        opt_params = dict_drop_empty(none_only=True, api_version=__version__, **merged_args)
+        return cls.post_with_files(file=sdist, overwrite=overwrite, **opt_params)
 
     def download_pkg(self) -> Path:
         fn = do_download_file(self.data_url)
