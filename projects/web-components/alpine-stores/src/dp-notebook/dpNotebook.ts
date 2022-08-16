@@ -1,4 +1,3 @@
-// @ts-ignore
 import notebookjs from "./notebook";
 import hljs from "highlight.js/lib/core";
 import "highlight.js/styles/docco.css";
