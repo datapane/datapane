@@ -206,15 +206,14 @@ class Environment(DPObjectRef):
         """
         assert environment or docker_image, "environment or docker image must be set"
 
-        opt_fields = dict_drop_empty(none_only=True,
-                                     environment=environment,
-                                     docker_image=docker_image,
-                                     project=project,
-                                     )
-
-        return cls.post(
-            name=name, overwrite=overwrite, **opt_fields
+        opt_fields = dict_drop_empty(
+            none_only=True,
+            environment=environment,
+            docker_image=docker_image,
+            project=project,
         )
+
+        return cls.post(name=name, overwrite=overwrite, **opt_fields)
 
 
 class App(DPObjectRef):
