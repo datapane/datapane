@@ -41,7 +41,7 @@ export abstract class Field<T = any> {
 
     private _props: any;
 
-    public constructor(properties: Param, opts?: any) {
+    public constructor(properties: Param) {
         makeObservable(this, {
             value: observable,
             setValue: action,
