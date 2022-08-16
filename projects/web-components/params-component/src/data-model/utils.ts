@@ -13,7 +13,7 @@ export const onAlpineReady = (fun: () => void) => {
 };
 
 export const noUndefinedVals = (obj: any): boolean => {
-    return Object.entries(obj).every(([k, v]: any) => v !== undefined);
+    return Object.values(obj).every((v: any) => v !== undefined);
 };
 
 export const jsonParseIfStr = (fields: any): any => {
