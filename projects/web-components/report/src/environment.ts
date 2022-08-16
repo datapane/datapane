@@ -1,4 +1,3 @@
-/* global process:true */
 /* eslint no-undef: "error" */
 
 const getHostName = (): string | null => {
