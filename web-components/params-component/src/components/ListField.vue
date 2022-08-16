@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { createInput } from "@formkit/vue";
 import ListFieldView from "./ListFieldView.vue";
-import { computed, ComputedRef, reactive, ref, toRef, watch } from "vue";
+import { computed, ComputedRef, reactive, ref, watch } from "vue";
 
 const p = defineProps<{
     value: string[];

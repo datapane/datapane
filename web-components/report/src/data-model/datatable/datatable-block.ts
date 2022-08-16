@@ -188,7 +188,7 @@ export class DataTableBlock extends AssetBlock {
 
         if (grid) {
             const plugins = await grid.getPlugins();
-            for (let p of plugins) {
+            for (const p of plugins) {
                 // Find export plugin by checking relevant properties
                 if ((p as any).exportFile && (p as any).exportString) {
                     this._revogridExportPlugin = p;

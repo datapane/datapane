@@ -19,7 +19,7 @@ const p = defineProps<{
 
 const emit = defineEmits(["toggle-query-open"]);
 
-const withErrHandling = function (f: Function): any {
+const withErrHandling = function (f: (...args: any) => any): any {
     return function (this: any, ...args: any[]) {
         return f.apply(this, args).catch((e: any) => {
             console.error(e);
