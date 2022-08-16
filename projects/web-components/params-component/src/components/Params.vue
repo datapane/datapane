@@ -22,9 +22,8 @@ watch(
 </script>
 
 <template>
-    <Observer>
+    <Observer v-if="paramsStore.fields">
         <component
-            v-if="paramsStore.fields"
             v-for="(field, idx) in paramsStore.fields"
             v-bind="field.props"
             :key="idx"
