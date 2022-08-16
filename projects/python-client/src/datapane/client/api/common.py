@@ -165,7 +165,7 @@ class Resource:
 
     def _check_endpoint(self, url: str):
         # raise exception if unavailable object is being accessed on the basic instance
-        basic_endpoints = ["files", "oembed", "reports", "settings", "users", "api-signup-tokens"]
+        basic_endpoints = ["files", "oembed", "reports", "settings", "users", "api-login-tokens"]
         parsed_url: furl = furl(url)
         url_parts = parsed_url.path.segments
         if (

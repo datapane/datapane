@@ -37,7 +37,7 @@ def test_app_basic(shared_datadir: Path, monkeypatch):
             sdist_file = s.download_pkg()
             # look into files
             tar = tarfile.open(sdist_file)
-            assert "dp_app.py" in tar.getnames()
+            assert dp_cfg.script.name in tar.getnames()
 
             ########################################################################
             # Test running

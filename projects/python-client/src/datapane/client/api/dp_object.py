@@ -64,10 +64,10 @@ class DPObjectRef:
         return self._url
 
     @url.setter
-    def url(self, id_or_url: URL):
+    def url(self, id_or_url: t.Union[int, URL]):
         # build a url to the resource on the api server
         _id: str
-        if self.endpoint in id_or_url:
+        if isinstance(id_or_url, str) and self.endpoint in id_or_url:
             url = cast(str, id_or_url)
             if not url.startswith("http"):
                 url = f"https://{url}"
@@ -76,7 +76,7 @@ class DPObjectRef:
             x: up.SplitResult = up.urlsplit(url)
             _id = list(filter(None, x.path.split("/")))[-1]
         else:
-            _id = id_or_url
+            _id = str(id_or_url)
 
         rel_obj_url = up.urljoin(self.endpoint, f"{_id}/")
         self.res = Resource(endpoint=rel_obj_url)
@@ -104,7 +104,7 @@ class DPObjectRef:
         if len(lookup_value) == 2:
             project, name = lookup_value
         try:
-            res = Resource(f"{cls.endpoint}/lookup/").get(name=name, project=project)
+            res = Resource(f"{cls.endpoint}lookup/").get(name=name, project=project)
         except HTTPError as e:
             lookup_str = f"{project}/{name}" if project else name
             log.error(

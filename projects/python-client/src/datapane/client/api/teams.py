@@ -306,4 +306,5 @@ class Schedule(DPObjectRef):
     # NOTE - mypy doesn't like this method because the signature is different from super type
     # potentially we may need to change it
     def update(self, cron: str = None, parameters: SDict = None) -> None:  # type: ignore
-        super().update(cron=cron, parameter_vals=parameters)
+        opt_params = dict_drop_empty(cron=cron, parameter_vals=parameters)
+        super().update(**opt_params)
