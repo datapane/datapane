@@ -22,12 +22,10 @@ def setup(test_org: bool):
     print("Building test reports / apps")
 
     # demo reports
-    builder_report = dp.builtins.build_demo_report()
     style_report = dp.builtins.build_demo_report()
-    builder_report.upload(name="CYPRESS-DEMO-REPORT", description="DESCRIPTION")
     style_report.upload(name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
 
-    dp_objs = {"builderReportURL": builder_report.web_url, "styleReportURL": style_report.web_url}
+    dp_objs = {"styleReportURL": style_report.web_url}
 
     def get_test_app(name: str) -> dp.App:
         with pushd(Path(".") / "tests" / "cypress_test_app"):
@@ -60,8 +58,6 @@ def teardown(test_org: bool):
     dp_objs: dict = json.load(sys.stdin)
 
     # delete the objects, ignoring errors
-    with suppress(Exception):
-        dp.Report.by_id(dp_objs["builderReportURL"]).delete()
     with suppress(Exception):
         dp.Report.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
