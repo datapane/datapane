@@ -79,7 +79,7 @@ describe("Changing a report's style", () => {
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
-        cy.dpLogin();
+        cy.dpLogin({ isStaff: true });
 
         // Delete local header
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
