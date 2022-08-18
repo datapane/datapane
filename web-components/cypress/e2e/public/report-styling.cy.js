@@ -1,12 +1,14 @@
 /* eslint-disable */
 import { URLS } from "../../support/constants";
 
-const CSS_HEADER = `:root {
+const CSS_HEADER = `<style>
+:root {
   --dp-accent-color: green;
   --dp-bg-color: black;
   --dp-text-align: right;
   --dp-font-family: monospace;
-}`;
+}
+</style>`;
 
 describe("Changing a report's style", () => {
     before(() => {

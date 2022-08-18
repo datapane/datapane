@@ -8,7 +8,6 @@ export const URLS = {
     SCHEDULE: `${Cypress.env("paramsAppURL")}schedules/create/`,
     FILE: `${Cypress.env("fileURL")}`,
     STYLE_REPORT: `${Cypress.env("styleReportURL")}`,
-    BUILDER_REPORT: `${Cypress.env("builderReportURL")}`,
 };
 
 export const HTML_HEADER = `<style type="text/css">

@@ -64,10 +64,10 @@ class DPObjectRef:
         return self._url
 
     @url.setter
-    def url(self, id_or_url: URL):
+    def url(self, id_or_url: t.Union[int, URL]):
         # build a url to the resource on the api server
         _id: str
-        if self.endpoint in id_or_url:
+        if isinstance(id_or_url, str) and self.endpoint in id_or_url:
             url = cast(str, id_or_url)
             if not url.startswith("http"):
                 url = f"https://{url}"
@@ -76,7 +76,7 @@ class DPObjectRef:
             x: up.SplitResult = up.urlsplit(url)
             _id = list(filter(None, x.path.split("/")))[-1]
         else:
-            _id = id_or_url
+            _id = str(id_or_url)
 
         rel_obj_url = up.urljoin(self.endpoint, f"{_id}/")
         self.res = Resource(endpoint=rel_obj_url)
@@ -104,7 +104,7 @@ class DPObjectRef:
         if len(lookup_value) == 2:
             project, name = lookup_value
         try:
-            res = Resource(f"{cls.endpoint}/lookup/").get(name=name, project=project)
+            res = Resource(f"{cls.endpoint}lookup/").get(name=name, project=project)
         except HTTPError as e:
             lookup_str = f"{project}/{name}" if project else name
             log.error(
@@ -131,19 +131,19 @@ class DPObjectRef:
 
     @classmethod
     def post_with_files(
-        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **kwargs: JSON
+        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **data: JSON
     ) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList
             files = dict(uploaded_file=[file])
 
-        res = Resource(cls.endpoint).post_files(files, overwrite=overwrite, **kwargs)
+        res = Resource(cls.endpoint).post_files(files=files, overwrite=overwrite, **data)
         return cls(dto=res)
 
     @classmethod
-    def post(cls: Type[U], overwrite: bool = False, **kwargs) -> U:
-        res = Resource(cls.endpoint).post(overwrite=overwrite, **kwargs)
+    def post(cls: Type[U], overwrite: bool = False, **data: JSON) -> U:
+        res = Resource(cls.endpoint).post(params=None, overwrite=overwrite, **data)
         return cls(dto=res)
 
     def __getattr__(self, attr):  # noqa: ANN001
@@ -187,10 +187,10 @@ class DPObjectRef:
         self.res.delete()
         log.debug(f"Deleted object {self.url}")
 
-    def update(self, **kwargs):
+    def update(self, **data: JSON):
         # filter None values
-        kwargs = {k: v for (k, v) in kwargs.items() if v is not None}
-        self.res.patch(**kwargs)
+        data = {k: v for (k, v) in data.items() if v is not None}
+        self.res.patch(params=None, **data)
         self.refresh()
         log.debug(f"Updated object {self.url}")
 

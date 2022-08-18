@@ -61,18 +61,22 @@ def login(
 
     config = c.Config(server=server)
 
-    with_token = bool(token)
+    token_type = "cli"
     if token is None:
-        token = token_connect("/accounts/login/", action="login", server=config.server)
+        # get via api-first mechanism instead
+        token = token_connect(server=config.server)
+        if token:
+            token_type = "api"
 
     config.token = token
+    # check token is valid, throws exception and error msg to user if not
     email = ping(config=config, cli_login=cli_login)
 
     # update config with valid values
     config.email = email
     config.save(env=env)
     c.init(config=config)
-    capture("CLI Login", with_token=with_token)
+    capture("CLI Login", token_type=token_type)
     return config.email
 
 
@@ -231,7 +235,7 @@ def template(url: URL, execute: bool):
     )
 
 
-def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
+def token_connect(server: str) -> t.Optional[str]:
     """
     Creates a login token, and prompts the user to login while polling for completion.
     Then log the user into the CLI with the retrieved API token.
@@ -253,10 +257,10 @@ def token_connect(open_url: str, action: str, server: str) -> t.Optional[str]:
 
     with requests.Session() as s:
         login_token = create_token(s)
-        url = furl(path=open_url, origin=server).add({"login_token": login_token}).url
+        url = furl(path="/accounts/login/", origin=server).add({"login_token": login_token}).url
 
         print(
-            f"\nOpening {action} page.. Please complete {action} via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
+            f"\nOpening login page.. please login via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
         )
         webbrowser.open(url=url, new=2)
 

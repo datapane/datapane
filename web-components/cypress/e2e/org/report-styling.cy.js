@@ -6,18 +6,19 @@ describe("Changing a report's style", () => {
         cy.dpLogin({ isStaff: true });
 
         // Change to accent-green bg-black theme
-        cy.visit("/org-settings-visual");
+        cy.visit("/teams-settings-visual");
         cy.get("#djHideToolBarButton").click();
         cy.get("[name=html_header]").clear().type(HTML_HEADER);
         cy.get("[name=light_text]").check();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
-        cy.dpLogin();
+        cy.dpLogin({ isStaff: true });
 
         // Submit empty local visual form
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
         cy.get("[name=is_light_prose]").should("be.checked");
+        cy.get("[name=style_header]").clear();
         cy.get("[type=submit]").click();
 
         // Verify global theme still applied
@@ -42,13 +43,13 @@ describe("Changing a report's style", () => {
         cy.dpLogin({ isStaff: true });
 
         // Change to global light prose
-        cy.visit("/org-settings-visual");
+        cy.visit("/teams-settings-visual");
         cy.get("#djHideToolBarButton").click();
         cy.get("[name=light_text]").check();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
-        cy.dpLogin();
+        cy.dpLogin({ isStaff: true });
 
         // Set local theme
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
@@ -72,13 +73,13 @@ describe("Changing a report's style", () => {
         cy.dpLogin({ isStaff: true });
 
         // Delete global header
-        cy.visit("/org-settings-visual");
+        cy.visit("/teams-settings-visual");
         cy.get("#djHideToolBarButton").click();
         cy.get("[name=html_header]").clear();
         cy.get("[data-cy=button-save-visual]").click();
 
         cy.clearCookies();
-        cy.dpLogin();
+        cy.dpLogin({ isStaff: true });
 
         // Delete local header
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);

@@ -371,7 +371,7 @@ class Report(DPObjectRef):
             source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
             publicly_visible: Visible to anyone with the link
             tags: A list of tags (as strings) used to categorise your document
-            project: Project to add the report to (Teams only)
+            project: Project to add the report to
             open: Open the file in your browser after creating
             formatting: Set the basic styling for your report
             overwrite: Overwrite the report

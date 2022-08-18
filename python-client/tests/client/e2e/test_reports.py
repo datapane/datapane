@@ -18,7 +18,7 @@ pytestmark = pytest.mark.usefixtures("dp_login")
 
 def test_report_simple():
     report = gen_report_simple()
-    report.upload(name=gen_name(), description="DESCRIPTION")
+    report.upload(name=gen_name(), description="DESCRIPTION", project="default")
     with deletable(report):
         pass
 
@@ -211,8 +211,9 @@ def test_complex_df_report():
         # check_df_equal(df_desc_2, df_desc_2_t.download_df())
 
 
-@pytest.mark.org
 def test_report_project():
+    # TODO - add additional checks like uploading to a report the user isn't a member of
+    # i.e. both in the same team, or another project in a diff team
     # update a report that will automatically be added to the default project
     report = gen_report_simple()
     report.upload(name="test_report_project")
@@ -220,9 +221,14 @@ def test_report_project():
     with deletable(report):
         assert report.project == "default"
 
+    # explicitly add to the project
+    report.upload(name="test_report_project_2", project="default")
+    with deletable(report):
+        assert report.project == "default"
+
     # test adding report to a group that doesn't exist
     report2 = gen_report_simple()
-    try:
+
+    with pytest.raises(requests.HTTPError) as e:
         report2.upload(name="test_wrong_project", project="wrong-project")
-    except requests.HTTPError as e:
         assert e.response.status_code == 400
