@@ -176,6 +176,7 @@ class Resource:
             raise UnsupportedResourceError(f"{url_parts[1].title()} are part of Datapane Enterprise.")
 
     def post(self, params: t.Dict = None, overwrite: bool = False, **data: JSON) -> JSON:
+        # do we ever want to support queryparams via POST?
         params = params or dict()
         extra_headers = {"Datapane-Object-Overwrite": "True"} if overwrite else {}
         r = self.session.post(self.url, headers=extra_headers, json=data, params=params, timeout=self.timeout)

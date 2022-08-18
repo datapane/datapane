@@ -131,19 +131,19 @@ class DPObjectRef:
 
     @classmethod
     def post_with_files(
-        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **kwargs: JSON
+        cls: Type[U], files: FileList = None, file: t.Optional[Path] = None, overwrite: bool = False, **data: JSON
     ) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
             # wrap up a single file into a FileList
             files = dict(uploaded_file=[file])
 
-        res = Resource(cls.endpoint).post_files(files, overwrite=overwrite, **kwargs)
+        res = Resource(cls.endpoint).post_files(files=files, overwrite=overwrite, **data)
         return cls(dto=res)
 
     @classmethod
-    def post(cls: Type[U], overwrite: bool = False, **kwargs: JSON) -> U:
-        res = Resource(cls.endpoint).post(overwrite=overwrite, **kwargs)
+    def post(cls: Type[U], overwrite: bool = False, **data: JSON) -> U:
+        res = Resource(cls.endpoint).post(params=None, overwrite=overwrite, **data)
         return cls(dto=res)
 
     def __getattr__(self, attr):  # noqa: ANN001
@@ -187,10 +187,10 @@ class DPObjectRef:
         self.res.delete()
         log.debug(f"Deleted object {self.url}")
 
-    def update(self, **kwargs):
+    def update(self, **data: JSON):
         # filter None values
-        kwargs = {k: v for (k, v) in kwargs.items() if v is not None}
-        self.res.patch(**kwargs)
+        data = {k: v for (k, v) in data.items() if v is not None}
+        self.res.patch(params=None, **data)
         self.refresh()
         log.debug(f"Updated object {self.url}")
 
