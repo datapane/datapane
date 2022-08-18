@@ -192,7 +192,7 @@ def check_get_config() -> Config:
         if _config.token == DEFAULT_TOKEN:
             # still don't have a token set for the env, open up the browser
             if not _IN_PYTEST:
-                f = furl(path="/home/", origin=_config.server)
+                f = furl(path="/accounts/login/", origin=_config.server)
                 webbrowser.open(url=str(f), new=2)
             raise InvalidTokenError(
                 "Please sign-up and login - if you already have then please restart your Jupyter kernel/Python instance to initialize your new token"

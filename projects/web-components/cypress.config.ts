@@ -11,7 +11,6 @@ export default defineConfig({
         testPassword: "",
         staffEmail: "support@datapane.com",
         staffPassword: "",
-        builderReportURL: "",
         styleReportURL: "",
         paramsAppURL: "",
         noParamsAppURL: "",

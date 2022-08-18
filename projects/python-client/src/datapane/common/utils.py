@@ -1,5 +1,6 @@
 import datetime
 import gzip
+import io
 import locale
 import logging
 import logging.config
@@ -193,6 +194,16 @@ def compress_file(f_name: NPath, level: int = 6) -> t.Generator[str, None, None]
             os.unlink(f_name_gz)
 
 
+def inmemory_compress(content: io.BytesIO) -> io.BytesIO:
+    """(x-plat) Memory-based gzip compression"""
+    content.seek(0)
+    zbuf = io.BytesIO()
+    with gzip.GzipFile(mode="wb", fileobj=zbuf, mtime=0.0) as zfile:
+        zfile.write(content.read())
+    zbuf.seek(0)
+    return zbuf
+
+
 @contextmanager
 def temp_workdir() -> t.Generator[str, None, None]:
     """Set working dir to a tempdir for duration of context"""
@@ -262,8 +273,10 @@ def timestamp(x: t.Optional[datetime.datetime] = None) -> str:
     return f'{x.isoformat(timespec="seconds")}{"" if x.tzinfo else "Z"}'
 
 
-def dict_drop_empty(xs: t.Dict, none_only: bool = False) -> t.Dict:
+def dict_drop_empty(xs: t.Optional[t.Dict] = None, none_only: bool = False, **kwargs) -> t.Dict:
     """Return a new dict with the empty/falsey values removed"""
+    xs = {**(xs or {}), **kwargs}
+
     if none_only:
         return {k: v for (k, v) in xs.items() if v is not None}
     else:

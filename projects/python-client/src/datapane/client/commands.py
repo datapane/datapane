@@ -448,7 +448,7 @@ def create(name: str, environment: Tuple[str], docker_image: str, project: str, 
     NAME: name of environment
     ENVIRONMENT: environment variables
     DOCKER IMAGE: docker image to be used inside apps
-    PROJECT: Project name (optional and only applicable for teams)
+    PROJECT: Project name (optional)
     """
     proccessed_environment = process_cmd_param_vals(environment)
     api.Environment.create(name, proccessed_environment, docker_image, project, overwrite)

@@ -54,7 +54,7 @@ describe("Running an app", () => {
 
         cy.get("[data-cy=button-run]").click();
         cy.wait("@getRuns", { requestTimeout: 30000 });
-        cy.get("#inline-report").should("contain", STR_VAL);
+        cy.get("#inline-report", { timeout: 20000 }).should("contain", STR_VAL);
         cy.get("#inline-report").should("contain", INT_VAL);
         cy.get("#inline-report").should("contain", FLOAT_VAL);
         cy.get("#inline-report").should("contain", "file upload fixture");
