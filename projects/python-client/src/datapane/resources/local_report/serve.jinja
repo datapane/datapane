@@ -1,0 +1,22 @@
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+hostname = "{{ host }}"
+port = {{port}}
+
+
+class DPServer(SimpleHTTPRequestHandler):
+    # TODO - implement setting correct response headers
+    pass
+
+
+if __name__ == "__main__":
+    server = HTTPServer((hostname, port), DPServer)
+    print(f"Server started at {hostname}:{port}")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    server.server_close()
+    print("Server stopped")

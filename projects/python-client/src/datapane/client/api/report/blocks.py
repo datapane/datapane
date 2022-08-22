@@ -70,6 +70,7 @@ class BuilderState:
     """Hold state whilst building the Report XML document"""
 
     embedded: bool = False
+    served: bool = False
     attachment_count: int = 0
     # NOTE - store as single element or a list?
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
@@ -631,6 +632,18 @@ class AssetBlock(DataBlock):
                 **self._attributes,
                 **self.get_file_attribs(),
                 src=f"data:{content_type};base64,{content}",
+            )
+        elif s.served:
+            # TODO - don't duplicate above
+            content_type = guess_type(self.file)
+            file_size = str(self.file.stat().st_size)
+            e = _E(
+                type=content_type,
+                size=file_size,
+                uploaded_filename=self.file.name,
+                **self._attributes,
+                **self.get_file_attribs(),
+                src=f"/static/{self.file.name}",
             )
         else:
             e = _E(

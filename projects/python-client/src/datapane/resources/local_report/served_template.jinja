@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        window.dpReportId = "foo";
+        window.dpAuthorId = "foo";
+    </script>
+    <script type="module" src="./dist/base/code-block.es.js"></script>
+    <script type="module" src="./dist/base/index.es.js"></script>
+    <link rel="stylesheet" href="dist/report/style.css">
+    <link rel="stylesheet" href="dist/base/style.css">
+</head>
+<body>
+<div id="report" class="w-full pb-12">
+</div>
+<script type="module">
+    import { mountReport } from "./dist/report/index.es.js";
+    const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
+    const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
+    const reportProps = {
+        htmlHeader,
+        report,
+    }
+    mountReport(reportProps);
+</script>
+</body>
+</html>

@@ -12,6 +12,7 @@ from enum import Enum
 from functools import reduce
 from os import path as osp
 from pathlib import Path
+from shutil import copyfile
 from uuid import uuid4
 
 import importlib_resources as ir
@@ -282,11 +283,16 @@ class Report(DPObjectRef):
             self.pages = [Page(blocks=pages)]
 
     def _to_xml(
-        self, embedded: bool, title: str = "Title", description: str = "Description", author: str = "Anonymous"
+        self,
+        embedded: bool,
+        served: bool,
+        title: str = "Title",
+        description: str = "Description",
+        author: str = "Anonymous",
     ) -> t.Tuple[Element, t.List[Path]]:
         """Build XML report document"""
         # convert Pages to XML
-        s = BuilderState(embedded)
+        s = BuilderState(embedded, served)
         _s = reduce(lambda _s, p: p._to_xml(_s), self.pages, s)
 
         # create the pages
@@ -302,7 +308,7 @@ class Report(DPObjectRef):
         )
 
         # add optional Meta
-        if embedded:
+        if embedded or served:
             meta = E.Meta(
                 E.Author(author or ""),
                 E.CreatedOn(timestamp()),
@@ -315,16 +321,19 @@ class Report(DPObjectRef):
     def _gen_report(
         self,
         embedded: bool,
+        served: bool,  # TODO - make enum instead of several bools?
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
         validate: bool = True,
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
-        report_doc, attachments = self._to_xml(embedded, title, description, author)
+        report_doc, attachments = self._to_xml(embedded, served, title, description, author)
 
         # post_process and validate
-        processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
+        processed_report_doc = local_post_transform(
+            report_doc, embedded="true()" if embedded else "false()", served="true()" if embedded else "false()"
+        )
         if validate:
             validate_report_doc(xml_doc=processed_report_doc)
             self._report_status_checks(processed_report_doc, embedded)
@@ -396,7 +405,7 @@ class Report(DPObjectRef):
         kwargs = dict_drop_empty(kwargs)
 
         # generate the report
-        report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
+        report_str, attachments = self._gen_report(embedded=False, served=False, title=name, description=description)
         files = dict(attachments=attachments)
 
         res = Resource(self.endpoint).post_files(files, overwrite=overwrite, document=report_str, **kwargs)
@@ -472,7 +481,7 @@ class Report(DPObjectRef):
         if not name:
             name = Path(path).stem[:127]
 
-        local_doc, _ = self._gen_report(embedded=True, title=name)
+        local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
         report_id = self._local_writer.write(
             local_doc,
             path,
@@ -533,10 +542,15 @@ class Report(DPObjectRef):
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         Path(path).mkdir()
-        copy_tree("./src/datapane/resources/local_report/served_template", f"./{path}")  # TODO - don't hardcode path
+        # TODO - don't hardcode path; joint paths properly
+        copy_tree("./src/datapane/resources/local_report/served_template", f"./{path}")
         name = Path(path).stem[:127]
 
-        local_doc, _ = self._gen_report(embedded=True, title=name)
+        local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
+
+        for a in attachments:
+            copyfile(str(a), f"./{path}/static/{a.name}")  # TODO - join paths properly
+
         self._served_local_writer.write(
             local_doc,
             path,
