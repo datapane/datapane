@@ -7,6 +7,7 @@ import dataclasses as dc
 import typing as t
 import webbrowser
 from base64 import b64encode
+from distutils.dir_util import copy_tree
 from enum import Enum
 from functools import reduce
 from os import path as osp
@@ -166,6 +167,63 @@ class ReportFileWriter:
         return report_id
 
 
+class ServedReportFileWriter:
+    """Collects data needed to display a local report document, and generates the local HTML"""
+
+    template: t.Optional[Template] = None
+    serve_py_template: t.Optional[Template] = None
+    assets: Path
+    logo: str
+    dev_mode: bool = False
+
+    def _setup_template(self):
+        """Jinja template setup for local rendering"""
+        # check we have the FE files, abort if not
+        self.assets = ir.files("datapane.resources.local_report")
+        template_loader = FileSystemLoader(self.assets)
+        template_env = Environment(loader=template_loader)
+        template_env.globals["include_raw"] = include_raw
+        self.template = template_env.get_template("served_template.jinja")
+        self.serve_py_template = template_env.get_template("serve.jinja")
+
+    def write(
+        self,
+        report_doc: str,
+        path: str,
+        name: str,
+        port: int,
+        host: str,
+        author: t.Optional[str] = None,
+        formatting: ReportFormatting = None,
+    ) -> str:
+        if formatting is None:
+            formatting = ReportFormatting()
+
+        # create template on demand
+        if not self.template:
+            self._setup_template()
+
+        report_id = uuid4().hex
+        r = self.template.render(
+            report_doc=report_doc,
+            report_width=formatting.width.value,
+            report_name=name,
+            report_author=author,
+            report_date=timestamp(),
+            css_header=formatting.to_css(),
+            is_light_prose=formatting.light_prose,
+            report_id=report_id,
+            author_id=c.config.session_id,
+            events=not _NO_ANALYTICS,
+        )
+        served = self.serve_py_template.render(port=port, host=host)
+
+        (Path(path) / "index.html").write_text(r, encoding="utf-8")
+        (Path(path) / "serve.py").write_text(served, encoding="utf-8")
+
+        return report_id
+
+
 # Type aliases
 BlockDict = t.Dict[str, BlockOrPrimitive]
 
@@ -178,6 +236,7 @@ class Report(DPObjectRef):
 
     _tmp_report: t.Optional[Path] = None  # Temp local report
     _local_writer = ReportFileWriter()
+    _served_local_writer = ServedReportFileWriter()
     _preview_file = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "project"]
 
@@ -465,3 +524,24 @@ class Report(DPObjectRef):
             formatting: Sets the basic report styling
         """
         self._save(self._preview_file.name, open=open, formatting=formatting)
+
+    def serve(
+        self,
+        path: str,
+        port: int = 8000,
+        host: str = "localhost",
+        formatting: t.Optional[ReportFormatting] = None,
+    ) -> None:
+        Path(path).mkdir()
+        copy_tree("./src/datapane/resources/local_report/served_template", f"./{path}")  # TODO - don't hardcode path
+        name = Path(path).stem[:127]
+
+        local_doc, _ = self._gen_report(embedded=True, title=name)
+        self._served_local_writer.write(
+            local_doc,
+            path,
+            name=name,
+            formatting=formatting,
+            port=port,
+            host=host,
+        )
