@@ -65,7 +65,9 @@ nav:
         - Attachments: "catalogues/blocks/attachment.ipynb"
         - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
-    - Components 🗃: "catalogues/components/index.ipynb"
+    - Components 🗃: 
+      - "catalogues/components/index.ipynb"
+      - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
     - Templates 📑:
       - "catalogues/templates/index.ipynb"
 
