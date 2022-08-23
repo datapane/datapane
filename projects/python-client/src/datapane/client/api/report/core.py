@@ -543,7 +543,7 @@ class Report(DPObjectRef):
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         Path(path).mkdir()
-        # TODO - don't hardcode path; joint paths properly
+        # TODO - don't hardcode path; join paths properly
         copy_tree("./src/datapane/resources/local_report/served_template", f"./{path}")
         name = Path(path).stem[:127]
 
@@ -551,7 +551,7 @@ class Report(DPObjectRef):
 
         for a in attachments:
             with compress_file(a) as a_gz:
-                copyfile(str(a_gz), f"./{path}/static/{Path(a_gz).name}")  # TODO - join paths properly
+                copyfile(str(a_gz), f"./{path}/static/{Path(a).name}")  # TODO - join paths properly
 
         self._served_local_writer.write(
             local_doc,
