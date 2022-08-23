@@ -643,7 +643,7 @@ class AssetBlock(DataBlock):
                 uploaded_filename=self.file.name,
                 **self._attributes,
                 **self.get_file_attribs(),
-                src=f"/static/{self.file.name}",
+                src=f"/static/{self.file.name}.gz",
             )
         else:
             e = _E(

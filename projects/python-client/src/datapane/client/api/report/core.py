@@ -29,6 +29,7 @@ from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
 from datapane.common import SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
+from datapane.common.utils import compress_file
 
 from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 
@@ -184,8 +185,8 @@ class ServedReportFileWriter:
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
         template_env.globals["include_raw"] = include_raw
-        self.template = template_env.get_template("served_template.jinja")
-        self.serve_py_template = template_env.get_template("serve.jinja")
+        self.template = template_env.get_template("served_template.html.jinja")
+        self.serve_py_template = template_env.get_template("serve.py.jinja")
 
     def write(
         self,
@@ -549,7 +550,8 @@ class Report(DPObjectRef):
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
         for a in attachments:
-            copyfile(str(a), f"./{path}/static/{a.name}")  # TODO - join paths properly
+            with compress_file(a) as a_gz:
+                copyfile(str(a_gz), f"./{path}/static/{Path(a_gz).name}")  # TODO - join paths properly
 
         self._served_local_writer.write(
             local_doc,
