@@ -1,37 +1,29 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import replace from "@rollup/plugin-replace";
-import path from "path";
+import {
+    ES_LIB,
+    PACKAGE_VERSION_BOKEH,
+    PLUGIN_REPLACE_BOKEH,
+    PLUGIN_VUE,
+} from "./dp-base-config";
+import tailwindcss from "tailwindcss";
 
 module.exports = defineConfig({
-    plugins: [
-        vue({
-            template: {
-                compilerOptions: {
-                    isCustomElement: (tag) =>
-                        tag.startsWith("revo-") || tag.startsWith("x-"),
-                },
-            },
-        }),
-        replace({
-            include: ["node_modules/@bokeh/**/*.js"],
-            values: {
-                // shim jquery to window object for bokehjs
-                jQuery: "window.jQuery",
-            },
-            preventAssignment: false,
-        }),
-    ],
+    css: {
+        postcss: {
+            plugins: [
+                tailwindcss({
+                    config: "./report.tailwind.config.js",
+                }) as any,
+            ],
+        },
+    },
+    plugins: [PLUGIN_VUE(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {
-        // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
-        PACKAGE_VERSION: JSON.stringify(process.env.npm_package_version),
+        PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
     },
     build: {
         outDir: "./dist/local-report/",
-        lib: {
-            entry: path.resolve(__dirname, "local-report.index.ts"),
-            formats: ["es"],
-        },
+        lib: ES_LIB("local-report.index.ts"),
         assetsInlineLimit: 100000000,
         chunkSizeWarningLimit: 100000000,
         cssCodeSplit: false,

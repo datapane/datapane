@@ -6,7 +6,7 @@ port = {{port}}
 
 class DPServer(SimpleHTTPRequestHandler):
     def end_headers(self):
-        if self.path.startswith("/static"):
+        if self.path.startswith("/static") and not self.path.endswith(".js"):
             self.send_header("Content-Encoding", "gzip")
         SimpleHTTPRequestHandler.end_headers(self)
 

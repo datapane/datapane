@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueESM from "../shared/rollup-plugin-vue-esm";
 import path from "path";
+import tailwindcss from "tailwindcss";
 
 module.exports = defineConfig(({ mode }) => ({
     plugins: [
@@ -17,7 +18,13 @@ module.exports = defineConfig(({ mode }) => ({
         }),
     ],
     css: {
-        postcss: path.resolve(__dirname, "postcss.config.js"),
+        postcss: {
+            plugins: [
+                tailwindcss({
+                    config: "./tailwind.config.js",
+                }) as any,
+            ],
+        },
     },
     build: {
         outDir: "./dist/base/",

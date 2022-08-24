@@ -100,18 +100,9 @@ module.exports = {
         require("@formkit/themes/tailwindcss"),
     ],
     content: [
-        // JS bundles
-        "./base/src/**/*.{vue,js,ts}",
-        "./params-component/src/**/*.{vue,js,ts}",
+        "./report/src/**/*.{vue,js,ts}",
         "./node_modules/@variantjs/**/*.ts",
-
-        // Template files
-        "../../../dp-server/src/dp/apps/dp_core/templates/**/*.html",
-        "../../../dp-server/src/dp/apps/dp_marketing/templates/**/*.html",
-        "../../../dp-server/src/dp/apps/dp_comments/templates/**/*.html",
-        "../../../dp-server/src/dp/apps/dp_org/templates/**/*.html",
-        "../../../dp-server/src/dp/apps/dp_public/templates/**/*.html",
-        "../../../dp-server/templates/**/*.html",
+        "../python-client/src/datapane/resources/local_report/*.html",
     ],
     safelist: [
         { pattern: /grid-cols-.*/ },

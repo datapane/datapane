@@ -11,20 +11,10 @@ import "codemirror/theme/eclipse.css";
 customElements.define("x-table-block", defineCustomElement(TableBlock));
 
 window.addEventListener("DOMContentLoaded", () => {
-    const windowProps = window.reportProps;
-    const reportProps = {
-        ...windowProps,
-        htmlHeader: windowProps.htmlHeader,
-        report: {
-            ...windowProps.report,
-            document: windowProps.report.document,
-        },
-    };
-
+    const { reportProps } = window;
     const app = createApp(Report, reportProps);
 
     // Register WCs as standard Vue components in local mode
     app.component("dpx-code-block", CodeBlock);
-
     app.mount("#report");
 });

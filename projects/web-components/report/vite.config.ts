@@ -1,43 +1,30 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import replace from "@rollup/plugin-replace";
-import path from "path";
+import {
+    ES_LIB,
+    PACKAGE_VERSION_BOKEH,
+    PLUGIN_REPLACE_BOKEH,
+    PLUGIN_VUE,
+} from "./dp-base-config";
+import tailwindcss from "tailwindcss";
 
 module.exports = defineConfig(({ mode }) => ({
     css: {
-        postcss: {},
+        postcss: {
+            plugins: [
+                tailwindcss({
+                    config: "./report.tailwind.config.js",
+                }) as any,
+            ],
+        },
     },
-    plugins: [
-        vue({
-            template: {
-                compilerOptions: {
-                    isCustomElement: (tag) =>
-                        tag.startsWith("dpx-") ||
-                        tag.startsWith("x-") ||
-                        tag.startsWith("revo-"),
-                },
-            },
-        }),
-        replace({
-            include: ["node_modules/@bokeh/**/*.js"],
-            values: {
-                // shim jquery to window object for bokehjs
-                jQuery: "window.jQuery",
-            },
-            preventAssignment: false,
-        }),
-    ],
+    plugins: [PLUGIN_VUE(["revo", "x", "dpx"]), PLUGIN_REPLACE_BOKEH],
     define: {
         // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
-        PACKAGE_VERSION: JSON.stringify(process.env.npm_package_version),
+        PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
     },
     build: {
         outDir: "./dist/report/",
-        lib: {
-            entry: path.resolve(__dirname, "index.ts"),
-            fileName: "index",
-            formats: ["es"],
-        },
+        lib: { ...ES_LIB("index.ts"), fileName: "index" },
         rollupOptions: {
             output: {
                 paths: {
@@ -45,6 +32,8 @@ module.exports = defineConfig(({ mode }) => ({
                         mode === "development"
                             ? "/static/vue.esm-browser.js"
                             : "/static/vue.esm-browser.prod.js",
+                    katex:
+                        "https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.mjs",
                 },
             },
             external: ["vue"],

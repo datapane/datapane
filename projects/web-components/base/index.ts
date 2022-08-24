@@ -1,7 +1,6 @@
-import "./src/styles/notebook.scss";
 import "./src/styles/base.scss";
-import "./src/styles/tailwind.css";
 import "./src/styles/templates-base.scss";
+import "./src/styles/tailwind.css"; // This import is skipped in production; see `base/vite.config.ts`
 
 // JS Polyfills
 import "whatwg-fetch";

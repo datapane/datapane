@@ -22,7 +22,6 @@
       const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
       const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
       window.reportProps = { report, htmlHeader };
-
     </script>
     <script type="module">
       {{ include_raw("local-report-base.js") }}
