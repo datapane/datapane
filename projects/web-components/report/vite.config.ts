@@ -36,7 +36,7 @@ module.exports = defineConfig(({ mode }) => ({
                         "https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.mjs",
                 },
             },
-            external: ["vue"],
+            external: ["vue", "katex"],
         },
     },
 }));
