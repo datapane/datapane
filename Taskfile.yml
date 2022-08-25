@@ -18,9 +18,5 @@ tasks:
     desc: Link the local-report artifacts into the python-client codebase (for Report.save)
     cmds:
       - |
-        case "$(uname -s)" in
-          Darwin) ln_cmd='ln -svf';;
-          *) ln_cmd='ln -srvf';;
-        esac
-        ${ln_cmd} 'projects/web-components/dist/local-report/local-report-base.js' 'projects/python-client/src/datapane/resources/local_report/local-report-base.js'
-        ${ln_cmd} 'projects/web-components/dist/local-report/local-report-base.css' 'projects/python-client/src/datapane/resources/local_report/local-report-base.css'
+        ln -svf '../../../../../web-components/dist/local-report/local-report-base.js' "projects/python-client/src/datapane/resources/local_report/local-report-base.js"
+        ln -svf '../../../../../web-components/dist/local-report/local-report-base.css' "projects/python-client/src/datapane/resources/local_report/local-report-base.css"
