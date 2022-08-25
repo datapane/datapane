@@ -20,7 +20,8 @@ tasks:
       - |
         ln -svf '../../../../../web-components/dist/local-report/local-report-base.js' "projects/python-client/src/datapane/resources/local_report/local-report-base.js"
         ln -svf '../../../../../web-components/dist/local-report/local-report-base.css' "projects/python-client/src/datapane/resources/local_report/local-report-base.css"
-        ln -svf ../../../../../../../web-components/dist/report projects/python-client/src/datapane/resources/local_report/served_template/dist/report
-        ln -svf ../../../../../../../../web-components/dist/base/DPClipboard.js projects/python-client/src/datapane/resources/local_report/served_template/dist/base/DPClipboard.js
-        ln -svf ../../../../../../../../web-components/dist/base/code-block.es.js projects/python-client/src/datapane/resources/local_report/served_template/dist/base/code-block.es.js
+        ln -svf '../../../../../../../web-components/dist/report' "projects/python-client/src/datapane/resources/local_report/served_template/dist/report"
+        ln -svf '../../../../../../../../web-components/dist/base/DPClipboard.js' "projects/python-client/src/datapane/resources/local_report/served_template/dist/base/DPClipboard.js"
+        ln -svf '../../../../../../../../web-components/dist/base/code-block.es.js' "projects/python-client/src/datapane/resources/local_report/served_template/dist/base/code-block.es.js"
+
 
