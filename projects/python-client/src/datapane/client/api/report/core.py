@@ -193,8 +193,8 @@ class ServedReportFileWriter:
         report_doc: str,
         path: str,
         name: str,
-        port: int,
-        host: str,
+        default_port: int,
+        default_host: str,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
@@ -218,7 +218,7 @@ class ServedReportFileWriter:
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
         )
-        served = self.serve_py_template.render(port=port, host=host)
+        served = self.serve_py_template.render(default_port=default_port, default_host=default_host)
 
         (Path(path) / "index.html").write_text(r, encoding="utf-8")
         (Path(path) / "serve.py").write_text(served, encoding="utf-8")
@@ -538,8 +538,8 @@ class Report(DPObjectRef):
     def build(
         self,
         path: str,
-        port: int = 8000,
-        host: str = "localhost",
+        default_port: int = 8000,
+        default_host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         path = Path(path)
@@ -559,8 +559,8 @@ class Report(DPObjectRef):
             str(path),
             name=name,
             formatting=formatting,
-            port=port,
-            host=host,
+            default_port=default_port,
+            default_host=default_host,
         )
 
     def serve(self):

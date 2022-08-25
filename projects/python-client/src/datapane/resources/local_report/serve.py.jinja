@@ -1,19 +1,24 @@
+import argparse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-hostname = "{{ host }}"
-port = {{port}}
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--host', help="The hostname of the server, e.g. localhost", default="{{ default_host }}")
+parser.add_argument('--port', help="The port used to run the server, e.g. 8000", default={{ default_port }})
+
+args = parser.parse_args()
 
 
 class DPServer(SimpleHTTPRequestHandler):
     def end_headers(self):
         if self.path.startswith("/static") and not self.path.endswith(".js"):
             self.send_header("Content-Encoding", "gzip")
-        SimpleHTTPRequestHandler.end_headers(self)
+        super().end_headers()
 
 
 if __name__ == "__main__":
-    server = HTTPServer((hostname, port), DPServer)
-    print(f"Server started at {hostname}:{port}")
+    server = HTTPServer((args.host, int(args.port)), DPServer)
+    print(f"Server started at {args.host}:{args.port}")
 
     try:
         server.serve_forever()
