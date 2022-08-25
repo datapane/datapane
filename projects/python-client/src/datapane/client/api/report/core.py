@@ -4,6 +4,8 @@ Datapane Reports Object
 Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
+import subprocess
+import sys
 import typing as t
 import webbrowser
 from base64 import b64encode
@@ -221,7 +223,7 @@ class ServedReportFileWriter:
         served = self.serve_py_template.render(default_port=default_port, default_host=default_host)
 
         (Path(path) / "index.html").write_text(r, encoding="utf-8")
-        (Path(path) / "serve.py").write_text(served, encoding="utf-8")
+        (Path(path) / "__main__.py").write_text(served, encoding="utf-8")
 
         return report_id
 
@@ -541,6 +543,7 @@ class Report(DPObjectRef):
         default_port: int = 8000,
         default_host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
+        serve: bool = True,
     ) -> None:
         path = Path(path)
         path.mkdir(exist_ok=True)
@@ -563,5 +566,24 @@ class Report(DPObjectRef):
             default_host=default_host,
         )
 
-    def serve(self):
-        pass
+        if serve:
+            self.serve(path)
+
+    def serve(
+        self,
+        path: str,
+        port: int = 8000,
+        host: str = "localhost",
+        formatting: t.Optional[ReportFormatting] = None,
+    ):
+        if not osp.isdir(path):
+            self.build(path, default_port=port, default_host=host, formatting=formatting)
+
+        subprocess_args = [sys.executable, path]
+
+        if host is not None:
+            subprocess_args.extend(["--host", host])
+        if port is not None:
+            subprocess_args.extend(["--port", str(port)])
+
+        subprocess.call(subprocess_args)
