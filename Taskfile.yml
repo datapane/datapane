@@ -23,3 +23,4 @@ tasks:
         ln -svf '../../../../../../../web-components/dist/report' "projects/python-client/src/datapane/resources/local_report/served_template/dist/report"
         ln -svf '../../../../../../../../web-components/dist/base/DPClipboard.js' "projects/python-client/src/datapane/resources/local_report/served_template/dist/base/DPClipboard.js"
         ln -svf '../../../../../../../../web-components/dist/base/code-block.es.js' "projects/python-client/src/datapane/resources/local_report/served_template/dist/base/code-block.es.js"
+        ln -svf '../../../../../../../../web-components/dist/vue.esm-browser.prod.js' "datapane/projects/python-client/src/datapane/resources/local_report/served_template/dist/static/vue.esm-browser.prod.js"

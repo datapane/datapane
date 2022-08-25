@@ -535,29 +535,33 @@ class Report(DPObjectRef):
         """
         self._save(self._preview_file.name, open=open, formatting=formatting)
 
-    def serve(
+    def build(
         self,
         path: str,
         port: int = 8000,
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
-        Path(path).mkdir()
-        # TODO - don't hardcode path; join paths properly
-        copy_tree("./src/datapane/resources/local_report/served_template", f"./{path}")
-        name = Path(path).stem[:127]
+        path = Path(path)
+        path.mkdir(exist_ok=True)
+        copy_tree(str(ir.files("datapane.resources") / "local_report/served_template"), str(path))
+        name = path.stem[:127]
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
         for a in attachments:
+            # TODO - compress in-memory to save a disk write?
             with compress_file(a) as a_gz:
-                copyfile(str(a_gz), f"./{path}/static/{Path(a).name}")  # TODO - join paths properly
+                copyfile(str(a_gz), osp.join(path, "static", Path(a).name))
 
         self._served_local_writer.write(
             local_doc,
-            path,
+            str(path),
             name=name,
             formatting=formatting,
             port=port,
             host=host,
         )
+
+    def serve(self):
+        pass
