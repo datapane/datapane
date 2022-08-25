@@ -2,16 +2,17 @@
 <html>
 <head>
     <script>
+        window.dpServed = true;
         window.dpReportId = "foo";
         window.dpAuthorId = "foo";
     </script>
-    <link rel="stylesheet" href="./dist/style.css">
+    <link rel="stylesheet" href="./dist/report/style.css">
 </head>
 <body>
 <div id="report" class="w-full pb-12">
 </div>
 <script type="module">
-    import { mountReport } from "./dist/index.es.js";
+    import { mountReport } from "./dist/report/index.es.js";
     const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
     const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
     const reportProps = {
@@ -20,6 +21,6 @@
     }
     mountReport(reportProps);
 </script>
-<script type="module" src="dist/code-block.es.js"></script>
+<script type="module" src="dist/base/code-block.es.js"></script>
 </body>
 </html>
