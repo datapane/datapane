@@ -61,6 +61,8 @@ jobs:
           # We're only pushing to the server as a side-effect, we never actually use what we push.
           # TODO: Implement environment variables to avoid writing the token to disk.
           poetry run datapane login --token '${{ secrets.DOCS_BUILD_DATAPANE_API_KEY }}'
+          # disable analytics within the docs, we know what's in here
+          mkdir -p ~/.config/datapane && touch ~/.config/datapane/no_analytics
 
       - name: Build
         run: |
