@@ -19,6 +19,7 @@ Every member must be assigned to one of our three system roles:&#x20;
 1. **Viewer** - can view reports and run scripts&#x20;
 2. **Editor** - all permissions of viewer, plus creating reports and scripts
 3. **Admin** - all permissions of editor, plus settings, member management and billing
+4. **Analyst** - can run apps (dynamic reports) but can't create reports or apps via the API. This role is only available for Enterprise users.
 
 The default project is automatically created by the server and is for internal members. If you need to invite an external collaborator for a specific report, see the section on [projects](/concepts/datapane-enterprise/authentication-and-sharing/#projects).&#x20;
 

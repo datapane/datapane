@@ -20,9 +20,10 @@ nav:
       - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
       - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
+      - Managing members: "tutorials/datapane-cloud/managing-members.md"
+    - Datapane Enterprise 🏢:
       - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
       - Files: "tutorials/datapane-cloud/files.md"
-      - Managing members: "tutorials/datapane-cloud/managing-members.md"
     - Styling 🎨:
       - tutorials/styling/index.ipynb
       - Adding source code: "tutorials/styling/adding-source-code.ipynb"

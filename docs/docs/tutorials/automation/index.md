@@ -10,9 +10,9 @@ Once you have a report you're happy with, you often need to generate it automati
 
 To learn more about GitHub actions, [see the documentation](https://docs.github.com/en/free-pro-team@latest/actions).
 
-### GitHub Actions vs. Datapane Teams Script Runner
+### GitHub Actions vs. Datapane Enterprise Script Runner
 
-_Datapane Teams_ also provides a [script runner](/tutorials/apps/), which has several advantages and optimizations not available on the GitHub action runner, including:
+_Datapane Enterprise_ also provides a [script runner](/tutorials/apps/), which has several advantages and optimizations not available on the GitHub action runner, including:
 
 -   **Friendly end-user forms**. GitHub actions are not suitable for allowing authenticated, non-technical users to to run your script with parameters; Datapane's script runner provides self-service forms for stakeholders.
 -   **Jupyter support**. Datapane's script runner allows you to deploy and run Jupyter Notebooks with parameters to generate dynamic reports, whilst the GitHub Action relies on a Python file

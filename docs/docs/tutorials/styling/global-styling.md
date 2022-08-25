@@ -4,7 +4,7 @@ This section describes how to add custom colours and fonts to your report.
 
 ## Styles
 
-Datapane Teams allows you to define a global style block which will apply to all of your reports. In this block you can \(re\)define the default font, background colour and more.
+Datapane Enterprise allows you to define a global style block which will apply to all of your reports. In this block you can \(re\)define the default font, background colour and more.
 
 ![Example of a styled report](../../img/tutorials/styling-whitelabelling-1.png)
 
