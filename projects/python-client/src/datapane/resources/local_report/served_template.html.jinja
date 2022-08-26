@@ -3,8 +3,9 @@
 <head>
     <script>
         window.dpServed = true;
-        window.dpReportId = "foo";
-        window.dpAuthorId = "foo";
+        window.dpLocalViewEvent = {{events|tojson}};
+        window.dpReportId = "{{report_id}}";
+        window.dpAuthorId = "{{author_id}}";
     </script>
     <link rel="stylesheet" href="./dist/report/style.css">
 </head>
