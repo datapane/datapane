@@ -257,7 +257,7 @@ def token_connect(server: str) -> t.Optional[str]:
 
     with requests.Session() as s:
         login_token = create_token(s)
-        url = furl(path="/accounts/login/", origin=server).add({"login_token": login_token}).url
+        url = furl(path="/accounts/api-login-token-accept", origin=server).add({"login_token": login_token}).url
 
         print(
             f"\nOpening login page.. please login via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
