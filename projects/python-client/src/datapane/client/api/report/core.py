@@ -566,18 +566,21 @@ class Report(DPObjectRef):
             default_host=default_host,
         )
 
+        log.debug(f"Successfully built report in {path}")
+
         if serve:
             self.serve(path)
 
     def serve(
         self,
         path: str,
-        port: int = 8000,
-        host: str = "localhost",
+        port: t.Optional[int] = None,
+        host: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
     ):
         if not osp.isdir(path):
-            self.build(path, default_port=port, default_host=host, formatting=formatting)
+            build_kwargs = dict(formatting=formatting, default_host=host, default_port=port)
+            self.build(path, **{k: v for k, v in build_kwargs.items() if v is not None})
 
         subprocess_args = [sys.executable, path]
 

@@ -44,8 +44,8 @@ module.exports = defineConfig(({ mode }) => ({
                 paths: {
                     vue:
                         mode === "development"
-                            ? "/static/vue.esm-browser.js"
-                            : "/static/vue.esm-browser.prod.js",
+                            ? "../vue.esm-browser.js"
+                            : "../vue.esm-browser.prod.js",
                 },
             },
             external: ["vue"],
