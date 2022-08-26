@@ -1,22 +1,9 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
 import vueESM from "../shared/rollup-plugin-vue-esm";
 import path from "path";
 import tailwindcss from "tailwindcss";
 
-module.exports = defineConfig(({ mode }) => ({
-    plugins: [
-        vue({
-            template: {
-                compilerOptions: {
-                    isCustomElement: (tag) =>
-                        tag.startsWith("dpx-") ||
-                        tag.startsWith("x-") ||
-                        tag.startsWith("revo-"),
-                },
-            },
-        }),
-    ],
+module.exports = defineConfig(() => ({
     css: {
         postcss: {
             plugins: [
@@ -35,20 +22,12 @@ module.exports = defineConfig(({ mode }) => ({
         rollupOptions: {
             input: {
                 index: path.resolve(__dirname, "index.ts"),
-                "code-block": path.resolve(__dirname, "code-block.index.ts"),
             },
             output: {
                 format: "es",
                 entryFileNames: "[name].[format].js",
                 assetFileNames: "[name].[ext]",
-                paths: {
-                    vue:
-                        mode === "development"
-                            ? "../vue.esm-browser.js"
-                            : "../vue.esm-browser.prod.js",
-                },
             },
-            external: ["vue"],
             plugins: [vueESM()],
         },
     },

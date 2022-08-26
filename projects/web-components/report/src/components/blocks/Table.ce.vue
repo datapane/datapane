@@ -7,7 +7,7 @@ const p = defineProps<{
 }>();
 
 const singleBlockEmbed = computed(() => JSON.parse(p.singleBlockEmbed));
-const { dpLocal } = window;
+const { dpLocal, dpServed } = window;
 
 const tableRef = (node: any): void => {
     /**
@@ -23,7 +23,11 @@ const tableRef = (node: any): void => {
 </script>
 
 <template>
-    <link v-if="!dpLocal" rel="stylesheet" href="/static/base/style.css" />
+    <link
+        v-if="!dpLocal && !dpServed"
+        rel="stylesheet"
+        href="/static/report/style.css"
+    />
     <div
         :ref="tableRef"
         :class="['w-full', { 'h-full absolute top-0': singleBlockEmbed }]"

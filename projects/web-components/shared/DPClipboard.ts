@@ -37,7 +37,8 @@ export class DPClipboard {
     }
 
     private static onSuccess = () => {
-        window.Alpine.store("copy").toggle();
+        // TODO - add explanation
+        window.Alpine && window.Alpine.store("copy").toggle();
     };
 
     private static getFieldValue(fieldId?: string): string {

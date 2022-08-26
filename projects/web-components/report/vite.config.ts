@@ -17,7 +17,7 @@ module.exports = defineConfig(({ mode }) => ({
             ],
         },
     },
-    plugins: [PLUGIN_VUE(["revo", "x", "dpx"]), PLUGIN_REPLACE_BOKEH],
+    plugins: [PLUGIN_VUE(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {
         // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,

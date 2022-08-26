@@ -1,6 +1,5 @@
 import { createApp, defineCustomElement } from "vue";
 import Report from "./src/components/ReportComponent.vue";
-import CodeBlock from "./src/components/blocks/Code.ce.vue";
 import TableBlock from "./src/components/blocks/Table.ce.vue";
 import "./src/styles/report.scss";
 import "../base/src/styles/tailwind.css";
@@ -13,8 +12,5 @@ customElements.define("x-table-block", defineCustomElement(TableBlock));
 window.addEventListener("DOMContentLoaded", () => {
     const { reportProps } = window;
     const app = createApp(Report, reportProps);
-
-    // Register WCs as standard Vue components in local mode
-    app.component("dpx-code-block", CodeBlock);
     app.mount("#report");
 });
