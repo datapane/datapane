@@ -61,6 +61,8 @@ Anything you add under the `<style>` block will be added to the top of your repo
 
 ## Whitelabelling
 
+[:octicons-organization-16: Enterprise feature](){.org}
+
 To use our Whitelabel feature, simply add a company logo under Settings - Visual Settings. Your company logo will be displayed instead of the Datapane logo in the following places:
 
 -   Login pages

@@ -19,14 +19,20 @@ nav:
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
       - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
-      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
-      - Managing members: "tutorials/datapane-cloud/managing-members.md"
+      - Projects: "tutorials/datapane-cloud/projects.md"
+#      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
+      - Workspaces:
+          - "tutorials/datapane-cloud/workspaces/index.md"
+          - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
+          - Managing members: "tutorials/datapane-cloud/workspaces/managing-members.md"
     - Datapane Enterprise 🏢:
-      - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
-      - Files: "tutorials/datapane-cloud/files.md"
+      - tutorials/datapane-enterprise/index.md
+      - Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
+      - Files: "tutorials/datapane-enterprise/files.md"
+      - Managing members: "tutorials/datapane-enterprise/managing-members.md"
     - Styling 🎨:
       - tutorials/styling/index.ipynb
-      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
+#      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
       - Global styling: "tutorials/styling/global-styling.md"
     - Automation 🤖:
       - tutorials/automation/index.md
