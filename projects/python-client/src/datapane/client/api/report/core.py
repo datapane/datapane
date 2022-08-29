@@ -6,6 +6,7 @@ Describes the `Report` object and included APIs for saving and uploading them.
 import dataclasses as dc
 import subprocess
 import sys
+import threading
 import typing as t
 import webbrowser
 from abc import ABC
@@ -16,9 +17,11 @@ from functools import reduce
 from os import path as osp
 from pathlib import Path
 from shutil import copyfile
+from time import sleep
 from uuid import uuid4
 
 import importlib_resources as ir
+import requests
 from jinja2 import Environment, FileSystemLoader, Template, contextfunction
 from lxml import etree
 from lxml.etree import Element, _Element
@@ -116,11 +119,11 @@ def include_raw(ctx, name) -> Markup:  # noqa: ANN001
 class BaseReportFileWriter(ABC):
     """Provides shared logic for standalone and served local report writers"""
 
-    html_template: t.Optional[Template] = None
+    template: t.Optional[Template] = None
     assets: Path
     logo: str
     dev_mode: bool = False
-    html_template_name: str
+    template_name: str
     report_id: str = uuid4().hex
 
     def _setup_template(self):  # TODO - type
@@ -134,7 +137,7 @@ class BaseReportFileWriter(ABC):
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
         template_env.globals["include_raw"] = include_raw
-        self.html_template = template_env.get_template(self.html_template_name)
+        self.template = template_env.get_template(self.template_name)
 
         return template_env
 
@@ -177,7 +180,7 @@ class StandaloneReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a local report document, and generates the local HTML"""
 
     dev_mode: bool = False
-    html_template_name = "template.html"
+    template_name = "template.html"
 
     def assert_bundle_exists(self):
         if not (self.assets / "local-report-base.css").exists():
@@ -201,7 +204,7 @@ class ServedReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a served local report document, and generates the local HTML"""
 
     serve_py_template: t.Optional[Template] = None
-    html_template_name = "served_template.html.jinja"
+    template_name = "served_template.html.jinja"
 
     def _setup_template(self):
         """Jinja template setup for local rendering"""
@@ -213,13 +216,13 @@ class ServedReportFileWriter(BaseReportFileWriter):
         report_doc: str,
         path: str,
         name: str,
-        default_port: int,
-        default_host: str,
+        port: int,
+        host: str,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
         r = self._write(report_doc, name, author, formatting)
-        served = self.serve_py_template.render(default_port=default_port, default_host=default_host)
+        served = self.serve_py_template.render(port=port, host=host)
 
         (Path(path) / "index.html").write_text(r, encoding="utf-8")
         (Path(path) / "__main__.py").write_text(served, encoding="utf-8")
@@ -539,10 +542,11 @@ class Report(DPObjectRef):
     def build(
         self,
         path: str,
-        default_port: int = 8000,
-        default_host: str = "localhost",
+        port: int = 8000,
+        host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
+        """TODO"""
         path = Path(path)
         path.mkdir(exist_ok=True)
         copy_tree(str(ir.files("datapane.resources") / "local_report/served_template"), str(path))
@@ -560,8 +564,8 @@ class Report(DPObjectRef):
             str(path),
             name=name,
             formatting=formatting,
-            default_port=default_port,
-            default_host=default_host,
+            port=port,
+            host=host,
         )
 
         log.debug(f"Successfully built report in {path}")
@@ -569,19 +573,36 @@ class Report(DPObjectRef):
     def serve(
         self,
         path: str,
-        port: t.Optional[int] = None,
-        host: t.Optional[str] = None,
+        port: int = 8000,
+        host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
+        open: bool = False,
     ):
+        """TODO"""
         if not osp.isdir(path):
-            build_kwargs = dict(formatting=formatting, default_host=host, default_port=port)
-            self.build(path, **{k: v for k, v in build_kwargs.items() if v is not None})
+            self.build(path, formatting=formatting, host=host, port=port)
 
-        subprocess_args = [sys.executable, path]
+        if open:
+            threading.Thread(target=self._open, args=(host, port), daemon=True).start()
 
-        if host is not None:
-            subprocess_args.extend(["--host", host])
-        if port is not None:
-            subprocess_args.extend(["--port", str(port)])
+        subprocess.call([sys.executable, path, "--host", host, "--port", str(port)])
 
-        subprocess.call(subprocess_args)
+    @staticmethod
+    def _open(host: str, port: int) -> None:
+        """TODO"""
+        url = f"http://{host}:{port}"
+        status_code: t.Optional[int] = None
+        request_limit = 100
+        attempts = 0
+
+        while status_code != 200:
+            try:
+                r = requests.get(url)
+                status_code = r.status_code
+            except requests.exceptions.ConnectionError:
+                attempts += 1
+            if attempts > request_limit:
+                raise TimeoutError(f"Reached maximum {request_limit} retries")
+            sleep(0.1)
+
+        webbrowser.open_new_tab(url)
