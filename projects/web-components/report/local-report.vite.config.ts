@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
 import {
-    ES_LIB,
+    esLib,
     PACKAGE_VERSION_BOKEH,
     PLUGIN_REPLACE_BOKEH,
-    PLUGIN_VUE,
+    pluginVue,
 } from "./dp-base-config";
 import tailwindcss from "tailwindcss";
 import minBundle from "../shared/rollup-plugin-min-bundle";
@@ -18,14 +18,14 @@ module.exports = defineConfig({
             ],
         },
     },
-    plugins: [PLUGIN_VUE(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
+    plugins: [pluginVue(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
     },
     build: {
         minify: "esbuild",
         outDir: "./dist/local-report/",
-        lib: ES_LIB("local-report.index.ts"),
+        lib: esLib("local-report.index.ts"),
         assetsInlineLimit: 100000000,
         chunkSizeWarningLimit: 100000000,
         cssCodeSplit: false,

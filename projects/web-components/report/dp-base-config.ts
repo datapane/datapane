@@ -12,7 +12,7 @@ export const PLUGIN_REPLACE_BOKEH = replace({
     preventAssignment: false,
 });
 
-export const PLUGIN_VUE = (customEls: string[]) =>
+export const pluginVue = (customEls: string[]) =>
     vue({
         template: {
             compilerOptions: {
@@ -27,7 +27,7 @@ export const PACKAGE_VERSION_BOKEH = JSON.stringify(
     process.env.npm_package_version
 );
 
-export const ES_LIB = (entry: string) => ({
+export const esLib = (entry: string) => ({
     entry: path.resolve(__dirname, entry),
     formats: ["es"] as LibraryFormats[],
 });
