@@ -8,6 +8,8 @@ import {
 import tailwindcss from "tailwindcss";
 import minBundle from "../shared/rollup-plugin-min-bundle";
 
+const ENTRY_NAME = "local-report-base.fat.js";
+
 module.exports = defineConfig({
     css: {
         postcss: {
@@ -32,14 +34,20 @@ module.exports = defineConfig({
         rollupOptions: {
             output: {
                 inlineDynamicImports: true,
-                entryFileNames: "local-report-base.fat.js",
+                entryFileNames: ENTRY_NAME,
                 assetFileNames: (assetInfo) => {
                     if (assetInfo.name == "style.css") {
                         return "local-report-base.css";
                     }
                     return `${assetInfo.name}`;
                 },
-                plugins: [minBundle()],
+                plugins: [
+                    // TODO - explain
+                    minBundle({
+                        entryFileName: ENTRY_NAME,
+                        emittedFileName: "local-report-base.js",
+                    }),
+                ],
             },
         },
     },
