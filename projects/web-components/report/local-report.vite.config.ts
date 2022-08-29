@@ -6,6 +6,7 @@ import {
     PLUGIN_VUE,
 } from "./dp-base-config";
 import tailwindcss from "tailwindcss";
+import minBundle from "../shared/rollup-plugin-min-bundle";
 
 module.exports = defineConfig({
     css: {
@@ -22,6 +23,7 @@ module.exports = defineConfig({
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
     },
     build: {
+        minify: "esbuild",
         outDir: "./dist/local-report/",
         lib: ES_LIB("local-report.index.ts"),
         assetsInlineLimit: 100000000,
@@ -30,13 +32,14 @@ module.exports = defineConfig({
         rollupOptions: {
             output: {
                 inlineDynamicImports: true,
-                entryFileNames: "local-report-base.js",
+                entryFileNames: "local-report-base.fat.js",
                 assetFileNames: (assetInfo) => {
                     if (assetInfo.name == "style.css") {
                         return "local-report-base.css";
                     }
                     return `${assetInfo.name}`;
                 },
+                plugins: [minBundle()],
             },
         },
     },
