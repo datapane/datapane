@@ -8,6 +8,7 @@ import subprocess
 import sys
 import typing as t
 import webbrowser
+from abc import ABC
 from base64 import b64encode
 from distutils.dir_util import copy_tree
 from enum import Enum
@@ -112,20 +113,19 @@ def include_raw(ctx, name) -> Markup:  # noqa: ANN001
     return Markup(src)
 
 
-class ReportFileWriter:
-    """Collects data needed to display a local report document, and generates the local HTML"""
+class BaseReportFileWriter(ABC):
+    """Provides shared logic for standalone and served local report writers"""
 
-    template: t.Optional[Template] = None
+    html_template: t.Optional[Template] = None
     assets: Path
     logo: str
     dev_mode: bool = False
+    html_template_name: str
+    report_id: str = uuid4().hex
 
-    def _setup_template(self):
-        """Jinja template setup for local rendering"""
-        # check we have the FE files, abort if not
+    def _setup_template(self):  # TODO - type
         self.assets = ir.files("datapane.resources.local_report")
-        if not (self.assets / "local-report-base.css").exists():
-            raise DPError("Can't find local FE bundle - report.save not available, please install release version")
+        self.assert_bundle_exists()
 
         # load the logo
         logo_img = (self.assets / "datapane-logo-dark.png").read_bytes()
@@ -134,16 +134,17 @@ class ReportFileWriter:
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
         template_env.globals["include_raw"] = include_raw
-        self.template = template_env.get_template("template.html")
+        self.html_template = template_env.get_template(self.html_template_name)
 
-    def write(
+        return template_env
+
+    def _write(
         self,
         report_doc: str,
-        path: str,
         name: str,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
-    ) -> str:
+    ):  # TODO - type
 
         if formatting is None:
             formatting = ReportFormatting()
@@ -152,7 +153,6 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        report_id = uuid4().hex
         r = self.template.render(
             report_doc=report_doc,
             report_width=formatting.width.value,
@@ -162,32 +162,50 @@ class ReportFileWriter:
             css_header=formatting.to_css(),
             is_light_prose=formatting.light_prose,
             dp_logo=self.logo,
-            report_id=report_id,
+            report_id=self.report_id,
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
         )
-        Path(path).write_text(r, encoding="utf-8")
 
-        return report_id
+        return r
+
+    def assert_bundle_exists(self):
+        pass
 
 
-class ServedReportFileWriter:
+class StandaloneReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a local report document, and generates the local HTML"""
 
-    template: t.Optional[Template] = None
-    serve_py_template: t.Optional[Template] = None
-    assets: Path
-    logo: str
     dev_mode: bool = False
+    html_template_name = "template.html"
+
+    def assert_bundle_exists(self):
+        if not (self.assets / "local-report-base.css").exists():
+            raise DPError("Can't find local FE bundle - report.save not available, please install release version")
+
+    def write(
+        self,
+        report_doc: str,
+        path: str,
+        name: str,
+        author: t.Optional[str] = None,
+        formatting: ReportFormatting = None,
+    ) -> str:
+        r = self._write(report_doc, name, author, formatting)
+        Path(path).write_text(r, encoding="utf-8")
+
+        return self.report_id
+
+
+class ServedReportFileWriter(BaseReportFileWriter):
+    """Collects data needed to display a served local report document, and generates the local HTML"""
+
+    serve_py_template: t.Optional[Template] = None
+    html_template_name = "served_template.html.jinja"
 
     def _setup_template(self):
         """Jinja template setup for local rendering"""
-        # check we have the FE files, abort if not
-        self.assets = ir.files("datapane.resources.local_report")
-        template_loader = FileSystemLoader(self.assets)
-        template_env = Environment(loader=template_loader)
-        template_env.globals["include_raw"] = include_raw
-        self.template = template_env.get_template("served_template.html.jinja")
+        template_env = super()._setup_template()
         self.serve_py_template = template_env.get_template("serve.py.jinja")
 
     def write(
@@ -200,32 +218,13 @@ class ServedReportFileWriter:
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
-        if formatting is None:
-            formatting = ReportFormatting()
-
-        # create template on demand
-        if not self.template:
-            self._setup_template()
-
-        report_id = uuid4().hex
-        r = self.template.render(
-            report_doc=report_doc,
-            report_width=formatting.width.value,
-            report_name=name,
-            report_author=author,
-            report_date=timestamp(),
-            css_header=formatting.to_css(),
-            is_light_prose=formatting.light_prose,
-            report_id=report_id,
-            author_id=c.config.session_id,
-            events=not _NO_ANALYTICS,
-        )
+        r = self._write(report_doc, name, author, formatting)
         served = self.serve_py_template.render(default_port=default_port, default_host=default_host)
 
         (Path(path) / "index.html").write_text(r, encoding="utf-8")
         (Path(path) / "__main__.py").write_text(served, encoding="utf-8")
 
-        return report_id
+        return self.report_id
 
 
 # Type aliases
@@ -239,7 +238,7 @@ class Report(DPObjectRef):
     """
 
     _tmp_report: t.Optional[Path] = None  # Temp local report
-    _local_writer = ReportFileWriter()
+    _local_writer = StandaloneReportFileWriter()
     _served_local_writer = ServedReportFileWriter()
     _preview_file = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "project"]
@@ -543,7 +542,6 @@ class Report(DPObjectRef):
         default_port: int = 8000,
         default_host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
-        serve: bool = True,
     ) -> None:
         path = Path(path)
         path.mkdir(exist_ok=True)
@@ -567,9 +565,6 @@ class Report(DPObjectRef):
         )
 
         log.debug(f"Successfully built report in {path}")
-
-        if serve:
-            self.serve(path)
 
     def serve(
         self,
