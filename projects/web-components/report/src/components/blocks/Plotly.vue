@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, onMounted } from "vue";
-import Plotly from "plotly.js-dist";
+import Plotly from "plotly.js-dist-min";
 import { v4 as uuid4 } from "uuid";
 
 const p = defineProps<{ plotJson: any; responsive: boolean }>();
