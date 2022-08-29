@@ -120,13 +120,12 @@ class BaseReportFileWriter(ABC):
     """Provides shared logic for standalone and served local report writers"""
 
     template: t.Optional[Template] = None
-    assets: Path
+    assets: Path = ir.files("datapane.resources.local_report")
     logo: str
     template_name: str
     report_id: str = uuid4().hex
 
     def _setup_template(self):
-        self.assets = ir.files("datapane.resources.local_report")
         self.assert_bundle_exists()
 
         # load the logo
@@ -191,6 +190,12 @@ class ServedReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a served local report document, and generates the local HTML"""
 
     template_name = "served_template.html.jinja"
+
+    def assert_bundle_exists(self):
+        if not (self.assets / "served_template" / "dist" / "report").exists():
+            raise DPError(
+                "Can't find served FE bundle - served reports are not available, please install release version"
+            )
 
 
 # Type aliases
@@ -518,7 +523,9 @@ class Report(DPObjectRef):
         """
         path = Path(path)
         path.mkdir(exist_ok=True)
-        copy_tree(str(ir.files("datapane.resources") / "local_report/served_template"), str(path))
+
+        self._served_local_writer.assert_bundle_exists()
+        copy_tree(str(self._served_local_writer.assets / "served_template"), str(path))
         name = path.stem[:127]
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
