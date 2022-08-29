@@ -4,8 +4,8 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--host', help="The hostname of the server, e.g. localhost")
-parser.add_argument('--port', help="The port used to run the server, e.g. 8000")
+parser.add_argument("--host", help="The hostname of the server, e.g. localhost")
+parser.add_argument("--port", help="The port used to run the server, e.g. 8000")
 
 args = parser.parse_args()
 
@@ -32,5 +32,6 @@ def main():
 
     server.server_close()
     print("Server stopped")
+
 
 main()

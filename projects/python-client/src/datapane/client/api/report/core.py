@@ -122,11 +122,10 @@ class BaseReportFileWriter(ABC):
     template: t.Optional[Template] = None
     assets: Path
     logo: str
-    dev_mode: bool = False
     template_name: str
     report_id: str = uuid4().hex
 
-    def _setup_template(self):  # TODO - type
+    def _setup_template(self):
         self.assets = ir.files("datapane.resources.local_report")
         self.assert_bundle_exists()
 
@@ -139,15 +138,14 @@ class BaseReportFileWriter(ABC):
         template_env.globals["include_raw"] = include_raw
         self.template = template_env.get_template(self.template_name)
 
-        return template_env
-
-    def _write(
+    def write(
         self,
         report_doc: str,
+        path: str,
         name: str,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
-    ):  # TODO - type
+    ) -> str:
 
         if formatting is None:
             formatting = ReportFormatting()
@@ -156,6 +154,7 @@ class BaseReportFileWriter(ABC):
         if not self.template:
             self._setup_template()
 
+        report_id: str = uuid4().hex
         r = self.template.render(
             report_doc=report_doc,
             report_width=formatting.width.value,
@@ -165,12 +164,14 @@ class BaseReportFileWriter(ABC):
             css_header=formatting.to_css(),
             is_light_prose=formatting.light_prose,
             dp_logo=self.logo,
-            report_id=self.report_id,
+            report_id=report_id,
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
         )
 
-        return r
+        Path(path).write_text(r, encoding="utf-8")
+
+        return report_id
 
     def assert_bundle_exists(self):
         pass
@@ -179,55 +180,17 @@ class BaseReportFileWriter(ABC):
 class StandaloneReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a local report document, and generates the local HTML"""
 
-    dev_mode: bool = False
     template_name = "template.html"
 
     def assert_bundle_exists(self):
         if not (self.assets / "local-report-base.css").exists():
             raise DPError("Can't find local FE bundle - report.save not available, please install release version")
 
-    def write(
-        self,
-        report_doc: str,
-        path: str,
-        name: str,
-        author: t.Optional[str] = None,
-        formatting: ReportFormatting = None,
-    ) -> str:
-        r = self._write(report_doc, name, author, formatting)
-        Path(path).write_text(r, encoding="utf-8")
-
-        return self.report_id
-
 
 class ServedReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a served local report document, and generates the local HTML"""
 
-    serve_py_template: t.Optional[Template] = None
     template_name = "served_template.html.jinja"
-
-    def _setup_template(self):
-        """Jinja template setup for local rendering"""
-        template_env = super()._setup_template()
-        self.serve_py_template = template_env.get_template("serve.py.jinja")
-
-    def write(
-        self,
-        report_doc: str,
-        path: str,
-        name: str,
-        port: int,
-        host: str,
-        author: t.Optional[str] = None,
-        formatting: ReportFormatting = None,
-    ) -> str:
-        r = self._write(report_doc, name, author, formatting)
-        served = self.serve_py_template.render(port=port, host=host)
-
-        (Path(path) / "index.html").write_text(r, encoding="utf-8")
-        (Path(path) / "__main__.py").write_text(served, encoding="utf-8")
-
-        return self.report_id
 
 
 # Type aliases
@@ -326,7 +289,7 @@ class Report(DPObjectRef):
     def _gen_report(
         self,
         embedded: bool,
-        served: bool,  # TODO - make enum instead of several bools?
+        served: bool,
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
@@ -334,6 +297,9 @@ class Report(DPObjectRef):
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
         report_doc, attachments = self._to_xml(embedded, served, title, description, author)
+
+        if embedded and served:
+            raise DPError("Report can't be both embedded and served")
 
         # post_process and validate
         processed_report_doc = local_post_transform(
@@ -542,11 +508,14 @@ class Report(DPObjectRef):
     def build(
         self,
         path: str,
-        port: int = 8000,
-        host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
-        """TODO"""
+        """Build a report which can be served by a local http server
+
+        Args:
+            path: File path to store the document
+            formatting: Sets the basic report styling
+        """
         path = Path(path)
         path.mkdir(exist_ok=True)
         copy_tree(str(ir.files("datapane.resources") / "local_report/served_template"), str(path))
@@ -561,11 +530,9 @@ class Report(DPObjectRef):
 
         self._served_local_writer.write(
             local_doc,
-            str(path),
+            str(path / "index.html"),
             name=name,
             formatting=formatting,
-            port=port,
-            host=host,
         )
 
         log.debug(f"Successfully built report in {path}")
@@ -578,18 +545,26 @@ class Report(DPObjectRef):
         formatting: t.Optional[ReportFormatting] = None,
         open: bool = False,
     ):
-        """TODO"""
+        """Serve the report from a local http server
+
+        Args:
+            path: File path to store the document; a new report will be built at the specified path if none is found
+            open: Open in your browser after creating (default: False)
+            port: The port used to serve the report (default: 8000)
+            host: The host used to serve the report (default: localhost)
+            formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
+        """
         if not osp.isdir(path):
-            self.build(path, formatting=formatting, host=host, port=port)
+            self.build(path, formatting=formatting)
 
         if open:
-            threading.Thread(target=self._open, args=(host, port), daemon=True).start()
+            threading.Thread(target=self._open_server, args=(host, port), daemon=True).start()
 
         subprocess.call([sys.executable, path, "--host", host, "--port", str(port)])
 
     @staticmethod
-    def _open(host: str, port: int) -> None:
-        """TODO"""
+    def _open_server(host: str, port: int) -> None:
+        """Polls localserver endpoint until a 200 response is returned, then opens the report URL"""
         url = f"http://{host}:{port}"
         status_code: t.Optional[int] = None
         request_limit = 100
