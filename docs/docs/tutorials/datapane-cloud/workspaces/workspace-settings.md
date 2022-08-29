@@ -21,7 +21,7 @@ At the bottom of this page, you can upgrade your Workspace plan to Cloud Pro. Se
 
     When you change the number of active members your Workspace has, it may take up to 12 hours for the changes under _Next payment_ to be reflected.
 
-![Workspace billing](../../../img/tutorials/billing.png)
+![Workspace billing](../../../img/tutorials/billing.png){.docs-image}
 
 ## Members
 
@@ -34,7 +34,7 @@ When inviting a new member to your Workspace, you'll be asked to enter their ema
     When someone accepts the invite to your Workspace, they will automatically become an active member. If you have upgraded to _Cloud Pro_, they will count towards your next payment amount.
 
 
-![Invite member modal](../../../img/tutorials/invite-modal.png)
+![Invite member modal](../../../img/tutorials/invite-modal.png){.docs-image}
 
 For more details on managing members and roles, see [Workspaces > Managing members](/managing-members)
 
@@ -43,4 +43,4 @@ For more details on managing members and roles, see [Workspaces > Managing membe
 
 Here you can change the name of your Workspace and change the visual style of your reports.
 
-![Other settings](../../../img/tutorials/workspace-other-settings.png)
+![Other settings](../../../img/tutorials/workspace-other-settings.png){.docs-image}
