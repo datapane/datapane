@@ -4,8 +4,7 @@ Datapane Reports Object
 Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
-import subprocess
-import sys
+import os
 import threading
 import typing as t
 import webbrowser
@@ -14,6 +13,7 @@ from base64 import b64encode
 from distutils.dir_util import copy_tree
 from enum import Enum
 from functools import reduce
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import path as osp
 from pathlib import Path
 from shutil import copyfile
@@ -41,6 +41,19 @@ from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
+
+
+class DPServer(SimpleHTTPRequestHandler):
+    """
+    Python HTTP server for served local reports,
+    with correct encoding header set on compressed assets
+    """
+
+    def end_headers(self):
+        if self.path.startswith("/static"):
+            self.send_header("Content-Encoding", "gzip")
+        super().end_headers()
+
 
 # only these types will be documented by default
 __all__ = ["Report", "ReportWidth"]
@@ -542,7 +555,7 @@ class Report(DPObjectRef):
             formatting=formatting,
         )
 
-        log.debug(f"Successfully built report in {path}")
+        display_msg(f"Successfully built report in {path}")
 
     def serve(
         self,
@@ -564,10 +577,22 @@ class Report(DPObjectRef):
         if not osp.isdir(path):
             self.build(path, formatting=formatting)
 
+        os.chdir(path)  # Run the server in the specified path
+        server = HTTPServer((host, port), DPServer)
+        display_msg(f"Server started at {host}:{port}")
+
         if open:
+            # Polls the server in a new thread then opens on 200;
+            # if the endpoint is simply opened then there is a race
+            # between the page loading and server becoming available.
             threading.Thread(target=self._open_server, args=(host, port), daemon=True).start()
 
-        subprocess.call([sys.executable, path, "--host", host, "--port", str(port)])
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+
+        server.server_close()
 
     @staticmethod
     def _open_server(host: str, port: int) -> None:
