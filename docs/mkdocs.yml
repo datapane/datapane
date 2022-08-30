@@ -69,6 +69,7 @@ nav:
     - Components 🗃:
       - "catalogues/components/index.ipynb"
       - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
+      - Timeline: "catalogues/components/timeline.ipynb"
     - Templates 📑:
       - "catalogues/templates/index.ipynb"
 
