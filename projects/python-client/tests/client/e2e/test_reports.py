@@ -44,15 +44,21 @@ def test_report_update_metadata():
     report.upload(name, **props)
 
     with deletable(report):
-        for (k, v) in props.items():
-            assert sorted(report.dto[k]) == sorted(v)
+
+        def check_props():
+            assert report.dto["description"] == props["description"]
+            assert report.dto["source_url"] == props["source_url"]
+            assert sorted(report.dto["tags"]) == sorted(props["tags"])
+            assert report.dto["publicly_visible"] == props.get("publicly_visible", False)
+
+        check_props()
         orig_dto = deepcopy(report.dto)
 
         # overwrite and upload again, using defaults
         report.upload(name, overwrite=True)
-        # check props haven't changed
-        for (k, v) in props.items():
-            assert sorted(report.dto[k]) == sorted(v)
+
+        # check specified props haven't changed
+        check_props()
 
         # check other elements haven't changed?
         for x in same_props:
