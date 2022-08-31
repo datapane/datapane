@@ -28,11 +28,10 @@ datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
 pytrends = "^4.8.0"
 nltk = "^3.7"
-datapane = "^0.14.0"
+datapane = {path = "../projects/python-client", develop = true}
 
 
 [tool.poetry.dev-dependencies]
-datapane = {path = "../projects/python-client", develop = true}
 
 
 [build-system]
