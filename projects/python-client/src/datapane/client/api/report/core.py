@@ -27,6 +27,7 @@ from lxml import etree
 from lxml.etree import Element, _Element
 from markupsafe import Markup  # used by Jinja
 
+from datapane import __version__ as dp_version
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import DPTmpFile, Resource
@@ -155,6 +156,7 @@ class BaseReportFileWriter(ABC):
         report_doc: str,
         path: str,
         name: str,
+        standalone: bool = False,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
@@ -179,6 +181,8 @@ class BaseReportFileWriter(ABC):
             report_id=report_id,
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
+            standalone=standalone,
+            cdn_base=f"http://localhost:8003/{dp_version}",  # TODO - change to prod url
         )
 
         Path(path).write_text(r, encoding="utf-8")
@@ -462,6 +466,7 @@ class Report(DPObjectRef):
         self,
         path: str,
         open: bool = False,
+        standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
@@ -475,6 +480,7 @@ class Report(DPObjectRef):
             local_doc,
             path,
             name=name,
+            standalone=standalone,
             formatting=formatting,
         )
 
@@ -490,6 +496,7 @@ class Report(DPObjectRef):
         self,
         path: str,
         open: bool = False,
+        standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
@@ -499,12 +506,13 @@ class Report(DPObjectRef):
         Args:
             path: File path to store the document
             open: Open in your browser after creating (default: False)
+            standalone: Inline the report source in the HTML report file rather than loading via CDN (default: False)
             name: Name of the document (optional: uses path if not provided)
             author: The report author / email / etc. (optional)
             formatting: Sets the basic report styling
         """
 
-        report_id = self._save(path, open, name, author, formatting)
+        report_id = self._save(path, open, standalone, name, author, formatting)
         capture("CLI Report Save", report_id=report_id)
 
     @capture_event("CLI Report Preview")
