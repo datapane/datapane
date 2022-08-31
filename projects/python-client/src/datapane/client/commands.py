@@ -369,17 +369,6 @@ def report():
     pass
 
 
-@report.command(name="serve")
-@click.argument("name", required=True)
-@click.argument("path", required=True)
-@click.option("--project")
-@click.option("--port", default=8000)
-@click.option("--host", default="localhost")
-@click.option("--open", is_flag=True)
-def serve(name: str, path: str, project: str, port: str, host: str, open: bool):
-    api.Report.get(name, project=project).serve(path, port, host, open)
-
-
 # NOTE - CLI Report creation disabled for now until we have a replacement for Asset
 # @report.command()
 # @click.argument("name")
