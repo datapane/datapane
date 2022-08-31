@@ -202,10 +202,10 @@ class StandaloneReportFileWriter(BaseReportFileWriter):
 class ServedReportFileWriter(BaseReportFileWriter):
     """Collects data needed to display a served local report document, and generates the local HTML"""
 
-    template_name = "served_template.html.jinja"
+    template_name = "served_template.html"
 
     def assert_bundle_exists(self):
-        if not (self.assets / "served_template" / "dist" / "report").exists():
+        if not (self.assets / "report").exists():
             raise DPError(
                 "Can't find served FE bundle - served reports are not available, please install release version"
             )
@@ -523,6 +523,8 @@ class Report(DPObjectRef):
         """
         self._save(self._preview_file.name, open=open, formatting=formatting)
 
+    ############################################################################
+    # Local served reports
     def build(
         self,
         path: str,
@@ -535,18 +537,23 @@ class Report(DPObjectRef):
             formatting: Sets the basic report styling
         """
         path = Path(path)
-        path.mkdir(exist_ok=True)
-
-        self._served_local_writer.assert_bundle_exists()
-        copy_tree(str(self._served_local_writer.assets / "served_template"), str(path))
         name = path.stem[:127]
+        (path / "dist").mkdir(parents=True, exist_ok=True)
+        (path / "static").mkdir(parents=True, exist_ok=True)
+
+        # Copy across symlinked source files
+        self._served_local_writer.assert_bundle_exists()
+        copy_tree(str(self._served_local_writer.assets / "report"), str(path / "dist"))
+        copyfile(
+            str(self._served_local_writer.assets / "vue.esm-browser.prod.js"), str(path / "vue.esm-browser.prod.js")
+        )
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
         for a in attachments:
             # TODO - compress in-memory to save a disk write?
             with compress_file(a) as a_gz:
-                copyfile(str(a_gz), osp.join(path, "static", Path(a).name))
+                copyfile(str(a_gz), str(path / "static" / Path(a).name))
 
         self._served_local_writer.write(
             local_doc,
