@@ -27,6 +27,7 @@ nav:
 #      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
     - 🏢 Datapane Enterprise:
       - tutorials/datapane-enterprise/index.md
+      - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
       - Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
       - Files: "tutorials/datapane-enterprise/files.md"
       - Managing members: "tutorials/datapane-enterprise/managing-members.md"

@@ -10,12 +10,12 @@ Here you can manage the subscription of your Workspace plan. You will see the nu
 
 The Cloud Starter plan limits you to:
 
-- 1 Project (which will be your default Project)
-- Up to 5 private reports
+-   1 Project (which will be your default Project)
+-   Up to 5 private reports
 
 Only reports not set to be publicly visible in _Report settings_ will count towards this limit of 5 reports.
 
-At the bottom of this page, you can upgrade your Workspace plan to Cloud Pro. Selecting this button will take you to [Stripe](https://stripe.com){:target="_blank"} to manage your payment and billing.
+At the bottom of this page, you can upgrade your Workspace plan to Cloud Pro. Selecting this button will take you to [Stripe](https://stripe.com){:target="\_blank"} to manage your payment and billing.
 
 !!! info
 
@@ -33,11 +33,9 @@ When inviting a new member to your Workspace, you'll be asked to enter their ema
 
     When someone accepts the invite to your Workspace, they will automatically become an active member. If you have upgraded to _Cloud Pro_, they will count towards your next payment amount.
 
-
 ![Invite member modal](../../../img/tutorials/invite-modal.png){.docs-image}
 
 For more details on managing members and roles, see [Workspaces > Managing members](/managing-members)
-
 
 ## Settings
 
