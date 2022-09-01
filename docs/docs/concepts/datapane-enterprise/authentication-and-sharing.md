@@ -2,7 +2,7 @@
 
 Datapane allows secure, authenticated sharing of reports, scripts, blobs, and secrets. Each user on your Datapane instance (e.g. [https://acme.datapane.net](https://acme.datapane.net)) has a private password-protected account.
 
-For more information on getting started, please see our tutorial sections on [Datapane CLI installation](/tutorials/basics/install-datapane/) and [authenticating with your Datapane server](/tutorials/datapane-cloud/authenticate-datapane/#datapane-teams).
+For more information on getting started, please see our tutorial sections on [Datapane CLI installation](/tutorials/basics/install-datapane/) and [authenticating with your Datapane server](/tutorials/datapane-enterprise/authenticate-datapane/).
 
 !!! info
 
