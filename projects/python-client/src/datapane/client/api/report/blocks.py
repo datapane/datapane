@@ -614,36 +614,31 @@ class AssetBlock(DataBlock):
         """per-file-type attributes, override if needed"""
         return self.file_attribs or dict()
 
+    def _b64_encode_src(self, content_type: str):
+        """
+        load the file and embed into a data-uri
+        NOTE - currently we read entire file into memory first prior to b64 encoding,
+        to consider using base64io-python to stream and encode in 1-pass
+        """
+        content = b64encode(self.file.read_bytes()).decode("ascii")
+        return f"data:{content_type};base64,{content}"
+
     def _to_xml(self, s: BuilderState) -> BuilderState:
         _E = getattr(E, self._tag)
         e: etree._Element
 
-        if s.embedded:
-            # load the file and embed into a data-uri
-            # NOTE - currently we read entire file into memory first prior to b64 encoding,
-            #  to consider using base64io-python to stream and encode in 1-pass
-            content = b64encode(self.file.read_bytes()).decode("ascii")
+        if s.embedded or s.served:
             content_type = guess_type(self.file)
             file_size = str(self.file.stat().st_size)
+            src = self._b64_encode_src(content_type) if s.embedded else f"/data/{self.file.name}"
+
             e = _E(
                 type=content_type,
                 size=file_size,
                 uploaded_filename=self.file.name,
                 **self._attributes,
                 **self.get_file_attribs(),
-                src=f"data:{content_type};base64,{content}",
-            )
-        elif s.served:
-            # TODO - don't duplicate above
-            content_type = guess_type(self.file)
-            file_size = str(self.file.stat().st_size)
-            e = _E(
-                type=content_type,
-                size=file_size,
-                uploaded_filename=self.file.name,
-                **self._attributes,
-                **self.get_file_attribs(),
-                src=f"/static/{self.file.name}",
+                src=src,
             )
         else:
             e = _E(

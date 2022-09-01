@@ -8,7 +8,6 @@ import os
 import threading
 import typing as t
 import webbrowser
-from abc import ABC
 from base64 import b64encode
 from distutils.dir_util import copy_tree
 from enum import Enum
@@ -51,7 +50,7 @@ class DPServer(SimpleHTTPRequestHandler):
     """
 
     def end_headers(self):
-        if self.path.startswith("/static"):
+        if self.path.startswith("/data"):
             self.send_header("Content-Encoding", "gzip")
         super().end_headers()
 
@@ -130,14 +129,20 @@ def include_raw(ctx, name) -> Markup:  # noqa: ANN001
     return Markup(src)
 
 
-class BaseReportFileWriter(ABC):
-    """Provides shared logic for standalone and served local report writers"""
+class ReportFileWriter:
+    """Provides shared logic for saved and served local report writers"""
 
     template: t.Optional[Template] = None
     assets: Path = ir.files("datapane.resources.local_report")
     logo: str
     template_name: str
     report_id: str = uuid4().hex
+    served: bool
+    template_name: str
+
+    def __init__(self, served: bool, template_name: str):
+        self.served = served
+        self.template_name = template_name
 
     def _setup_template(self):
         self.assert_bundle_exists()
@@ -190,28 +195,11 @@ class BaseReportFileWriter(ABC):
         return report_id
 
     def assert_bundle_exists(self):
-        pass
-
-
-class StandaloneReportFileWriter(BaseReportFileWriter):
-    """Collects data needed to display a local report document, and generates the local HTML"""
-
-    template_name = "template.html"
-
-    def assert_bundle_exists(self):
-        if not (self.assets / "local-report-base.css").exists():
-            raise DPError("Can't find local FE bundle - report.save not available, please install release version")
-
-
-class ServedReportFileWriter(BaseReportFileWriter):
-    """Collects data needed to display a served local report document, and generates the local HTML"""
-
-    template_name = "served_template.html"
-
-    def assert_bundle_exists(self):
-        if not (self.assets / "report").exists():
+        resource_to_check = "report" if self.served else "local-report-base.css"
+        if not (self.assets / resource_to_check).exists():
+            report_method = "save" if self.served else "serve"
             raise DPError(
-                "Can't find served FE bundle - served reports are not available, please install release version"
+                f"Can't find local FE bundle - report.{report_method} not available, please install release version"
             )
 
 
@@ -226,8 +214,8 @@ class Report(DPObjectRef):
     """
 
     _tmp_report: t.Optional[Path] = None  # Temp local report
-    _local_writer = StandaloneReportFileWriter()
-    _served_local_writer = ServedReportFileWriter()
+    _local_writer = ReportFileWriter(served=False, template_name="template.html")
+    _served_local_writer = ReportFileWriter(served=True, template_name="served_template.html")
     _preview_file = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "project"]
 
@@ -546,12 +534,12 @@ class Report(DPObjectRef):
         """
         path = Path(path)
         name = path.stem[:127]
-        (path / "dist").mkdir(parents=True, exist_ok=True)
+        (path / "data").mkdir(parents=True, exist_ok=True)
         (path / "static").mkdir(parents=True, exist_ok=True)
 
         # Copy across symlinked source files
         self._served_local_writer.assert_bundle_exists()
-        copy_tree(str(self._served_local_writer.assets / "report"), str(path / "dist"))
+        copy_tree(str(self._served_local_writer.assets / "report"), str(path / "static"))
         copyfile(
             str(self._served_local_writer.assets / "vue.esm-browser.prod.js"), str(path / "vue.esm-browser.prod.js")
         )
@@ -561,7 +549,7 @@ class Report(DPObjectRef):
         for a in attachments:
             # TODO - compress in-memory to save a disk write?
             with compress_file(a) as a_gz:
-                copyfile(str(a_gz), str(path / "static" / Path(a).name))
+                copyfile(str(a_gz), str(path / "data" / Path(a).name))
 
         self._served_local_writer.write(
             local_doc,
