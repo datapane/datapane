@@ -1,6 +1,6 @@
 # Deployment and Hosting
 
-Datapane Teams is a client-server architecture consisting of a local, open source Python library and a hosted server component.&#x20;
+Datapane Enterprise is a client-server architecture consisting of a local, open source Python library and a hosted server component.&#x20;
 
 For Datapane’s server component, we provide the following deployment options:
 

@@ -4,7 +4,7 @@ description: You can store common files and datasets on Datapane to use in your 
 
 # Files
 
-[:octicons-organization-16: Teams feature](){.org}
+[:octicons-organization-16: Enterprise feature](){.org}
 
 !!! info
 

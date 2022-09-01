@@ -9,27 +9,35 @@ nav:
   - Quickstart: "quickstart.ipynb"
 
   - Tutorials:
-    - Getting started 🌱:
+    - 🌱 Getting started:
       - Install Datapane: "tutorials/basics/install-datapane.md"
       - Create a report: "tutorials/basics/create-a-report.ipynb"
-    - Blocks types 🧱:
+    - 🧱 Blocks types:
       - tutorials/blocks/index.ipynb
-    - Datapane Cloud ☁️:
+    - ☁️ Datapane Cloud:
       - tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
       - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
-      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
-      - Report notifications: "tutorials/datapane-cloud/report-notifications.ipynb"
-      - Files: "tutorials/datapane-cloud/files.md"
-      - Managing members: "tutorials/datapane-cloud/managing-members.md"
-    - Styling 🎨:
+      - Workspaces:
+        - "tutorials/datapane-cloud/workspaces/index.md"
+        - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
+        - Managing members: "tutorials/datapane-cloud/workspaces/managing-members.md"
+      - Projects: "tutorials/datapane-cloud/projects.md"
+#      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
+    - 🏢 Datapane Enterprise:
+      - tutorials/datapane-enterprise/index.md
+      - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
+      - Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
+      - Files: "tutorials/datapane-enterprise/files.md"
+      - Managing members: "tutorials/datapane-enterprise/managing-members.md"
+    - 🎨 Styling:
       - tutorials/styling/index.ipynb
-      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
+#      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
       - Global styling: "tutorials/styling/global-styling.md"
-    - Automation 🤖:
+    - 🤖 Automation:
       - tutorials/automation/index.md
-    - Apps 📦:
+    - 📦 Apps:
       - tutorials/apps/index.ipynb
       - Parameters and forms:
         - "tutorials/apps/parameters-and-forms/index.ipynb"
@@ -42,7 +50,7 @@ nav:
 
   - Catalogues:
     - "catalogues/index.ipynb"
-    - Blocks 🧱:
+    - 🧱 Blocks:
       - "catalogues/blocks/index.ipynb"
       - Tables and data:
         - Big Number: "catalogues/blocks/bignumber.ipynb"
@@ -66,12 +74,12 @@ nav:
         - Attachments: "catalogues/blocks/attachment.ipynb"
         - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
-    - Components 🗃:
+    - 🗃 Components:
       - "catalogues/components/index.ipynb"
       - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
-      - Timeline: "catalogues/components/timeline.ipynb"
-    - Templates 📑:
+    - 📑 Templates:
       - "catalogues/templates/index.ipynb"
+      - Timeline: "catalogues/components/timeline.ipynb"
 
   - Guides:
     - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
