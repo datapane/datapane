@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datapane"
-version = "0.14.0"
+version = "0.15.1"
 description = "Datapane client library and CLI tool"
 authors = ["Datapane Team <dev@datapane.com>"]
 license = "Apache-2.0"
@@ -77,7 +77,7 @@ nbconvert = ">=5.6.1,<7.0.0"
 packaging = ">=20.0.0,<22.0.0"
 posthog = "^1.4.0"
 pydantic = "^1.6.0"
-PyYAML = "^6.0.0"
+PyYAML = ">=5.4.0,<7.0.0"
 requests = "^2.19.0"
 requests-toolbelt = "^0.9.1"
 stringcase = "^1.2.0"
@@ -112,7 +112,7 @@ dp-runner = "datapane.runner.__main__:main"
 # The same config should be duplicated in other pyproject.toml files so that
 # black always finds it.
 line-length = 120
-target-version = ['py38']
+target-version = ['py37']
 include = '\.pyi?$'
 
 # FOR PEP-517/518
