@@ -42,7 +42,10 @@ module.exports = defineConfig({
                     return `${assetInfo.name}`;
                 },
                 plugins: [
-                    // TODO - explain
+                    // Minify via terser at the final compilation stage,
+                    // as minifation isn't supported by rollup on ES modules and converting
+                    // to UMD modules makes the build time much slower.
+                    // However, we can do it here as local-report-base is a single outputted file
                     minBundle({
                         entryFileName: ENTRY_NAME,
                         emittedFileName: "local-report-base.js",

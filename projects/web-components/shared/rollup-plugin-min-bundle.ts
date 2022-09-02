@@ -1,5 +1,7 @@
 /**
- * TODO
+ * Minify generated bundle during last step of JS compilation
+ * NOTE: This should only be used on single-file outputs (e.g. local-report.base),
+ * as minifying at the end stage could cause some issues with codesplitting
  */
 
 import { minify } from "terser";

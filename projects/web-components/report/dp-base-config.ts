@@ -1,5 +1,5 @@
 /**
- * TODO
+ * Vite helpers for commonly duplicated config options
  */
 
 import vue from "@vitejs/plugin-vue";
