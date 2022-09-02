@@ -42,6 +42,11 @@ from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
+# TODO - where to put these?
+VUE_ESM_FILE = "vue.esm-browser.prod.js"
+SERVED_REPORT_BUNDLE_DIR = "static"
+SERVED_REPORT_ASSETS_DIR = "data"
+
 
 class DPServer(SimpleHTTPRequestHandler):
     """
@@ -532,24 +537,30 @@ class Report(DPObjectRef):
             path: File path to store the document
             formatting: Sets the basic report styling
         """
+
         path = Path(path)
         name = path.stem[:127]
-        (path / "data").mkdir(parents=True, exist_ok=True)
-        (path / "static").mkdir(parents=True, exist_ok=True)
+        bundle_path = path / SERVED_REPORT_BUNDLE_DIR
+        assets_path = path / SERVED_REPORT_ASSETS_DIR
 
-        # Copy across symlinked source files
+        bundle_path.mkdir(parents=True, exist_ok=True)
+        assets_path.mkdir(parents=True, exist_ok=True)
+
         self._served_local_writer.assert_bundle_exists()
-        copy_tree(str(self._served_local_writer.assets / "report"), str(path / "static"))
-        copyfile(
-            str(self._served_local_writer.assets / "vue.esm-browser.prod.js"), str(path / "vue.esm-browser.prod.js")
-        )
+
+        # Copy across symlinked report bundle
+        copy_tree(str(self._served_local_writer.assets / "report"), str(bundle_path))
+
+        # Copy across symlinked Vue module
+        copyfile(str(self._served_local_writer.assets / VUE_ESM_FILE), str(path / VUE_ESM_FILE))
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
         for a in attachments:
             # TODO - compress in-memory to save a disk write?
+            # Copy across user report assets
             with compress_file(a) as a_gz:
-                copyfile(str(a_gz), str(path / "data" / Path(a).name))
+                copyfile(str(a_gz), str(assets_path / Path(a).name))
 
         self._served_local_writer.write(
             local_doc,
