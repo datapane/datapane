@@ -55,7 +55,7 @@ class DPServer(SimpleHTTPRequestHandler):
     """
 
     def end_headers(self):
-        if self.path.startswith("/data"):
+        if self.path.startswith(f"/{SERVED_REPORT_ASSETS_DIR}"):
             self.send_header("Content-Encoding", "gzip")
         super().end_headers()
 
