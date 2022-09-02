@@ -18,7 +18,6 @@ tasks:
     desc: Link the local-report artifacts into the python-client codebase (for Report.save)
     cmds:
       - |
-        ln -svf '../../../../../web-components/dist/local-report/local-report-base.js' "projects/python-client/src/datapane/resources/local_report/local-report-base.js"
-        ln -svf '../../../../../web-components/dist/local-report/local-report-base.css' "projects/python-client/src/datapane/resources/local_report/local-report-base.css"
+        ln -svf '../../../../../web-components/dist/local-report/local-report-base.{css,js}' "projects/python-client/src/datapane/resources/local_report/"
         ln -svf '../../../../../web-components/dist/report' "projects/python-client/src/datapane/resources/local_report/report"
         ln -svf '../../../../../web-components/dist/vue.esm-browser.prod.js' "projects/python-client/src/datapane/resources/local_report/vue.esm-browser.prod.js"
