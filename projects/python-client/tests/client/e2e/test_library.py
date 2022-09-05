@@ -1,6 +1,6 @@
+import os
 import subprocess
 import sys
-import os
 
 
 def test_arbitrary_arguments_from_cli():
