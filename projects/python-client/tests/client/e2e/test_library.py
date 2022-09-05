@@ -13,7 +13,7 @@ def test_arbitrary_arguments_from_cli():
         "pytest",
         test_file_path,
         "-k",
-        "test_pytest_from_cli",
+        "test_datapane_init_from_cli",
         "-p",
         "no:warnings",
     ]
@@ -32,7 +32,7 @@ def test_no_arguments_from_cli():
         "pytest",
         test_file_path,
         "-k",
-        "test_pytest_from_cli",
+        "test_datapane_init_from_cli",
     ]
 
     p = subprocess.run(test_command)
@@ -40,7 +40,7 @@ def test_no_arguments_from_cli():
     assert p.returncode == 0
 
 
-def test_pytest_from_cli():
+def test_datapane_init_from_cli():
     """This test is run by keyword expression from other CLI tests.
     It explicitly imports datapane to ensure __init__ is always executed."""
     import datapane as dp
