@@ -43,6 +43,6 @@ def test_no_arguments_from_cli():
 def test_datapane_init_from_cli():
     """This test is run by keyword expression from other CLI tests.
     It explicitly imports datapane to ensure __init__ is always executed."""
-    import datapane as dp
+    import datapane as dp   # noqa: F401
 
     assert True
