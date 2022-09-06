@@ -537,10 +537,10 @@ class Report(DPObjectRef):
             formatting: Sets the basic report styling
         """
 
-        path: Path = Path(path)
-        name = path.stem[:127]
-        bundle_path = path / SERVED_REPORT_BUNDLE_DIR
-        assets_path = path / SERVED_REPORT_ASSETS_DIR
+        pl_path: Path = Path(path)
+        name = pl_path.stem[:127]
+        bundle_path = pl_path / SERVED_REPORT_BUNDLE_DIR
+        assets_path = pl_path / SERVED_REPORT_ASSETS_DIR
 
         bundle_path.mkdir(parents=True, exist_ok=True)
         assets_path.mkdir(parents=True, exist_ok=True)
@@ -551,7 +551,7 @@ class Report(DPObjectRef):
         copy_tree(str(self._served_local_writer.assets / "report"), str(bundle_path))
 
         # Copy across symlinked Vue module
-        copyfile(str(self._served_local_writer.assets / VUE_ESM_FILE), str(path / VUE_ESM_FILE))
+        copyfile(str(self._served_local_writer.assets / VUE_ESM_FILE), str(pl_path / VUE_ESM_FILE))
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
@@ -563,7 +563,7 @@ class Report(DPObjectRef):
 
         self._served_local_writer.write(
             local_doc,
-            str(path / "index.html"),
+            str(pl_path / "index.html"),
             name=name,
             formatting=formatting,
         )
