@@ -6,6 +6,7 @@ import {
     pluginVue,
 } from "./dp-base-config";
 import tailwindcss from "tailwindcss";
+import vueESM from "../shared/rollup-plugin-vue-esm";
 
 module.exports = defineConfig(({ mode }) => ({
     css: {
@@ -37,6 +38,7 @@ module.exports = defineConfig(({ mode }) => ({
                 },
             },
             external: ["vue", "katex"],
+            plugins: [vueESM()],
         },
     },
 }));
