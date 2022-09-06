@@ -110,23 +110,6 @@ def obj_to_str(df: pd.DataFrame):
     df[df_cat.columns] = df_cat.apply(to_str_cat_vals)
 
 
-def bipartite_to_bool(df: pd.DataFrame):
-    """Converts biperatite numeric {0, 1} columns to bool"""
-    # Get names of numeric columns with only 2 unique values.
-    df_num = df.select_dtypes("integer", exclude=["timedelta"])
-    bipartite_columns = df_num.columns[df_num.dropna().nunique() == 2]
-
-    for column in bipartite_columns:
-        series = df[column]
-
-        # Only apply the type change to {0, 1} columns
-        val_range = series.min(), series.max()
-        val_min, val_max = val_range[0], val_range[1]
-
-        if val_min == 0 and val_max == 1:
-            df[column] = df[column].astype(bool)
-
-
 def str_to_arrow_str(df: pd.DataFrame):
     """Use the memory-efficient pyarrow string dtype (pandas >= 1.3 only)"""
     # convert objects to str / NA
@@ -174,7 +157,6 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     # df[td_col.columns] = td_col
     obj_to_str(df)
     parse_categories(df)
-    bipartite_to_bool(df)
 
     # convert all strings to use the arrow dtype
     str_to_arrow_str(df)
