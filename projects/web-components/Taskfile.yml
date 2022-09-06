@@ -25,7 +25,7 @@ tasks:
   build:local-report:
     desc: "Build local-report artifacts for inclusion in other projects"
     cmds:
-      - npm run build:local-report && npm run build:report
+      - npm run build:local-report
   build:report:
     desc: "Build report artifacts for inclusion in served local reports"
     cmds:
