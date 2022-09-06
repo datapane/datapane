@@ -138,12 +138,11 @@ class ReportFileWriter:
     """Provides shared logic for saved and served local report writers"""
 
     template: t.Optional[Template] = None
-    assets: Path = ir.files("datapane.resources.local_report")
+    assets: ir.abc.Traversable = ir.files("datapane.resources.local_report")
     logo: str
     template_name: str
     report_id: str = uuid4().hex
     served: bool
-    template_name: str
 
     def __init__(self, served: bool, template_name: str):
         self.served = served
@@ -318,7 +317,7 @@ class Report(DPObjectRef):
 
         # post_process and validate
         processed_report_doc = local_post_transform(
-            report_doc, embedded="true()" if embedded else "false()", served="true()" if embedded else "false()"
+            report_doc, embedded="true()" if embedded else "false()", served="true()" if served else "false()"
         )
         if validate:
             validate_report_doc(xml_doc=processed_report_doc)
@@ -538,7 +537,7 @@ class Report(DPObjectRef):
             formatting: Sets the basic report styling
         """
 
-        path = Path(path)
+        path: Path = Path(path)
         name = path.stem[:127]
         bundle_path = path / SERVED_REPORT_BUNDLE_DIR
         assets_path = path / SERVED_REPORT_ASSETS_DIR
