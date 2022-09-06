@@ -20,7 +20,7 @@
         {% include "local-report-base.css" %}
       </style>
     {% else %}
-      <link rel="stylesheet" href="{{ cdn_base }}/dist/style.css">
+      <link rel="stylesheet" href="{{ cdn_base }}/report/style.css">
     {% endif %}
     <script>
       const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
@@ -33,7 +33,7 @@
       </script>
     {% else %}
       <script type="module">
-        import { mountReport } from "{{ cdn_base }}/dist/index.es.js";
+        import { mountReport } from "{{ cdn_base }}/report/index.es.js";
         mountReport(window.reportProps);
       </script>
     {% endif %}

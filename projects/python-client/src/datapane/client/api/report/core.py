@@ -192,7 +192,7 @@ class ReportFileWriter:
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
             standalone=standalone,
-            cdn_base=f"http://localhost:8003/{dp_version}",  # TODO - change to prod url
+            cdn_base=f"https://datapane-cdn.com/v{dp_version}",
         )
 
         Path(path).write_text(r, encoding="utf-8")

@@ -37,7 +37,8 @@ export class DPClipboard {
     }
 
     private static onSuccess = () => {
-        // TODO - add explanation
+        // Only toggle the copy notification if `window.Alpine` is available,
+        // i.e. we're on datapane.com rather than a local report
         window.Alpine && window.Alpine.store("copy").toggle();
     };
 
