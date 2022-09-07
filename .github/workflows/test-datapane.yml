@@ -58,7 +58,7 @@ jobs:
       - name: Run Tests
         working-directory: ./projects/python-client/
         run: |
-          pip install "poetry>=1.1.0,<1.2.0"
+          pip install 'poetry~=1.2.0'
           poetry config virtualenvs.in-project true
           # rmdir --ignore-fail-on-non-empty -v .venv
           poetry install -E plotting -E cloud
