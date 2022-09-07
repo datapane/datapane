@@ -5,7 +5,7 @@ export default defineConfig({
     viewportHeight: 1050,
     defaultCommandTimeout: 8000,
     includeShadowDom: true,
-    video: true,
+    video: false,
     env: {
         testEmail: "test@datapane.com",
         testPassword: "",
