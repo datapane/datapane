@@ -109,6 +109,7 @@ __all__ = [
     "_setup_dp_logging",
     "enable_logging",
     "log",
+    "load_params_from_command_line",
 ]
 
 
@@ -126,7 +127,10 @@ else:
 # only init fully in library-mode, as framework and app init explicitly
 if get_dp_mode() == DPMode.LIBRARY:
     init()
-    # parse any commandline params
+
+
+def load_params_from_command_line() -> None:
+    """Call this from your own scripts to read any CLI parameters into the global Params object"""
     from .client.utils import parse_command_line
 
     config = parse_command_line()
