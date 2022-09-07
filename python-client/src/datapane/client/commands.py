@@ -320,7 +320,7 @@ def app_list():
 
 
 @app.command()
-@click.option("--dp-parameter", multiple=True)
+@click.option("--parameter", "-p", multiple=True)
 @click.option("--cache/--disable-cache", default=True)
 @click.option("--wait/--no-wait", default=True)
 @click.option("--project")
@@ -328,14 +328,14 @@ def app_list():
 @click.argument("name")
 def run(
     name: str,
-    dp_parameter: Tuple[str],
+    parameter: Tuple[str],
     cache: bool,
     wait: bool,
     project: str,
     show_output: bool,
 ):
     """Run a report"""
-    params = process_cmd_param_vals(dp_parameter)
+    params = process_cmd_param_vals(parameter)
     log.info(f"Running app with parameters {params}")
     app = api.App.get(name, project=project)
     with api_error_handler("Error running app"):
@@ -492,20 +492,20 @@ def schedule():
 
 
 @schedule.command()  # type: ignore[no-redef]
-@click.option("--dp-parameter", multiple=True)
+@click.option("--parameter", "-p", multiple=True)
 @click.argument("name", required=True)
 @click.argument("cron", required=True)
 @click.option("--project")
-def create(name: str, cron: str, dp_parameter: Tuple[str], project: str):
+def create(name: str, cron: str, parameter: Tuple[str], project: str):
     """
     Create a schedule
 
     NAME: Name of the App to run
     CRON: crontab representing the schedule interval
-    DP_PARAMETERS: key/value list of parameters to use when running the app on schedule
+    PARAMETERS: key/value list of parameters to use when running the app on schedule
     [Project]: Project in which the app is present
     """
-    params = process_cmd_param_vals(dp_parameter)
+    params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
     app_obj = api.App.get(name, project=project)
     schedule_obj = api.Schedule.create(app_obj, cron, params)
@@ -513,20 +513,20 @@ def create(name: str, cron: str, dp_parameter: Tuple[str], project: str):
 
 
 @schedule.command()
-@click.option("--dp-parameter", multiple=True)
+@click.option("--parameter", "-p", multiple=True)
 @click.argument("id", required=True)
 @click.argument("cron", required=False)
-def update(id: str, cron: str, dp_parameter: Tuple[str]):
+def update(id: str, cron: str, parameter: Tuple[str]):
     """
     Add a schedule
 
     ID: ID/URL of the Schedule
     CRON: crontab representing the schedule interval
-    DP_PARAMETERS: key/value list of parameters to use when running the app on schedule
+    PARAMETERS: key/value list of parameters to use when running the app on schedule
     """
 
-    params = process_cmd_param_vals(dp_parameter)
-    assert cron or dp_parameter, "Must update either cron or parameters"
+    params = process_cmd_param_vals(parameter)
+    assert cron or parameter, "Must update either cron or parameters"
 
     log.info(f"Updating schedule with parameters {params}")
 
