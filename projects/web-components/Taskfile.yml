@@ -26,6 +26,10 @@ tasks:
     desc: "Build local-report artifacts for inclusion in other projects"
     cmds:
       - npm run build:local-report
+  build:storybook:
+    desc: "Build Storybook"
+    cmds:
+      - npm run build:storybook
 
   deploy:
     desc: "Deploy the package"
