@@ -102,6 +102,9 @@ describe("Running an app", () => {
         cy.get("[data-cy=button-run]").click();
 
         cy.wait("@getRuns", { requestTimeout: 20000 });
-        cy.get("#inline-report").should("contain", "__REPORT_RENDERED__");
+        cy.get("#inline-report", { timeout: 20000 }).should(
+            "contain",
+            "__REPORT_RENDERED__"
+        );
     });
 });
