@@ -40,14 +40,14 @@ def test_no_pytest_arguments_from_cli():
     assert p.returncode == 0
 
 
-def test_correctly_formatted_dp_parameter_arguments_from_cli():
+def test_correctly_formatted_parameter_arguments_from_cli():
     """Running a Python program with correctly formatted arguments for
-    --dp-parameter to make sure Datapane doesn't fail when imported."""
+    --parameter to make sure Datapane doesn't fail when imported."""
     test_command = [
         sys.executable,
         "-c",
         "import datapane",
-        "--dp-parameter",
+        "--parameter",
         "my_param=arg",
     ]
 
@@ -56,14 +56,14 @@ def test_correctly_formatted_dp_parameter_arguments_from_cli():
     assert p.returncode == 0
 
 
-def test_incorrectly_formatted_dp_parameter_arguments_from_cli():
+def test_incorrectly_formatted_parameter_arguments_from_cli():
     """Running a Python program with incorrectly formatted arguments for
-    --dp-parameter to make sure Datapane fails when imported."""
+    --parameter to make sure Datapane fails when imported."""
     test_command = [
         sys.executable,
         "-c",
-        "import datapane",
-        "--dp-parameter",
+        "import datapane; datapane.load_params_from_command_line()",
+        "--parameter",
         "my_param:arg",
     ]
 
@@ -86,6 +86,25 @@ def test_arbitrary_arguments_from_cli():
 
     p = subprocess.run(test_command)
 
+    assert p.returncode == 0
+
+
+def test_parameter_parsing_for_library():
+    """Running a Python program which uses load_params_from_command_line should work"""
+    test_command = [
+        sys.executable,
+        "-c",
+        "import datapane; datapane.load_params_from_command_line(); print(datapane.Params)",
+        "--parameter",
+        "my_param=123",
+    ]
+
+    p = subprocess.run(test_command, capture_output=True)
+
+    # Should have loaded the parameter:
+    assert p.stdout.strip() == b"{'my_param': 123}"
+
+    # And finished without error
     assert p.returncode == 0
 
 
