@@ -37,7 +37,7 @@ jobs:
       - name: Build Docs
         working-directory: ./projects/python-client/
         run: |
-          pip install "poetry>=1.1.0,<1.2.0"
+          pip install 'poetry~=1.2.0'
           poetry config virtualenvs.in-project true
           poetry install
           # --config 'lunr_search={"fuzziness": 1, "index_docstrings": True}'
