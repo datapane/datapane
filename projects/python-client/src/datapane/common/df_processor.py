@@ -111,7 +111,8 @@ def obj_to_str(df: pd.DataFrame):
 
 
 def bipartite_to_bool(df: pd.DataFrame):
-    """Converts biperatite numeric {0, 1} columns to bool"""
+    # This was removed from our processing steps as some users required the numerical representation of binary columns.
+    """Converts biperatite numeric {0, 1} columns to bool."""
     # Get names of numeric columns with only 2 unique values.
     df_num = df.select_dtypes("integer", exclude=["timedelta"])
     bipartite_columns = df_num.columns[df_num.dropna().nunique() == 2]
@@ -174,7 +175,6 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     # df[td_col.columns] = td_col
     obj_to_str(df)
     parse_categories(df)
-    bipartite_to_bool(df)
 
     # convert all strings to use the arrow dtype
     str_to_arrow_str(df)
