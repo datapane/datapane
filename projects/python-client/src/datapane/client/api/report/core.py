@@ -20,7 +20,6 @@ from time import sleep
 from uuid import uuid4
 
 import importlib_resources as ir
-import requests
 from jinja2 import Environment, FileSystemLoader, Template, contextfunction
 from lxml import etree
 from lxml.etree import Element, _Element
@@ -576,7 +575,7 @@ class Report(DPObjectRef):
         port: int = 8000,
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
-        open: bool = False,
+        open: bool = True,
     ):
         """Serve the report from a local http server
 
@@ -595,8 +594,7 @@ class Report(DPObjectRef):
         display_msg(f"Server started at {host}:{port}")
 
         if open:
-            # Polls the server in a new thread then opens on 200;
-            # if the endpoint is simply opened then there is a race
+            # If the endpoint is simply opened then there is a race
             # between the page loading and server becoming available.
             threading.Thread(target=self._open_server, args=(host, port), daemon=True).start()
 
@@ -609,20 +607,6 @@ class Report(DPObjectRef):
 
     @staticmethod
     def _open_server(host: str, port: int) -> None:
-        """Polls localserver endpoint until a 200 response is returned, then opens the report URL"""
-        url = f"http://{host}:{port}"
-        status_code: t.Optional[int] = None
-        request_limit = 100
-        attempts = 0
-
-        while status_code != 200:
-            try:
-                r = requests.get(url)
-                status_code = r.status_code
-            except requests.exceptions.ConnectionError:
-                attempts += 1
-            if attempts > request_limit:
-                raise TimeoutError(f"Reached maximum {request_limit} retries")
-            sleep(0.1)
-
-        webbrowser.open_new_tab(url)
+        """Opens localserver endpoint, should be called in its own thread"""
+        sleep(1)  # yield to main thread in order to allow start server process to run
+        webbrowser.open_new_tab(f"http://{host}:{port}")

@@ -6,8 +6,6 @@
               method='xml' cdata-section-elements="Text HTML Code Formula Embed Description"/>
   <xsl:strip-space elements="*"/>
   <xsl:param name="embedded"/>
-  <!-- TODO - what is this, is it necessary? -->
-  <xsl:param name="served"/>
 
   <!--  Match and copy across everything, i.e. id -->
   <xsl:template match="@* | node()">
