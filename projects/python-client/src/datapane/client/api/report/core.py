@@ -523,7 +523,7 @@ class Report(DPObjectRef):
 
     ############################################################################
     # Local served reports
-    def build(self, path: str, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False) -> None:
+    def build(self, path: NPath, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False) -> None:
         """Build a report which can be served by a local http server
 
         Args:
