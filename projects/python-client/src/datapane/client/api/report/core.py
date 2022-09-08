@@ -622,14 +622,13 @@ class Report(DPObjectRef):
         """Remove the previous report build directory if it exists and is a sub-path of the cwd"""
         is_cwd_subpath = str(path.resolve()).startswith(os.getcwd())
         is_rm_safe = is_cwd_subpath and not path.is_absolute()
-        path_is_dir = path.is_dir()
 
-        if path_is_dir and is_rm_safe:
-            rmtree(path)
-        elif path_is_dir and not is_rm_safe:
+        if path.is_dir() and not is_rm_safe:
             raise DPError(
                 "Can't rebuild served report unless `path` is a relative sub-path of the current working directory"
             )
+
+        rmtree(path)
 
     @staticmethod
     def _open_server(host: str, port: int) -> None:
