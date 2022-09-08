@@ -16,6 +16,7 @@ from os import path as osp
 from pathlib import Path
 from shutil import copy, copytree
 from time import sleep
+from typing import cast
 from uuid import uuid4
 
 import importlib_resources as ir
@@ -136,7 +137,9 @@ class ReportFileWriter:
     """Provides shared logic for saved and served local report writers"""
 
     template: t.Optional[Template] = None
-    assets: ir.abc.Traversable = ir.files("datapane.resources.local_report")
+    # Type is `ir.abc.Traversable` which extends `Path`,
+    # but the former isn't compatible with `shutil`
+    assets: Path = cast(Path, ir.files("datapane.resources.local_report"))
     logo: str
     template_name: str
     report_id: str = uuid4().hex
@@ -523,7 +526,9 @@ class Report(DPObjectRef):
 
     ############################################################################
     # Local served reports
-    def build(self, path: NPath, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False) -> None:
+    def build(
+        self, path: NPath, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False
+    ) -> None:
         """Build a report which can be served by a local http server
 
         Args:
@@ -542,8 +547,9 @@ class Report(DPObjectRef):
 
         self._served_local_writer.assert_bundle_exists()
 
-        # Copy across symlinked report bundle
-        copytree(self._served_local_writer.assets / "report", bundle_path, dirs_exist_ok=True)
+        # Copy across symlinked report bundle.
+        # Ignore `call-arg` as CI errors on `dirs_exist_ok`
+        copytree(self._served_local_writer.assets / "report", bundle_path, dirs_exist_ok=True)  # type: ignore[call-arg]
 
         # Copy across symlinked Vue module
         copy(self._served_local_writer.assets / VUE_ESM_FILE, pl_path / VUE_ESM_FILE)
