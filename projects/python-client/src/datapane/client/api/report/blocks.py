@@ -22,7 +22,7 @@ from lxml.builder import ElementMaker
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
-from datapane.common import PKL_MIMETYPE, NPath, SSDict, guess_type, log, utf_read_text
+from datapane.common import MIME, PKL_MIMETYPE, NPath, SSDict, guess_type, log, utf_read_text
 from datapane.common.report import get_embed_url, is_valid_id, mk_attribs
 
 from ..common import DPTmpFile
@@ -614,7 +614,7 @@ class AssetBlock(DataBlock):
         """per-file-type attributes, override if needed"""
         return self.file_attribs or dict()
 
-    def _b64_encode_src(self, content_type: str):
+    def _b64_encode_src(self, content_type: MIME) -> str:
         """
         load the file and embed into a data-uri
         NOTE - currently we read entire file into memory first prior to b64 encoding,
