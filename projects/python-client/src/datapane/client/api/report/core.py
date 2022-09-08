@@ -54,7 +54,7 @@ class CompressedAssetsHTTPHandler(SimpleHTTPRequestHandler):
     """
 
     def end_headers(self):
-        if self.path.startswith(f"/{SERVED_REPORT_ASSETS_DIR}"):
+        if self.path.startswith(f"/{SERVED_REPORT_ASSETS_DIR}") and not self.path.endswith(VUE_ESM_FILE):
             self.send_header("Content-Encoding", "gzip")
         super().end_headers()
 
@@ -555,10 +555,10 @@ class Report(DPObjectRef):
 
         # Copy across symlinked report bundle.
         # Ignore `call-arg` as CI errors on `dirs_exist_ok`
-        copytree(self._served_local_writer.assets / "report", bundle_path, dirs_exist_ok=True)  # type: ignore[call-arg]
+        copytree(self._served_local_writer.assets / "report", bundle_path / "report", dirs_exist_ok=True)  # type: ignore[call-arg]
 
         # Copy across symlinked Vue module
-        copy(self._served_local_writer.assets / VUE_ESM_FILE, pl_path / VUE_ESM_FILE)
+        copy(self._served_local_writer.assets / VUE_ESM_FILE, bundle_path / VUE_ESM_FILE)
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
