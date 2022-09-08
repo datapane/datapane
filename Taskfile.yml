@@ -38,7 +38,5 @@ tasks:
     desc: Clean up the local-report artifacts
     dir: projects/python-client/src/datapane/resources/local_report
     cmds:
-      - rm -f local-report-base.js
-      - rm -f local-report-base.css
-      - rm -f vue.esm-browser.prod.js
+      - rm -f local-report-base.js local-report-base.css vue.esm-browser.prod.js
       - rm -rf report
