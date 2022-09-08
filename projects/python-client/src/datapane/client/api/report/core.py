@@ -41,7 +41,7 @@ from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
-# TODO - where to put these?
+CDN_BASE = f"https://datapane-cdn.com/v{dp_version}"
 VUE_ESM_FILE = "vue.esm-browser.prod.js"
 SERVED_REPORT_BUNDLE_DIR = "static"
 SERVED_REPORT_ASSETS_DIR = "data"
@@ -166,6 +166,7 @@ class ReportFileWriter:
         report_doc: str,
         path: str,
         name: str,
+        cdn_base: str = CDN_BASE,
         standalone: bool = False,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
@@ -192,7 +193,7 @@ class ReportFileWriter:
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
             standalone=standalone,
-            cdn_base=f"https://datapane-cdn.com/v{dp_version}",
+            cdn_base=cdn_base,
         )
 
         Path(path).write_text(r, encoding="utf-8")
@@ -458,6 +459,7 @@ class Report(DPObjectRef):
     def _save(
         self,
         path: str,
+        cdn_base: str,
         open: bool = False,
         standalone: bool = False,
         name: t.Optional[str] = None,
@@ -473,6 +475,7 @@ class Report(DPObjectRef):
             local_doc,
             path,
             name=name,
+            cdn_base=cdn_base,
             standalone=standalone,
             formatting=formatting,
         )
@@ -493,6 +496,7 @@ class Report(DPObjectRef):
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
+        cdn_base: str = CDN_BASE,
     ) -> None:
         """Save the report document to a local HTML file
 
@@ -503,9 +507,10 @@ class Report(DPObjectRef):
             name: Name of the document (optional: uses path if not provided)
             author: The report author / email / etc. (optional)
             formatting: Sets the basic report styling
+            cdn_base: The base url to use for standalone reports (default: https://datapane-cdn.com/{version})
         """
 
-        report_id = self._save(path, open, standalone, name, author, formatting)
+        report_id = self._save(path, cdn_base, open, standalone, name, author, formatting)
         capture("CLI Report Save", report_id=report_id)
 
     @capture_event("CLI Report Preview")
