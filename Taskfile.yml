@@ -21,8 +21,8 @@ tasks:
     cmds:
       - ln -svf "../../../../../web-components/dist/local-report/local-report-base.js" ./
       - ln -svf "../../../../../web-components/dist/local-report/local-report-base.css" ./
-      - ln -svf '../../../../../web-components/dist/report' ./
       - ln -svf '../../../../../web-components/dist/vue.esm-browser.prod.js' ./
+      - ln -svf '../../../../../web-components/dist/report' ./
 
   cp-local-report:
     desc: copy the local-report artifacts into the python-client codebase (pre-build)
