@@ -31,7 +31,7 @@ from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
-from datapane.common import SDict, dict_drop_empty, log, timestamp
+from datapane.common import NPath, SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 from datapane.common.utils import compress_file
 
@@ -570,7 +570,7 @@ class Report(DPObjectRef):
 
     def serve(
         self,
-        path: str,
+        path: NPath,
         port: int = 8000,
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
