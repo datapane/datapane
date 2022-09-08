@@ -48,7 +48,7 @@ SERVED_REPORT_BUNDLE_DIR = "static"
 SERVED_REPORT_ASSETS_DIR = "data"
 
 
-class DPServer(SimpleHTTPRequestHandler):
+class CompressedAssetsHTTPHandler(SimpleHTTPRequestHandler):
     """
     Python HTTP server for served local reports,
     with correct encoding header set on compressed assets
@@ -525,15 +525,12 @@ class Report(DPObjectRef):
 
     ############################################################################
     # Local served reports
-    def build(
-        self,
-        path: str,
-        formatting: t.Optional[ReportFormatting] = None,
-    ) -> None:
+    def build(self, path: str, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = True) -> None:
         """Build a report which can be served by a local http server
 
         Args:
             path: File path to store the document
+            compress_assets: Compress user assets during report generation (default: True)
             formatting: Sets the basic report styling
         """
 
@@ -555,11 +552,14 @@ class Report(DPObjectRef):
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
+        # Copy across attachments
         for a in attachments:
-            # TODO - compress in-memory to save a disk write?
-            # Copy across user report assets
-            with compress_file(a) as a_gz:
-                copyfile(str(a_gz), str(assets_path / Path(a).name))
+            destination_path = str(assets_path / Path(a).name)
+            if compress_assets:
+                with compress_file(a) as a_gz:
+                    copyfile(str(a_gz), destination_path)
+            else:
+                copyfile(str(a), destination_path)
 
         self._served_local_writer.write(
             local_doc,
@@ -577,6 +577,7 @@ class Report(DPObjectRef):
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
         open: bool = False,
+        compress_assets: bool = True,
     ):
         """Serve the report from a local http server
 
@@ -585,13 +586,17 @@ class Report(DPObjectRef):
             open: Open in your browser after creating (default: False)
             port: The port used to serve the report (default: 8000)
             host: The host used to serve the report (default: localhost)
+            compress_assets: Compress user assets during report generation (default: True)
             formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
         """
         if not osp.isdir(path):
-            self.build(path, formatting=formatting)
+            self.build(path, formatting=formatting, compress_assets=compress_assets)
 
-        os.chdir(path)  # Run the server in the specified path
-        server = HTTPServer((host, port), DPServer)
+        # Run the server in the specified path
+        os.chdir(path)
+        # Use server with appropriate compression headers if asset compression is enabled
+        server_class = CompressedAssetsHTTPHandler if compress_assets else SimpleHTTPRequestHandler
+        server = HTTPServer((host, port), server_class)
         display_msg(f"Server started at {host}:{port}")
 
         if open:
