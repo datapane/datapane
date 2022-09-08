@@ -1,7 +1,7 @@
 # Release Notes
-!!! note "What to know what's next?"
+!!! hint "What to know what's next?"
 
-    Check out our [Product Roadmap]([https://datapane.nolt.io/roadmap) to see what upcoming features we are considering and submit your own suggestions and ideas!
+    Check out our [Product Roadmap](https://datapane.nolt.io/roadmap) to see what upcoming features we are considering and make a suggestion!
 
 ## **30 August 2022**
 
@@ -13,13 +13,22 @@
 
 ### :octicons-organization-24: Datapane Teams
 
-Added workspaces with private report sharing and project support to Datapane.com (now known as Datapane Cloud). This means you can securely share reports with your team and clients.
+![](img/releasenotes/cloud.png){ .docs-image }
 
-We have a generous free tier which allows unlimited users and up to 5 private workspace reports, and introductory pricing starts at $12 per seat after this. 
+We have launched **Team Workspaces** on Datapane Cloud. 
+
+Datapane Cloud is the best way to host and share your reports, dashboards, and apps. 
+
+With this release, Datapane Cloud users can now securely share reports with their team or clients by creating private workspaces and projects.
+
+[Create a Free Workspace]((https://datapane.com/accounts/signup)){ .md-button }
 
 ### :octicons-repo-template-24: Templates and Components Catalogs
 
-Starting from this release, we are providing a series of templates and components which lower the barrier to building something awesome using the Python. Check them out in our new [Catalogue](catalogues/index.ipynb).
+<a src="/catalogues/blocks/table"><img class="docs-image" src="https://user-images.githubusercontent.com/15690380/183948469-c76fa50f-e0a2-438a-b13c-9e58d6071c1c.png"></a>
+
+
+Starting from this release, we are providing a series of templates and components which lower the barrier to building something awesome using Datapane and Python. Check them out in our new [Catalogue](catalogues/index.ipynb).
 
 Our first templates include:
 
@@ -35,10 +44,8 @@ An engagement dashboard for social media. It can be used as a starting point for
 
 A text-heavy report. It can be used as a starting point for creating a text-heavy Datapane report that starts off as a Jupyter Notebook.
 
-
-
 ### :octicons-code-square-24: Open-source Report Renderer
-Up until recently, our report renderer has been a bundled and minified Javascript library which was not open to contributions. As part of porting our Report renderer from React to Vue.js, we've taken the step of open-sourcing the entire renderer, which you can check out [on GitHub](https://github.com/datapane/datapane/tree/master/projects/web-components/report).
+Prior to this release, our report renderer was a bundled and minified Javascript library which was not open to contributions. As part of porting our Report renderer from React to Vue.js, we've taken the step of open-sourcing the entire renderer, which you can check out [on GitHub](https://github.com/datapane/datapane/tree/master/projects/web-components/report).
 
 ### :octicons-bug-24: Other Bug Fixes and Improvements
 - Add Plotapi support to `dp.Plot`
