@@ -525,7 +525,7 @@ class Report(DPObjectRef):
 
     ############################################################################
     # Local served reports
-    def build(self, path: str, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = True) -> None:
+    def build(self, path: str, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False) -> None:
         """Build a report which can be served by a local http server
 
         Args:
@@ -577,7 +577,6 @@ class Report(DPObjectRef):
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
         open: bool = False,
-        compress_assets: bool = True,
     ):
         """Serve the report from a local http server
 
@@ -586,17 +585,13 @@ class Report(DPObjectRef):
             open: Open in your browser after creating (default: False)
             port: The port used to serve the report (default: 8000)
             host: The host used to serve the report (default: localhost)
-            compress_assets: Compress user assets during report generation (default: True)
             formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
         """
         if not osp.isdir(path):
-            self.build(path, formatting=formatting, compress_assets=compress_assets)
+            self.build(path, formatting=formatting, compress_assets=True)
 
-        # Run the server in the specified path
-        os.chdir(path)
-        # Use server with appropriate compression headers if asset compression is enabled
-        server_class = CompressedAssetsHTTPHandler if compress_assets else SimpleHTTPRequestHandler
-        server = HTTPServer((host, port), server_class)
+        os.chdir(path)  # Run the server in the specified path
+        server = HTTPServer((host, port), CompressedAssetsHTTPHandler)
         display_msg(f"Server started at {host}:{port}")
 
         if open:
