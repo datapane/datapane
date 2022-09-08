@@ -542,11 +542,10 @@ class Report(DPObjectRef):
             compress_assets: Compress user assets during report generation (default: True)
             formatting: Sets the basic report styling
         """
-
-        if osp.isdir(path):
-            rmtree(path)
-
         pl_path: Path = Path(path)
+
+        self._rm_report_build(pl_path)
+
         name = pl_path.stem[:127]
         bundle_path = pl_path / SERVED_REPORT_BUNDLE_DIR
         assets_path = pl_path / SERVED_REPORT_ASSETS_DIR
@@ -617,6 +616,19 @@ class Report(DPObjectRef):
             pass
 
         server.server_close()
+
+    @staticmethod
+    def _rm_report_build(path: Path):
+        """Remove the previous report build directory if it exists and is a sub-path of the cwd"""
+        is_cwd_subpath = str(path.resolve()).startswith(os.getcwd())
+        is_rm_safe = is_cwd_subpath and not path.is_absolute()
+
+        if (path_is_dir := path.is_dir()) and is_rm_safe:
+            rmtree(path)
+        elif path_is_dir and not is_rm_safe:
+            raise DPError(
+                "Can't rebuild served report unless `path` is a relative sub-path of the current working directory"
+            )
 
     @staticmethod
     def _open_server(host: str, port: int) -> None:
