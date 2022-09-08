@@ -597,8 +597,7 @@ class Report(DPObjectRef):
             host: The host used to serve the report (default: localhost)
             formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
         """
-        if not osp.isdir(path):
-            self.build(path, formatting=formatting, compress_assets=True)
+        self.build(path, formatting=formatting, compress_assets=True)
 
         os.chdir(path)  # Run the server in the specified path
         server = HTTPServer((host, port), CompressedAssetsHTTPHandler)
