@@ -15,7 +15,7 @@ describe("Report rendering", () => {
     it("Should switch between section tabs successfully", () => {
         cy.scrollToFirst("[data-cy=page-1]").click();
 
-        cy.get("[data-cy=section-tabs]")
+        cy.get("[data-cy=section-tabs]", { timeout: 20000 })
             .eq(2)
             .scrollIntoView()
             .within(() => {
