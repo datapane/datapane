@@ -59,5 +59,5 @@ Cypress.Commands.add("dpSetInitialReport", () => {
 });
 
 Cypress.Commands.add("scrollToFirst", (selector) => {
-    return cy.get(selector).first().scrollIntoView();
+    return cy.get(selector, { timeout: 20000 }).first().scrollIntoView();
 });
