@@ -14,7 +14,7 @@ from functools import reduce
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import path as osp
 from pathlib import Path
-from shutil import copy, copytree
+from shutil import copy, copytree, rmtree
 from time import sleep
 from typing import cast
 from uuid import uuid4
@@ -41,7 +41,7 @@ from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
-CDN_BASE = f"https://datapane-cdn.com/v{dp_version}"
+CDN_BASE = f"http://localhost:8003/v{dp_version}"
 VUE_ESM_FILE = "vue.esm-browser.prod.js"
 SERVED_REPORT_BUNDLE_DIR = "static"
 SERVED_REPORT_ASSETS_DIR = "data"
@@ -543,13 +543,16 @@ class Report(DPObjectRef):
             formatting: Sets the basic report styling
         """
 
+        if osp.isdir(path):
+            rmtree(path)
+
         pl_path: Path = Path(path)
         name = pl_path.stem[:127]
         bundle_path = pl_path / SERVED_REPORT_BUNDLE_DIR
         assets_path = pl_path / SERVED_REPORT_ASSETS_DIR
 
-        bundle_path.mkdir(parents=True, exist_ok=True)
-        assets_path.mkdir(parents=True, exist_ok=True)
+        bundle_path.mkdir(parents=True)
+        assets_path.mkdir(parents=True)
 
         self._served_local_writer.assert_bundle_exists()
 
