@@ -458,7 +458,7 @@ class Report(DPObjectRef):
     def _save(
         self,
         path: str,
-        cdn_base: str,
+        cdn_base: str = CDN_BASE,
         open: bool = False,
         standalone: bool = False,
         name: t.Optional[str] = None,
