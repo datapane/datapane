@@ -9,13 +9,12 @@ import threading
 import typing as t
 import webbrowser
 from base64 import b64encode
-from distutils.dir_util import copy_tree
 from enum import Enum
 from functools import reduce
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import path as osp
 from pathlib import Path
-from shutil import copyfile
+from shutil import copy, copytree
 from time import sleep
 from uuid import uuid4
 
@@ -544,21 +543,21 @@ class Report(DPObjectRef):
         self._served_local_writer.assert_bundle_exists()
 
         # Copy across symlinked report bundle
-        copy_tree(str(self._served_local_writer.assets / "report"), str(bundle_path))
+        copytree(self._served_local_writer.assets / "report", bundle_path, dirs_exist_ok=True)
 
         # Copy across symlinked Vue module
-        copyfile(str(self._served_local_writer.assets / VUE_ESM_FILE), str(pl_path / VUE_ESM_FILE))
+        copy(self._served_local_writer.assets / VUE_ESM_FILE, pl_path / VUE_ESM_FILE)
 
         local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
 
         # Copy across attachments
         for a in attachments:
-            destination_path = str(assets_path / Path(a).name)
+            destination_path = assets_path / a.name
             if compress_assets:
                 with compress_file(a) as a_gz:
-                    copyfile(str(a_gz), destination_path)
+                    copy(a_gz, destination_path)
             else:
-                copyfile(str(a), destination_path)
+                copy(a, destination_path)
 
         self._served_local_writer.write(
             local_doc,
