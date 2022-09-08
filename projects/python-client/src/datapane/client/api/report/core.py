@@ -171,7 +171,6 @@ class ReportFileWriter:
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
-
         if formatting is None:
             formatting = ReportFormatting()
 
@@ -517,6 +516,7 @@ class Report(DPObjectRef):
     def preview(
         self,
         open: bool,
+        standalone: bool = False,
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         """Preview the report in a new browser window.
@@ -525,9 +525,10 @@ class Report(DPObjectRef):
 
         Args:
             open: Open in your browser after creating (default: True)
+            standalone: Inline the report source in the HTML report file rather than loading via CDN (default: False)
             formatting: Sets the basic report styling
         """
-        self._save(self._preview_file.name, open=open, formatting=formatting)
+        self._save(self._preview_file.name, open=open, standalone=standalone, formatting=formatting)
 
     ############################################################################
     # Local served reports
