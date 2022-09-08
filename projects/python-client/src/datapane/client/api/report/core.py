@@ -41,7 +41,7 @@ from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
 
-CDN_BASE = f"http://localhost:8003/v{dp_version}"
+CDN_BASE = f"https://datapane-cdn.com/v{dp_version}"
 VUE_ESM_FILE = "vue.esm-browser.prod.js"
 SERVED_REPORT_BUNDLE_DIR = "static"
 SERVED_REPORT_ASSETS_DIR = "data"
