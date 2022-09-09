@@ -94,6 +94,7 @@ class Bundler(SdistBuilder):
         self.cfgdir = cfgdir
         self.module = module
         self.extra_files = []  # type: ignore
+        self.data_directory = None  # type: ignore
         self.includes = FilePatterns(include_patterns, str(cfgdir))
         self.excludes = FilePatterns(exclude_patterns, str(cfgdir))
 
