@@ -1,6 +1,7 @@
 declare global {
     interface Window {
         dpLocal: boolean;
+        dpServed: boolean;
         reportProps?: any;
         posthog: any;
         hasPosthog: any;

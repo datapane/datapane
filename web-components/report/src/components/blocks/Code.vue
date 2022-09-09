@@ -10,7 +10,6 @@ const p = defineProps<{ language: string; code: string }>();
 const clip = ref<DPClipboard>();
 const copyBtn = ref<HTMLButtonElement | null>(null);
 const code = computed(() => p.code.trim());
-const { dpLocal } = window;
 
 onMounted(() => {
     if (copyBtn.value) {
@@ -27,7 +26,6 @@ onUnmounted(() => {
 
 <template>
     <div class="relative">
-        <link v-if="!dpLocal" rel="stylesheet" href="/static/base/style.css" />
         <button
             class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
             ref="copyBtn"
@@ -49,5 +47,3 @@ pre {
     @apply w-full;
 }
 </style>
-
-<style src="highlight.js/styles/stackoverflow-light.css" />
