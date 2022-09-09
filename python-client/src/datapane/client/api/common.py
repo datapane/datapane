@@ -124,7 +124,7 @@ def _process_res(r: Response, empty_ok: bool = False) -> t.Union[Munch, JSON]:
         if r.status_code == 426:
             check_pip_version()
         elif r.status_code == 401:
-            failure_msg(f"Couldn't successfully connect to {c.config.server}, please check your login details")
+            failure_msg(f"Couldn't successfully connect to {furl(r.url).origin}, please check your login details")
         else:
             try:
                 log.error(pprint.pformat(r.json()))
