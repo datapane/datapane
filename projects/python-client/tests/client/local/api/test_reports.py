@@ -38,7 +38,7 @@ def num_blocks(report_str: str) -> int:
 def assert_report(
     report: dp.Report, expected_attachments: int = None, expected_num_blocks: int = None
 ) -> t.Tuple[str, t.List[Path]]:
-    report_str, attachments = report._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+    report_str, attachments = report._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
     # print(report_str)
     if expected_attachments:
         assert len(attachments) == expected_attachments
@@ -198,35 +198,35 @@ def test_gen_failing_reports():
     # nested pages
     with pytest.raises(DPError):
         r = dp.Report(dp.Page(dp.Page(md_block)))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
     with pytest.raises(DPError):
         r = dp.Report(dp.Group(dp.Page(md_block)))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # page/pages with 0 objects
     with pytest.raises(DPError):
         r = dp.Report(dp.Page(blocks=[]))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # select with 1 object
     with pytest.raises(DPError):
         r = dp.Report(dp.Page(dp.Select(blocks=[md_block])))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # empty text block
     with pytest.raises(AssertionError):
         r = dp.Report(dp.Text(" "))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # empty df
     with pytest.raises(DPError):
         r = dp.Report(dp.DataTable(pd.DataFrame()))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # invalid names
     with pytest.raises(DocumentInvalid):
         r = dp.Report(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
-        r._gen_report(embedded=False, title="TITLE", description="DESCRIPTION")
+        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     with pytest.raises(DPError):
         dp.Report(dp.Text("a", name="3-invalid-name"))

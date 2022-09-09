@@ -48,7 +48,7 @@ jobs:
 
       - name: Build (+ Link) Local Report bundle
         run: |
-          task web-components:install:ci web-components:build:local-report link-local-report
+          task web-components:install:ci web-components:build:local-report web-components:build:report link-local-report
 
       - name: Install Docs Dependencies
         run: |

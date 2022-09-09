@@ -30,8 +30,11 @@ const pageNumber = ref(0);
 onMounted(() => {
     /* View tracking */
     if (window.dpLocal && window.dpLocalViewEvent) {
-        trackLocalReportView();
-    } else {
+        trackLocalReportView("CLI_REPORT_VIEW");
+    } else if (window.dpServed && window.dpLocalViewEvent) {
+        trackLocalReportView("SERVED_REPORT_VIEW");
+    }
+    {
         if (p.disableTrackViews) {
             return;
         }

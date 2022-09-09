@@ -16,7 +16,27 @@ includes:
 tasks:
   link-local-report:
     desc: Link the local-report artifacts into the python-client codebase (for Report.save)
+    deps: [clean-local-report]
+    dir: projects/python-client/src/datapane/resources/local_report
     cmds:
-      - |
-        ln -svf '../../../../../web-components/dist/local-report/local-report-base.js' "projects/python-client/src/datapane/resources/local_report/local-report-base.js"
-        ln -svf '../../../../../web-components/dist/local-report/local-report-base.css' "projects/python-client/src/datapane/resources/local_report/local-report-base.css"
+      - ln -svf "../../../../../web-components/dist/local-report/local-report-base.js" ./
+      - ln -svf "../../../../../web-components/dist/local-report/local-report-base.css" ./
+      - ln -svf '../../../../../web-components/dist/vue.esm-browser.prod.js' ./
+      - ln -svf '../../../../../web-components/dist/report' ./
+
+  cp-local-report:
+    desc: copy the local-report artifacts into the python-client codebase (pre-build)
+    deps: [clean-local-report]
+    dir: projects/python-client/src/datapane/resources/local_report
+    cmds:
+      - cp -vf ../../../../../web-components/dist/local-report/local-report-base.js ./
+      - cp -vf ../../../../../web-components/dist/local-report/local-report-base.css ./
+      - cp -vf ../../../../../web-components/dist/vue.esm-browser.prod.js ./
+      - cp -rvf ../../../../../web-components/dist/report ./
+
+  clean-local-report:
+    desc: Clean up the local-report artifacts
+    dir: projects/python-client/src/datapane/resources/local_report
+    cmds:
+      - rm -f local-report-base.js local-report-base.css vue.esm-browser.prod.js
+      - rm -rf report

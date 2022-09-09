@@ -37,7 +37,9 @@ export class DPClipboard {
     }
 
     private static onSuccess = () => {
-        window.Alpine.store("copy").toggle();
+        // Only toggle the copy notification if `window.Alpine` is available,
+        // i.e. we're on datapane.com rather than a local report
+        window.Alpine && window.Alpine.store("copy").toggle();
     };
 
     private static getFieldValue(fieldId?: string): string {

@@ -1,50 +1,56 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import replace from "@rollup/plugin-replace";
-import path from "path";
+import {
+    esLib,
+    PACKAGE_VERSION_BOKEH,
+    PLUGIN_REPLACE_BOKEH,
+    pluginVue,
+} from "./dp-base-config";
+import tailwindcss from "tailwindcss";
+import minBundle from "../shared/rollup-plugin-min-bundle";
+
+const ENTRY_NAME = "local-report-base.fat.js";
 
 module.exports = defineConfig({
-    plugins: [
-        vue({
-            template: {
-                compilerOptions: {
-                    isCustomElement: (tag) =>
-                        tag.startsWith("revo-") || tag.startsWith("x-"),
-                },
-            },
-        }),
-        replace({
-            include: ["node_modules/@bokeh/**/*.js"],
-            values: {
-                // shim jquery to window object for bokehjs
-                jQuery: "window.jQuery",
-            },
-            preventAssignment: false,
-        }),
-    ],
+    css: {
+        postcss: {
+            plugins: [
+                tailwindcss({
+                    config: "./report.tailwind.config.js",
+                }) as any,
+            ],
+        },
+    },
+    plugins: [pluginVue(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {
-        // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
-        PACKAGE_VERSION: JSON.stringify(process.env.npm_package_version),
+        PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
     },
     build: {
+        minify: "esbuild",
         outDir: "./dist/local-report/",
-        lib: {
-            entry: path.resolve(__dirname, "local-report.index.ts"),
-            formats: ["es"],
-        },
+        lib: esLib("local-report.index.ts"),
         assetsInlineLimit: 100000000,
         chunkSizeWarningLimit: 100000000,
         cssCodeSplit: false,
         rollupOptions: {
             output: {
                 inlineDynamicImports: true,
-                entryFileNames: "local-report-base.js",
+                entryFileNames: ENTRY_NAME,
                 assetFileNames: (assetInfo) => {
                     if (assetInfo.name == "style.css") {
                         return "local-report-base.css";
                     }
                     return `${assetInfo.name}`;
                 },
+                plugins: [
+                    // Minify via terser at the final compilation stage,
+                    // as minifation isn't supported by rollup on ES modules and converting
+                    // to UMD modules makes the build time much slower.
+                    // However, we can do it here as local-report-base is a single outputted file
+                    minBundle({
+                        entryFileName: ENTRY_NAME,
+                        emittedFileName: "local-report-base.js",
+                    }),
+                ],
             },
         },
     },

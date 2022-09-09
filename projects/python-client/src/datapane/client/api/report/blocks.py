@@ -22,7 +22,7 @@ from lxml.builder import ElementMaker
 from pandas.io.formats.style import Styler
 
 from datapane.client import DPError
-from datapane.common import PKL_MIMETYPE, NPath, SSDict, guess_type, log, utf_read_text
+from datapane.common import MIME, PKL_MIMETYPE, NPath, SSDict, guess_type, log, utf_read_text
 from datapane.common.report import get_embed_url, is_valid_id, mk_attribs
 
 from ..common import DPTmpFile
@@ -70,6 +70,7 @@ class BuilderState:
     """Hold state whilst building the Report XML document"""
 
     embedded: bool = False
+    served: bool = False
     attachment_count: int = 0
     # NOTE - store as single element or a list?
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
@@ -613,24 +614,31 @@ class AssetBlock(DataBlock):
         """per-file-type attributes, override if needed"""
         return self.file_attribs or dict()
 
+    def _b64_encode_src(self, content_type: MIME) -> str:
+        """
+        load the file and embed into a data-uri
+        NOTE - currently we read entire file into memory first prior to b64 encoding,
+        to consider using base64io-python to stream and encode in 1-pass
+        """
+        content = b64encode(self.file.read_bytes()).decode("ascii")
+        return f"data:{content_type};base64,{content}"
+
     def _to_xml(self, s: BuilderState) -> BuilderState:
         _E = getattr(E, self._tag)
         e: etree._Element
 
-        if s.embedded:
-            # load the file and embed into a data-uri
-            # NOTE - currently we read entire file into memory first prior to b64 encoding,
-            #  to consider using base64io-python to stream and encode in 1-pass
-            content = b64encode(self.file.read_bytes()).decode("ascii")
+        if s.embedded or s.served:
             content_type = guess_type(self.file)
             file_size = str(self.file.stat().st_size)
+            src = self._b64_encode_src(content_type) if s.embedded else f"/data/{self.file.name}"
+
             e = _E(
                 type=content_type,
                 size=file_size,
                 uploaded_filename=self.file.name,
                 **self._attributes,
                 **self.get_file_attribs(),
-                src=f"data:{content_type};base64,{content}",
+                src=src,
             )
         else:
             e = _E(

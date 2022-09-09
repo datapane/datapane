@@ -4,13 +4,19 @@ Datapane Reports Object
 Describes the `Report` object and included APIs for saving and uploading them.
 """
 import dataclasses as dc
+import os
+import threading
 import typing as t
 import webbrowser
 from base64 import b64encode
 from enum import Enum
 from functools import reduce
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from os import path as osp
 from pathlib import Path
+from shutil import copy, copytree, rmtree
+from time import sleep
+from typing import cast
 from uuid import uuid4
 
 import importlib_resources as ir
@@ -19,19 +25,39 @@ from lxml import etree
 from lxml.etree import Element, _Element
 from markupsafe import Markup  # used by Jinja
 
+from datapane import __version__ as dp_version
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import DPTmpFile, Resource
 from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
-from datapane.common import SDict, dict_drop_empty, log, timestamp
+from datapane.common import NPath, SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
+from datapane.common.utils import compress_file
 
 from .blocks import BlockOrPrimitive, BuilderState, E, Page, PageOrPrimitive
 
 local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
 local_post_transform = etree.XSLT(local_post_xslt)
+
+CDN_BASE = f"https://datapane-cdn.com/v{dp_version}"
+VUE_ESM_FILE = "vue.esm-browser.prod.js"
+SERVED_REPORT_BUNDLE_DIR = "static"
+SERVED_REPORT_ASSETS_DIR = "data"
+
+
+class CompressedAssetsHTTPHandler(SimpleHTTPRequestHandler):
+    """
+    Python HTTP server for served local reports,
+    with correct encoding header set on compressed assets
+    """
+
+    def end_headers(self):
+        if self.path.startswith(f"/{SERVED_REPORT_ASSETS_DIR}") and not self.path.endswith(VUE_ESM_FILE):
+            self.send_header("Content-Encoding", "gzip")
+        super().end_headers()
+
 
 # only these types will be documented by default
 __all__ = ["Report", "ReportWidth"]
@@ -108,19 +134,23 @@ def include_raw(ctx, name) -> Markup:  # noqa: ANN001
 
 
 class ReportFileWriter:
-    """Collects data needed to display a local report document, and generates the local HTML"""
+    """Provides shared logic for saved and served local report writers"""
 
     template: t.Optional[Template] = None
-    assets: Path
+    # Type is `ir.abc.Traversable` which extends `Path`,
+    # but the former isn't compatible with `shutil`
+    assets: Path = cast(Path, ir.files("datapane.resources.local_report"))
     logo: str
-    dev_mode: bool = False
+    template_name: str
+    report_id: str = uuid4().hex
+    served: bool
+
+    def __init__(self, served: bool, template_name: str):
+        self.served = served
+        self.template_name = template_name
 
     def _setup_template(self):
-        """Jinja template setup for local rendering"""
-        # check we have the FE files, abort if not
-        self.assets = ir.files("datapane.resources.local_report")
-        if not (self.assets / "local-report-base.css").exists():
-            raise DPError("Can't find local FE bundle - report.save not available, please install release version")
+        self.assert_bundle_exists()
 
         # load the logo
         logo_img = (self.assets / "datapane-logo-dark.png").read_bytes()
@@ -129,17 +159,18 @@ class ReportFileWriter:
         template_loader = FileSystemLoader(self.assets)
         template_env = Environment(loader=template_loader)
         template_env.globals["include_raw"] = include_raw
-        self.template = template_env.get_template("template.html")
+        self.template = template_env.get_template(self.template_name)
 
     def write(
         self,
         report_doc: str,
         path: str,
         name: str,
+        cdn_base: str = CDN_BASE,
+        standalone: bool = False,
         author: t.Optional[str] = None,
         formatting: ReportFormatting = None,
     ) -> str:
-
         if formatting is None:
             formatting = ReportFormatting()
 
@@ -147,7 +178,7 @@ class ReportFileWriter:
         if not self.template:
             self._setup_template()
 
-        report_id = uuid4().hex
+        report_id: str = uuid4().hex
         r = self.template.render(
             report_doc=report_doc,
             report_width=formatting.width.value,
@@ -160,10 +191,21 @@ class ReportFileWriter:
             report_id=report_id,
             author_id=c.config.session_id,
             events=not _NO_ANALYTICS,
+            standalone=standalone,
+            cdn_base=cdn_base,
         )
+
         Path(path).write_text(r, encoding="utf-8")
 
         return report_id
+
+    def assert_bundle_exists(self):
+        resource_to_check = "report" if self.served else "local-report-base.css"
+        if not (self.assets / resource_to_check).exists():
+            report_method = "save" if self.served else "serve"
+            raise DPError(
+                f"Can't find local FE bundle - report.{report_method} not available, please install release version"
+            )
 
 
 # Type aliases
@@ -177,7 +219,8 @@ class Report(DPObjectRef):
     """
 
     _tmp_report: t.Optional[Path] = None  # Temp local report
-    _local_writer = ReportFileWriter()
+    _local_writer = ReportFileWriter(served=False, template_name="template.html")
+    _served_local_writer = ReportFileWriter(served=True, template_name="served_template.html")
     _preview_file = DPTmpFile(f"{uuid4().hex}.html")
     list_fields: t.List[str] = ["name", "web_url", "project"]
 
@@ -223,11 +266,16 @@ class Report(DPObjectRef):
             self.pages = [Page(blocks=pages)]
 
     def _to_xml(
-        self, embedded: bool, title: str = "Title", description: str = "Description", author: str = "Anonymous"
+        self,
+        embedded: bool,
+        served: bool,
+        title: str = "Title",
+        description: str = "Description",
+        author: str = "Anonymous",
     ) -> t.Tuple[Element, t.List[Path]]:
         """Build XML report document"""
         # convert Pages to XML
-        s = BuilderState(embedded)
+        s = BuilderState(embedded, served)
         _s = reduce(lambda _s, p: p._to_xml(_s), self.pages, s)
 
         # create the pages
@@ -243,7 +291,7 @@ class Report(DPObjectRef):
         )
 
         # add optional Meta
-        if embedded:
+        if embedded or served:
             meta = E.Meta(
                 E.Author(author or ""),
                 E.CreatedOn(timestamp()),
@@ -256,16 +304,22 @@ class Report(DPObjectRef):
     def _gen_report(
         self,
         embedded: bool,
+        served: bool,
         title: str = "Title",
         description: str = "Description",
         author: str = "Anonymous",
         validate: bool = True,
     ) -> t.Tuple[str, t.List[Path]]:
         """Generate a report for saving/uploading"""
-        report_doc, attachments = self._to_xml(embedded, title, description, author)
+        report_doc, attachments = self._to_xml(embedded, served, title, description, author)
+
+        if embedded and served:
+            raise DPError("Report can't be both embedded and served")
 
         # post_process and validate
-        processed_report_doc = local_post_transform(report_doc, embedded="true()" if embedded else "false()")
+        processed_report_doc = local_post_transform(
+            report_doc, embedded="true()" if embedded else "false()", served="true()" if served else "false()"
+        )
         if validate:
             validate_report_doc(xml_doc=processed_report_doc)
             self._report_status_checks(processed_report_doc, embedded)
@@ -337,7 +391,7 @@ class Report(DPObjectRef):
         kwargs = dict_drop_empty(kwargs)
 
         # generate the report
-        report_str, attachments = self._gen_report(embedded=False, title=name, description=description)
+        report_str, attachments = self._gen_report(embedded=False, served=False, title=name, description=description)
         files = dict(attachments=attachments)
 
         res = Resource(self.endpoint).post_files(files, overwrite=overwrite, document=report_str, **kwargs)
@@ -404,7 +458,9 @@ class Report(DPObjectRef):
     def _save(
         self,
         path: str,
+        cdn_base: str = CDN_BASE,
         open: bool = False,
+        standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
@@ -413,11 +469,13 @@ class Report(DPObjectRef):
         if not name:
             name = Path(path).stem[:127]
 
-        local_doc, _ = self._gen_report(embedded=True, title=name)
+        local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
         report_id = self._local_writer.write(
             local_doc,
             path,
             name=name,
+            cdn_base=cdn_base,
+            standalone=standalone,
             formatting=formatting,
         )
 
@@ -433,27 +491,32 @@ class Report(DPObjectRef):
         self,
         path: str,
         open: bool = False,
+        standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[ReportFormatting] = None,
+        cdn_base: str = CDN_BASE,
     ) -> None:
         """Save the report document to a local HTML file
 
         Args:
             path: File path to store the document
             open: Open in your browser after creating (default: False)
+            standalone: Inline the report source in the HTML report file rather than loading via CDN (default: False)
             name: Name of the document (optional: uses path if not provided)
             author: The report author / email / etc. (optional)
             formatting: Sets the basic report styling
+            cdn_base: The base url to use for standalone reports (default: https://datapane-cdn.com/{version})
         """
 
-        report_id = self._save(path, open, name, author, formatting)
+        report_id = self._save(path, cdn_base, open, standalone, name, author, formatting)
         capture("CLI Report Save", report_id=report_id)
 
     @capture_event("CLI Report Preview")
     def preview(
         self,
         open: bool,
+        standalone: bool = False,
         formatting: t.Optional[ReportFormatting] = None,
     ) -> None:
         """Preview the report in a new browser window.
@@ -462,6 +525,116 @@ class Report(DPObjectRef):
 
         Args:
             open: Open in your browser after creating (default: True)
+            standalone: Inline the report source in the HTML report file rather than loading via CDN (default: False)
             formatting: Sets the basic report styling
         """
-        self._save(self._preview_file.name, open=open, formatting=formatting)
+        self._save(self._preview_file.name, open=open, standalone=standalone, formatting=formatting)
+
+    ############################################################################
+    # Local served reports
+    def build(
+        self,
+        name: str = "report",
+        dest: t.Optional[NPath] = None,
+        formatting: t.Optional[ReportFormatting] = None,
+        compress_assets: bool = False,
+        overwrite: bool = False,
+    ) -> Path:
+        """Build a report which can be served by a local http server
+
+        Args:
+            name: The name of the report, which will also be the name of the report directory
+            dest: File path to store the report directory
+            compress_assets: Compress user assets during report generation (default: True)
+            formatting: Sets the basic report styling
+            overwrite: Replace existing report with the same name and destination if already exists (default: False)
+        """
+        path: Path = Path(dest or os.getcwd()) / name
+        report_exists = path.is_dir()
+
+        if report_exists and overwrite:
+            rmtree(path)
+        elif report_exists and not overwrite:
+            raise DPError(f"Report exists at given path {str(path)} -- set `overwrite=True` to allow overwrite")
+
+        bundle_path = path / SERVED_REPORT_BUNDLE_DIR
+        assets_path = path / SERVED_REPORT_ASSETS_DIR
+
+        bundle_path.mkdir(parents=True)
+        assets_path.mkdir(parents=True)
+
+        self._served_local_writer.assert_bundle_exists()
+
+        # Copy across symlinked report bundle.
+        # Ignore `call-arg` as CI errors on `dirs_exist_ok`
+        copytree(self._served_local_writer.assets / "report", bundle_path / "report", dirs_exist_ok=True)  # type: ignore[call-arg]
+
+        # Copy across symlinked Vue module
+        copy(self._served_local_writer.assets / VUE_ESM_FILE, bundle_path / VUE_ESM_FILE)
+
+        local_doc, attachments = self._gen_report(embedded=False, served=True, title=name)
+
+        # Copy across attachments
+        for a in attachments:
+            destination_path = assets_path / a.name
+            if compress_assets:
+                with compress_file(a) as a_gz:
+                    copy(a_gz, destination_path)
+            else:
+                copy(a, destination_path)
+
+        self._served_local_writer.write(
+            local_doc,
+            str(path / "index.html"),
+            name=name,
+            formatting=formatting,
+        )
+
+        display_msg(f"Successfully built report in {path}")
+
+        return path
+
+    def serve(
+        self,
+        name: str = "report",
+        dest: t.Optional[NPath] = None,
+        port: int = 8000,
+        host: str = "localhost",
+        formatting: t.Optional[ReportFormatting] = None,
+        open: bool = True,
+        overwrite: bool = False,
+    ) -> None:
+        """Serve the report from a local http server
+
+        Args:
+            name: The name of the report, which will also be the name of the report directory
+            dest: File path to store the report directory
+            open: Open in your browser after creating (default: False)
+            port: The port used to serve the report (default: 8000)
+            host: The host used to serve the report (default: localhost)
+            formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
+            overwrite: Replace existing report with the same name and destination if already exists (default: False)
+        """
+        path = self.build(name=name, dest=dest, formatting=formatting, compress_assets=True, overwrite=overwrite)
+
+        os.chdir(path)  # Run the server in the specified path
+        server = HTTPServer((host, port), CompressedAssetsHTTPHandler)
+        display_msg(f"Server started at {host}:{port}")
+
+        if open:
+            # If the endpoint is simply opened then there is a race
+            # between the page loading and server becoming available.
+            threading.Thread(target=self._open_server, args=(host, port), daemon=True).start()
+
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+
+        server.server_close()
+
+    @staticmethod
+    def _open_server(host: str, port: int) -> None:
+        """Opens localserver endpoint, should be called in its own thread"""
+        sleep(1)  # yield to main thread in order to allow start server process to run
+        webbrowser.open_new_tab(f"http://{host}:{port}")

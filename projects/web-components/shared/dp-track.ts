@@ -135,9 +135,11 @@ export const trackReportView = (properties: ReportViewPayload) => {
     asyncPosthogCapture("Report View", properties);
 };
 
-export const trackLocalReportView = () => {
+export const trackLocalReportView = (
+    event: "CLI_REPORT_VIEW" | "SERVED_REPORT_VIEW"
+) => {
     asyncDPTrackEvent(
-        "CLI_REPORT_VIEW",
+        event,
         {
             author_id: window.dpAuthorId,
             report_id: window.dpReportId,
