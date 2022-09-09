@@ -533,22 +533,32 @@ class Report(DPObjectRef):
     ############################################################################
     # Local served reports
     def build(
-        self, path: NPath, formatting: t.Optional[ReportFormatting] = None, compress_assets: bool = False
-    ) -> None:
+        self,
+        name: str = "report",
+        dest: t.Optional[NPath] = None,
+        formatting: t.Optional[ReportFormatting] = None,
+        compress_assets: bool = False,
+        overwrite: bool = False,
+    ) -> Path:
         """Build a report which can be served by a local http server
 
         Args:
-            path: File path to store the document
+            name: The name of the report, which will also be the name of the report directory
+            dest: File path to store the report directory
             compress_assets: Compress user assets during report generation (default: True)
             formatting: Sets the basic report styling
+            overwrite: Replace existing report with the same name and destination if already exists (default: False)
         """
-        pl_path: Path = Path(path)
+        path: Path = Path(dest or os.getcwd()) / name
+        report_exists = path.is_dir()
 
-        self._rm_report_build(pl_path)
+        if report_exists and overwrite:
+            rmtree(path)
+        elif report_exists and not overwrite:
+            raise DPError(f"Report exists at given path {str(path)} -- set `overwrite=True` to allow overwrite")
 
-        name = pl_path.stem[:127]
-        bundle_path = pl_path / SERVED_REPORT_BUNDLE_DIR
-        assets_path = pl_path / SERVED_REPORT_ASSETS_DIR
+        bundle_path = path / SERVED_REPORT_BUNDLE_DIR
+        assets_path = path / SERVED_REPORT_ASSETS_DIR
 
         bundle_path.mkdir(parents=True)
         assets_path.mkdir(parents=True)
@@ -575,31 +585,37 @@ class Report(DPObjectRef):
 
         self._served_local_writer.write(
             local_doc,
-            str(pl_path / "index.html"),
+            str(path / "index.html"),
             name=name,
             formatting=formatting,
         )
 
         display_msg(f"Successfully built report in {path}")
 
+        return path
+
     def serve(
         self,
-        path: NPath,
+        name: str = "report",
+        dest: t.Optional[NPath] = None,
         port: int = 8000,
         host: str = "localhost",
         formatting: t.Optional[ReportFormatting] = None,
         open: bool = True,
-    ):
+        overwrite: bool = False,
+    ) -> None:
         """Serve the report from a local http server
 
         Args:
-            path: File path to store the document; a new report will be built at the specified path if none is found
+            name: The name of the report, which will also be the name of the report directory
+            dest: File path to store the report directory
             open: Open in your browser after creating (default: False)
             port: The port used to serve the report (default: 8000)
             host: The host used to serve the report (default: localhost)
             formatting: Sets the basic report styling; note that this is ignored if a report exists at the specified path
+            overwrite: Replace existing report with the same name and destination if already exists (default: False)
         """
-        self.build(path, formatting=formatting, compress_assets=True)
+        path = self.build(name=name, dest=dest, formatting=formatting, compress_assets=True, overwrite=overwrite)
 
         os.chdir(path)  # Run the server in the specified path
         server = HTTPServer((host, port), CompressedAssetsHTTPHandler)
@@ -616,20 +632,6 @@ class Report(DPObjectRef):
             pass
 
         server.server_close()
-
-    @staticmethod
-    def _rm_report_build(path: Path):
-        """Remove the previous report build directory if it exists and is a sub-path of the cwd"""
-        is_cwd_subpath = str(path.resolve()).startswith(os.getcwd())
-        is_rm_safe = is_cwd_subpath and not path.is_absolute()
-        path_is_dir = path.is_dir()
-
-        if path_is_dir and not is_rm_safe:
-            raise DPError(
-                "Can't rebuild served report unless `path` is a relative sub-path of the current working directory"
-            )
-        elif path_is_dir:
-            rmtree(path)
 
     @staticmethod
     def _open_server(host: str, port: int) -> None:
