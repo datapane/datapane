@@ -10,15 +10,33 @@ import requests
 import datapane as dp
 from datapane.client import config as c
 
-from ..local.api.test_reports import gen_report_complex_with_files, gen_report_simple
+from ..local.api.test_reports import gen_legacy_report_simple, gen_report_complex_with_files, gen_report_simple
 from .common import check_name, deletable, gen_description, gen_df, gen_name, gen_plot
 
 pytestmark = pytest.mark.usefixtures("dp_login")
 
 
+def test_legacy_report_with_single_file(datadir: Path):
+    """Ensure deprecated Report.save and Report.upload work as expected"""
+    report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
+    # Test we can save then upload
+    report.save(str(datadir / "test_report.html"))
+    report.upload(name=gen_name(), description="DESCRIPTION")
+    with deletable(report):
+        pass
+
+
+def test_legacy_report_simple():
+    """Ensure deprecated dp.Report works as expected"""
+    report = gen_legacy_report_simple()
+    report.upload(name=gen_name(), description="DESCRIPTION", project="default")
+    with deletable(report):
+        pass
+
+
 def test_report_simple():
     report = gen_report_simple()
-    report.upload(name=gen_name(), description="DESCRIPTION", project="default")
+    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION", project="default")
     with deletable(report):
         pass
 
@@ -41,7 +59,7 @@ def test_report_update_metadata():
         "num_blocks",
     )
 
-    report.upload(name, **props)
+    dp.Uploader(report).go(name, **props)
 
     with deletable(report):
 
@@ -55,7 +73,7 @@ def test_report_update_metadata():
         orig_dto = deepcopy(report.dto)
 
         # overwrite and upload again, using defaults
-        report.upload(name, overwrite=True)
+        dp.Uploader(report).go(name, overwrite=True)
 
         # check specified props haven't changed
         check_props()
@@ -67,33 +85,35 @@ def test_report_update_metadata():
 
 def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
-    # Test we can save then upload
-    report.save(str(datadir / "test_report.html"))
-    report.upload(name=gen_name(), description="DESCRIPTION")
+    # Test we can save, build then upload
+    dp.Saver(report).go(str(datadir / "test_report.html"))
+    dp.Server(report).build(name="test_report", dest=datadir)
+    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    report.upload(name=gen_name(), description="DESCRIPTION")
+    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
 
 def test_report_update_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    report.upload(name=gen_name(), description="DESCRIPTION")
+    uploader = dp.Uploader(report)
+    uploader.go(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         doc_a = report.document
-        report.upload(name=gen_name(), description="DESCRIPTION")
+        uploader.go(name=gen_name(), description="DESCRIPTION")
         doc_b = report.document
         assert doc_a == doc_b
 
 
 def test_demo_report():
     report = dp.builtins.build_demo_report()
-    report.upload(name=gen_name(), description="DESCRIPTION")
+    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
@@ -122,8 +142,8 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     df_asset = dp.DataTable(df=df, caption="Our Dataframe")
     divider = dp.Divider()
     empty_block = dp.Empty(name="empty-block")
-    dp_report = dp.Report(m, file_asset, df_asset, plot_asset, list_asset, divider, empty_block, media_asset)
-    dp_report.upload(name=name, description=description, source_url=source_url)
+    dp_report = dp.App(m, file_asset, df_asset, plot_asset, list_asset, divider, empty_block, media_asset)
+    dp.Uploader(dp_report).go(name=name, description=description, source_url=source_url)
 
     with deletable(dp_report):
         # are the fields ok
@@ -207,8 +227,8 @@ def test_complex_df_report():
     df_desc_t = dp.DataTable(df_desc)
     df_desc_2_t = dp.DataTable(df_desc_2)
 
-    with deletable(dp.Report(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
-        dp_report.upload(name=gen_name())
+    with deletable(dp.App(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
+        dp.Uploader(dp_report).go(name=gen_name())
 
         # NOTE - as above, downloading embedded assets from a report currently not supported in API
         # check_df_equal(tz_df, tz_t.download_df())
@@ -222,13 +242,13 @@ def test_report_project():
     # i.e. both in the same team, or another project in a diff team
     # update a report that will automatically be added to the default project
     report = gen_report_simple()
-    report.upload(name="test_report_project")
+    dp.Uploader(report).go(name="test_report_project")
     # check if the project name is default
     with deletable(report):
         assert report.project == "default"
 
     # explicitly add to the project
-    report.upload(name="test_report_project_2", project="default")
+    dp.Uploader(report).go(name="test_report_project_2", project="default")
     with deletable(report):
         assert report.project == "default"
 
@@ -236,5 +256,5 @@ def test_report_project():
     report2 = gen_report_simple()
 
     with pytest.raises(requests.HTTPError) as e:
-        report2.upload(name="test_wrong_project", project="wrong-project")
+        dp.Uploader(report2).go(name="test_wrong_project", project="wrong-project")
         assert e.response.status_code == 400

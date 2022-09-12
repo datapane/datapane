@@ -37,7 +37,7 @@ def test_build_md_report():
 def test_add_header():
     text = "HEADER"
 
-    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
+    r = dp.App(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
     r1 = dp.builtins.add_header(r, header=text, all_pages=True)
     assert_report(r1, 0, 15)
@@ -52,7 +52,7 @@ def test_add_header():
 def test_add_footer():
     text = "FOOTER"
 
-    r = dp.Report(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
+    r = dp.App(blocks=[dp.Page(md_block, md_block) for _ in range(3)])
 
     r1 = dp.builtins.add_footer(r, footer=text, all_pages=True)
     assert_report(r1, 0, 15)

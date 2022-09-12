@@ -8,11 +8,12 @@
         window.dpAuthorId = "{{author_id}}";
     </script>
     <script src="https://kit.fontawesome.com/256c714d9a.js"></script>
-    <link rel="stylesheet" href="./static/report/style.css">
+    <link rel="stylesheet" href="./static/app/style.css">
 </head>
 <body>
-<div id="report" class="w-full pb-12">
-</div>
+<main class="{{ report_width_class }} w-full mx-auto">
+    <div id="report" class=" w-full pb-12"></div>
+</main>
 <div style="position: fixed; bottom: 0; width: 100%; z-index: 3;">
   <nav class="bg-gray-200 border-t border-gray-300">
     <div class="relative flex items-center justify-between h-12">
@@ -31,9 +32,9 @@
   </nav>
 </div>
 <script type="module">
-    import { mountReport } from "./static/report/index.es.js";
+    import { mountReport } from "./static/app/index.es.js";
     const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
-    const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
+    const report = { document: {{ report_doc|tojson }}, output_is_light_prose: {{ is_light_prose|tojson }} };
     const reportProps = {
         htmlHeader,
         report,

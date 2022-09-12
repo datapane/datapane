@@ -13,5 +13,5 @@ if dp.ON_DATAPANE:
     print("on datapane")
 if __name__ == "__datapane__":  # same as dp.by_datapane
     print("by datapane")
-    report = dp.Report(blocks=blocks)
+    report = dp.App(blocks=blocks)
     report.upload(name="dp_report", description="Description", overwrite=True)

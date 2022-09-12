@@ -14,7 +14,7 @@ import pandas as pd
 from datapane.common import NPath
 
 from .report import blocks as b
-from .report.core import Report
+from .report.core import App
 
 __all__ = [
     "add_code",
@@ -33,7 +33,7 @@ def _map_page_blocks(page: b.Page, f: t.Callable[[b.BlockList], b.BlockList]) ->
     return page
 
 
-def _map_report_pages(r: Report, f: t.Callable[[b.Page], b.Page], all_pages: bool = True) -> Report:
+def _map_report_pages(r: App, f: t.Callable[[b.Page], b.Page], all_pages: bool = True) -> App:
     def g(i: int, page: b.Page) -> b.Page:
         return f(page) if all_pages or i == 0 else page
 
@@ -63,7 +63,7 @@ def build_md_report(
     text_or_file: t.Union[str, NPath],
     *args: b.BlockOrPrimitive,
     **kwargs: b.BlockOrPrimitive,
-) -> Report:
+) -> App:
     """
     An easy way to build a complete report from a single top-level markdown text / file template.
     Any additional context can be passed in and will be inserted into the Markdown template.
@@ -74,7 +74,7 @@ def build_md_report(
         **kwargs: keyword template context arguments
 
     Returns:
-        A datapane Report object for saving or uploading
+        A datapane App object for saving or uploading
 
     ..tip:: Either text or file is required as input
     ..tip:: Context, via args/kwargs can be plain Python objects, e.g. dataframes, and plots, or Datapane blocks, e.g. dp.Plot, etc.
@@ -86,10 +86,10 @@ def build_md_report(
         b_text = b.Text(text=t.cast(str, text_or_file))
 
     group = b_text.format(*args, **kwargs)
-    return Report(b.Page(group))
+    return App(b.Page(group))
 
 
-def add_header(report: Report, header: b.BlockOrPrimitive, all_pages: bool = True) -> Report:
+def add_header(report: App, header: b.BlockOrPrimitive, all_pages: bool = True) -> App:
     """
     Add a header to the report, returning a modified version of the same report
 
@@ -108,7 +108,7 @@ def add_header(report: Report, header: b.BlockOrPrimitive, all_pages: bool = Tru
     )
 
 
-def add_footer(report: Report, footer: b.BlockOrPrimitive, all_pages: bool = True) -> Report:
+def add_footer(report: App, footer: b.BlockOrPrimitive, all_pages: bool = True) -> App:
     """
     Add a footer to the report, returning a modified version of the same report
 
@@ -144,12 +144,12 @@ def gen_plot() -> alt.Chart:
     return alt.Chart(gen_df()).mark_line().encode(x="x", y="y")
 
 
-def build_demo_report() -> Report:
+def build_demo_report() -> App:
     """
     Generate a sample demo report
 
     Returns:
-        A datapane Report object for saving or uploading
+        A datapane App object for saving or uploading
 
     """
 
@@ -416,4 +416,4 @@ dp.Attachment(data=[1,2,3])
         b.Text(adv_blocks).format(plots=plots, tables=tables, text=text, embed=embed, media=media), title="Blocks"
     )
 
-    return Report(page_1, page_2, page_3)
+    return App(page_1, page_2, page_3)

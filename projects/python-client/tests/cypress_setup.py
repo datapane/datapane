@@ -27,11 +27,11 @@ def setup(test_org: bool):
 
     dp_objs = {"styleReportURL": style_report.web_url}
 
-    def get_test_app(name: str) -> dp.App:
+    def get_test_app(name: str) -> dp.LegacyApp:
         with pushd(Path(".") / "tests" / "cypress_test_app"):
             dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path(f"{name}.yaml"), script=Path(f"{name}.py"))
             with sc.build_bundle(dp_cfg) as sdist:
-                app = dp.App.upload_pkg(sdist, dp_cfg, name=gen_name())
+                app = dp.LegacyApp.upload_pkg(sdist, dp_cfg, name=gen_name())
         return app
 
     # add a basic app and file
@@ -59,12 +59,12 @@ def teardown(test_org: bool):
 
     # delete the objects, ignoring errors
     with suppress(Exception):
-        dp.Report.by_id(dp_objs["styleReportURL"]).delete()
+        dp.App.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
         with suppress(Exception):
-            dp.App.by_id(dp_objs["paramsAppURL"]).delete()
+            dp.LegacyApp.by_id(dp_objs["paramsAppURL"]).delete()
         with suppress(Exception):
-            dp.App.by_id(dp_objs["noParamsAppURL"]).delete()
+            dp.LegacyApp.by_id(dp_objs["noParamsAppURL"]).delete()
         with suppress(Exception):
             dp.File.by_id(dp_objs["fileURL"]).delete()
 

@@ -290,7 +290,7 @@ def deploy(
             with tarfile.open(sdist) as tf:
                 for n in tf.getnames():
                     log.debug(f"  {n}")
-        r: api.App = api.App.upload_pkg(sdist, dp_cfg, overwrite)
+        r: api.LegacyApp = api.LegacyApp.upload_pkg(sdist, dp_cfg, overwrite)
         success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
 
 
@@ -299,7 +299,7 @@ def deploy(
 @click.option("--project")
 def download(name: str, project: str):
     """Download app referenced by NAME to FILE"""
-    s = api.App.get(name, project=project)
+    s = api.LegacyApp.get(name, project=project)
     fn = s.download_pkg()
     success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
 
@@ -309,14 +309,14 @@ def download(name: str, project: str):
 @click.option("--project")
 def delete(name: str, project: str):
     """Delete an app"""
-    api.App.get(name, project).delete()
+    api.LegacyApp.get(name, project).delete()
     success_msg(f"Deleted App {name}")
 
 
 @app.command("list")
 def app_list():
     """List Apps"""
-    print_table(api.App.list(), "Apps")
+    print_table(api.LegacyApp.list(), "Apps")
 
 
 @app.command()
@@ -337,7 +337,7 @@ def run(
     """Run a report"""
     params = process_cmd_param_vals(parameter)
     log.info(f"Running app with parameters {params}")
-    app = api.App.get(name, project=project)
+    app = api.LegacyApp.get(name, project=project)
     with api_error_handler("Error running app"):
         r = app.run(parameters=params, cache=cache)
     if wait:
@@ -507,7 +507,7 @@ def create(name: str, cron: str, parameter: Tuple[str], project: str):
     """
     params = process_cmd_param_vals(parameter)
     log.info(f"Adding schedule with parameters {params}")
-    app_obj = api.App.get(name, project=project)
+    app_obj = api.LegacyApp.get(name, project=project)
     schedule_obj = api.Schedule.create(app_obj, cron, params)
     success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
 

@@ -11,8 +11,7 @@ from lxml import etree
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
-from datapane.client.api.report.blocks import BaseElement
-from datapane.client.api.report.core import BuilderState
+from datapane.client.api.report.blocks import BaseElement, BuilderState
 from datapane.client.utils import DPError
 from datapane.common.report import load_doc, validate_report_doc
 
@@ -36,9 +35,11 @@ def num_blocks(report_str: str) -> int:
 
 
 def assert_report(
-    report: dp.Report, expected_attachments: int = None, expected_num_blocks: int = None
+    report: dp.App, expected_attachments: int = None, expected_num_blocks: int = None
 ) -> t.Tuple[str, t.List[Path]]:
-    report_str, attachments = report._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+    report_str, attachments = dp.Processor(report)._gen_report(
+        embedded=False, served=False, title="TITLE", description="DESCRIPTION"
+    )
     # print(report_str)
     if expected_attachments:
         assert len(attachments) == expected_attachments
@@ -50,7 +51,16 @@ def assert_report(
 
 ################################################################################
 # Generators
-def gen_report_simple() -> dp.Report:
+def gen_report_simple() -> dp.App:
+    return dp.App(
+        blocks=[
+            md_block_id,
+            str_md_block,
+        ]
+    )
+
+
+def gen_legacy_report_simple() -> dp.Report:
     return dp.Report(
         blocks=[
             md_block_id,
@@ -59,13 +69,13 @@ def gen_report_simple() -> dp.Report:
     )
 
 
-def gen_report_complex_no_files() -> dp.Report:
+def gen_report_complex_no_files() -> dp.App:
     """Generate a complex layout report with simple elements"""
     select = dp.Select(blocks=[md_block, md_block], type=dp.SelectType.TABS)
     group = dp.Group(md_block, md_block, columns=2)
     toggle = dp.Toggle(md_block, md_block)
 
-    return dp.Report(
+    return dp.App(
         dp.Page(
             blocks=[
                 dp.Group(md_block, md_block, columns=2),
@@ -90,7 +100,7 @@ def gen_report_complex_no_files() -> dp.Report:
     )
 
 
-def gen_report_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.Report:
+def gen_report_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.App:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -121,9 +131,9 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     )
 
     if single_file:
-        return dp.Report(dp.Group(blocks=[md_block, dt_asset]))
+        return dp.App(dp.Group(blocks=[md_block, dt_asset]))
     else:
-        return dp.Report(
+        return dp.App(
             dp.Page(
                 dp.Select(
                     md_block, html_block, html_block_1, code_block, formula_block, embed_block, type=dp.SelectType.TABS
@@ -147,7 +157,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 # PyReport Tests
 def test_gen_report_single():
     # report with single block
-    report = dp.Report("test block")
+    report = dp.App("test block")
     assert_report(report, 0)
     assert len(report.pages[0].blocks) == 1
     assert isinstance(report.pages[0].blocks[0], dp.Text)
@@ -163,7 +173,7 @@ def test_gen_report_simple():
 
 
 def test_gen_report_nested_mixed():
-    report = dp.Report(
+    report = dp.App(
         dp.Group(
             md_block_id,
             str_md_block,
@@ -182,9 +192,9 @@ def test_gen_report_nested_mixed():
 def test_gen_report_primitives(datadir: Path):
     # check we don't allow arbitary python primitives - must be pickled directly via dp.Attachment
     with pytest.raises(DPError):
-        _ = dp.Report([1, 2, 3])
+        _ = dp.App([1, 2, 3])
 
-    report = dp.Report(
+    report = dp.App(
         "Simple string Markdown #2",  # Markdown
         gen_df(),  # Table
         gen_plot(),  # Plot
@@ -197,44 +207,44 @@ def test_gen_report_primitives(datadir: Path):
 def test_gen_failing_reports():
     # nested pages
     with pytest.raises(DPError):
-        r = dp.Report(dp.Page(dp.Page(md_block)))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Page(dp.Page(md_block)))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
     with pytest.raises(DPError):
-        r = dp.Report(dp.Group(dp.Page(md_block)))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Group(dp.Page(md_block)))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # page/pages with 0 objects
     with pytest.raises(DPError):
-        r = dp.Report(dp.Page(blocks=[]))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Page(blocks=[]))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # select with 1 object
     with pytest.raises(DPError):
-        r = dp.Report(dp.Page(dp.Select(blocks=[md_block])))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Page(dp.Select(blocks=[md_block])))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # empty text block
     with pytest.raises(AssertionError):
-        r = dp.Report(dp.Text(" "))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Text(" "))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # empty df
     with pytest.raises(DPError):
-        r = dp.Report(dp.DataTable(pd.DataFrame()))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.DataTable(pd.DataFrame()))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # invalid names
     with pytest.raises(DocumentInvalid):
-        r = dp.Report(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
-        r._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        r = dp.App(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
+        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     with pytest.raises(DPError):
-        dp.Report(dp.Text("a", name="3-invalid-name"))
+        dp.App(dp.Text("a", name="3-invalid-name"))
 
 
 def test_gen_report_nested_blocks():
     s = "# Test markdown block <hello/> \n Test **content**"
-    report = dp.Report(
+    report = dp.App(
         blocks=[
             dp.Group(dp.Text(s, name="test-id-1"), "Simple string Markdown", label="test-group-label"),
             dp.Select(

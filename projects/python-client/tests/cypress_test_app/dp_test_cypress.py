@@ -5,9 +5,11 @@ str_param = dp.Params.get("__STRING__REQUIRED__")
 int_param = dp.Params.get("__INT__")
 float_param = dp.Params.get("__FLOAT__")
 
-dp.Report(
+app = dp.App(
     dp.Text(str_param),
     dp.Text(str(int_param)),
     dp.Text(str(float_param)),
     dp.Text(file_param.read_text()),
-).upload(name="params-test-report", overwrite=True)
+)
+
+dp.Uploader(app).go(name="params-test-report", overwrite=True)
