@@ -1,6 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
+# TODO: we should probably bundle the statics within the docs build
+# We build against the datpane source, so reference a CDN that has statics
+# that match closer to what we build against
+# Note that Staging can be a few hours out of step with source.
+dp_version="$(poetry run python -c 'print(__import__("datapane").__version__)')"
+export DATAPANE_CDN_BASE="https://staging.datapane-cdn.com/v${dp_version}"
+
 # remove artifacts before building
 find docs -type f \( -name '*.html' -o -name '*-preview.png' \) -delete
 
