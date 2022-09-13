@@ -10,11 +10,11 @@ For more information on getting started, please see our tutorial sections on [Da
 
 ## Access Tokens
 
-If you want to share a private report with an outside party - such as a client or contractor - you can use the link provided next to the **Share** button to generate a secure signed token. This link contains this token which allows anyone with the link to access the report, without signing up to Datapane.
+If you want to share a private report with an outside party—such as a client or contractor—you can use the link provided next to the **Share** button to generate a secure signed token. This link contains this token which allows anyone with the link to access the report, without signing up to Datapane.
 
 ![](../../img/concepts/authentication-and-sharing-1.png)
 
-This token also works across embeds, so you can [embed](/tutorials/datapane-cloud/embedding/#business-integrations) a private report into platforms such as Confluence or your own webpage. You can also use the [report notifications](/tutorials/datapane-cloud/report-notifications "mention") mechanism for this.&#x20;
+You can also use the [report notifications](/tutorials/datapane-enterprise/report-notifications "mention") mechanism for this.&#x20;
 
 !!! info
 
@@ -22,12 +22,12 @@ This token also works across embeds, so you can [embed](/tutorials/datapane-clou
 
 ## Projects
 
-To share a report with a specific group of people on your Datapane Server, your administrator can create a Project under Settings -> Projects. When a new user is added to your Datapane server, the administrator can add them to a specific project. This is especially useful for sharing with external clients.&#x20;
+To share a report with a specific group of people on your Datapane Server, your administrator can create a Project under Settings -> Projects. When a new user is added to your Datapane server, the administrator can add them to a specific Project. This is especially useful for sharing with external clients.&#x20;
 
 ![](../../img/concepts/authentication-and-sharing-2.png)
 
 !!! warning
 
-    Datapane Servers come with a default project. All reports and scripts are shared with the `default` group automatically. If you do not want specific internal or external users to view these reports, **do not add them to the `default` project**.
+    Datapane Servers come with a default Project. All reports and scripts are shared with the `default` group automatically. If you do not want specific internal or external users to view these reports, **do not add them to the `default` Project**.
 
-You can also change the project of a report via the web UI (as per the first image above).
+You can also change the Project of a report via the web UI (as per the first image above).
