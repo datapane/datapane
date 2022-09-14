@@ -61,7 +61,7 @@ $ pip3 install -U datapane
 #### conda
 
 ```
-$ conda install -c conda-forge "datapane>=0.14.0"
+$ conda install -c conda-forge "datapane>=0.15.1"
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
