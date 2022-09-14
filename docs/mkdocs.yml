@@ -77,9 +77,9 @@ nav:
     - 🗃 Components:
       - "catalogues/components/index.ipynb"
       - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
+      - Timeline: "catalogues/components/timeline.ipynb"
     - 📑 Templates:
       - "catalogues/templates/index.ipynb"
-      - Timeline: "catalogues/components/timeline.ipynb"
 
   - Guides:
     - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
