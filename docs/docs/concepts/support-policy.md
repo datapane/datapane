@@ -12,4 +12,4 @@ Here's what you can expect to happen during this period,&#x20;
 
 We will let you know if the planned maintenance period changes, and will alert you immediately if a deployment goes over 15 minutes of downtime. We know Datapane is a key part of your day-to-day workflow, and we appreciate your patience as we work to keep our platform in great shape and ship new features.
 
-**Questions?** If you have questions or concerns about any scheduled maintenance, or if you spot anything unusual after it’s complete, please email support@datapane.com and we'll get back to you ASAP.
+**Questions?** If you have questions or concerns about any scheduled maintenance, or if you spot anything unusual after it’s complete, please email [support@datapane.com](mailto:support@datapane.com) and we'll get back to you ASAP.

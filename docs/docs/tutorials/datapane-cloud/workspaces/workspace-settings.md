@@ -35,7 +35,7 @@ When inviting a new member to your Workspace, you'll be asked to enter their ema
 
 ![Invite member modal](../../../img/tutorials/invite-modal.png){.docs-image}
 
-For more details on managing members and roles, see [Workspaces > Managing members](/managing-members)
+For more details on managing members and roles, see [Workspaces > Managing members](/tutorials/datapane-cloud/workspaces/managing-members)
 
 ## Settings
 

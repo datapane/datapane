@@ -1,6 +1,6 @@
 # Release Notes
 
-!!! hint "What to know what's next?"
+!!! hint "Want to know what's next?"
 
     Check out our [Product Roadmap](https://datapane.nolt.io/roadmap) to see what upcoming features we are considering and make a suggestion!
 
@@ -11,17 +11,17 @@
 | Python version   | 0.15.0 |
 | Breaking changes | True   |
 
-### :octicons-organization-24: Datapane Teams
+### :octicons-organization-24: Workspaces
 
 ![](img/releasenotes/cloud.png){ .docs-image }
 
-We have launched **Team Workspaces** on Datapane Cloud.
+We have launched **Workspaces** on Datapane Cloud.
 
 Datapane Cloud is the best way to host and share your reports, dashboards, and apps.
 
-With this release, Datapane Cloud users can now securely share reports with their team or clients by creating private workspaces and projects.
+With this release, Datapane Cloud users can now securely share reports with their team or clients by creating private Workspaces and Projects.
 
-[Create a Free Workspace](https://datapane.com/accounts/signup){ .md-button }
+[Create a free Workspace](https://datapane.com/accounts/signup){ .md-button }
 
 ### :octicons-repo-template-24: Templates and Components Catalogs
 

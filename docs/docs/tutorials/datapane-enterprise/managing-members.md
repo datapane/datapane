@@ -8,7 +8,7 @@ If you're an Admin logging in to your instance for the first time, you'll be pro
 
 ![Invite member modal](../../img/tutorials/invite-modal.png){.docs-image}
 
-### Roles and projects
+### Roles and Projects
 
 Every member must be assigned to one of our four system roles:&#x20;
 

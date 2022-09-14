@@ -4,7 +4,7 @@
 
 A Project is a grouping of reports much like a folder. To share a report with a specific group of members of your Workspace, you can create a Project from the _Home_ or _Projects_ pages (if you have permission).
 
-![Create a project modal](../../img/tutorials/create-project.png){.docs-image}
+![Create a Project modal](../../img/tutorials/create-project.png){.docs-image}
 
 !!! info
 

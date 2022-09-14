@@ -8,7 +8,7 @@ You can invite members to your Workspace by going to the _Members_ tab in _Works
 
 ![Invite member modal](../../../img/tutorials/invite-modal.png){.docs-image}
 
-### Roles and projects
+### Roles and Projects
 
 Every member must be assigned to one of our four system roles:&#x20;
 

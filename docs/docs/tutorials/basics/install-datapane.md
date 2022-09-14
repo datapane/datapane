@@ -1,4 +1,4 @@
-# Installation
+# Install Datapane
 
 description: Installing and setting up the Datapane library and API on your device
 
@@ -15,13 +15,13 @@ If you use `conda`, you can install it with:
 === "Bash"
 
     ``` bash
-    conda install -c conda-forge "datapane>=0.14.0"
+    conda install -c conda-forge "datapane>=0.15.1"
     ```
 
 === "Jupyter"
 
     ``` bash
-    !conda install -c conda-forge "datapane>=0.14.0"
+    !conda install -c conda-forge "datapane>=0.15.1"
     ```
 
 !!! warning
@@ -73,10 +73,6 @@ $ conda update datapane OR conda update --all
 
 ## Windows Tips and Troubleshooting
 
-!!! info
-
-    Having problems running on Windows? Please read on...
-
 We generally recommend installing via `conda` over `pip` on Windows as it's easier to install all the required dependencies.
 
 If you need to install Python first, the latest versions of Windows 10 can install Python for you automatically - running `python` from the command-prompt will take you to the Windows Store where you can download an [official version](https://docs.python.org/3/using/windows.html#the-microsoft-store-package). We also strongly recommend using a 64-bit rather than the 32-bit version of Python, you can check this by running the command `python -c "import struct; print(struct.calcsize('P')*8, 'bit')"` from the Command Prompt.
@@ -116,4 +112,4 @@ To fix this, adjust your `%PATH%` to include your specific `Scripts` path as men
 
 !!! info
 
-    If you are still having problems installing, please ask on the [Datapane Forum](https://forum.datapane.com) or [Datapane Chat](https://chat.datapane.com), and someone will come to help you.
+    If you are still having problems installing, please ask on our [Datapane Discord server](https://chat.datapane.com), and someone will come to help you.
