@@ -161,3 +161,18 @@ def test_new_config(mock_analytics, monkeypatch):
         report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
         assert posthog.identify.call_count == 1
         assert posthog.capture.call_count == 3
+
+
+def test_upgrade_server(mock_analytics):
+    config_file = """
+    server: https://datapane.com
+    token: REAL_TOKEN
+    """
+    env_name = "upgrade-server"
+    _upgrade_version(mock_analytics, env_name, config_file, identify_calls=1, capture_calls=2)
+
+    from datapane.client import config as c
+
+    new_config = c.Config.load(env_name)
+
+    assert new_config.server == "https://cloud.datapane.com"
