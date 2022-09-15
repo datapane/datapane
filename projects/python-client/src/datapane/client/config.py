@@ -24,7 +24,8 @@ APP_NAME = "datapane"
 APP_DIR = Path(click.get_app_dir(APP_NAME))
 APP_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_ENV = "default"
-DEFAULT_SERVER = "https://datapane.com"
+PAST_DEFAULT_SERVER = "https://datapane.com"
+DEFAULT_SERVER = "https://cloud.datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
 LATEST_VERSION = 4
 
@@ -91,11 +92,13 @@ class Config:
         c_yaml["from_file"] = True
 
         # NOTE - type checker doesn't like us setting class variables on instance
-        config = dacite.from_dict(Config, c_yaml)
+        config: Config = dacite.from_dict(Config, c_yaml)
         config._env = env
         config._path = config_f
         log.debug(f"Loaded client environment from {config._path}")
+
         # check if stored file is out of date
+        config.upgrade_server_config()
         config.upgrade_config_format()
 
         # set to the global state
@@ -131,6 +134,11 @@ class Config:
     @staticmethod
     def get_config_file(env: str) -> Path:
         return APP_DIR / f"{env}.yaml"
+
+    def upgrade_server_config(self):
+        if self.server == PAST_DEFAULT_SERVER:
+            self.server = DEFAULT_SERVER
+            self.save()
 
     def upgrade_config_format(self):
         """Handles updating the older config format
