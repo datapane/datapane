@@ -15,7 +15,7 @@ type ReportViewPayload = {
 const API_HOST = "https://events.datapane.com";
 // NOTE - this will use prod as the url for local reports
 const KPIS_ENDPOINT = urljoin(
-    environment.url ?? "https://datapane.com/",
+    environment.url ?? "https://cloud.datapane.com/",
     "dp-kpis/"
 );
 //const KPIS_ENDPOINT = "http://localhost:8090/dp-kpis/";
