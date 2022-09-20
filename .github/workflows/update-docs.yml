@@ -1,9 +1,10 @@
 name: Update API Docs
 
 on:
-  # Run on any push to master and all PRs (any branch)
+  # Publish the API Docs whenever there's a release
   push:
-    branches: [ master ]
+    tags:
+      - v*
 
 jobs:
   main:
