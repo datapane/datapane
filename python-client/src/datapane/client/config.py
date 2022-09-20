@@ -98,7 +98,6 @@ class Config:
         log.debug(f"Loaded client environment from {config._path}")
 
         # check if stored file is out of date
-        config.upgrade_server_config()
         config.upgrade_config_format()
 
         # set to the global state
@@ -124,8 +123,8 @@ class Config:
 
         with self._path.open("w") as f:
             config_dictionary = dc.asdict(self)
-            config_dictionary["_path"] = None
-            config_dictionary["_env"] = None
+            del config_dictionary["_path"]
+            del config_dictionary["_env"]
             yaml.safe_dump(config_dictionary, f)
 
     def remove(self):
@@ -135,15 +134,14 @@ class Config:
     def get_config_file(env: str) -> Path:
         return APP_DIR / f"{env}.yaml"
 
-    def upgrade_server_config(self):
-        if self.server == PAST_DEFAULT_SERVER:
-            self.server = DEFAULT_SERVER
-            self.save()
-
     def upgrade_config_format(self):
         """Handles updating the older config format
         - we default to the oldest version with default values, and upgrade here
+        - TODO - switch this to stdlib configparser
         """
+        # this isn't tied to a particular config version
+        if self.server == PAST_DEFAULT_SERVER:
+            self.server = DEFAULT_SERVER
 
         # migrate older config files
         if self.version in (1, 2, 3):
@@ -162,9 +160,12 @@ class Config:
 
                     capture("CLI Login", config=self, with_token=True)
 
-            self.version = 4
+            self.version = 5
             self.save()
         elif self.version == 4:
+            self.version = 5
+            self.save()  # trigger removal of _env & _pass from file
+        elif self.version == 5:
             pass  # current
 
 

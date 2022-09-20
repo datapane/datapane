@@ -9,6 +9,7 @@ import os
 from unittest import mock
 
 import pytest
+import yaml
 
 
 @pytest.fixture(scope="module")
@@ -41,12 +42,13 @@ def _upgrade_version(mock_analytics, env: str, config: str, identify_calls: int,
     env_file = tmp_path / f"{env}.yaml"
     env_file.write_text(config)
     _config = c.Config.load(env)
-    assert c.config.version == 4
+    assert c.config.version == 5
     assert _config.email == "joebloggs@datapane.com"
     assert _config.completed_action
     assert posthog.identify.call_count == identify_calls
     assert posthog.capture.call_count == capture_calls
     # TODO - we really should test the saved yaml also...
+    return _config
 
 
 def test_upgrade_v0(mock_analytics):
@@ -101,6 +103,32 @@ def test_upgrade_v3_completed(mock_analytics):
     _upgrade_version(mock_analytics, "v3c", config_file, identify_calls=0, capture_calls=0)
 
 
+def test_upgrade_v4(mock_analytics):
+    config_file = """
+    _env: null
+    _path: null
+    completed_action: true
+    email: joebloggs@datapane.com
+    server: https://datapane.com
+    session_id: 94cecec23d32433db4c8d9105e8eb9c6
+    token: REAL_TOKEN
+    version: 4
+    """
+    _upgrade_version(mock_analytics, "v4c", config_file, identify_calls=0, capture_calls=0)
+
+    from datapane.client import config as c
+
+    assert c.config.server == c.DEFAULT_SERVER
+
+    # load and check _env and _path not present
+    with c.config._path.open("r") as f:
+        c_yaml = yaml.safe_load(f)
+    assert c_yaml["version"] == 5
+    assert c_yaml["server"] == c.DEFAULT_SERVER
+    assert "_env" not in c_yaml
+    assert "_path" not in c_yaml
+
+
 # def test_upgrade_v3_nologin(mock_analytics):
 #     config_file = """
 #     completed_action: false
@@ -121,8 +149,9 @@ def test_new_config(mock_analytics, monkeypatch):
 
     # check pre-invariants
     c.init()
-    assert c.config.version == 4
+    assert c.config.version == 5
     assert c.config.email == ""
+    assert c.config.server == c.DEFAULT_SERVER
     assert not c.config.completed_action
     assert posthog.identify.call_count == 0
     assert posthog.capture.call_count == 0
@@ -146,7 +175,7 @@ def test_new_config(mock_analytics, monkeypatch):
 
     # load and check config file
     _config = c.Config.load()
-    assert c.config.version == 4
+    assert c.config.version == 5
     assert _config.email == "joebloggs@datapane.com"
     assert _config.completed_action
     assert _config.session_id == session_id
@@ -161,18 +190,3 @@ def test_new_config(mock_analytics, monkeypatch):
         report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
         assert posthog.identify.call_count == 1
         assert posthog.capture.call_count == 3
-
-
-def test_upgrade_server(mock_analytics):
-    config_file = """
-    server: https://datapane.com
-    token: REAL_TOKEN
-    """
-    env_name = "upgrade-server"
-    _upgrade_version(mock_analytics, env_name, config_file, identify_calls=1, capture_calls=2)
-
-    from datapane.client import config as c
-
-    new_config = c.Config.load(env_name)
-
-    assert new_config.server == "https://cloud.datapane.com"
