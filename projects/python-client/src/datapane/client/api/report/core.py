@@ -10,7 +10,6 @@ import typing as t
 from enum import Enum
 from pathlib import Path
 from uuid import uuid4
-from warnings import warn
 
 from datapane import __version__ as dp_version
 from datapane.client.api.common import DPTmpFile
@@ -18,6 +17,9 @@ from datapane.client.api.dp_object import DPObjectRef
 from datapane.client.utils import DPError
 
 from .blocks import BlockOrPrimitive, Page, PageOrPrimitive
+
+# from warnings import warn
+
 
 CDN_BASE: str = os.getenv("DATAPANE_CDN_BASE", f"https://test.datapane-cdn.com/v{dp_version}")
 
@@ -149,11 +151,11 @@ class App(DPObjectRef):
     ) -> None:
         from .processors import Uploader
 
-        warn(
-            "`App.upload` is deprecated and will be removed from future releases, use `Uploader` instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
+        # warn(
+        #     "`App.upload` is deprecated and will be removed from future releases, use `Uploader` instead",
+        #     DeprecationWarning,
+        #     stacklevel=2,
+        # )
         Uploader(self).go(
             name, description, source_url, publicly_visible, tags, project, open, formatting, overwrite, **kwargs
         )
@@ -170,11 +172,11 @@ class App(DPObjectRef):
     ) -> None:
         from .processors import Saver
 
-        warn(
-            "`App.save` is deprecated and will be removed from future releases, use `Saver` instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
+        # warn(
+        #     "`App.save` is deprecated and will be removed from future releases, use `Saver` instead",
+        #     DeprecationWarning,
+        #     stacklevel=2,
+        # )
         Saver(self).go(path, open, standalone, name, author, formatting, cdn_base)
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
@@ -202,9 +204,9 @@ class Report(App):
         layout: t.Optional[PageLayout] = None,
         **kwargs,
     ):
-        warn(
-            "`Report` is deprecated and will be removed from future releases, use `App` instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
+        # warn(
+        #     "`Report` is deprecated and will be removed from future releases, use `App` instead",
+        #     DeprecationWarning,
+        #     stacklevel=2,
+        # )
         super().__init__(*arg_blocks, blocks=blocks, layout=layout, **kwargs)
