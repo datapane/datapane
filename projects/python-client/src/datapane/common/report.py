@@ -29,10 +29,6 @@ def is_valid_id(id: str) -> bool:
     return re.fullmatch(r"^[a-zA-Z_][\w.-]*$", id) is not None
 
 
-def escape_html_tags(doc: str) -> str:
-    return doc.replace("<", "&lt;").replace(">", "&gt;")
-
-
 def validate_report_doc(
     xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, quiet: bool = False
 ) -> bool:

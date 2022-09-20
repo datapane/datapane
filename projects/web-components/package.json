@@ -50,6 +50,7 @@
         "plotly.js-dist-min": "^2.14.0",
         "posthog-js": "^1.24.0",
         "ramda": "^0.28.0",
+        "sanitize-html": "^2.7.2",
         "sass": "^1.49.9",
         "stream": "0.0.2",
         "url-join": "^5.0.0",
