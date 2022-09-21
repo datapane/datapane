@@ -10,7 +10,8 @@ from datapane.client.api import HTTPError
 
 from .common import check_name, deletable, gen_name
 
-pytestmark = pytest.mark.usefixtures("dp_login")
+# pytestmark = pytest.mark.usefixtures("dp_login")
+pytestmark = pytest.mark.skip("LeagacyApp tests disabled")
 
 # TODO: FIX TEST TO USE ENVIRONMENT VALUE FROM ENVIRONMENT OBJECT
 
@@ -26,7 +27,7 @@ def test_app_basic(shared_datadir: Path, monkeypatch):
     env_name = gen_name("env")
     with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.App.upload_pkg(sdist, dp_cfg, name=name, environment=env_name)
+            s = dp.LegacyApp.upload_pkg(sdist, dp_cfg, name=name, environment=env_name)
 
         with deletable(s):
             # are fields added?
@@ -51,7 +52,7 @@ def test_app_basic(shared_datadir: Path, monkeypatch):
                 run.refresh()
             assert run.status == "SUCCESS"
 
-            with deletable(dp.Report.by_id(run.report)) as report:
+            with deletable(dp.App.by_id(run.report)) as report:
                 assert report.web_url
 
             ########################################################################
@@ -77,7 +78,7 @@ def test_app_complex(shared_datadir: Path, monkeypatch):
 
     with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name)
+            s = dp.LegacyApp.upload_pkg(sdist, dp_cfg, environment=env_name)
 
         with deletable(s):
             assert "datapane-demos" in s.source_url
@@ -121,7 +122,7 @@ def test_app_complex_report(shared_datadir: Path, monkeypatch):
     env_name = "ENV"
     with deletable(dp.Environment.create(name=env_name, environment={"ENV_VAR": "env_value"}, overwrite=True)):
         with sc.build_bundle(dp_cfg) as sdist:
-            s = dp.App.upload_pkg(sdist, dp_cfg, environment=env_name, overwrite=True)
+            s = dp.LegacyApp.upload_pkg(sdist, dp_cfg, environment=env_name, overwrite=True)
 
         with deletable(s):
             run = s.run()
@@ -131,7 +132,7 @@ def test_app_complex_report(shared_datadir: Path, monkeypatch):
                 run.refresh()
 
             assert run.status == "SUCCESS"
-            report = dp.Report.by_id(run.report)
+            report = dp.App.by_id(run.report)
             assert report.num_blocks == 11
 
 

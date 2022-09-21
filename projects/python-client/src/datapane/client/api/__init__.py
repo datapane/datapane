@@ -10,7 +10,7 @@ These objects are all available under the `datapane` module, via `import datapan
 
 The core document APIs, these are found in `datapane.client.api.report`, including,
 
-  - `datapane.client.api.report.core.Report`
+  - `datapane.client.api.report.core.App`
   - Layout Blocks
     - `datapane.client.api.report.blocks.Page`
     - `datapane.client.api.report.blocks.Group`
@@ -32,7 +32,7 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
 
   - `datapane.client.api.teams.File`
   - `datapane.client.api.teams.Environment`
-  - `datapane.client.api.teams.App`
+  - `datapane.client.api.teams.LegacyApp`
   - `datapane.client.api.teams.Schedule`
 
 
@@ -69,9 +69,20 @@ from .report.blocks import (
     Text,
     Toggle,
 )
-from .report.core import FontChoice, PageLayout, Report, ReportFormatting, ReportWidth, TextAlignment
+from .report.core import (
+    App,
+    AppFormatting,
+    AppWidth,
+    FontChoice,
+    PageLayout,
+    Report,
+    ReportFormatting,
+    ReportWidth,
+    TextAlignment,
+)
+from .report.processors import Processor, Saver, Server, Uploader
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
-from .teams import App, Environment, File, Run, Schedule
+from .teams import Environment, File, LegacyApp, Run, Schedule
 from .user import hello_world, login, logout, ping, template
 
 from ..config import init  # isort:skip  otherwise circular import issue
@@ -80,6 +91,9 @@ from . import builtins  # isort:skip
 __all__ = [
     "warnings",
     "init",
+    "App",
+    "AppFormatting",
+    "AppWidth",
     "IncompatibleVersionError",
     "builtins",
     "HTTPError",
@@ -95,9 +109,11 @@ __all__ = [
     "Empty",
     "Formula",
     "Group",
+    "LegacyApp",
     "Media",
     "Page",
     "Plot",
+    "Report",
     "Select",
     "SelectType",
     "Table",
@@ -105,12 +121,15 @@ __all__ = [
     "Toggle",
     "FontChoice",
     "PageLayout",
-    "Report",
+    "Processor",
     "ReportFormatting",
     "ReportWidth",
     "TextAlignment",
+    "Uploader",
     "Params",
     "Result",
+    "Saver",
+    "Server",
     "_report",
     "_reset_runtime",
     "by_datapane",
@@ -119,6 +138,7 @@ __all__ = [
     "File",
     "Run",
     "Schedule",
+    "Server",
     "hello_world",
     "login",
     "logout",

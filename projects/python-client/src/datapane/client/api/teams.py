@@ -29,19 +29,19 @@ from .dp_object import DPObjectRef, save_df
 if t.TYPE_CHECKING:
     import pandas as pd
 
-__all__ = ["File", "Environment", "App", "Schedule"]
+__all__ = ["File", "Environment", "Schedule"]
 
 __pdoc__ = {
     "File.endpoint": False,
-    "App.endpoint": False,
+    "LegacyApp.endpoint": False,
     "Environment.endpoint": False,
     "Schedule.endpoint": False,
     # most app parameters we ignore
-    "App.call": False,
-    "App.upload_pkg": False,
-    "App.download_pkg": False,
-    "App.run": False,
-    "App.local_run": False,
+    "LegacyApp.call": False,
+    "LegacyApp.upload_pkg": False,
+    "LegacyApp.download_pkg": False,
+    "LegacyApp.run": False,
+    "LegacyApp.local_run": False,
 }
 
 
@@ -216,7 +216,7 @@ class Environment(DPObjectRef):
         return cls.post(name=name, overwrite=overwrite, **opt_fields)
 
 
-class App(DPObjectRef):
+class LegacyApp(DPObjectRef):
     """
     Apps allow users to build, deploy, and automate data-driven Python workflows and apps
     to their cloud that can be customised and run by other users.
@@ -227,7 +227,7 @@ class App(DPObjectRef):
     endpoint: str = "/apps/"
 
     @classmethod
-    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, overwrite: bool = False, **kwargs) -> App:
+    def upload_pkg(cls, sdist: Path, dp_cfg: DatapaneCfg, overwrite: bool = False, **kwargs) -> LegacyApp:
         # TODO - use DPTmpFile
         # merge all the params for the API-call
         merged_args = {**dp_cfg.to_dict(), **kwargs}
@@ -299,7 +299,7 @@ class Schedule(DPObjectRef):
     list_fields = ["id", "app", "cron", "parameter_vals"]
 
     @classmethod
-    def create(cls, app: App, cron: str, parameters: SDict) -> Schedule:
+    def create(cls, app: LegacyApp, cron: str, parameters: SDict) -> Schedule:
         return cls.post(app=app.url, cron=cron, parameter_vals=parameters)
 
     # NOTE - mypy doesn't like this method because the signature is different from super type

@@ -3,7 +3,6 @@ import argparse
 import json
 import os
 import pickle
-import sys
 from contextlib import suppress
 from pathlib import Path
 
@@ -17,7 +16,7 @@ from datapane.common.utils import pushd
 c.set_config(c.Config(server=os.environ["DP_TEST_SERVER"], token=os.environ["DP_TEST_TOKEN"]))
 
 
-def setup(test_org: bool):
+def setup(file: Path, test_org: bool):
     """Create the cypress test objects"""
     print("Building test reports / apps")
 
@@ -27,11 +26,11 @@ def setup(test_org: bool):
 
     dp_objs = {"styleReportURL": style_report.web_url}
 
-    def get_test_app(name: str) -> dp.App:
+    def get_test_app(name: str) -> dp.LegacyApp:
         with pushd(Path(".") / "tests" / "cypress_test_app"):
             dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path(f"{name}.yaml"), script=Path(f"{name}.py"))
             with sc.build_bundle(dp_cfg) as sdist:
-                app = dp.App.upload_pkg(sdist, dp_cfg, name=gen_name())
+                app = dp.LegacyApp.upload_pkg(sdist, dp_cfg, name=gen_name())
         return app
 
     # add a basic app and file
@@ -47,24 +46,24 @@ def setup(test_org: bool):
             {"paramsAppURL": params_app.web_url, "noParamsAppURL": no_params_app.web_url, "fileURL": obj_file.web_url}
         )
 
-    # write to stderr for cypress tests to pick up
-    print(json.dumps(dp_objs), flush=True, file=sys.stderr)
+    # write to tmp file for cypress tests to pick up
+    file.write_text(json.dumps(dp_objs))
 
 
-def teardown(test_org: bool):
+def teardown(file: Path, test_org: bool):
     """Delete the cypress test objects"""
     print("Deleting test reports / apps")
     # read the urls from stdin
-    dp_objs: dict = json.load(sys.stdin)
+    dp_objs: dict = json.loads(file.read_text())
 
     # delete the objects, ignoring errors
     with suppress(Exception):
-        dp.Report.by_id(dp_objs["styleReportURL"]).delete()
+        dp.App.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
         with suppress(Exception):
-            dp.App.by_id(dp_objs["paramsAppURL"]).delete()
+            dp.LegacyApp.by_id(dp_objs["paramsAppURL"]).delete()
         with suppress(Exception):
-            dp.App.by_id(dp_objs["noParamsAppURL"]).delete()
+            dp.LegacyApp.by_id(dp_objs["noParamsAppURL"]).delete()
         with suppress(Exception):
             dp.File.by_id(dp_objs["fileURL"]).delete()
 
@@ -73,5 +72,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Setup system for cypress tests")
     parser.add_argument("--teardown", action="store_true")
     parser.add_argument("--org", action="store_true")
+    parser.add_argument("file", type=Path)
     args = parser.parse_args()
-    teardown(args.org) if args.teardown else setup(args.org)
+    teardown(args.file, args.org) if args.teardown else setup(args.file, args.org)

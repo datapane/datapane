@@ -22,7 +22,7 @@ total_df = df[df["date"] == df["date"].max()].sort_values("total_vaccinations", 
 total_styled = total_df.style.bar(subset=["total_vaccinations"], color='#5fba7d', vmax=total_df["total_vaccinations"].sum())
 
 # embed into a Datapane Report
-report = dp.Report(
+report = dp.App(
     "## Vaccination Report",
     dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
     dp.Table(total_styled, caption="Current vaccination totals by manufacturer"),

@@ -7,7 +7,7 @@ df = data.iris()
 fig = alt.Chart(df).mark_point().encode(x="petalLength:Q", y="petalWidth:Q", color="species:N")
 
 
-report = dp.Report(
+report = dp.App(
     dp.Text(
         """
 # Hello world
@@ -48,7 +48,7 @@ fig = (
         """
 import datapane as dp
 
-report = dp.Report(
+report = dp.App(
     dp.Plot(fig),
     dp.DataTable(df)
 )

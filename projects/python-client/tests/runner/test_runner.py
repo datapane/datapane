@@ -53,7 +53,7 @@ def test_exec(datadir: Path, monkeypatch, capsys):
     assert out == "x is 4\nin foo\nmy_df\n5\n"
 
 
-class MockApp(dp.App):
+class MockApp(dp.LegacyApp):
     """Use custom mock class to disable constructor but keep other methods"""
 
     script = ""
@@ -94,7 +94,7 @@ def mock_do_download_file(fn: str, *args):
     return Path(fn)
 
 
-@mock.patch("datapane.client.api.App", new=MockApp)
+@mock.patch("datapane.client.api.LegacyApp", new=MockApp)
 @mock.patch("datapane.client.api.common.do_download_file", side_effect=mock_do_download_file)
 def _runner(
     params: SDict, env: SSDict, script: Path, ddf, sdist: Path = Path("."), app_schema: t.List[SDict] = []
@@ -115,7 +115,7 @@ def _runner(
 
 # TODO - fix exception handling stacktraces
 @mock.patch("datapane.runner.exec_script.setup_script", autospec=True)
-@mock.patch("datapane.client.api.Report.upload", autospec=True, side_effect=mock_report_upload)
+@mock.patch("datapane.client.api.App.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
     """Test running an isolated code snippet with params
     NOTE - we can simplify by calling exec_script.run directly, doesn't test as much of API however
@@ -137,7 +137,7 @@ def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
         isc.assert_called()
         (rc_args, rc_kwargs) = rc.call_args
         assert rc_kwargs["description"] == "Description"
-        _r: dp.Report = rc_args[0]
+        _r: dp.App = rc_args[0]
         _blocks = _r.pages[0].blocks
         assert isinstance(_blocks, list)
         assert len(_blocks) == 3
@@ -151,7 +151,7 @@ def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
     f("WORLD")
 
 
-@mock.patch("datapane.client.api.Report.upload", autospec=True, side_effect=mock_report_upload)
+@mock.patch("datapane.client.api.App.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")
