@@ -10,9 +10,16 @@ const CSS_HEADER = `<style>
 }
 </style>`;
 
+const MALICIOUS_HEADER =
+    "<style onload=\"window.location.href = 'https://google.com'\"></style><script id='cy-malicious-script'></script>";
+
 describe("Changing a report's style", () => {
     before(() => {
         cy.dpLogin();
+    });
+
+    beforeEach(() => {
+        Cypress.Cookies.preserveOnce("sessionid", "djdt");
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
         cy.get("#djHideToolBarButton").click();
     });
@@ -69,5 +76,15 @@ describe("Changing a report's style", () => {
             "background-color",
             "rgb(255, 255, 255)"
         );
+    });
+
+    it("Should sanitise attempted JS injection", () => {
+        cy.get("#id_style_header").clear().type(MALICIOUS_HEADER);
+        cy.get("button[type=submit]").click();
+
+        cy.visit(URLS.STYLE_REPORT);
+
+        cy.get("script[id=cy-malicious-script]").should("not.exist");
+        cy.get("[data-cy=report-component]").should("exist");
     });
 });
