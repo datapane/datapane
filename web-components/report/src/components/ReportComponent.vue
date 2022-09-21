@@ -14,6 +14,7 @@ import {
     trackReportView,
 } from "../../../shared/dp-track";
 import { ReportProps } from "../data-model/types";
+import sanitizeHtml from "sanitize-html";
 
 // Vue can't use a ts interface as props
 // see https://github.com/vuejs/core/issues/4294
@@ -61,8 +62,19 @@ const rootGroup: ComputedRef<LayoutBlock> = computed(
     () => report.children[pageNumber.value].children[0]
 );
 
-// HTML header is taken from the report object, unless overwritten via props
-const htmlHeader = p.htmlHeader || p.report.output_style_header;
+const htmlHeader = computed(() => {
+    // HTML header is taken from the report object, unless overwritten via props
+    const dirtyHeader = p.htmlHeader || p.report.output_style_header;
+    return p.isOrg
+        ? dirtyHeader
+        : sanitizeHtml(dirtyHeader, {
+              allowedTags: ["style"],
+              allowedAttributes: {
+                  style: [],
+              },
+              allowVulnerableTags: true, // Suppress warning for allowing `style`
+          });
+});
 
 const htmlHeaderRef = (node: any) => {
     /**
