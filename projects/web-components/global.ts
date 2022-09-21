@@ -10,6 +10,7 @@ declare global {
         dpLocalViewEvent: any;
         Alpine: any;
         $testResources: any;
+        errorHandler: any;
     }
 }
 
