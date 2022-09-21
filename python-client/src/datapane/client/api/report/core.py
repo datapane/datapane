@@ -18,7 +18,7 @@ from datapane.client.utils import DPError
 
 from .blocks import BlockOrPrimitive, Page, PageOrPrimitive
 
-CDN_BASE: str = os.getenv("DATAPANE_CDN_BASE", f"https://test.datapane-cdn.com/v{dp_version}")
+CDN_BASE: str = os.getenv("DATAPANE_CDN_BASE", f"https://datapane-cdn.com/v{dp_version}")
 
 # only these types will be documented by default
 __all__ = ["App", "AppWidth"]
