@@ -18,7 +18,7 @@ plot1 = (
     .interactive()
 )
 
-report = dp.Report(
+report = dp.App(
     """🎆 Congratulations on uploading your first Datapane report!! 🎆""",
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(

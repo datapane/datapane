@@ -1,5 +1,7 @@
 import datapane as dp
 
-dp.Report(
+app = dp.App(
     dp.Text("__REPORT_RENDERED__"),
-).upload(name="no-params-test-report", overwrite=True)
+)
+
+dp.Uploader(app).go(name="no-params-test-report", overwrite=True)

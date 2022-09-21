@@ -31,7 +31,7 @@ def setup_api(dp_token: str, dp_host: str, debug: bool = False, logs: TextIO = N
 
 def run_api(run_config: RunnerConfig) -> RunResult:
     """Bootstrap the recursive calls into run"""
-    app = api.App.by_id(run_config.app_id)
+    app = api.LegacyApp.by_id(run_config.app_id)
     # is the app compatible with the client runner/api
     if not is_version_compatible(__version__, app.api_version, raise_exception=False):
         log.warning(
