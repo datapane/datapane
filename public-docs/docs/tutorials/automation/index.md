@@ -25,7 +25,7 @@ _Datapane Enterprise_ also provides a [script runner](/tutorials/apps/), which h
 
     This tutorial presumes you have a basic understanding of how to use GitHub actions. For more information, please refer to GitHub's documentation.
 
-Your GitHub action requires access to your Datapane API token, which you can find on your [settings page](https://datapane.com/settings) once you have logged in to Datapane. This should not be stored in plain text, and should be added to your repository's [secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets) section.
+Your GitHub action requires access to your Datapane API token, which you can find on your [settings page](https://cloud.datapane.com/settings) once you have logged in to Datapane. This should not be stored in plain text, and should be added to your repository's [secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets) section.
 
 The Datapane action requires that the repository contains a Python script which publishes a report. Once you have your token in your repository, you can you can add the Datapane action as a `job`, including the path to the Python script, and a reference to your secret token.
 
