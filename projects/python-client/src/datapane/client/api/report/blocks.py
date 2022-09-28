@@ -27,6 +27,7 @@ from datapane.common.report import get_embed_url, is_valid_id, mk_attribs
 
 from ..common import DPTmpFile
 from ..dp_object import save_df
+from ..ipython_utils import block_to_iframe
 
 E = ElementMaker()  # XML Tag Factory
 
@@ -140,9 +141,9 @@ class BaseElement(ABC):
         """Display the block as a side effect within a Jupyter notebook"""
         from IPython.display import display, HTML
 
-        block_html = "<!-- Block -->"
+        block_iframe_html_string = block_to_iframe(self)
 
-        display(HTML(block_html))
+        display(HTML(block_iframe_html_string))
 
 
     @abstractmethod
