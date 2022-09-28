@@ -181,6 +181,24 @@ class App(DPObjectRef):
 
         return view_html_string
 
+    def stringify(
+        self,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+        cdn_base: str = CDN_BASE,
+        template_name: str = "template.html"
+    ) -> str:
+        from .processors import Stringify
+
+        stringify_processor = Stringify(self)
+        stringify_processor.template_name = template_name
+        
+        app_html = stringify_processor.go(standalone, name, author, formatting, cdn_base)
+
+        return app_html
+
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
         # pre-process report blocks
         if all(isinstance(b, Page) for b in pages):
