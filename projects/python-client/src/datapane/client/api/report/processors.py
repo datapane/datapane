@@ -229,6 +229,43 @@ class LocalProcessor(Processor, ABC):
 
         return report_id
 
+
+    def stringify(
+        self,
+        report_doc: str,
+        name: str,
+        cdn_base: str = CDN_BASE,
+        standalone: bool = False,
+        author: t.Optional[str] = None,
+        formatting: AppFormatting = None,
+    ) -> str:
+        if formatting is None:
+            formatting = AppFormatting()
+
+        # create template on demand
+        if not self.template:
+            self._setup_template()
+
+        report_id: str = uuid4().hex
+        r = self.template.render(
+            report_doc=report_doc,
+            report_width_class=report_width_classes.get(formatting.width),
+            report_name=name,
+            report_author=author,
+            report_date=timestamp(),
+            css_header=formatting.to_css(),
+            is_light_prose=formatting.light_prose,
+            dp_logo=self.logo,
+            report_id=report_id,
+            author_id=c.config.session_id,
+            events=not _NO_ANALYTICS,
+            standalone=standalone,
+            cdn_base=cdn_base,
+        )
+
+        return report_id, r
+
+
     def assert_bundle_exists(self):
         resource_to_check = "report" if self.served else "local-report-base.css"
         if not (self.assets / resource_to_check).exists():
@@ -547,3 +584,62 @@ class Server(LocalProcessor):
         """Opens localserver endpoint, should be called in its own thread"""
         sleep(1)  # yield to main thread in order to allow start server process to run
         webbrowser.open_new_tab(f"http://{host}:{port}")
+
+
+class Stringify(LocalProcessor):
+    """
+    Stringifies a given App as a single HTML string
+    """
+
+    served = False
+    template_name = "template.html"
+
+    def go(
+        self,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+        cdn_base: str = CDN_BASE,
+    ) -> str:
+        """Stringify the app document to a HTML string
+
+        Args:
+            standalone: Inline the app source in the HTML app file rather than loading via CDN (default: False)
+            name: Name of the document (optional: uses path if not provided)
+            author: The app author / email / etc. (optional)
+            formatting: Sets the basic app styling
+            cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
+        """
+
+        report_id, app_html_string = self._save(cdn_base, standalone, name, author, formatting)
+        
+        if(self.template_name == "ipynb_template.html"):
+            capture("IPython Block Display", report_id=report_id)
+        else:
+            capture("App Stringified", report_id=report_id)
+
+        return app_html_string
+
+    def _save(
+        self,
+        cdn_base: str = CDN_BASE,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+    ) -> str:
+
+        if not name:
+            name = "Stringified App"
+
+        local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
+        app_html_string = self.stringify(
+            local_doc,
+            name=name,
+            cdn_base=cdn_base,
+            standalone=standalone,
+            formatting=formatting,
+        )
+
+        return app_html_string
