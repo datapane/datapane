@@ -1,0 +1,57 @@
+<style>
+  #dp-{{ report_id }} {
+    width: 1px;
+    min-width: 100%;
+  }
+</style>
+<script src="https://davidjbradshaw.com/iframe-resizer/js/iframeResizer.min.js"></script>
+<iframe id="dp-{{ report_id }}" srcdoc="{% filter escape %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://kit.fontawesome.com/256c714d9a.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700|Inconsolata|Karla|Rubik&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      window.dpLocal = true;
+      {% if events %}
+        window.dpLocalViewEvent = {{events|tojson}};
+        window.dpReportId = "{{report_id}}";
+        window.dpAuthorId = "{{author_id}}";
+      {% endif %}
+    </script>
+    {% if standalone %}
+      <style>
+        {% include "local-report-base.css" %}
+      </style>
+    {% else %}
+      <link rel="stylesheet" href="{{ cdn_base }}/report/style.css">
+    {% endif %}
+    <script>
+      const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };
+      const htmlHeader = `<style type="text/css">{{ css_header }}</style>`;
+      window.reportProps = { report, htmlHeader };
+    </script>
+    {% if standalone %}
+      <script type="module">
+        {{ include_raw("local-report-base.js") }}
+      </script>
+    {% else %}
+      <script type="module">
+        import { mountReport } from "{{ cdn_base }}/report/index.es.js";
+        mountReport(window.reportProps);
+      </script>
+    {% endif %}
+  </head>
+  <body>
+    <main class="{{ report_width_class }} w-full mx-auto">
+      <div id="report" class="w-full"></div>
+    </main>
+    <script type="text/javascript" src="https://davidjbradshaw.com/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
+  </body>
+</html>{% endfilter %}" style="border:none;"></iframe>
+<script>
+  iFrameResize({ log: true, checkOrigin: false }, '#dp-{{ report_id }}')
+</script>
