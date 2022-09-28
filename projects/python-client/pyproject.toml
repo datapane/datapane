@@ -28,7 +28,13 @@ classifiers = [
 #]
 
 # extra files (allows overriding gitignore)
-include = ["NOTICE", "src/**/local-report-base.*"]  # "README.md", "LICENSE"]
+include = [
+    "NOTICE",
+    "README.md",
+    "LICENSE",
+    "src/datapane/resources/local_report/*",
+    "src/datapane/resources/local_report/report/**/*",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7.1, < 3.11.0"
