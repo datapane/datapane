@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-import html
-import uuid
+import typing
+
+if typing.TYPE_CHECKING:
+    from .report.blocks import BaseElement
 
 """
 Datapane helper functions to improve the Datapane UX in Jupyter notebooks
 """
 
 
-def block_to_iframe(block: Block) -> str:
+def block_to_iframe(block: BaseElement) -> str:
     """Convert a Block to HTML, placed within an iFrame
 
     Args:
