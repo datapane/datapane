@@ -12,4 +12,4 @@ app = dp.App(
     dp.Text(file_param.read_text()),
 )
 
-dp.Uploader(app).go(name="params-test-report", overwrite=True)
+dp.upload(app, name="params-test-report", overwrite=True)
