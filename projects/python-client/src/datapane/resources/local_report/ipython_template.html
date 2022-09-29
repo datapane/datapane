@@ -4,7 +4,7 @@
     min-width: 100%;
   }
 </style>
-<script src="https://davidjbradshaw.com/iframe-resizer/js/iframeResizer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.min.js" integrity="sha512-dnvR4Aebv5bAtJxDunq3eE8puKAJrY9GBJYl9GC6lTOEC76s1dbDfJFcL9GyzpaDW4vlI/UjR8sKbc1j6Ynx6w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <iframe id="dp-{{ report_id }}" srcdoc="{% filter escape %}<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -49,8 +49,7 @@
     <main class="{{ report_width_class }} w-full mx-auto">
       <div id="report" class="w-full"></div>
     </main>
-    <script type="text/javascript" src="https://davidjbradshaw.com/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
-  </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.min.js" integrity="sha512-14SY6teTzhrLWeL55Q4uCyxr6GQOxF3pEoMxo2mBxXwPRikdMtzKMYWy2B5Lqjr6PHHoGOxZgPaxUYKQrSmu0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  </body>
 </html>{% endfilter %}" style="border:none;"></iframe>
 <script>
   iFrameResize({ log: true, checkOrigin: false }, '#dp-{{ report_id }}')
