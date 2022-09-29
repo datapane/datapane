@@ -36,7 +36,7 @@ def test_legacy_report_simple():
 
 def test_report_simple():
     report = gen_report_simple()
-    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION", project="default")
+    dp.upload(report, name=gen_name(), description="DESCRIPTION", project="default")
     with deletable(report):
         pass
 
@@ -59,7 +59,7 @@ def test_report_update_metadata():
         "num_blocks",
     )
 
-    dp.Uploader(report).go(name, **props)
+    dp.upload(report, name, **props)
 
     with deletable(report):
 
@@ -73,7 +73,7 @@ def test_report_update_metadata():
         orig_dto = deepcopy(report.dto)
 
         # overwrite and upload again, using defaults
-        dp.Uploader(report).go(name, overwrite=True)
+        dp.upload(report, name, overwrite=True)
 
         # check specified props haven't changed
         check_props()
@@ -86,34 +86,33 @@ def test_report_update_metadata():
 def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
     # Test we can save, build then upload
-    dp.Saver(report).go(str(datadir / "test_report.html"))
-    dp.Server(report).build(name="test_report", dest=datadir)
-    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
+    dp.save(report, str(datadir / "test_report.html"))
+    dp.build(report, name="test_report", dest=datadir)
+    dp.upload(report, name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
 
 def test_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
+    dp.upload(report, name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
 
 def test_report_update_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    uploader = dp.Uploader(report)
-    uploader.go(name=gen_name(), description="DESCRIPTION")
+    dp.upload(report, name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         doc_a = report.document
-        uploader.go(name=gen_name(), description="DESCRIPTION")
+        dp.upload(report, name=gen_name(), description="DESCRIPTION")
         doc_b = report.document
         assert doc_a == doc_b
 
 
 def test_demo_report():
     report = dp.builtins.build_demo_report()
-    dp.Uploader(report).go(name=gen_name(), description="DESCRIPTION")
+    dp.upload(report, name=gen_name(), description="DESCRIPTION")
     with deletable(report):
         pass
 
@@ -143,7 +142,7 @@ def test_full_report(tmp_path: Path, shared_datadir: Path, monkeypatch):
     divider = dp.Divider()
     empty_block = dp.Empty(name="empty-block")
     dp_report = dp.App(m, file_asset, df_asset, plot_asset, list_asset, divider, empty_block, media_asset)
-    dp.Uploader(dp_report).go(name=name, description=description, source_url=source_url)
+    dp.upload(dp_report, name=name, description=description, source_url=source_url)
 
     with deletable(dp_report):
         # are the fields ok
@@ -228,7 +227,7 @@ def test_complex_df_report():
     df_desc_2_t = dp.DataTable(df_desc_2)
 
     with deletable(dp.App(tz_t, index_t, df_desc_t, df_desc_2_t)) as dp_report:
-        dp.Uploader(dp_report).go(name=gen_name())
+        dp.upload(dp_report, name=gen_name())
 
         # NOTE - as above, downloading embedded assets from a report currently not supported in API
         # check_df_equal(tz_df, tz_t.download_df())
@@ -242,13 +241,13 @@ def test_report_project():
     # i.e. both in the same team, or another project in a diff team
     # update a report that will automatically be added to the default project
     report = gen_report_simple()
-    dp.Uploader(report).go(name="test_report_project")
+    dp.upload(report, name="test_report_project")
     # check if the project name is default
     with deletable(report):
         assert report.project == "default"
 
     # explicitly add to the project
-    dp.Uploader(report).go(name="test_report_project_2", project="default")
+    dp.upload(report, name="test_report_project_2", project="default")
     with deletable(report):
         assert report.project == "default"
 
@@ -256,5 +255,5 @@ def test_report_project():
     report2 = gen_report_simple()
 
     with pytest.raises(requests.HTTPError) as e:
-        dp.Uploader(report2).go(name="test_wrong_project", project="wrong-project")
+        dp.upload(report2, name="test_wrong_project", project="wrong-project")
         assert e.response.status_code == 400
