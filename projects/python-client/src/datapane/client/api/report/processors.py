@@ -36,7 +36,7 @@ from datapane.common.utils import compress_file
 from .blocks import BuilderState, E
 from .core import CDN_BASE, App, AppFormatting, AppWidth
 
-__all__ = ["Uploader", "Saver", "Server"]
+__all__ = ["upload", "save", "serve", "build"]
 
 
 # TODO - Refactor to share dp_tags.widths
@@ -256,21 +256,6 @@ class Uploader(Processor):
         overwrite: bool = False,
         **kwargs,
     ) -> None:
-        """
-        Upload the app document, including its attached assets, to the logged-in Datapane Server.
-
-        Args:
-            name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
-            description: A high-level description for the document, this is displayed in searches and thumbnails
-            source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
-            publicly_visible: Visible to anyone with the link
-            tags: A list of tags (as strings) used to categorise your document
-            project: Project to add the app to
-            open: Open the file in your browser after creating
-            formatting: Set the basic styling for your app
-            overwrite: Overwrite the app
-        """
-
         display_msg("Uploading app and associated data - *please wait...*")
 
         self._upload_report(
@@ -367,18 +352,6 @@ class Saver(LocalProcessor):
         formatting: t.Optional[AppFormatting] = None,
         cdn_base: str = CDN_BASE,
     ) -> None:
-        """Save the app document to a local HTML file
-
-        Args:
-            path: File path to store the document
-            open: Open in your browser after creating (default: False)
-            standalone: Inline the app source in the HTML app file rather than loading via CDN (default: False)
-            name: Name of the document (optional: uses path if not provided)
-            author: The app author / email / etc. (optional)
-            formatting: Sets the basic app styling
-            cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
-        """
-
         report_id = self._save(path, cdn_base, open, standalone, name, author, formatting)
         capture("CLI Report Save", report_id=report_id)
 
@@ -451,17 +424,6 @@ class Server(LocalProcessor):
         open: bool = True,
         overwrite: bool = False,
     ) -> None:
-        """Serve the app from a local http server
-
-        Args:
-            name: The name of the app, which will also be the name of the app directory
-            dest: File path to store the app directory
-            open: Open in your browser after creating (default: False)
-            port: The port used to serve the app (default: 8000)
-            host: The host used to serve the app (default: localhost)
-            formatting: Sets the basic app styling; note that this is ignored if a app exists at the specified path
-            overwrite: Replace existing app with the same name and destination if already exists (default: False)
-        """
         path = self.build(name=name, dest=dest, formatting=formatting, compress_assets=True, overwrite=overwrite)
 
         os.chdir(path)  # Run the server in the specified path
@@ -488,15 +450,6 @@ class Server(LocalProcessor):
         compress_assets: bool = False,
         overwrite: bool = False,
     ) -> Path:
-        """Build a app which can be served by a local http server
-
-        Args:
-            name: The name of the app, which will also be the name of the app directory
-            dest: File path to store the app directory
-            compress_assets: Compress user assets during app generation (default: True)
-            formatting: Sets the basic app styling
-            overwrite: Replace existing app with the same name and destination if already exists (default: False)
-        """
         path: Path = Path(dest or os.getcwd()) / name
         app_exists = path.is_dir()
 
@@ -547,3 +500,114 @@ class Server(LocalProcessor):
         """Opens localserver endpoint, should be called in its own thread"""
         sleep(1)  # yield to main thread in order to allow start server process to run
         webbrowser.open_new_tab(f"http://{host}:{port}")
+
+
+def serve(
+    app: App,
+    name: str = "app",
+    dest: t.Optional[NPath] = None,
+    port: int = 8000,
+    host: str = "localhost",
+    formatting: t.Optional[AppFormatting] = None,
+    open: bool = True,
+    overwrite: bool = False,
+):
+    """Serve the app from a local http server
+    Args:
+        app: The `App` object
+        name: The name of the app directory to be created
+        dest: File path to store the app directory
+        open: Open in your browser after creating (default: False)
+        port: The port used to serve the app (default: 8000)
+        host: The host used to serve the app (default: localhost)
+        formatting: Sets the basic app styling; note that this is ignored if a app exists at the specified path
+        overwrite: Replace existing app with the same name and destination if already exists (default: False)
+    """
+    Server(app).go(name=name, dest=dest, port=port, host=host, formatting=formatting, open=open, overwrite=overwrite)
+
+
+def build(
+    app: App,
+    name: str = "app",
+    dest: t.Optional[NPath] = None,
+    formatting: t.Optional[AppFormatting] = None,
+    compress_assets: bool = False,
+    overwrite: bool = False,
+) -> None:
+    """Build an app with a directory structure, which can be served by a local http server
+    Args:
+        app: The `App` object
+        name: The name of the app directory to be created
+        dest: File path to store the app directory
+        compress_assets: Compress user assets during app generation (default: True)
+        formatting: Sets the basic app styling
+        overwrite: Replace existing app with the same name and destination if already exists (default: False)
+    """
+    Server(app).build(name=name, dest=dest, formatting=formatting, compress_assets=compress_assets, overwrite=overwrite)
+
+
+def save(
+    app: App,
+    path: str,
+    open: bool = False,
+    standalone: bool = False,
+    name: t.Optional[str] = None,
+    author: t.Optional[str] = None,
+    formatting: t.Optional[AppFormatting] = None,
+    cdn_base: str = CDN_BASE,
+) -> None:
+    """Save the app document to a local HTML file
+    Args:
+        app: The `App` object
+        path: File path to store the document
+        open: Open in your browser after creating (default: False)
+        standalone: Inline the app source in the HTML app file rather than loading via CDN (default: False)
+        name: Name of the document (optional: uses path if not provided)
+        author: The app author / email / etc. (optional)
+        formatting: Sets the basic app styling
+        cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
+    """
+    Saver(app).go(
+        path=path, open=open, standalone=standalone, name=name, author=author, formatting=formatting, cdn_base=cdn_base
+    )
+
+
+def upload(
+    app: App,
+    name: str,
+    description: str = "",
+    source_url: str = "",
+    publicly_visible: bool = False,
+    tags: t.List[str] = None,
+    project: t.Optional[str] = None,
+    open: bool = False,
+    formatting: t.Optional[AppFormatting] = None,
+    overwrite: bool = False,
+    **kwargs,
+):
+    """
+    Upload the app document, including its attached assets, to the logged-in Datapane Server.
+    Args:
+        app: The `App` object
+        name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
+        description: A high-level description for the document, this is displayed in searches and thumbnails
+        source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
+        publicly_visible: Visible to anyone with the link
+        tags: A list of tags (as strings) used to categorise your document
+        project: Project to add the app to
+        open: Open the file in your browser after creating
+        formatting: Set the basic styling for your app
+        overwrite: Overwrite the app
+    """
+    Uploader(app).go(
+        name=name,
+        description=description,
+        source_url=source_url,
+        publicly_visible=publicly_visible,
+        tags=tags,
+        project=project,
+        open=open,
+        formatting=formatting,
+        overwrite=overwrite,
+        **kwargs,
+    )
