@@ -146,10 +146,10 @@ class App(DPObjectRef):
         overwrite: bool = False,
         **kwargs,
     ) -> None:
-        from .processors import Uploader
+        from .processors import upload
 
-        Uploader(self).go(
-            name, description, source_url, publicly_visible, tags, project, open, formatting, overwrite, **kwargs
+        upload(
+            self, name, description, source_url, publicly_visible, tags, project, open, formatting, overwrite, **kwargs
         )
 
     def save(
@@ -162,9 +162,9 @@ class App(DPObjectRef):
         formatting: t.Optional[AppFormatting] = None,
         cdn_base: str = CDN_BASE,
     ) -> None:
-        from .processors import Saver
+        from .processors import save_report
 
-        Saver(self).go(path, open, standalone, name, author, formatting, cdn_base)
+        save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
     def stringify(
         self,

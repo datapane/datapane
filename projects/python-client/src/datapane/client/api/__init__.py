@@ -80,7 +80,7 @@ from .report.core import (
     ReportWidth,
     TextAlignment,
 )
-from .report.processors import Processor, Saver, Server, Uploader
+from .report.processors import Processor, build, save_report, serve, upload
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import Environment, File, LegacyApp, Run, Schedule
 from .user import hello_world, login, logout, ping, template
@@ -125,11 +125,8 @@ __all__ = [
     "ReportFormatting",
     "ReportWidth",
     "TextAlignment",
-    "Uploader",
     "Params",
     "Result",
-    "Saver",
-    "Server",
     "_report",
     "_reset_runtime",
     "by_datapane",
@@ -138,10 +135,13 @@ __all__ = [
     "File",
     "Run",
     "Schedule",
-    "Server",
     "hello_world",
     "login",
     "logout",
     "ping",
     "template",
+    "upload",
+    "save_report",
+    "serve",
+    "build",
 ]
