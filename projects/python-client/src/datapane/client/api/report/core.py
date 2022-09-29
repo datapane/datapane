@@ -162,9 +162,9 @@ class App(DPObjectRef):
         formatting: t.Optional[AppFormatting] = None,
         cdn_base: str = CDN_BASE,
     ) -> None:
-        from .processors import save_app
+        from .processors import save_report
 
-        save_app(self, path, open, standalone, name, author, formatting, cdn_base)
+        save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
         # pre-process report blocks

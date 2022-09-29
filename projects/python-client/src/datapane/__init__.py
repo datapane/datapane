@@ -67,7 +67,7 @@ from .client.api import (
     login,
     logout,
     ping,
-    save_app,
+    save_report,
     serve,
     template,
     upload,
@@ -123,7 +123,7 @@ __all__ = [
     "log",
     "load_params_from_command_line",
     "upload",
-    "save_app",
+    "save_report",
     "serve",
     "build",
 ]

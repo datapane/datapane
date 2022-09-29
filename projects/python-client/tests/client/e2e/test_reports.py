@@ -86,7 +86,7 @@ def test_report_update_metadata():
 def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
     # Test we can save, build then upload
-    dp.save_app(report, str(datadir / "test_report.html"))
+    dp.save_report(report, str(datadir / "test_report.html"))
     dp.build(report, name="test_report", dest=datadir)
     dp.upload(report, name=gen_name(), description="DESCRIPTION")
     with deletable(report):

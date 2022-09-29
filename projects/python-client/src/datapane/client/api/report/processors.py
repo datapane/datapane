@@ -36,7 +36,7 @@ from datapane.common.utils import compress_file
 from .blocks import BuilderState, E
 from .core import CDN_BASE, App, AppFormatting, AppWidth
 
-__all__ = ["upload", "save_app", "serve", "build"]
+__all__ = ["upload", "save_report", "serve", "build"]
 
 
 # TODO - Refactor to share dp_tags.widths
@@ -546,7 +546,7 @@ def build(
     Server(app).build(name=name, dest=dest, formatting=formatting, compress_assets=compress_assets, overwrite=overwrite)
 
 
-def save_app(
+def save_report(
     app: App,
     path: str,
     open: bool = False,
