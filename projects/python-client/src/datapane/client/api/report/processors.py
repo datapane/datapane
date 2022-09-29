@@ -237,7 +237,7 @@ class LocalProcessor(Processor, ABC):
         standalone: bool = False,
         author: t.Optional[str] = None,
         formatting: AppFormatting = None,
-    ) -> str:
+    ) -> t.Tuple[str, str]:
         if formatting is None:
             formatting = AppFormatting()
 
@@ -579,13 +579,13 @@ class Stringify(LocalProcessor):
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
         formatting: t.Optional[AppFormatting] = None,
-    ) -> str:
+    ) -> t.Tuple[str, str]:
 
         if not name:
             name = "Stringified App"
 
         local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
-        app_html_string = self.stringify(
+        report_id, app_html_string = self.stringify(
             local_doc,
             name=name,
             cdn_base=cdn_base,
@@ -593,7 +593,7 @@ class Stringify(LocalProcessor):
             formatting=formatting,
         )
 
-        return app_html_string
+        return report_id, app_html_string
 
 
 def serve(
