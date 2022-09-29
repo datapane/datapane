@@ -229,7 +229,6 @@ class LocalProcessor(Processor, ABC):
 
         return report_id
 
-
     def stringify(
         self,
         report_doc: str,
@@ -264,7 +263,6 @@ class LocalProcessor(Processor, ABC):
         )
 
         return report_id, r
-
 
     def assert_bundle_exists(self):
         resource_to_check = "report" if self.served else "local-report-base.css"
@@ -613,8 +611,8 @@ class Stringify(LocalProcessor):
         """
 
         report_id, app_html_string = self._save(cdn_base, standalone, name, author, formatting)
-        
-        if(self.template_name == "ipynb_template.html"):
+
+        if self.template_name == "ipynb_template.html":
             capture("IPython Block Display", report_id=report_id)
         else:
             capture("App Stringified", report_id=report_id)

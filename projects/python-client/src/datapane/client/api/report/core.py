@@ -173,13 +173,13 @@ class App(DPObjectRef):
         author: t.Optional[str] = None,
         formatting: t.Optional[AppFormatting] = None,
         cdn_base: str = CDN_BASE,
-        template_name: str = "template.html"
+        template_name: str = "template.html",
     ) -> str:
         from .processors import Stringify
 
         stringify_processor = Stringify(self)
         stringify_processor.template_name = template_name
-        
+
         app_html = stringify_processor.go(standalone, name, author, formatting, cdn_base)
 
         return app_html

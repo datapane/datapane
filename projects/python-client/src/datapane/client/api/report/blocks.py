@@ -132,19 +132,16 @@ class BaseElement(ABC):
             self.name = name
             self._attributes.update(name=name)
 
-
     def _add_attributes(self, **kwargs):
         self._attributes.update(mk_attribs(**kwargs))
 
-
     def _ipython_display_(self):
         """Display the block as a side effect within a Jupyter notebook"""
-        from IPython.display import display, HTML
+        from IPython.display import HTML, display
 
         block_iframe_html_string = block_to_iframe(self)
 
         display(HTML(block_iframe_html_string))
-
 
     @abstractmethod
     def _to_xml(self, s: BuilderState) -> BuilderState:

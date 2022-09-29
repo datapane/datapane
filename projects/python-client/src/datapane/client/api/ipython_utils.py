@@ -1,13 +1,16 @@
 from __future__ import annotations
-import uuid
+
 import html
+import uuid
 
 """
 Datapane helper functions to improve the Datapane UX in Jupyter notebooks
 """
+
+
 def block_to_iframe(block: Block) -> str:
     """Convert a Block to HTML, placed within an iFrame"""
-     # importing within function scope to avoid circular dependency
+    # importing within function scope to avoid circular dependency
     from .report.core import App
 
     app = App(block)
