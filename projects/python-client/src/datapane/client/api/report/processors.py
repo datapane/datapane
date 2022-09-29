@@ -612,7 +612,7 @@ class Stringify(LocalProcessor):
 
         report_id, app_html_string = self._save(cdn_base, standalone, name, author, formatting)
 
-        if self.template_name == "ipynb_template.html":
+        if self.template_name == "ipython_template.html":
             capture("IPython Block Display", report_id=report_id)
         else:
             capture("App Stringified", report_id=report_id)
