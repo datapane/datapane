@@ -649,7 +649,7 @@ def stringify_report(
     formatting: t.Optional[AppFormatting] = None,
     cdn_base: str = CDN_BASE,
     template_name: str = "template.html",
-) -> None:
+) -> str:
     """Stringify the app document to a HTML string
 
     Args:
