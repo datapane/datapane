@@ -329,7 +329,7 @@ six = "*"
 
 [[package]]
 name = "datapane"
-version = "0.15.1"
+version = "0.15.3"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
@@ -339,7 +339,7 @@ develop = true
 [package.dependencies]
 altair = "^4.0.0"
 boltons = ">=20.0.0,<22.0.0"
-chardet = ">=3.0.4,<5.0.0"
+chardet = ">=4.0.0,<6.0.0"
 click = ">=7.1.0, <9.0.0"
 click-spinner = "^0.1.8"
 colorlog = ">= 4.1.0, <7.0.0"
@@ -347,19 +347,19 @@ dacite = "^1.0.2"
 datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
 dominate = "^2.4.0"
-dulwich = "^0.20.45"
+dulwich = "^0.20.0"
 furl = "^2.0.0"
-glom = "^20.5.0"
+glom = ">=20.11.0,<23.0.0"
 importlib_resources = ">=3.0.0,<6.0.0"
-Jinja2 = ">=2.11.0,<3.1.0"
+Jinja2 = "^3.0.0"
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
 munch = "^2.3.0"
-nbconvert = ">=5.6.1,<7.0.0"
+nbconvert = ">=6.1.0,<7.0.0"
 packaging = ">=20.0.0,<22.0.0"
 pandas = "^1.1.0"
-posthog = "^1.4.0"
+posthog = ">=1.4.0, <3.0.0"
 pyarrow = ">=3.0.0, < 7.0.0"
 pydantic = "^1.6.0"
 PyYAML = ">=5.4.0,<7.0.0"
@@ -367,13 +367,13 @@ requests = "^2.19.0"
 requests-toolbelt = "^0.9.1"
 stringcase = "^1.2.0"
 tabulate = "^0.8.0"
-toolz = "^0.11.0"
-validators = ">=0.18.0,<0.19.0"
+toolz = ">=0.11.0,<0.13.0"
+validators = ">=0.18.0,<0.21.0"
 vega-datasets = ">=0.9.0,<1.0.0"
 
 [package.extras]
-cloud = ["flit-core (>=3.0.0,<3.1.0)"]
-plotting = ["bokeh (>=2.4.2,<2.5.0)", "folium (>=0.12.0,<0.13.0)", "matplotlib (>=3.0.0,<4.0.0)", "plotapi (>=5.0.0,<6.0.0)", "plotly (>=4.0.0,<6.0.0)"]
+cloud = ["flit-core (>=3.1.0,<4.0.0)"]
+plotting = ["bokeh (>=2.3.0,<3.0.0)", "folium (>=0.12.0,<0.13.0)", "matplotlib (>=3.2.0,<4.0.0)", "plotapi (>=6.0.0,<7.0.0)", "plotly (>=5.0.0,<6.0.0)"]
 
 [package.source]
 type = "directory"
@@ -737,11 +737,11 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "joblib"
-version = "1.1.0"
+version = "1.2.0"
 description = "Lightweight pipelining with Python functions"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [[package]]
 name = "json5"
@@ -2437,8 +2437,8 @@ jinja2 = [
     {file = "Jinja2-3.0.3.tar.gz", hash = "sha256:611bb273cd68f3b993fabdc4064fc858c5b47a973cb5aa7999ec1ba405c87cd7"},
 ]
 joblib = [
-    {file = "joblib-1.1.0-py2.py3-none-any.whl", hash = "sha256:f21f109b3c7ff9d95f8387f752d0d9c34a02aa2f7060c2135f465da0e5160ff6"},
-    {file = "joblib-1.1.0.tar.gz", hash = "sha256:4158fcecd13733f8be669be0683b96ebdbbd38d23559f54dca7205aea1bf1e35"},
+    {file = "joblib-1.2.0-py3-none-any.whl", hash = "sha256:091138ed78f800342968c523bdde947e7a305b8594b910a0fea2ab83c3c6d385"},
+    {file = "joblib-1.2.0.tar.gz", hash = "sha256:e1cee4a79e4af22881164f218d4311f60074197fb707e082e803b61f6d137018"},
 ]
 json5 = [
     {file = "json5-0.9.9-py2.py3-none-any.whl", hash = "sha256:1ff8351ee2ae80fd89d64210d9522db7e157516a7b12c72089ded6964527283f"},
@@ -3137,6 +3137,13 @@ pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5"},
     {file = "PyYAML-6.0-cp310-cp310-win32.whl", hash = "sha256:2cd5df3de48857ed0544b34e2d40e9fac445930039f3cfe4bcc592a1f836d513"},
     {file = "PyYAML-6.0-cp310-cp310-win_amd64.whl", hash = "sha256:daf496c58a8c52083df09b80c860005194014c3698698d1a57cbcfa182142a3a"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d4b0ba9512519522b118090257be113b9468d804b19d63c71dbcf4a48fa32358"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:81957921f441d50af23654aa6c5e5eaf9b06aba7f0a19c18a538dc7ef291c5a1"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:afa17f5bc4d1b10afd4466fd3a44dc0e245382deca5b3c353d8b757f9e3ecb8d"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:dbad0e9d368bb989f4515da330b88a057617d16b6a8245084f1b05400f24609f"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:432557aa2c09802be39460360ddffd48156e30721f5e8d917f01d31694216782"},
+    {file = "PyYAML-6.0-cp311-cp311-win32.whl", hash = "sha256:bfaef573a63ba8923503d27530362590ff4f576c626d86a9fed95822a8255fd7"},
+    {file = "PyYAML-6.0-cp311-cp311-win_amd64.whl", hash = "sha256:01b45c0191e6d66c470b6cf1b9531a771a83c1c4208272ead47a3ae4f2f603bf"},
     {file = "PyYAML-6.0-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:897b80890765f037df3403d22bab41627ca8811ae55e9a722fd0392850ec4d86"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:50602afada6d6cbfad699b0c7bb50d5ccffa7e46a3d738092afddc1f9758427f"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:48c346915c114f5fdb3ead70312bd042a953a8ce5c7106d5bfb1a5254e47da92"},
@@ -3207,6 +3214,7 @@ pyzmq = [
     {file = "pyzmq-23.2.1-cp37-cp37m-musllinux_1_1_x86_64.whl", hash = "sha256:48400b96788cdaca647021bf19a9cd668384f46e4d9c55cf045bdd17f65299c8"},
     {file = "pyzmq-23.2.1-cp37-cp37m-win32.whl", hash = "sha256:8a68f57b7a3f7b6b52ada79876be1efb97c8c0952423436e84d70cc139f16f0d"},
     {file = "pyzmq-23.2.1-cp37-cp37m-win_amd64.whl", hash = "sha256:9e5bf6e7239fc9687239de7a283aa8b801ab85371116045b33ae20132a1325d6"},
+    {file = "pyzmq-23.2.1-cp38-cp38-macosx_10_15_universal2.whl", hash = "sha256:0ff6294e001129a9f22dcbfba186165c7e6f573c46de2704d76f873c94c65416"},
     {file = "pyzmq-23.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:ffc6b1623d0f9affb351db4ca61f432dca3628a5ee015f9bf2bfbe9c6836881c"},
     {file = "pyzmq-23.2.1-cp38-cp38-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:4d6f110c56f7d5b4d64dde3a382ae61b6d48174e30742859d8e971b18b6c9e5c"},
     {file = "pyzmq-23.2.1-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:9269fbfe3a4eb2009199120861c4571ef1655fdf6951c3e7f233567c94e8c602"},
@@ -3431,7 +3439,6 @@ stringcase = [
 ]
 tabulate = [
     {file = "tabulate-0.8.10-py3-none-any.whl", hash = "sha256:0ba055423dbaa164b9e456abe7920c5e8ed33fcc16f6d1b2f2d152c8e1e8b4fc"},
-    {file = "tabulate-0.8.10-py3.8.egg", hash = "sha256:436f1c768b424654fce8597290d2764def1eea6a77cfa5c33be00b1bc0f4f63d"},
     {file = "tabulate-0.8.10.tar.gz", hash = "sha256:6c57f3f3dd7ac2782770155f3adb2db0b1a269637e42f27599925e64b114f519"},
 ]
 tenacity = [
