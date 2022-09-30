@@ -36,7 +36,7 @@ from datapane.common.utils import compress_file
 from .blocks import BuilderState, E
 from .core import CDN_BASE, App, AppFormatting, AppWidth
 
-__all__ = ["upload", "save_report", "serve", "build"]
+__all__ = ["upload", "save_report", "stringify_report", "serve", "build"]
 
 
 # TODO - Refactor to share dp_tags.widths
@@ -538,17 +538,7 @@ class Stringify(LocalProcessor):
         formatting: t.Optional[AppFormatting] = None,
         cdn_base: str = CDN_BASE,
     ) -> str:
-        """Stringify the app document to a HTML string
-
-        Args:
-            standalone: Inline the app source in the HTML app file rather than loading via CDN (default: False)
-            name: Name of the document (optional: uses path if not provided)
-            author: The app author / email / etc. (optional)
-            formatting: Sets the basic app styling
-            cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
-        """
-
-        report_id, view_html_string = self._save(cdn_base, standalone, name, author, formatting)
+        report_id, view_html_string = self._stringify(cdn_base, standalone, name, author, formatting)
 
         if self.template_name == "ipython_template.html":
             capture("IPython Block Display", report_id=report_id)
@@ -557,7 +547,7 @@ class Stringify(LocalProcessor):
 
         return view_html_string
 
-    def _save(
+    def _stringify(
         self,
         cdn_base: str = CDN_BASE,
         standalone: bool = False,
@@ -649,6 +639,35 @@ def save_report(
     Saver(app).go(
         path=path, open=open, standalone=standalone, name=name, author=author, formatting=formatting, cdn_base=cdn_base
     )
+
+
+def stringify_report(
+    app: App,
+    standalone: bool = False,
+    name: t.Optional[str] = None,
+    author: t.Optional[str] = None,
+    formatting: t.Optional[AppFormatting] = None,
+    cdn_base: str = CDN_BASE,
+    template_name: str = "template.html",
+) -> None:
+    """Stringify the app document to a HTML string
+
+    Args:
+        standalone: Inline the app source in the HTML app file rather than loading via CDN (default: False)
+        name: Name of the document (optional: uses path if not provided)
+        author: The app author / email / etc. (optional)
+        formatting: Sets the basic app styling
+        cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
+        template_name: The name of the template to use for repor rendering (default: template.html)
+    """
+    stringify_processor = Stringify(app)
+    stringify_processor.template_name = template_name
+
+    view_html_string = stringify_processor.go(
+        standalone=standalone, name=name, author=author, formatting=formatting, cdn_base=cdn_base
+    )
+
+    return view_html_string
 
 
 def upload(

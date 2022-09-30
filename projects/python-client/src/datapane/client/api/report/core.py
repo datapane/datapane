@@ -175,14 +175,11 @@ class App(DPObjectRef):
         cdn_base: str = CDN_BASE,
         template_name: str = "template.html",
     ) -> str:
-        from .processors import Stringify
+        from .processors import stringify_report
 
-        stringify_processor = Stringify(self)
-        stringify_processor.template_name = template_name
+        view_html_string = stringify_report(self, standalone, name, author, formatting, cdn_base, template_name)
 
-        app_html = stringify_processor.go(standalone, name, author, formatting, cdn_base)
-
-        return app_html
+        return view_html_string
 
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
         # pre-process report blocks
