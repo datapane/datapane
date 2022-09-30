@@ -563,14 +563,14 @@ class Stringify(LocalProcessor):
             cdn_base: The base url to use for standalone apps (default: https://datapane-cdn.com/{version})
         """
 
-        report_id, app_html_string = self._save(cdn_base, standalone, name, author, formatting)
+        report_id, view_html_string = self._save(cdn_base, standalone, name, author, formatting)
 
         if self.template_name == "ipython_template.html":
             capture("IPython Block Display", report_id=report_id)
         else:
             capture("App Stringified", report_id=report_id)
 
-        return app_html_string
+        return view_html_string
 
     def _save(
         self,
@@ -585,7 +585,7 @@ class Stringify(LocalProcessor):
             name = "Stringified App"
 
         local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
-        report_id, app_html_string = self.stringify(
+        report_id, view_html_string = self.stringify(
             local_doc,
             name=name,
             cdn_base=cdn_base,
@@ -593,7 +593,7 @@ class Stringify(LocalProcessor):
             formatting=formatting,
         )
 
-        return report_id, app_html_string
+        return report_id, view_html_string
 
 
 def serve(
