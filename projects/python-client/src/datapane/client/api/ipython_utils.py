@@ -23,6 +23,6 @@ def block_to_iframe(block: BaseElement) -> str:
     from .report.core import App
 
     app = App(block)
-    iframe_html_string = app.stringify(template_name="ipython_template.html")
+    block_html_string = app.stringify(template_name="ipython_template.html")
 
-    return iframe_html_string
+    return block_html_string
