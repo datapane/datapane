@@ -201,28 +201,14 @@ class LocalProcessor(Processor, ABC):
         author: t.Optional[str] = None,
         formatting: AppFormatting = None,
     ) -> str:
-        if formatting is None:
-            formatting = AppFormatting()
-
-        # create template on demand
-        if not self.template:
-            self._setup_template()
-
-        report_id: str = uuid4().hex
-        r = self.template.render(
-            report_doc=report_doc,
-            report_width_class=report_width_classes.get(formatting.width),
-            report_name=name,
-            report_author=author,
-            report_date=timestamp(),
-            css_header=formatting.to_css(),
-            is_light_prose=formatting.light_prose,
-            dp_logo=self.logo,
-            report_id=report_id,
-            author_id=c.config.session_id,
-            events=not _NO_ANALYTICS,
-            standalone=standalone,
-            cdn_base=cdn_base,
+        report_id, r = self.stringify(
+            report_doc,
+            path,
+            name,
+            cdn_base,
+            standalone,
+            author,
+            formatting,
         )
 
         Path(path).write_text(r, encoding="utf-8")
