@@ -201,9 +201,8 @@ class LocalProcessor(Processor, ABC):
         author: t.Optional[str] = None,
         formatting: AppFormatting = None,
     ) -> str:
-        report_id, r = self.stringify(
+        report_id, r = self.render(
             report_doc,
-            path,
             name,
             cdn_base,
             standalone,
@@ -215,7 +214,7 @@ class LocalProcessor(Processor, ABC):
 
         return report_id
 
-    def stringify(
+    def render(
         self,
         report_doc: str,
         name: str,
@@ -571,7 +570,7 @@ class Stringify(LocalProcessor):
             name = "Stringified App"
 
         local_doc, _ = self._gen_report(embedded=True, served=False, title=name)
-        report_id, view_html_string = self.stringify(
+        report_id, view_html_string = self.render(
             local_doc,
             name=name,
             cdn_base=cdn_base,
