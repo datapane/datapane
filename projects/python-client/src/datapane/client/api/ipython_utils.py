@@ -26,3 +26,16 @@ def block_to_iframe(block: BaseElement) -> str:
     block_html_string = app.stringify(template_name="ipython_template.html")
 
     return block_html_string
+
+
+def cells_to_blocks(jupyter_output_cache: dict) -> list:
+    """Convert Jupyter notebook cells to a list of Datapane Blocks
+
+    Args:
+        jupyter_output_cache: The output cache (Out or _oh) dict from a Jupyter notebook
+
+    Returns:
+        List of Datapane Blocks
+    """
+    blocks = []
+    return blocks
