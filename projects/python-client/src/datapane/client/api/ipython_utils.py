@@ -38,7 +38,7 @@ def cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     Returns:
         Datapane Block
     """
-    from .report.blocks import BaseElement
+    from .report.blocks import wrap_block
 
     # Get the output object from the cache
     cell_output_object = jupyter_output_cache.get(cell["execution_count"], None)
@@ -47,11 +47,11 @@ def cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     if cell_output_object is None:
         return None
 
-    # If the output is a Datapane Block, return it
-    if isinstance(cell_output_object, BaseElement):
-        return cell_output_object
-
-    pass
+    try:
+        block = wrap_block(cell_output_object)
+        return block
+    except Exception as e:
+        return None
 
 
 def cells_to_blocks(jupyter_output_cache: dict) -> list:
