@@ -29,7 +29,7 @@ def block_to_iframe(block: BaseElement) -> str:
     return block_html_string
 
 
-def cell_to_block(cell: dict) -> BaseElement:
+def cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     """Convert a Jupyter notebook cell to a Datapane Block
 
     Args:
@@ -38,7 +38,19 @@ def cell_to_block(cell: dict) -> BaseElement:
     Returns:
         Datapane Block
     """
-    # TODO
+    from .report.blocks import BaseElement
+
+    # Get the output object from the cache
+    cell_output_object = jupyter_output_cache.get(cell["execution_count"], None)
+
+    # No corresponding output object, so skip
+    if cell_output_object is None:
+        return None
+
+    # If the output is a Datapane Block, return it
+    if isinstance(cell_output_object, BaseElement):
+        return cell_output_object
+
     pass
 
 
@@ -74,7 +86,7 @@ def cells_to_blocks(jupyter_output_cache: dict) -> list:
                 block = Code("".join(cell["source"]))
                 blocks.append(block)
 
-            block = cell_to_block(cell)
+            block = cell_to_block(cell, jupyter_output_cache)
             if block:
                 blocks.append(block)
 
