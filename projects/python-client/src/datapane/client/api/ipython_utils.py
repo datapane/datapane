@@ -121,17 +121,19 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     for cell in notebook_json["cells"]:
         tags = cell["metadata"].get("tags", [])
 
-        if cell["cell_type"] == "markdown":
-            block = markdown_cell_to_block(cell)
-            blocks.append(block)
+        if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
 
-        elif cell["cell_type"] == "code":
-            if "show-code" in tags:
-                block = input_cell_to_block(cell)
+            if cell["cell_type"] == "markdown":
+                block = markdown_cell_to_block(cell)
                 blocks.append(block)
 
-            block = output_cell_to_block(cell, jupyter_output_cache)
-            if block:
-                blocks.append(block)
+            elif cell["cell_type"] == "code":
+                if "dp-show-code" in tags:
+                    block = input_cell_to_block(cell)
+                    blocks.append(block)
+
+                block = output_cell_to_block(cell, jupyter_output_cache)
+                if block:
+                    blocks.append(block)
 
     return blocks
