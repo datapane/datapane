@@ -3,6 +3,10 @@ from __future__ import annotations
 import json
 import typing
 
+from IPython.display import display
+
+from datapane.client.utils import display_msg
+
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement, Code, Text
 
@@ -114,6 +118,9 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     Returns:
         List of Datapane Blocks
     """
+    display_msg(f"Converting cells to blocks.")
+    display_msg(f"Please make sure you have run all cells in the notebook before running this command.")
+
     notebook_json = get_jupyter_notebook_json()
 
     blocks = []
