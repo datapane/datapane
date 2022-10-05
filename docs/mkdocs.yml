@@ -13,9 +13,9 @@ nav:
       - Install Datapane: "tutorials/basics/install-datapane.md"
       - Create a report: "tutorials/basics/create-a-report.ipynb"
     - 🧱 Blocks types:
-      - tutorials/blocks/index.ipynb
+      - Block types: tutorials/blocks/index.ipynb
     - ☁️ Datapane Cloud:
-      - tutorials/datapane-cloud/index.md
+      - Datapane Cloud: tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
       - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
@@ -26,21 +26,21 @@ nav:
       - Projects: "tutorials/datapane-cloud/projects.md"
 #      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
     - 🏢 Datapane Enterprise:
-      - tutorials/datapane-enterprise/index.md
+      - Datapane Enterprise: tutorials/datapane-enterprise/index.md
       - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
       - Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
       - Files: "tutorials/datapane-enterprise/files.md"
       - Managing members: "tutorials/datapane-enterprise/managing-members.md"
     - 🎨 Styling:
-      - tutorials/styling/index.ipynb
+      - Styling: tutorials/styling/index.ipynb
 #      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
       - Global styling: "tutorials/styling/global-styling.md"
     - 🤖 Automation:
       - tutorials/automation/index.md
     - 📦 Apps:
-      - tutorials/apps/index.ipynb
+      - Apps: tutorials/apps/index.ipynb
       - Parameters and forms:
-        - "tutorials/apps/parameters-and-forms/index.ipynb"
+        - Parameters and forms: "tutorials/apps/parameters-and-forms/index.ipynb"
         - Configuration: "tutorials/apps/parameters-and-forms/configuration.md"
         - Parameters: "tutorials/apps/parameters-and-forms/parameters.md"
       - Scheduled report runs: "tutorials/apps/scheduling.md"
@@ -49,9 +49,9 @@ nav:
       - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
 
   - Catalogues:
-    - "catalogues/index.ipynb"
+    - Catalogues: "catalogues/index.ipynb"
     - 🧱 Blocks:
-      - "catalogues/blocks/index.ipynb"
+      - Blocks: "catalogues/blocks/index.ipynb"
       - Tables and data:
         - Big Number: "catalogues/blocks/bignumber.ipynb"
         - Data Table: "catalogues/blocks/datatable.ipynb"
@@ -75,11 +75,11 @@ nav:
         - Embeds: "catalogues/blocks/embed.ipynb"
         - Media: "catalogues/blocks/media.ipynb"
     - 🗃 Components:
-      - "catalogues/components/index.ipynb"
+      - Components: "catalogues/components/index.ipynb"
       - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
       - Timeline: "catalogues/components/timeline.ipynb"
     - 📑 Templates:
-      - "catalogues/templates/index.ipynb"
+      - Templates: "catalogues/templates/index.ipynb"
 
   - Guides:
     - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
