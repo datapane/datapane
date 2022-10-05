@@ -119,7 +119,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
         List of Datapane Blocks
     """
     display_msg(f"Converting cells to blocks.")
-    display_msg(f"Please make sure you have run all cells in the notebook before running this command.")
+    display_msg(f"  Please make sure you have run all cells in the notebook before running this command.")
 
     notebook_json = get_jupyter_notebook_json()
 
