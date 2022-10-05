@@ -28,31 +28,6 @@ def block_to_iframe(block: BaseElement) -> str:
     return block_html_string
 
 
-def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
-    """Convert a Jupyter notebook output cell to a Datapane Block
-
-    Args:
-        cell: Jupyter notebook cell dict
-
-    Returns:
-        Datapane Block
-    """
-    from .report.blocks import wrap_block
-
-    # Get the output object from the Jupyter output cache
-    cell_output_object = jupyter_output_cache.get(cell["execution_count"], None)
-
-    # If there's corresponding output object, skip
-    if cell_output_object is None:
-        return None
-
-    try:
-        block = wrap_block(cell_output_object)
-        return block
-    except Exception as e:
-        return None
-
-
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
 
@@ -97,6 +72,31 @@ def input_cell_to_block(cell: dict) -> Code:
     block = Code("".join(cell["source"]))
 
     return block
+
+
+def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
+    """Convert a Jupyter notebook output cell to a Datapane Block
+
+    Args:
+        cell: Jupyter notebook cell dict
+
+    Returns:
+        Datapane Block
+    """
+    from .report.blocks import wrap_block
+
+    # Get the output object from the Jupyter output cache
+    cell_output_object = jupyter_output_cache.get(cell["execution_count"], None)
+
+    # If there's corresponding output object, skip
+    if cell_output_object is None:
+        return None
+
+    try:
+        block = wrap_block(cell_output_object)
+        return block
+    except Exception as e:
+        return None
 
 
 def cells_to_blocks(jupyter_output_cache: dict) -> list:
