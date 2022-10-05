@@ -1,19 +1,18 @@
-from __future__ import annotations
-
-import json
-import typing
-
-from IPython.display import display
-
-from datapane.client.utils import display_msg
-
-if typing.TYPE_CHECKING:
-    from .report.blocks import BaseElement, Code, Text
-
 """
 Datapane helper functions to improve the Datapane UX in Jupyter notebooks
 """
+from __future__ import annotations
 
+import io
+import json
+import os
+import typing
+
+from datapane.client.utils import display_msg
+from requests import get
+
+if typing.TYPE_CHECKING:
+    from .report.blocks import BaseElement, Code, Text
 
 def block_to_iframe(block: BaseElement) -> str:
     """Convert a Block to HTML, placed within an iFrame
@@ -31,7 +30,6 @@ def block_to_iframe(block: BaseElement) -> str:
 
     return block_html_string
 
-
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
 
@@ -45,6 +43,48 @@ def get_jupyter_notebook_json() -> dict:
 
     return notebook_json
 
+def get_colab_notebook_json() -> dict:
+    """Get the JSON for the current Colab notebook
+
+    Returns:
+        Notebook JSON
+    """
+    from googleapiclient.http import MediaIoBaseDownload
+    from googleapiclient.discovery import build
+    from google.colab import auth
+
+    # Get the notebook's Google Drive file_id 
+    file_id = get('http://172.28.0.2:9000/api/sessions').json()[0]['path'].replace("fileId=","")
+
+    auth.authenticate_user()
+    drive_service = build('drive', 'v3')
+
+    request = drive_service.files().get_media(fileId=file_id)
+    downloaded = io.BytesIO()
+    downloader = MediaIoBaseDownload(downloaded, request)
+    done = False
+    while done is False:
+        # _ is a placeholder for a progress object that we ignore.
+        # (Our file is small, so we skip reporting progress.)
+        _, done = downloader.next_chunk()
+
+    downloaded.seek(0)
+    notebook_json = json.loads(downloaded.read().decode('utf-8'))
+
+    return notebook_json
+
+def get_notebook_json() -> dict:
+    """Get the JSON for the current Colab or Jupyter notebook
+
+    Returns:
+        Notebook JSON
+    """ 
+    if 'COLAB_GPU' in os.environ:
+        notebook_json = get_colab_notebook_json()
+    else: 
+        notebook_json = get_jupyter_notebook_json()
+
+    return notebook_json
 
 def markdown_cell_to_block(cell: dict) -> Text:
     """Convert a Jupyter notebook cell to a Datapane Text Block
@@ -61,7 +101,6 @@ def markdown_cell_to_block(cell: dict) -> Text:
 
     return block
 
-
 def input_cell_to_block(cell: dict) -> Code:
     """Convert a Jupyter notebook cell to a Datapane Code Block
 
@@ -76,7 +115,6 @@ def input_cell_to_block(cell: dict) -> Code:
     block = Code("".join(cell["source"]))
 
     return block
-
 
 def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     """Convert a Jupyter notebook output cell to a Datapane Block
@@ -102,7 +140,6 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     except Exception as e:
         return None
 
-
 def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     """Convert Jupyter notebook cells to a list of Datapane Blocks
 
@@ -121,7 +158,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     display_msg(f"Converting cells to blocks.")
     display_msg(f"  Please make sure you have run all cells in the notebook before running this command.")
 
-    notebook_json = get_jupyter_notebook_json()
+    notebook_json = get_notebook_json()
 
     blocks = []
 
