@@ -99,11 +99,17 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
         return None
 
 
-def cells_to_blocks(jupyter_output_cache: dict) -> list:
+def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     """Convert Jupyter notebook cells to a list of Datapane Blocks
+
+    Recognized cell tags:
+        - `dp-exclude` - Exclude this cell (when opt_out=True)
+        - `dp-include` - Include this cell (when opt_out=False)
+        - `dp-show-code` - Show the input code for this cell
 
     Args:
         jupyter_output_cache: The output cache (Out or _oh) dict from a Jupyter notebook
+        opt_out: When True, all cells are converted to blocks unless explicitly opted out with the tag `dp-exclude`. When False, only cells with the tag `dp-include` are converted to blocks.
 
     Returns:
         List of Datapane Blocks
