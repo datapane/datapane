@@ -29,9 +29,9 @@ nav:
           - tutorials/automation/index.md
 
   - Catalogs:
-      - "catalogs/index.ipynb"
+      - Catalogs: "catalogs/index.ipynb"
       - 🧱 Blocks:
-          - "catalogs/blocks/index.ipynb"
+          - Blocks: "catalogs/blocks/index.ipynb"
           - Tables and data:
               - Big Number: "catalogs/blocks/bignumber.ipynb"
               - Data Table: "catalogs/blocks/datatable.ipynb"
@@ -55,11 +55,11 @@ nav:
               - Embeds: "catalogs/blocks/embed.ipynb"
               - Media: "catalogs/blocks/media.ipynb"
       - 🗃 Components:
-          - "catalogs/components/index.ipynb"
+          - Components: "catalogs/components/index.ipynb"
           - Calendar heatmap: "catalogs/components/calendar-heatmap.ipynb"
           - Timeline: "catalogs/components/timeline.ipynb"
       - 📑 Templates:
-          - "catalogs/templates/index.ipynb"
+          - Templates: "catalogs/templates/index.ipynb"
   - Reference:
       - API reference: "https://datapane.github.io/datapane/"
 

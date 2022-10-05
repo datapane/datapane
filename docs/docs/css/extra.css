@@ -68,6 +68,8 @@ md-nav__title {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     margin: 1em 0;
+    list-style: none;
+    margin: 1em 0 0 -1em;
 }
 
 .md-typeset .grid.cards > :-webkit-any(ul, ol) > li,

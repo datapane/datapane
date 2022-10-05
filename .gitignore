@@ -30,6 +30,7 @@ test_proj*/
 test_report*/
 test_script*/
 .ipynb_checkpoints
+docs/**/*.md.tmp
 
 # macOS internals
 .DS_Store

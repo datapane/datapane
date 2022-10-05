@@ -66,10 +66,11 @@ md-nav__title {
 
 /* Grid feature */
 .md-typeset .grid ul {
-    grid-gap: 0.4rem;
     display: grid;
+    grid-gap: 0.4rem;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    margin: 1em 0;
+    list-style: none;
+    margin: 1em 0 0 -1em;
 }
 
 .md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
