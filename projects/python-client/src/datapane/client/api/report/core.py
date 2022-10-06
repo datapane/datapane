@@ -166,6 +166,21 @@ class App(DPObjectRef):
 
         save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
+    def stringify(
+        self,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+        cdn_base: str = CDN_BASE,
+        template_name: str = "template.html",
+    ) -> str:
+        from .processors import stringify_report
+
+        view_html_string = stringify_report(self, standalone, name, author, formatting, cdn_base, template_name)
+
+        return view_html_string
+
     def _preprocess_pages(self, pages: t.List[BlockOrPrimitive]):
         # pre-process report blocks
         if all(isinstance(b, Page) for b in pages):
