@@ -8,6 +8,7 @@ import json
 import os
 import typing
 
+from datapane.client.analytics import capture_event
 from datapane.client.utils import display_msg
 from requests import get
 
@@ -30,6 +31,7 @@ def block_to_iframe(block: BaseElement) -> str:
 
     return block_html_string
 
+@capture_event("Get Jupyter Notebook JSON")
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
 
@@ -43,6 +45,7 @@ def get_jupyter_notebook_json() -> dict:
 
     return notebook_json
 
+@capture_event("Get Colab Notebook JSON")
 def get_colab_notebook_json() -> dict:
     """Get the JSON for the current Colab notebook
 
@@ -142,6 +145,7 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     except Exception as e:
         return None
 
+@capture_event("IPython Cells to Blocks")
 def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     """Convert Jupyter notebook cells to a list of Datapane Blocks
 
