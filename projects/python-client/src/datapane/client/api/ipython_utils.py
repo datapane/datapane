@@ -49,12 +49,14 @@ def get_colab_notebook_json() -> dict:
     Returns:
         Notebook JSON
     """
+    import ipynbname
+
     from googleapiclient.http import MediaIoBaseDownload
     from googleapiclient.discovery import build
     from google.colab import auth
 
     # Get the notebook's Google Drive file_id 
-    file_id = get('http://172.28.0.2:9000/api/sessions').json()[0]['path'].replace("fileId=","")
+    file_id = ipynbname.name().replace("fileId=","")
 
     auth.authenticate_user()
     drive_service = build('drive', 'v3')
