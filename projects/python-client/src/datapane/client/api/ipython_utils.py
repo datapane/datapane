@@ -162,7 +162,6 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
         List of Datapane Blocks
     """
     display_msg(f"Converting cells to blocks.")
-    display_msg(f"Please ensure all cells in the notebook have been executed and then saved before running this command.")
 
     notebook_json = get_notebook_json()
 
@@ -185,5 +184,10 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
                 block = output_cell_to_block(cell, jupyter_output_cache)
                 if block:
                     blocks.append(block)
+
+    if not blocks:
+        display_msg("No blocks found.")
+
+    display_msg(f"Please ensure all cells in the notebook have been executed and then saved before running this command.")
 
     return blocks
