@@ -107,7 +107,7 @@ class BaseTable(BaseAsset, Generic[U]):
         f.write(self.render_html(x))
 
     def to_block(self, x: T) -> DataBlock:
-        return Table(x) if self._get_cells(x) <= self.TABLE_CELLS_LIMIT else DataTable(x)
+        return DataTable(x)
 
     def _get_cells(self, x: U) -> int:
         df = self._get_df(x)
