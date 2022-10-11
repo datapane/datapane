@@ -8,9 +8,9 @@ import json
 import os
 import typing
 
+from datapane.client import DPError
 from datapane.client.analytics import capture_event
 from datapane.client.utils import display_msg
-from requests import get
 
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement, Code, Text
@@ -40,8 +40,11 @@ def get_jupyter_notebook_json() -> dict:
     """
     import ipynbname
 
-    nb_path = ipynbname.path()
-    notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
+    try:
+        nb_path = ipynbname.path()
+        notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
+    except FileNotFoundError as e:
+        raise DPError(f"Notebook not found. This command must be executed from within a notebook environment.") from e
 
     return notebook_json
 
