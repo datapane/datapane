@@ -181,9 +181,10 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
                     block = input_cell_to_block(cell)
                     blocks.append(block)
 
-                block = output_cell_to_block(cell, jupyter_output_cache)
-                if block:
-                    blocks.append(block)
+                if cells_to_blocks.__name__ not in "".join(cell["source"]):
+                    block = output_cell_to_block(cell, jupyter_output_cache)
+                    if block:
+                        blocks.append(block)
 
     if not blocks:
         display_msg("No blocks found.")
