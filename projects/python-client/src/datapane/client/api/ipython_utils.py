@@ -181,6 +181,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> list:
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
+            block: BaseElement = None
 
             if cell["cell_type"] == "markdown":
                 block = markdown_cell_to_block(cell)
