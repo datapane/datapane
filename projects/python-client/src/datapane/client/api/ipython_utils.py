@@ -170,6 +170,8 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
 
     Returns:
         List of Datapane Blocks
+
+    ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
     display_msg("Converting cells to blocks.")
 
