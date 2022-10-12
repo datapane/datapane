@@ -65,11 +65,11 @@ Here's the dataset used...
     # test string
     group = dp.Text(text).format(table_asset, plot=plot_asset, select=select_asset)
     assert isinstance(group, dp.Group)
-    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "Table"]
+    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "DataTable"]
 
     # test file
     group = dp.Text(file=datadir / "report.md").format(table_asset, plot=plot_asset, select=select_asset)
     assert isinstance(group, dp.Group)
-    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "Table"]
+    assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "DataTable"]
     assert "file-input" in element_to_str(group)
     assert "file-input" in glom(group, "blocks.0.content")
