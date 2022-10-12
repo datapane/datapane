@@ -15,6 +15,7 @@ from datapane.client.utils import display_msg
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement, Code, Text
 
+
 def block_to_iframe(block: BaseElement) -> str:
     """Convert a Block to HTML, placed within an iFrame
 
@@ -31,6 +32,7 @@ def block_to_iframe(block: BaseElement) -> str:
 
     return block_html_string
 
+
 @capture_event("Get Jupyter Notebook JSON")
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
@@ -44,9 +46,10 @@ def get_jupyter_notebook_json() -> dict:
         nb_path = ipynbname.path()
         notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
     except FileNotFoundError as e:
-        raise DPError(f"Notebook not found. This command must be executed from within a notebook environment.") from e
+        raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
 
     return notebook_json
+
 
 @capture_event("Get Colab Notebook JSON")
 def get_colab_notebook_json() -> dict:
@@ -56,16 +59,15 @@ def get_colab_notebook_json() -> dict:
         Notebook JSON
     """
     import ipynbname
-
-    from googleapiclient.http import MediaIoBaseDownload
-    from googleapiclient.discovery import build
     from google.colab import auth
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaIoBaseDownload
 
-    # Get the notebook's Google Drive file_id 
-    file_id = ipynbname.name().replace("fileId=","")
+    # Get the notebook's Google Drive file_id
+    file_id = ipynbname.name().replace("fileId=", "")
 
     auth.authenticate_user()
-    drive_service = build('drive', 'v3')
+    drive_service = build("drive", "v3")
 
     request = drive_service.files().get_media(fileId=file_id)
     downloaded = io.BytesIO()
@@ -77,22 +79,24 @@ def get_colab_notebook_json() -> dict:
         _, done = downloader.next_chunk()
 
     downloaded.seek(0)
-    notebook_json = json.loads(downloaded.read().decode('utf-8'))
+    notebook_json = json.loads(downloaded.read().decode("utf-8"))
 
     return notebook_json
+
 
 def get_notebook_json() -> dict:
     """Get the JSON for the current Colab or Jupyter notebook
 
     Returns:
         Notebook JSON
-    """ 
-    if 'COLAB_GPU' in os.environ:
+    """
+    if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
-    else: 
+    else:
         notebook_json = get_jupyter_notebook_json()
 
     return notebook_json
+
 
 def markdown_cell_to_block(cell: dict) -> Text:
     """Convert a Jupyter notebook cell to a Datapane Text Block
@@ -109,6 +113,7 @@ def markdown_cell_to_block(cell: dict) -> Text:
 
     return block
 
+
 def input_cell_to_block(cell: dict) -> Code:
     """Convert a Jupyter notebook cell to a Datapane Code Block
 
@@ -123,6 +128,7 @@ def input_cell_to_block(cell: dict) -> Code:
     block = Code("".join(cell["source"]))
 
     return block
+
 
 def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     """Convert a Jupyter notebook output cell to a Datapane Block
@@ -145,11 +151,12 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
     try:
         block = wrap_block(cell_output_object)
         return block
-    except Exception as e:
+    except Exception:
         return None
 
+
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
+def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> list:
     """Convert Jupyter notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -164,7 +171,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     Returns:
         List of Datapane Blocks
     """
-    display_msg(f"Converting cells to blocks.")
+    display_msg("Converting cells to blocks.")
 
     notebook_json = get_notebook_json()
 
@@ -192,6 +199,8 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out=True) -> list:
     if not blocks:
         display_msg("No blocks found.")
 
-    display_msg(f"Please ensure all cells in the notebook have been executed and then saved before running this command.")
+    display_msg(
+        "Please ensure all cells in the notebook have been executed and then saved before running this command."
+    )
 
     return blocks
