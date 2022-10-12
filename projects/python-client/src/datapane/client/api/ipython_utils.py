@@ -1,5 +1,5 @@
 """
-Datapane helper functions to improve the Datapane UX in Jupyter notebooks
+Datapane helper functions to improve the Datapane UX in IPython notebooks
 """
 from __future__ import annotations
 
