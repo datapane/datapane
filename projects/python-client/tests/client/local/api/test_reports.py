@@ -201,7 +201,7 @@ def test_gen_report_primitives(datadir: Path):
         datadir / "datapane-logo.png",  # Attachment
     )
     assert_report(report, 3)
-    assert glom(report, ("pages.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
+    assert glom(report, ("pages.0.blocks", ["_tag"])) == ["Text", "DataTable", "Plot", "Attachment"]
 
 
 def test_gen_failing_reports():
