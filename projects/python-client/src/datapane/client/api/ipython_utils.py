@@ -130,7 +130,7 @@ def input_cell_to_block(cell: dict) -> Code:
     return block
 
 
-def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
+def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> typing.Any[BaseElement, None]:
     """Convert a Jupyter notebook output cell to a Datapane Block
 
     Args:
@@ -156,7 +156,7 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> BaseElement:
 
 
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> list:
+def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> typing.List[BaseElement]:
     """Convert Jupyter notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -181,7 +181,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> list:
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
-            block: BaseElement = None
+            block = None  # type: typing.Any[BaseElement, None]
 
             if cell["cell_type"] == "markdown":
                 block = markdown_cell_to_block(cell)
