@@ -99,10 +99,10 @@ def get_notebook_json() -> dict:
 
 
 def markdown_cell_to_block(cell: dict) -> Text:
-    """Convert a Jupyter notebook cell to a Datapane Text Block
+    """Convert a IPython notebook cell to a Datapane Text Block
 
     Args:
-        cell: Jupyter notebook cell dict
+        cell: IPython notebook cell dict
 
     Returns:
         Datapane Block
@@ -115,10 +115,10 @@ def markdown_cell_to_block(cell: dict) -> Text:
 
 
 def input_cell_to_block(cell: dict) -> Code:
-    """Convert a Jupyter notebook cell to a Datapane Code Block
+    """Convert a IPython notebook cell to a Datapane Code Block
 
     Args:
-        cell: Jupyter notebook cell dict
+        cell: IPython notebook cell dict
 
     Returns:
         Datapane Block
@@ -130,19 +130,19 @@ def input_cell_to_block(cell: dict) -> Code:
     return block
 
 
-def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> typing.Any[BaseElement, None]:
-    """Convert a Jupyter notebook output cell to a Datapane Block
+def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Any[BaseElement, None]:
+    """Convert a IPython notebook output cell to a Datapane Block
 
     Args:
-        cell: Jupyter notebook cell dict
+        cell: IPython notebook cell dict
 
     Returns:
         Datapane Block
     """
     from .report.blocks import wrap_block
 
-    # Get the output object from the Jupyter output cache
-    cell_output_object = jupyter_output_cache.get(cell["execution_count"], None)
+    # Get the output object from the IPython output cache
+    cell_output_object = ipython_output_cache.get(cell["execution_count"], None)
 
     # If there's corresponding output object, skip
     if cell_output_object is None:
@@ -156,8 +156,8 @@ def output_cell_to_block(cell: dict, jupyter_output_cache: dict) -> typing.Any[B
 
 
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> typing.List[BaseElement]:
-    """Convert Jupyter notebook cells to a list of Datapane Blocks
+def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.List[BaseElement]:
+    """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
         - `dp-exclude` - Exclude this cell (when opt_out=True)
@@ -165,7 +165,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> typing.
         - `dp-show-code` - Show the input code for this cell
 
     Args:
-        jupyter_output_cache: The output cache (Out or _oh) dict from a Jupyter notebook
+        ipython_output_cache: The output cache (Out or _oh) dict from a IPython notebook
         opt_out: When True, all cells are converted to blocks unless explicitly opted out with the tag `dp-exclude`. When False, only cells with the tag `dp-include` are converted to blocks.
 
     Returns:
@@ -193,7 +193,7 @@ def cells_to_blocks(jupyter_output_cache: dict, opt_out: bool = True) -> typing.
                     blocks.append(block)
 
                 if cells_to_blocks.__name__ not in "".join(cell["source"]):
-                    block = output_cell_to_block(cell, jupyter_output_cache)
+                    block = output_cell_to_block(cell, ipython_output_cache)
                     if block:
                         blocks.append(block)
 
