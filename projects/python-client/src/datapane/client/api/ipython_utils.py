@@ -88,7 +88,13 @@ def get_colab_notebook_json() -> dict:
     # Get the notebook's Google Drive file_id
     file_id = ipynbname.name().replace("fileId=", "")
 
-    auth.authenticate_user()
+    try:
+        auth.authenticate_user()
+    except Exception as e:
+        raise DPError(
+            "Google Drive authentication failed. Please allow this notebook to access your Google Drive."
+        ) from e
+
     drive_service = build("drive", "v3")
 
     request = drive_service.files().get_media(fileId=file_id)
