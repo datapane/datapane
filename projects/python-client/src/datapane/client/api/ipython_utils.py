@@ -222,6 +222,10 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
                     block = output_cell_to_block(cell, ipython_output_cache)
                     if block:
                         blocks.append(block)
+                    elif "dp-include" in tags:
+                        display_msg(
+                            f'Cell output of type {type(ipython_output_cache.get(cell["execution_count"]))} not supported. Skipping.',
+                        )
 
     if not blocks:
         display_msg("No blocks found.")
