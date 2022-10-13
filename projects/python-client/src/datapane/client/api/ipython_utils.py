@@ -51,6 +51,28 @@ def get_jupyter_notebook_json() -> dict:
     return notebook_json
 
 
+@capture_event("Get VSCode Notebook JSON")
+def get_vscode_notebook_json() -> dict:
+    """Get the JSON for the current VSCode notebook
+
+    Returns:
+        Notebook JSON
+    """
+    import ipynbname
+
+    try:
+        nb_path = str(ipynbname.path())
+
+        # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
+        nb_path = nb_path.split("-jvsc-")[0] + ".ipynb"
+
+        notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
+    except FileNotFoundError as e:
+        raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
+
+    return notebook_json
+
+
 @capture_event("Get Colab Notebook JSON")
 def get_colab_notebook_json() -> dict:
     """Get the JSON for the current Colab notebook
@@ -85,13 +107,15 @@ def get_colab_notebook_json() -> dict:
 
 
 def get_notebook_json() -> dict:
-    """Get the JSON for the current Colab or Jupyter notebook
+    """Get the JSON for the current Jupyter, Colab, or VSCode notebook
 
     Returns:
         Notebook JSON
     """
     if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
+    if "VSCODE_PID" in os.environ:
+        notebook_json = get_vscode_notebook_json()
     else:
         notebook_json = get_jupyter_notebook_json()
 
