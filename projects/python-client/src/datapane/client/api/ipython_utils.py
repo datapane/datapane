@@ -114,7 +114,7 @@ def get_notebook_json() -> dict:
     """
     if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
-    if "VSCODE_PID" in os.environ:
+    elif "VSCODE_PID" in os.environ:
         notebook_json = get_vscode_notebook_json()
     else:
         notebook_json = get_jupyter_notebook_json()
