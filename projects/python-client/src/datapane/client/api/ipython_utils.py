@@ -7,6 +7,7 @@ import io
 import json
 import os
 import typing
+from pathlib import Path
 
 from datapane.client import DPError
 from datapane.client.analytics import capture_event
@@ -33,6 +34,21 @@ def block_to_iframe(block: BaseElement) -> str:
     return block_html_string
 
 
+def read_notebook_json(path: Path) -> dict:
+    """Read a notebook IPYNB file
+
+    Args:
+        path: Path to the notebook IPYNB file
+
+    Returns:
+        Notebook JSON
+    """
+    with open(path, encoding="utf-8") as f:
+        notebook_json = json.load(f)
+
+    return notebook_json
+
+
 @capture_event("Get Jupyter Notebook JSON")
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
@@ -44,7 +60,7 @@ def get_jupyter_notebook_json() -> dict:
 
     try:
         nb_path = ipynbname.path()
-        notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
+        notebook_json = read_notebook_json(nb_path)
     except FileNotFoundError as e:
         raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
 
@@ -61,12 +77,12 @@ def get_vscode_notebook_json() -> dict:
     import ipynbname
 
     try:
-        nb_path = str(ipynbname.path())
+        nb_path = ipynbname.path()
 
         # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
-        nb_path = nb_path.split("-jvsc-")[0] + ".ipynb"
+        nb_path = Path(str(nb_path.split("-jvsc-")[0] + ".ipynb"))
 
-        notebook_json = json.loads(open(nb_path, encoding="utf-8").read())
+        notebook_json = read_notebook_json(nb_path)
     except FileNotFoundError as e:
         raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
 
