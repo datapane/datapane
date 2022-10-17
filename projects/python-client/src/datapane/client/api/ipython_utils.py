@@ -137,8 +137,6 @@ def get_notebook_json() -> dict:
     Returns:
         Notebook JSON
     """
-    from IPython import get_ipython
-
     if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
     elif "VSCODE_PID" in os.environ:
