@@ -196,7 +196,7 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     # Get the output object from the IPython output cache
     cell_output_object = ipython_output_cache.get(cell["execution_count"], None)
 
-    # If there's corresponding output object, skip
+    # If there's no corresponding output object, skip
     if cell_output_object is None:
         return None
 
