@@ -226,6 +226,9 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
     ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
     display_msg("Converting cells to blocks.")
+    display_msg(
+        "Please ensure all cells in the notebook have been executed and then saved before running this command."
+    )
 
     notebook_json = get_notebook_json()
 
@@ -256,9 +259,5 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
 
     if not blocks:
         display_msg("No blocks found.")
-
-    display_msg(
-        "Please ensure all cells in the notebook have been executed and then saved before running this command."
-    )
 
     return blocks
