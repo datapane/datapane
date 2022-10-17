@@ -12,10 +12,10 @@ from pathlib import Path
 
 from datapane.client import DPError
 from datapane.client.analytics import capture_event
-from datapane.client.utils import display_msg
+from datapane.client.utils import display_msg, is_jupyter
 
 if typing.TYPE_CHECKING:
-    from .report.blocks import BaseElement, Code, Text
+    from .report.blocks import BaseElement
 
 
 def block_to_iframe(block: BaseElement) -> str:
@@ -143,7 +143,7 @@ def get_notebook_json() -> dict:
         notebook_json = get_colab_notebook_json()
     elif "VSCODE_PID" in os.environ:
         notebook_json = get_vscode_notebook_json()
-    elif get_ipython().__class__.__name__ == "ZMQInteractiveShell":
+    elif is_jupyter():
         notebook_json = get_jupyter_notebook_json()
     else:
         raise DPError("Can't detect notebook environment")
