@@ -7,6 +7,7 @@ import io
 import json
 import os
 import typing
+from contextlib import suppress
 from pathlib import Path
 
 from datapane.client import DPError
@@ -197,14 +198,11 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     cell_output_object = ipython_output_cache.get(cell["execution_count"], None)
 
     # If there's no corresponding output object, skip
-    if cell_output_object is None:
-        return None
+    if cell_output_object is not None:
+        with suppress(Exception):
+            return wrap_block(cell_output_object)
 
-    try:
-        block = wrap_block(cell_output_object)
-        return block
-    except Exception:
-        return None
+    return None
 
 
 @capture_event("IPython Cells to Blocks")
