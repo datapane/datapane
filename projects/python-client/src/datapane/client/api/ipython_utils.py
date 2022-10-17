@@ -182,7 +182,7 @@ def input_cell_to_block(cell: dict) -> Code:
     return block
 
 
-def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Any[BaseElement, None]:
+def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optional[BaseElement]:
     """Convert a IPython notebook output cell to a Datapane Block
 
     Args:
