@@ -240,7 +240,6 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
             if cell["cell_type"] == "markdown":
                 block = markdown_cell_to_block(cell)
                 blocks.append(block)
-
             elif cell["cell_type"] == "code":
                 if "dp-show-code" in tags:
                     block = input_cell_to_block(cell)
