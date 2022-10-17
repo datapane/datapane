@@ -150,7 +150,7 @@ def get_notebook_json() -> dict:
     return notebook_json
 
 
-def markdown_cell_to_block(cell: dict) -> Text:
+def markdown_cell_to_block(cell: dict) -> BaseElement:
     """Convert a IPython notebook cell to a Datapane Text Block
 
     Args:
@@ -166,7 +166,7 @@ def markdown_cell_to_block(cell: dict) -> Text:
     return block
 
 
-def input_cell_to_block(cell: dict) -> Code:
+def input_cell_to_block(cell: dict) -> BaseElement:
     """Convert a IPython notebook cell to a Datapane Code Block
 
     Args:
@@ -238,7 +238,7 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
-            block = None  # type: typing.Any[BaseElement, None]
+            block: typing.Optional[BaseElement]
 
             if cell["cell_type"] == "markdown":
                 block = markdown_cell_to_block(cell)
