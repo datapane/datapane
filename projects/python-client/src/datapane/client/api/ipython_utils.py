@@ -149,38 +149,6 @@ def get_notebook_json() -> dict:
     return notebook_json
 
 
-def markdown_cell_to_block(cell: dict) -> BaseElement:
-    """Convert a IPython notebook cell to a Datapane Text Block
-
-    Args:
-        cell: IPython notebook cell dict
-
-    Returns:
-        Datapane Block
-    """
-    from .report.blocks import Text
-
-    block = Text("".join(cell["source"]))
-
-    return block
-
-
-def input_cell_to_block(cell: dict) -> BaseElement:
-    """Convert a IPython notebook cell to a Datapane Code Block
-
-    Args:
-        cell: IPython notebook cell dict
-
-    Returns:
-        Datapane Block
-    """
-    from .report.blocks import Code
-
-    block = Code("".join(cell["source"]))
-
-    return block
-
-
 def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optional[BaseElement]:
     """Convert a IPython notebook output cell to a Datapane Block
 
@@ -234,20 +202,23 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
-            block: typing.Optional[BaseElement]
 
             if cell["cell_type"] == "markdown":
-                block = markdown_cell_to_block(cell)
-                blocks.append(block)
+                from .report.blocks import Text
+
+                markdown_block: BaseElement = Text("".join(cell["source"]))
+                blocks.append(markdown_block)
             elif cell["cell_type"] == "code":
                 if "dp-show-code" in tags:
-                    block = input_cell_to_block(cell)
-                    blocks.append(block)
+                    from .report.blocks import Code
+
+                    code_block: BaseElement = Code("".join(cell["source"]))
+                    blocks.append(code_block)
 
                 if cells_to_blocks.__name__ not in "".join(cell["source"]):
-                    block = output_cell_to_block(cell, ipython_output_cache)
-                    if block:
-                        blocks.append(block)
+                    output_block = output_cell_to_block(cell, ipython_output_cache)
+                    if output_block:
+                        blocks.append(output_block)
                     elif "dp-include" in tags:
                         display_msg(
                             f'Cell output of type {type(ipython_output_cache.get(cell["execution_count"]))} not supported. Skipping.',
