@@ -93,7 +93,7 @@ class PathWrapper(BaseAsset):
 class BaseTable(BaseAsset, Generic[U]):
     mimetype = "application/vnd.datapane.table+html"
     ext = ".tbl.html"
-    TABLE_CELLS_LIMIT: int = 5000
+    TABLE_CELLS_LIMIT: int = 100
     obj_type: U
     block_type = Table
 
@@ -107,7 +107,7 @@ class BaseTable(BaseAsset, Generic[U]):
         f.write(self.render_html(x))
 
     def to_block(self, x: T) -> DataBlock:
-        return DataTable(x)
+        return Table(x) if self._get_cells(x) <= self.TABLE_CELLS_LIMIT else DataTable(x)
 
     def _get_cells(self, x: U) -> int:
         df = self._get_df(x)
