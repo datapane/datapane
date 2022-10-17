@@ -62,7 +62,9 @@ def get_jupyter_notebook_json() -> dict:
         nb_path = ipynbname.path()
         notebook_json = read_notebook_json(nb_path)
     except FileNotFoundError as e:
-        raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
+        raise DPError(
+            "Notebook not found. This command must be executed from within a Jupyter notebook environment."
+        ) from e
 
     return notebook_json
 
@@ -134,12 +136,16 @@ def get_notebook_json() -> dict:
     Returns:
         Notebook JSON
     """
+    from IPython import get_ipython
+
     if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
     elif "VSCODE_PID" in os.environ:
         notebook_json = get_vscode_notebook_json()
-    else:
+    elif get_ipython().__class__.__name__ == "ZMQInteractiveShell":
         notebook_json = get_jupyter_notebook_json()
+    else:
+        raise DPError("Can't detect notebook environment")
 
     return notebook_json
 
