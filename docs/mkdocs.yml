@@ -1,7 +1,7 @@
 site_name: Datapane Docs
 repo_name: datapane/datapane
 repo_url: https://github.com/datapane/datapane/
-edit_uri: 'edit/master/docs/docs/'
+edit_uri: "edit/master/docs/docs/"
 copyright: © 2022 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
@@ -9,85 +9,79 @@ nav:
   - Quickstart: "quickstart.ipynb"
   - Release Notes: releasenotes.md
   - Tutorials:
-    - 🌱 Getting started:
-      - Install Datapane: "tutorials/basics/install-datapane.md"
-      #- Create a report: "tutorials/basics/create-a-report.ipynb"
-      - Create an app: "tutorials/basics/create-an-app.ipynb"
-    - 🧱 Blocks types:
-      - tutorials/blocks/index.ipynb
-    - ☁️ Datapane Cloud:
-      - tutorials/datapane-cloud/index.md
-      - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
-      #- Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
-      - Upload an app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
-      #- Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
-      - App visibility: "tutorials/datapane-cloud/app-visibility.ipynb"
-      - Workspaces:
-        - "tutorials/datapane-cloud/workspaces/index.md"
-        - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
-        - Managing members: "tutorials/datapane-cloud/workspaces/managing-members.md"
-      - Projects: "tutorials/datapane-cloud/projects.md"
-#      - Embedding: "tutorials/datapane-cloud/embedding.ipynb"
-    - 🏢 Datapane Enterprise:
-      - tutorials/datapane-enterprise/index.md
-      - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
-      #- Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
-      - App notifications: "tutorials/datapane-enterprise/app-notifications.ipynb"
-      - Files: "tutorials/datapane-enterprise/files.md"
-      - Managing members: "tutorials/datapane-enterprise/managing-members.md"
-    - 🎨 Styling:
-      - tutorials/styling/index.ipynb
-#      - Adding source code: "tutorials/styling/adding-source-code.ipynb"
-      - Global styling: "tutorials/styling/global-styling.md"
-    - 🤖 Automation:
-      - tutorials/automation/index.md
+      - 🌱 Getting started:
+          - Install Datapane: "tutorials/basics/install-datapane.md"
+          - Create an app: "tutorials/basics/create-an-app.ipynb"
+      - 🧱 Blocks types:
+          - tutorials/blocks/index.ipynb
+      - ☁️ Datapane Cloud:
+          - tutorials/datapane-cloud/index.md
+          - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
+          - Upload an app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
+          - App visibility: "tutorials/datapane-cloud/app-visibility.ipynb"
+          - Workspaces:
+              - "tutorials/datapane-cloud/workspaces/index.md"
+              - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
+              - Managing members: "tutorials/datapane-cloud/workspaces/managing-members.md"
+          - Projects: "tutorials/datapane-cloud/projects.md"
+      - 🏢 Datapane Enterprise:
+          - tutorials/datapane-enterprise/index.md
+          - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
+          - App notifications: "tutorials/datapane-enterprise/app-notifications.ipynb"
+          - Files: "tutorials/datapane-enterprise/files.md"
+          - Managing members: "tutorials/datapane-enterprise/managing-members.md"
+      - 🎨 Styling:
+          - tutorials/styling/index.ipynb
+          - Global styling: "tutorials/styling/global-styling.md"
+      - 🤖 Automation:
+          - tutorials/automation/index.md
 
   - Catalogues:
-    - "catalogues/index.ipynb"
-    - 🧱 Blocks:
-      - "catalogues/blocks/index.ipynb"
-      - Tables and data:
-        - Big Number: "catalogues/blocks/bignumber.ipynb"
-        - Data Table: "catalogues/blocks/datatable.ipynb"
-        - Table: "catalogues/blocks/table.ipynb"
-      - Plots and visualizations:
-        - Plots: "catalogues/blocks/plot.ipynb"
-        - Maps: "catalogues/blocks/map.ipynb"
-      - Text and HTML:
-        - Text: "catalogues/blocks/text.ipynb"
-        - Code: "catalogues/blocks/code.ipynb"
-        - Formula: "catalogues/blocks/formula.ipynb"
-        - HTML: "catalogues/blocks/html.ipynb"
-      - Layout and pages:
-        - Groups: "catalogues/blocks/group.ipynb"
-        - Pages: "catalogues/blocks/page.ipynb"
-        - Selects: "catalogues/blocks/select.ipynb"
-      # - Divider: "catalogues/blocks/divider.ipynb"
-      # - Toggle: "catalogues/blocks/toggle.ipynb"
-      - Media and embeds:
-        - Attachments: "catalogues/blocks/attachment.ipynb"
-        - Embeds: "catalogues/blocks/embed.ipynb"
-        - Media: "catalogues/blocks/media.ipynb"
-    - 🗃 Components:
-      - "catalogues/components/index.ipynb"
-      - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
-      - Timeline: "catalogues/components/timeline.ipynb"
-    - 📑 Templates:
-      - "catalogues/templates/index.ipynb"
+      - "catalogues/index.ipynb"
+      - 🧱 Blocks:
+          - "catalogues/blocks/index.ipynb"
+          - Tables and data:
+              - Big Number: "catalogues/blocks/bignumber.ipynb"
+              - Data Table: "catalogues/blocks/datatable.ipynb"
+              - Table: "catalogues/blocks/table.ipynb"
+          - Plots and visualizations:
+              - Plots: "catalogues/blocks/plot.ipynb"
+              - Maps: "catalogues/blocks/map.ipynb"
+          - Text and HTML:
+              - Text: "catalogues/blocks/text.ipynb"
+              - Code: "catalogues/blocks/code.ipynb"
+              - Formula: "catalogues/blocks/formula.ipynb"
+              - HTML: "catalogues/blocks/html.ipynb"
+          - Layout and pages:
+              - Groups: "catalogues/blocks/group.ipynb"
+              - Pages: "catalogues/blocks/page.ipynb"
+              - Selects: "catalogues/blocks/select.ipynb"
+          # - Divider: "catalogues/blocks/divider.ipynb"
+          # - Toggle: "catalogues/blocks/toggle.ipynb"
+          - Media and embeds:
+              - Attachments: "catalogues/blocks/attachment.ipynb"
+              - Embeds: "catalogues/blocks/embed.ipynb"
+              - Media: "catalogues/blocks/media.ipynb"
+      - 🗃 Components:
+          - "catalogues/components/index.ipynb"
+          - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
+          - Timeline: "catalogues/components/timeline.ipynb"
+      - 📑 Templates:
+          - "catalogues/templates/index.ipynb"
 
   - Guides:
-    - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
-    - Accessing data in Python: "guides/accessing-data-in-python/accessing-data-in-python.ipynb"
+      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
+      - Accessing data in Python: "guides/accessing-data-in-python/accessing-data-in-python.ipynb"
 
   - Explanations:
-    - Datapane Enterprise:
-      - "concepts/datapane-enterprise/index.md"
-      - Deployment and hosting: "concepts/datapane-enterprise/deployment-and-hosting.md"
-      - Authentication and sharing: "concepts/datapane-enterprise/authentication-and-sharing.md"
-    - Support policy: "concepts/support-policy.md"
+      - Datapane Enterprise:
+          - "concepts/datapane-enterprise/index.md"
+          - Deployment and hosting: "concepts/datapane-enterprise/deployment-and-hosting.md"
+          - Authentication and sharing: "concepts/datapane-enterprise/authentication-and-sharing.md"
+      - Support policy: "concepts/support-policy.md"
 
   - Reference:
-    - API reference: "https://datapane.github.io/datapane/"
+      - API reference: "https://datapane.github.io/datapane/"
 
 theme:
   name: material
@@ -137,6 +131,13 @@ plugins:
           - remove_input
   - search:
       lang: en
+  - redirects:
+      redirect_maps:
+        "tutorials/basics/create-a-report.md": "tutorials/basics/create-an-app.ipynb"
+        "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
+        "tutorials/datapane-cloud/report-visibility.md": "tutorials/datapane-cloud/app-visibility.ipynb"
+        "tutorials/datapane-enterprise/report-notifications.md": "tutorials/datapane-enterprise/app-notifications.ipynb"
+
   #- tags
   # Currently a sponsor-only feature
   # - social:
