@@ -1,12 +1,12 @@
 # Global Styling and Whitelabelling
 
-This section describes how to add custom colours and fonts to your report.
+This section describes how to add custom colours and fonts to your app.
 
 ## Styles
 
-Datapane Enterprise allows you to define a global style block which will apply to all of your reports. In this block you can \(re\)define the default font, background colour and more.
+Datapane Enterprise allows you to define a global style block which will apply to all of your apps. In this block you can \(re\)define the default font, background colour and more.
 
-![Example of a styled report](../../img/tutorials/styling-whitelabelling-1.png)
+![Example of a styled app](../../img/tutorials/styling-whitelabelling-1.png)
 
 To use this feature, you'll need to have Admin Access. Head over to Settings -&gt; Visual Settings, and scroll to the Styling section, where you'll see a block of HTML/CSS which looks like this:
 
@@ -21,7 +21,7 @@ To use this feature, you'll need to have Admin Access. Head over to Settings -&g
 </style>
 ```
 
-You can edit this block to add your brand colours, load in a custom font or even add a logo. Any assets that you add will be displayed in a bar at the top of your report, and these changes will apply retroactively to your old reports.
+You can edit this block to add your brand colours, load in a custom font or even add a logo. Any assets that you add will be displayed in a bar at the top of your app, and these changes will apply retroactively to your old apps.
 
 ### **Adding a custom font**
 
@@ -44,7 +44,7 @@ Note that this will only apply to the headings and prose - UI text in DataTables
 
 ### **Adding a custom header**
 
-Anything you add under the `<style>` block will be added to the top of your report as a default header. You can use this to load in a custom image, text or analytics script as follows:
+Anything you add under the `<style>` block will be added to the top of your app as a default header. You can use this to load in a custom image, text or analytics script as follows:
 
 ```html
 <style type="text/css">
@@ -66,5 +66,5 @@ Anything you add under the `<style>` block will be added to the top of your repo
 To use our Whitelabel feature, simply add a company logo under Settings - Visual Settings. Your company logo will be displayed instead of the Datapane logo in the following places:
 
 -   Login pages
--   Shared reports
--   Shared report embeds
+-   Shared apps
+-   Shared app embeds
