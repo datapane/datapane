@@ -119,7 +119,9 @@ theme:
   favicon: img/favicon.png
 
 extra_css:
-  - stylesheets/extra.css
+  - css/extra.css
+extra_javascript:
+  - js/extra.js
 
 plugins:
   - mknotebooks:
