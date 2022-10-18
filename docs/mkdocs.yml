@@ -11,14 +11,14 @@ nav:
   - Tutorials:
     - 🌱 Getting started:
       - Install Datapane: "tutorials/basics/install-datapane.md"
-      #- Create an app: "tutorials/basics/create-a-app.ipynb"
+      #- Create a report: "tutorials/basics/create-a-report.ipynb"
       - Create an app: "tutorials/basics/create-an-app.ipynb"
     - 🧱 Blocks types:
       - tutorials/blocks/index.ipynb
     - ☁️ Datapane Cloud:
       - tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
-      #- Upload an app: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
+      #- Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
       - Upload an app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
       #- Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
       - App visibility: "tutorials/datapane-cloud/app-visibility.ipynb"
