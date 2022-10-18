@@ -13,7 +13,7 @@ The Cloud Starter plan limits you to:
 -   1 Project (which will be your default Project)
 -   Up to 5 private apps
 
-Only apps not set to be publicly visible in App settings_ will count towards this limit of 5 apps.
+Only apps not set to be publicly visible in _App settings_ will count towards this limit of 5 apps.
 
 At the bottom of this page, you can upgrade your Workspace plan to Cloud Pro. Selecting this button will take you to [Stripe](https://stripe.com){:target="\_blank"} to manage your payment and billing.
 
