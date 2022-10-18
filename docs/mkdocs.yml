@@ -11,14 +11,17 @@ nav:
   - Tutorials:
     - 🌱 Getting started:
       - Install Datapane: "tutorials/basics/install-datapane.md"
-      - Create a report: "tutorials/basics/create-a-report.ipynb"
+      #- Create an app: "tutorials/basics/create-a-app.ipynb"
+      - Create an app: "tutorials/basics/create-an-app.ipynb"
     - 🧱 Blocks types:
       - tutorials/blocks/index.ipynb
     - ☁️ Datapane Cloud:
       - tutorials/datapane-cloud/index.md
       - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
-      - Upload a report: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
-      - Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
+      #- Upload an app: "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.ipynb"
+      - Upload an app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
+      #- Report visibility: "tutorials/datapane-cloud/report-visibility.ipynb"
+      - App visibility: "tutorials/datapane-cloud/app-visibility.ipynb"
       - Workspaces:
         - "tutorials/datapane-cloud/workspaces/index.md"
         - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
@@ -28,7 +31,8 @@ nav:
     - 🏢 Datapane Enterprise:
       - tutorials/datapane-enterprise/index.md
       - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
-      - Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
+      #- Report notifications: "tutorials/datapane-enterprise/report-notifications.ipynb"
+      - App notifications: "tutorials/datapane-enterprise/app-notifications.ipynb"
       - Files: "tutorials/datapane-enterprise/files.md"
       - Managing members: "tutorials/datapane-enterprise/managing-members.md"
     - 🎨 Styling:
@@ -37,16 +41,6 @@ nav:
       - Global styling: "tutorials/styling/global-styling.md"
     - 🤖 Automation:
       - tutorials/automation/index.md
-    - 📦 Apps:
-      - tutorials/apps/index.ipynb
-      - Parameters and forms:
-        - "tutorials/apps/parameters-and-forms/index.ipynb"
-        - Configuration: "tutorials/apps/parameters-and-forms/configuration.md"
-        - Parameters: "tutorials/apps/parameters-and-forms/parameters.md"
-      - Scheduled report runs: "tutorials/apps/scheduling.md"
-      - Environments and variables: "tutorials/apps/variables.ipynb"
-      - Configuration and dependencies: "tutorials/apps/configuration-and-dependencies.md"
-      - Integrating databases or APIs: "tutorials/apps/database-and-network-access.md"
 
   - Catalogues:
     - "catalogues/index.ipynb"
