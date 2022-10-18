@@ -86,6 +86,7 @@ nav:
 theme:
   name: material
   logo: img/logo.png
+  custom_dir: overrides
   features:
     - navigation.sections
     - navigation.top
@@ -168,6 +169,9 @@ markdown_extensions:
 
 extra:
   generator: false
+  analytics:
+    provider: posthog
+    api_key: phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/datapane/datapane
