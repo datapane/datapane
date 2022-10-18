@@ -1,10 +1,10 @@
 # Automation
 
-Automating report creation, including via GitHub Actions.
+Automating app creation, including via GitHub Actions.
 
 ## Introduction
 
-Once you have a report you're happy with, you often need to generate it automatically; for instance, to run on a schedule, or to be triggered through an API. To make this easier, Datapane provides a GitHub action which allows you to run your Python script automatically to generate and publish a new report.
+Once you have an app you're happy with, you often need to generate it automatically; for instance, to run on a schedule, or to be triggered through an API. To make this easier, Datapane provides a GitHub action which allows you to run your Python script automatically to generate and publish a new app.
 
 [Datapane Build](https://github.com/marketplace/actions/datapane-build){ .md-button }
 
@@ -15,9 +15,9 @@ To learn more about GitHub actions, [see the documentation](https://docs.github.
 _Datapane Enterprise_ also provides a [script runner](/tutorials/apps/), which has several advantages and optimizations not available on the GitHub action runner, including:
 
 -   **Friendly end-user forms**. GitHub actions are not suitable for allowing authenticated, non-technical users to to run your script with parameters; Datapane's script runner provides self-service forms for stakeholders.
--   **Jupyter support**. Datapane's script runner allows you to deploy and run Jupyter Notebooks with parameters to generate dynamic reports, whilst the GitHub Action relies on a Python file
+-   **Jupyter support**. Datapane's script runner allows you to deploy and run Jupyter Notebooks with parameters to generate dynamic apps, whilst the GitHub Action relies on a Python file
 -   **On-premise and cloud hosting**. Datapane's script runner does not require GitHub, and can run on your own cloud environment or server.
--   **Private report generation**. Generate private reports which are not shared with the outside world.
+-   **Private app generation**. Generate private apps which are not shared with the outside world.
 
 ## Configuring your job
 
@@ -27,13 +27,13 @@ _Datapane Enterprise_ also provides a [script runner](/tutorials/apps/), which h
 
 Your GitHub action requires access to your Datapane API token, which you can find on your [settings page](https://cloud.datapane.com/settings) once you have logged in to Datapane. This should not be stored in plain text, and should be added to your repository's [secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets) section.
 
-The Datapane action requires that the repository contains a Python script which publishes a report. Once you have your token in your repository, you can you can add the Datapane action as a `job`, including the path to the Python script, and a reference to your secret token.
+The Datapane action requires that the repository contains a Python script which publishes an app. Once you have your token in your repository, you can you can add the Datapane action as a `job`, including the path to the Python script, and a reference to your secret token.
 
 ```yaml
 jobs:
-    build_report:
+    build_app:
         runs-on: ubuntu-latest
-        name: Run end-of-week Datapane reports
+        name: Run end-of-week Datapane apps
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-python@v1
@@ -41,7 +41,7 @@ jobs:
                   python-version: 3.8
             - uses: datapane/build-action@v2
               with:
-                  script: "reports/end_of_week.py"
+                  script: "apps/end_of_week.py"
                   token: ${{ secrets.TOKEN }}
 ```
 
@@ -49,7 +49,7 @@ jobs:
 
 ### Running on a schedule
 
-To run your report on a schedule, you can use the `schedule` option:
+To run your app on a schedule, you can use the `schedule` option:
 
 ```yaml
 on:
@@ -60,7 +60,7 @@ on:
 
 ### Manual running
 
-Manual runs can be triggered via the `workflow_dispatch` option. If your report has user-configurable parameters, you can define these in your workflow and enter them via the GH Action site when manually triggering your workflow.
+Manual runs can be triggered via the `workflow_dispatch` option. If your app has user-configurable parameters, you can define these in your workflow and enter them via the GH Action site when manually triggering your workflow.
 
 The parameters in the GH Action UI are all strings, however Datapane will convert them to primitive values as needed, e.g. the string `false` becomes a python boolean `False` value. Workflow parameters are described in the [docs](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch). The input must manually be converted to the `parameters` json string to pass to the Datapane `build-action` as follows.
 
@@ -76,9 +76,9 @@ on:
                 description: "Country to report for"
                 required: false
 jobs:
-    build_report:
+    build_app:
         runs-on: ubuntu-latest
-        name: Run Parameterised Datapane report
+        name: Run Parameterised Datapane app
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-python@v1
@@ -86,7 +86,7 @@ jobs:
                   python-version: 3.8
             - uses: datapane/build-action@v2
               with:
-                  script: "reports/financials.py"
+                  script: "apps/financials.py"
                   token: ${{ secrets.TOKEN }}
                   parameters: ${{ toJson(github.event.inputs) }}
 ```
@@ -107,14 +107,14 @@ GitHub's action UI provides an interface for running your action with parameters
 
     For more information, see GitHub [docs](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-workflow-dispatch-event) for running a parameterised datapane workflow via an API Call.
 
-To trigger your report generation through an API, you need to send a POST request to `/repos/{owner}/{repo}/actions/workflows/{workflow_name}/dispatches`. For instance, for a repo called `acme/reporting`, with a workflow as above called `financial_report` you could trigger it as follows:
+To trigger your app generation through an API, you need to send a POST request to `/repos/{owner}/{repo}/actions/workflows/{workflow_name}/dispatches`. For instance, for a repo called `acme/reporting`, with a workflow as above called `financial_app` you could trigger it as follows:
 
 ```bash
 $ curl \
   -u GH_USERNAME:GH_TOKEN \
   -X POST \
   -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/acme/reporting/actions/workflows/financial_report/dispatches \
+  https://api.github.com/repos/acme/reporting/actions/workflows/financial_app/dispatches \
   -d '{"ref":"ref", "inputs": { "company": "APPL", "market": "UK"} }'
 ```
 
@@ -133,9 +133,9 @@ env:
     version: "==0.8.0"
     requirements: '["networkx"]'
 jobs:
-    build_report:
+    build_app:
         runs-on: ubuntu-latest
-        name: Build Datapane report
+        name: Build Datapane app
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-python@v1
@@ -147,7 +147,7 @@ jobs:
                   key: ${{ runner.os }}-pip-${{ env.requirements }}-${{ env.version }}
             - uses: datapane/build-action@v2
               with:
-                  script: "reports/financials.py"
+                  script: "apps/financials.py"
                   token: ${{ secrets.TOKEN }}
                   version: "${{ env.version }}"
                   requirements: "${{ env.requirements }}"
@@ -162,9 +162,9 @@ env:
     version: "==0.8.0"
     requirements: '["networkx==2.5", "pandas==1.0.5"]'
 jobs:
-    build_report:
+    build_app:
         runs-on: ubuntu-latest
-        name: Build Datapane report
+        name: Build Datapane app
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-python@v1
@@ -184,7 +184,7 @@ jobs:
                   echo "~/.venv/bin" >> $GITHUB_PATH
             - uses: datapane/build-action@v2
               with:
-                  script: "reports/dp_script.py"
+                  script: "apps/dp_script.py"
                   token: ${{ secrets.TOKEN }}
                   requirements: "${{ env.requirements }}"
 ```

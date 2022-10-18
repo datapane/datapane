@@ -10,7 +10,7 @@ description: You can store common files and datasets on Datapane to use in your 
 
     Please see the [File API Reference](https://datapane.github.io/datapane/teams.html#datapane.client.api.teams.Blob) for more details.
 
-It is often necessary to make use of non-code assets such as datasets, models, or files when generating reports. In many situations, deploying these alongside your script is not ideal.
+It is often necessary to make use of non-code assets such as datasets, models, or files when generating apps. In many situations, deploying these alongside your script is not ideal.
 
 1. If they are deployed on a **different cadence** to your script; for instance, you want to make use of a model which is trained on a daily cadence, even though the code of your script remains static.
 2. If they are deployed from a **different environment** than your script; for instance, you may train a model on Sagemaker and want to use it in your script.
