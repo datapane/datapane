@@ -13,21 +13,30 @@ md-nav__title {
 }
 
 .md-header {
-    --tw-gradient-to: #09091a;
-    --tw-gradient-from: #131329;
+    --tw-gradient-to: #581c87;
+    --tw-gradient-from: #312e81;
     --tw-gradient-stops: var(--tw-gradient-from),
         var(--tw-gradient-to, rgb(19 19 41 / 0));
-    background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }
 
+.md-header__topic {
+    font-weight: 600;
+}
+* {
+    --md-footer-bg-color: #312e81;
+}
 [data-md-color-scheme="default"] {
-    --md-primary-fg-color: #5b57d7;
-    --md-accent-fg-color: #805df7;
+    --md-primary-fg-color: #312e81;
+    --md-accent-fg-color: #581c87;
+    --md-default-fg-color--light: #312e81;
 }
 
 [data-md-color-scheme="slate"] {
     --md-primary-fg-color: #7571f1;
     --md-accent-fg-color: #805df7;
+    --md-default-bg-color: #1f2937;
+    --md-default-fg-color--light: #fff;
 }
 
 .org {
@@ -99,4 +108,47 @@ md-nav__title {
     border-radius: 8px;
     max-width: 480px !important;
     margin: 1.2rem auto 0;
+}
+
+.md-typeset h1,
+.md-typeset h2 {
+    font-weight: 700;
+}
+/*
+.md-typeset h1 {
+    color: #312e81;
+}
+
+.md-typeset h2 {
+    color: #581c87;
+} */
+
+.md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
+.md-typeset .grid > .card {
+    border-radius: 0.5rem;
+}
+
+[data-md-color-scheme="default"]
+    .md-typeset
+    .grid.cards
+    > :-webkit-any(ul, ol)
+    > li,
+.md-typeset .grid > .card {
+    /* shadow */
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
+        0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+        var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    /* rounded-lg */
+    border: none;
+}
+
+[data-md-color-scheme="default"]
+    .md-typeset
+    .grid.cards
+    > :-webkit-any(ul, ol)
+    > li:hover,
+.md-typeset .grid > .card:hover {
+    background-color: rgb(249 250 251);
 }
