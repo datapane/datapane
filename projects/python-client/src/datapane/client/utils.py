@@ -1,4 +1,5 @@
 import argparse
+import os
 import string
 import sys
 import typing as t
@@ -66,6 +67,20 @@ def is_jupyter() -> bool:
         return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # type: ignore [name-defined]  # noqa: F821
     except Exception:
         return False
+
+
+def get_ide_name() -> str:
+    """Try and get the name of the IDE the script is running in"""
+    if "PYCHARM_HOSTED" in os.environ:
+        return "pycharm"
+    if "COLAB_GPU" in os.environ:
+        return "colab"
+    elif "VSCODE_PID" in os.environ:
+        return "vscode"
+    elif is_jupyter():
+        return "jupyter"
+
+    return "unknown"
 
 
 class MarkdownFormatter(string.Formatter):
