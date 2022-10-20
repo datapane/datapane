@@ -81,7 +81,7 @@ def get_vscode_notebook_json() -> dict:
         nb_path = ipynbname.path()
 
         # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
-        nb_path = Path(str(nb_path.split("-jvsc-")[0] + ".ipynb"))
+        nb_path = Path(str(nb_path).split("-jvsc-")[0] + ".ipynb")
 
         notebook_json = read_notebook_json(nb_path)
     except FileNotFoundError as e:
