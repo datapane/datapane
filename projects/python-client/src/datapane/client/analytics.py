@@ -42,7 +42,11 @@ def capture(event: str, config: Optional[c.Config] = None, **properties) -> None
         config.save()
 
     properties.update(
-        source="cli", dp_version=__version__, ide_name=get_ide_name(), in_jupyter=is_jupyter(), using_conda=_USING_CONDA
+        source="cli",
+        dp_version=__version__,
+        ide_name=get_ide_name(),
+        in_jupyter=is_jupyter(),
+        using_conda=_USING_CONDA,
     )
 
     with suppress(Exception):
@@ -54,6 +58,7 @@ def identify(config: c.Config, **properties) -> None:
         os=platform.system(),
         python_version=platform.python_version(),
         dp_version=__version__,
+        ide_name=get_ide_name(),
         in_jupyter=is_jupyter(),
         using_conda=_USING_CONDA,
     )
