@@ -36,9 +36,9 @@ def app_to_image(app_path, image_path, width, height):
     )
 
 
-def embed_local_app(app_path, width, height, iframe=False):
+def embed_local_app(app_path, width, height, iframe=True):
     if iframe:
-        return IFrame(app_path, width=width, height=height)
+        return IFrame(app_path, width=width, height=height, extras=['loading="lazy"'])
     else:
         width = 700
         app_filename = Path(app_path).name
