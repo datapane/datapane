@@ -9,7 +9,7 @@ tasks:
     desc: "Install dependencies ready for development on the codebase"
     run: once
     cmds:
-      - cmd: git config filter.clear-notebook-output.clean "poetry run jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --ClearMetadataPreprocessor.preserve_cell_metadata_mask tags --to=notebook --stdin --stdout --log-level=ERROR"
+      - cmd: git config filter.clear-notebook-output.clean "cd docs/; poetry run jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --ClearMetadataPreprocessor.preserve_cell_metadata_mask tags --to=notebook --stdin --stdout --log-level=ERROR"
       - cmd: poetry install
 
   test:
