@@ -1,6 +1,6 @@
-# datapane-docs-beta
+# datapane-docs
 
-The new Datapane documentation.
+The Datapane documentation.
 
 ## Requirements
 
@@ -52,6 +52,16 @@ Use metadata to show or hide input/output cells in notebooks.
 -   `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
 -   `remove_all_output`, e.g. for the cells outputting information after calling `.save()` or `.upload()`.
 -   `remove_cell`, e.g. when you want something executed without displaying input or output.
+
+## Contributing
+
+The docs include many Jupyter notebook (`ipynb`) files that must have their output and metadata (except `tags`) cleared. 
+
+The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
+
+```bash
+git config filter.clear-notebook-output.clean "jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --ClearMetadataPreprocessor.preserve_cell_metadata_mask tags --to=notebook --stdin --stdout --log-level=ERROR"
+```
 
 ## Deploying
 
