@@ -55,7 +55,7 @@ Use metadata to show or hide input/output cells in notebooks.
 
 ## Contributing
 
-The docs include many Jupyter notebook (`ipynb`) files that must have their output and metadata (except `tags`) cleared before a commit. 
+The docs include many Jupyter notebook (`ipynb`) files that must have their output and metadata (except `tags`) cleared before a commit.
 
 The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
 
