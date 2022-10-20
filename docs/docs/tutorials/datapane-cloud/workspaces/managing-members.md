@@ -1,6 +1,6 @@
 # Managing members
 
-You can invite members to your Workspace so your whole team has access to a shared environment for reports and scripts.
+You can invite members to your Workspace so your whole team has access to a shared environment for apps and scripts.
 
 ### Inviting members
 
@@ -12,10 +12,10 @@ You can invite members to your Workspace by going to the _Members_ tab in _Works
 
 Every member must be assigned to one of our four system roles:&#x20;
 
-1. **Viewer**: can view reports and run scripts&#x20;
-2. **Editor**: all permissions of viewer, plus creating reports and scripts
+1. **Viewer**: can view apps and run scripts&#x20;
+2. **Editor**: all permissions of viewer, plus creating apps and scripts
 3. **Admin**: all permissions of editor, plus settings, member management and billing
-4. **Analyst**: can run apps (dynamic reports) but can't create reports or apps via the API. This role is only available for Enterprise users.
+4. **Analyst**: can run apps but can't create apps via the API. This role is only available for Enterprise users.
 
 ### Advanced
 

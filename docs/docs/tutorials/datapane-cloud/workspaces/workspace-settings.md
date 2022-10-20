@@ -11,9 +11,9 @@ Here you can manage the subscription of your Workspace plan. You will see the nu
 The Cloud Starter plan limits you to:
 
 -   1 Project (which will be your default Project)
--   Up to 5 private reports
+-   Up to 5 private apps
 
-Only reports not set to be publicly visible in _Report settings_ will count towards this limit of 5 reports.
+Only apps not set to be publicly visible in _App settings_ will count towards this limit of 5 apps.
 
 At the bottom of this page, you can upgrade your Workspace plan to Cloud Pro. Selecting this button will take you to [Stripe](https://stripe.com){:target="\_blank"} to manage your payment and billing.
 
@@ -39,6 +39,6 @@ For more details on managing members and roles, see [Workspaces > Managing membe
 
 ## Settings
 
-Here you can change the name of your Workspace and change the visual style of your reports.
+Here you can change the name of your Workspace and change the visual style of your apps.
 
 ![Other settings](../../../img/tutorials/workspace-other-settings.png){.docs-image}

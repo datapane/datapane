@@ -17,7 +17,7 @@
 
 We have launched **Workspaces** on Datapane Cloud.
 
-Datapane Cloud is the best way to host and share your reports, dashboards, and apps.
+Datapane Cloud is the best way to host and share your apps, dashboards, and apps.
 
 With this release, Datapane Cloud users can now securely share reports with their team or clients by creating private Workspaces and Projects.
 
@@ -33,15 +33,15 @@ Our first templates include:
 
 #### Classifier dashboard
 
-A performance dashboard for classifiers. It can be used as a starting point for creating a Datapane report that highlights the performance of multiple classifiers on a dataset.
+A performance dashboard for classifiers. It can be used as a starting point for creating a Datapane app that highlights the performance of multiple classifiers on a dataset.
 
 #### Social media dashboard
 
-An engagement dashboard for social media. It can be used as a starting point for creating a Datapane report that highlights user engagement with social media channels.
+An engagement dashboard for social media. It can be used as a starting point for creating a Datapane app that highlights user engagement with social media channels.
 
 #### Text-heavy report
 
-A text-heavy report. It can be used as a starting point for creating a text-heavy Datapane report that starts off as a Jupyter Notebook.
+A text-heavy app. It can be used as a starting point for creating a text-heavy Datapane app that starts off as a Jupyter Notebook.
 
 ### :octicons-code-square-24: Open-source Report Renderer
 
@@ -145,7 +145,7 @@ datapane signup
 | Python version   | 0.12.1 |
 | Breaking changes | True   |
 
--   `report.publish` is now called `report.upload`
+-   `app.publish` is now called `app.upload`
 -   `dp.Markdown` replaced with `dp.Text` for text content
 -   `dp.Page` must use `title` parameter to set the page title, not `label`
 -   Objects like `scripts`, `blobs` and `variables` now keep their original name instead of being converted to lowercase slugs, for instance `my variable` won't be renamed to`my_variable`. You may need to update any scripts to use the new names (or re-add variables / blobs with the older names).
@@ -165,9 +165,9 @@ datapane signup
 -   Report thumbnails are now shown correctly when the first asset is an image
 -   Added a product feedback form in left sidebar of Datapane Home
 -   Per-report styling is now available on Enterprise
--   Medium exports no longer require Publishing a report
+-   Medium exports no longer require Publishing an app
 -   Streamlined `Home` and `Gallery` pages
--   If you have added code to a report, it will now show in the embed view
+-   If you have added code to an app, it will now show in the embed view
 
 ---
 
@@ -263,10 +263,10 @@ Read our [installation guide](https://github.com/datapane/datapane-onpremise) on
 
 -   Better report header design
 -   See the report visibility (Public/Private) on the 'My Reports' page
--   DataTable component is now available for offline reports generated via `report.save`
+-   DataTable component is now available for offline reports generated via `app.save`
 -   Live support chat added to hosted Datapane Enterprise instances
 -   Clearer signup process for Datapane Enterprise users
--   'More from user' section of a report no longer shows that same report
+-   'More from user' section of an app no longer shows that same report
 -   Fixed a bug with Bokeh where some report blocks would be repeated
 
 ---
@@ -280,8 +280,8 @@ Read our [installation guide](https://github.com/datapane/datapane-onpremise) on
 
 ### :octicons-bug-24: Other Bug Fixes and Improvements
 
--   LaTeX equations can now be added to your reports! Check out the [Formula](catalogues/blocks/formula.ipynb) block for more info.
--   Increased the maximum size of a report from 25MB to 100MB
+-   LaTeX equations can now be added to your apps! Check out the [Formula](catalogues/blocks/formula.ipynb) block for more info.
+-   Increased the maximum size of an app from 25MB to 100MB
 -   Enterprise Scripts can now specify environment variables directly from their `datapane.yaml` file - these can be static value or user variables that are dynamically injected into your script e.g. DB parameters.
 -   Datapane Enterprise users can now set their private report sharing timeout (previously this was fixed at 48 hours)
 -   Sharing a private report link sometimes broke due to an extra # being appended to the URL

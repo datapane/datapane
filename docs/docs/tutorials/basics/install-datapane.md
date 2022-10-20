@@ -15,13 +15,13 @@ If you use `conda`, you can install it with:
 === "Bash"
 
     ``` bash
-    conda install -c conda-forge "datapane>=0.15.1"
+    conda install -c conda-forge "datapane>=0.15.3"
     ```
 
 === "Jupyter"
 
     ``` bash
-    !conda install -c conda-forge "datapane>=0.15.1"
+    !conda install -c conda-forge "datapane>=0.15.3"
     ```
 
 !!! warning
@@ -46,7 +46,7 @@ If you use `pip`, you can install it with:
 
 ## Upgrading
 
-We upgrade Datapane regularly to include new features, both in the client and on the hosted version. From time to time your client may no longer be compatible with the Datapane server when uploading a report. If this happens, you will receive an error like the following:&#x20;
+We upgrade Datapane regularly to include new features, both in the client and on the hosted version. From time to time your client may no longer be compatible with the Datapane server when uploading an app. If this happens, you will receive an error like the following:&#x20;
 
 ```
 IncompatibleVersionError: Your client is out-of-date (version 0.9.2) and may be causing errors, "

@@ -2,19 +2,19 @@
 
 ## Projects
 
-A Project is a grouping of reports much like a folder. To share a report with a specific group of members of your Workspace, you can create a Project from the _Home_ or _Projects_ pages (if you have permission).
+A Project is a grouping of apps much like a folder. To share an app with a specific group of members of your Workspace, you can create a Project from the _Home_ or _Projects_ pages (if you have permission).
 
 ![Create a Project modal](../../img/tutorials/create-project.png){.docs-image}
 
 !!! info
 
-    All Workspaces come with a default Project. All reports are shared with the `default` group automatically.
+    All Workspaces come with a default Project. All apps are shared with the `default` group automatically.
 
 When a new member is added to your Workspace, you can add them to specific Projects.
 
-You can change which Project a report is part of on the _Report settings_ page.
+You can change which Project an app is part of on the _App settings_ page.
 
-![Report settings](../../img/tutorials/report-settings.png){.docs-image}
+![App settings](../../img/tutorials/app-settings.png){.docs-image}
 
 !!! info
 
