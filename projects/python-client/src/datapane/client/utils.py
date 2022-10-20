@@ -69,7 +69,7 @@ def is_jupyter() -> bool:
         return False
 
 
-def get_ide_name() -> str:
+def get_environment_type() -> str:
     """Try and get the name of the IDE the script is running in"""
     if "PYCHARM_HOSTED" in os.environ:
         return "pycharm"

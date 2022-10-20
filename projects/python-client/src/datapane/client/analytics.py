@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional, TypeVar, cast
 import posthog
 
 from datapane import _IN_DPSERVER, _IN_PYTEST, _USING_CONDA, ON_DATAPANE, __version__, log
-from datapane.client.utils import get_ide_name, is_jupyter
+from datapane.client.utils import get_environment_type, is_jupyter
 
 from . import config as c
 
@@ -44,7 +44,7 @@ def capture(event: str, config: Optional[c.Config] = None, **properties) -> None
     properties.update(
         source="cli",
         dp_version=__version__,
-        ide_name=get_ide_name(),
+        environment_type=get_environment_type(),
         in_jupyter=is_jupyter(),
         using_conda=_USING_CONDA,
     )
@@ -58,7 +58,7 @@ def identify(config: c.Config, **properties) -> None:
         os=platform.system(),
         python_version=platform.python_version(),
         dp_version=__version__,
-        ide_name=get_ide_name(),
+        environment_type=get_environment_type(),
         in_jupyter=is_jupyter(),
         using_conda=_USING_CONDA,
     )
