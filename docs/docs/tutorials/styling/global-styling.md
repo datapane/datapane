@@ -1,10 +1,8 @@
-# Global Styling and Whitelabelling
-
-This section describes how to add custom colours and fonts to your app.
+This section describes how to add custom colours and fonts to all the apps in your workspace.
 
 ## Styles
 
-Datapane Enterprise allows you to define a global style block which will apply to all of your apps. In this block you can \(re\)define the default font, background colour and more.
+Datapane allows you to define a global style block which will apply to all of your apps. In this block you can \(re\)define the default font, background colour and more.
 
 ![Example of a styled app](../../img/tutorials/styling-whitelabelling-1.png)
 
@@ -58,13 +56,3 @@ Anything you add under the `<style>` block will be added to the top of your app 
 
 <img src="my-image.png" />
 ```
-
-## Whitelabelling
-
-[:octicons-organization-16: Enterprise feature](){.org}
-
-To use our Whitelabel feature, simply add a company logo under Settings - Visual Settings. Your company logo will be displayed instead of the Datapane logo in the following places:
-
--   Login pages
--   Shared apps
--   Shared app embeds
