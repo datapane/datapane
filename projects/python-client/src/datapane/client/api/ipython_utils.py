@@ -50,7 +50,6 @@ def read_notebook_json(path: Path) -> dict:
     return notebook_json
 
 
-@capture_event("Get Jupyter Notebook JSON")
 def get_jupyter_notebook_json() -> dict:
     """Get the JSON for the current Jupyter notebook
 
@@ -70,7 +69,6 @@ def get_jupyter_notebook_json() -> dict:
     return notebook_json
 
 
-@capture_event("Get VSCode Notebook JSON")
 def get_vscode_notebook_json() -> dict:
     """Get the JSON for the current VSCode notebook
 
@@ -92,7 +90,6 @@ def get_vscode_notebook_json() -> dict:
     return notebook_json
 
 
-@capture_event("Get Colab Notebook JSON")
 def get_colab_notebook_json() -> dict:
     """Get the JSON for the current Colab notebook
 
