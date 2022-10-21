@@ -7,10 +7,8 @@ from contextlib import suppress
 from pathlib import Path
 
 import datapane as dp
-from datapane.client import apps as sc
 from datapane.client import config as c
 from datapane.client.commands import gen_name
-from datapane.common.utils import pushd
 
 # login to server
 c.set_config(c.Config(server=os.environ["DP_TEST_SERVER"], token=os.environ["DP_TEST_TOKEN"]))
@@ -26,25 +24,13 @@ def setup(file: Path, test_org: bool):
 
     dp_objs = {"styleReportURL": style_report.web_url}
 
-    def get_test_app(name: str) -> dp.LegacyApp:
-        with pushd(Path(".") / "tests" / "cypress_test_app"):
-            dp_cfg = sc.DatapaneCfg.create_initial(config_file=Path(f"{name}.yaml"), script=Path(f"{name}.py"))
-            with sc.build_bundle(dp_cfg) as sdist:
-                app = dp.LegacyApp.upload_pkg(sdist, dp_cfg, name=gen_name())
-        return app
-
-    # add a basic app and file
+    # add a basic file
     if test_org:
-        # apps
-        params_app = get_test_app("dp_test_cypress")
-        no_params_app = get_test_app("dp_test_cypress_noparams")
         # file
         obj = {"foo": "bar"}
         obj_file = dp.File.upload_obj(data=pickle.dumps(obj), name=gen_name())
         # record obj urls
-        dp_objs.update(
-            {"paramsAppURL": params_app.web_url, "noParamsAppURL": no_params_app.web_url, "fileURL": obj_file.web_url}
-        )
+        dp_objs.update({"fileURL": obj_file.web_url})
 
     # write to tmp file for cypress tests to pick up
     file.write_text(json.dumps(dp_objs))
@@ -60,10 +46,6 @@ def teardown(file: Path, test_org: bool):
     with suppress(Exception):
         dp.App.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
-        with suppress(Exception):
-            dp.LegacyApp.by_id(dp_objs["paramsAppURL"]).delete()
-        with suppress(Exception):
-            dp.LegacyApp.by_id(dp_objs["noParamsAppURL"]).delete()
         with suppress(Exception):
             dp.File.by_id(dp_objs["fileURL"]).delete()
 
