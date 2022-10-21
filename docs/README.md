@@ -1,6 +1,6 @@
-# datapane-docs-beta
+# datapane-docs
 
-The new Datapane documentation.
+The Datapane documentation.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ The new Datapane documentation.
 
 ## Generating the docs
 
-1. Run `poetry run ./nbbuild.sh` to execute all Jupyter notebooks and generate Datapane reports and image previews.
+1. Run `poetry run ./nbbuild.sh` to execute all Jupyter notebooks and generate Datapane apps and image previews.
 2. Run `poetry run mkdocs build` to generate static site in `site/`.
 
 `poetry run mkdocs serve` can be used to serve locally.
@@ -25,22 +25,22 @@ _hint:_ You can also use the same tool we use for Deploys for local serving afte
 wrangler pages dev --live-reload
 ```
 
-## Embedding reports and previews
+## Embedding apps and previews
 
-1. Save your report to the same directory as the notebook:
+1. Save your app to the same directory as the notebook:
 
     ```python
-    report.save(path="simple-report.html")
+    app.save(path="simple-app.html")
     ```
 
 2. Use `dpdocsutils` to:
 
-    - embed the interactive report (`iframe=True`),
-    - or insert a generated preview image that hyperlinks to the interactive report (`iframe=False`, default)
+    - embed the interactive app (`iframe=True`),
+    - or insert a generated preview image that hyperlinks to the interactive app (`iframe=False`, default)
 
     ```python
     from dpdocsutils import previews
-    previews.embed_local_report('/tutorials/basics/simple-report.html', width="100%", height=400)
+    previews.embed_local_app('/tutorials/basics/simple-app.html', width="100%", height=400)
     ```
 
 3. Mark the cell with the metadata tag `remove_input` so we only see the output.
@@ -52,6 +52,16 @@ Use metadata to show or hide input/output cells in notebooks.
 -   `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
 -   `remove_all_output`, e.g. for the cells outputting information after calling `.save()` or `.upload()`.
 -   `remove_cell`, e.g. when you want something executed without displaying input or output.
+
+## Contributing
+
+The docs include many Jupyter notebook (`ipynb`) files that must have their output and metadata (except `tags`) cleared before a commit.
+
+The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
+
+```bash
+git config filter.clear-notebook-output.clean "cd docs/; poetry run jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --ClearMetadataPreprocessor.preserve_cell_metadata_mask tags --to=notebook --stdin --stdout --log-level=ERROR"
+```
 
 ## Deploying
 

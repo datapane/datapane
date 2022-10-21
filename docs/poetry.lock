@@ -1030,6 +1030,22 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "mkdocs-redirects"
+version = "1.2.0"
+description = "A MkDocs plugin for dynamic page redirects to prevent broken links."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+mkdocs = ">=1.1.1"
+
+[package.extras]
+dev = ["autoflake", "black", "isort", "pytest", "twine (>=1.13.0)"]
+release = ["twine (>=1.13.0)"]
+test = ["autoflake", "black", "isort", "pytest"]
+
+[[package]]
 name = "mknotebooks"
 version = "0.7.1.post0.dev98"
 description = "Plugin for mkdocs to generate markdown documents from jupyter notebooks."
@@ -2046,7 +2062,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11.0"
-content-hash = "e1f78d417496b45b74c4ce209a8fbb0a630aebdb854fed720a873a2c2e34c3c7"
+content-hash = "59163bc36a02364d6866c724c0cf6b39f306b494b9be76c14107ccd564d36e8d"
 
 [metadata.files]
 altair = [
@@ -2723,6 +2739,9 @@ mkdocs-material = [
 mkdocs-material-extensions = [
     {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
     {file = "mkdocs_material_extensions-1.0.3-py3-none-any.whl", hash = "sha256:a82b70e533ce060b2a5d9eb2bc2e1be201cf61f901f93704b4acf6e3d5983a44"},
+]
+mkdocs-redirects = [
+    {file = "mkdocs-redirects-1.2.0.tar.gz", hash = "sha256:ddd38267d49fdfa19fb2f25b4aed2fb53f0496c818bf3018009c8eaf6676a327"},
 ]
 mknotebooks = [
     {file = "mknotebooks-0.7.1.post0.dev98-py3-none-any.whl", hash = "sha256:4bda0a4931e06cd30625a9a485abcefbd98b825a63228dbb06ba090596684b1e"},

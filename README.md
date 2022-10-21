@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://datapane.com">
-    <img src="https://datapane.com/static/datapane-logo-dark.png" width="250px" alt="Datapane" />
+    <img src="https://cloud.datapane.com/static/datapane-logo-dark.png" width="250px" alt="Datapane" />
   </a>
 </p>
 <p align="center">

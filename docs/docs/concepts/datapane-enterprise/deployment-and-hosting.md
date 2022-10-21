@@ -37,13 +37,13 @@ Datapane will upgrade, administer, and maintain the server. Core data leaves the
 
 ### Security Measures
 
--   Binary data and assets are stored on Google Cloud Storage, and user data and report metadata is stored in Google Cloud SQL (isolated per customer). In both mechanisms, data is encrypted at rest. For technical information, see the [Google Cloud FAQs](https://cloud.google.com/sql/faq#encryption).&#x20;
+-   Binary data and assets are stored on Google Cloud Storage, and user data and app metadata is stored in Google Cloud SQL (isolated per customer). In both mechanisms, data is encrypted at rest. For technical information, see the [Google Cloud FAQs](https://cloud.google.com/sql/faq#encryption).&#x20;
 -   Scripts are stored on single-tenant Google Cloud Storage buckets which are encrypted at rest. Execution of scripts happens in an isolated environment which is namespaced to the tenancy and is fully sandboxed.
 -   Our endpoints are TLS/SSL only
 -   We use audit logs on Google Cloud to provide an audit trail over infrastructure and the Datapane platform, allowing security analysis and audit access
 -   Datapane API requests are authenticated using secure private tokens over TLS/SSL.
 -   Each user has a private account which is not shared with other instances and operates in a separate database. Users cannot authenticate across tenancies.
--   Secure signed URLs can be generated for reports, automatically expire after a user-defined period, and can revoked on request.
+-   Secure signed URLs can be generated for apps, automatically expire after a user-defined period, and can revoked on request.
 
 ## Self-hosted (Docker)
 
@@ -88,4 +88,4 @@ Datapane deploys, manages, and maintains a server on your private VPC. No teleme
 -   Email alerting and reporting integrations
 -   Custom cloud region deployments
 
-Datapane’s team will update and maintain the server based on pre-agreed upgrade policy. Solutions engineering for Datapane Apps and Report building and custom integrations and services can be provided.
+Datapane’s team will update and maintain the server based on pre-agreed upgrade policy. Solutions engineering for Datapane Apps building and custom integrations and services can be provided.
