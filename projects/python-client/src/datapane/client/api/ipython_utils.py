@@ -19,14 +19,7 @@ if typing.TYPE_CHECKING:
 
 
 def block_to_iframe(block: BaseElement) -> str:
-    """Convert a Block to HTML, placed within an iFrame
-
-    Args:
-        block: Datapane Block to convert
-
-    Returns:
-        HTML string for the block
-    """
+    """Convert a Block to HTML, placed within an iFrame"""
     from .report.core import App
 
     app = App(block)
@@ -36,14 +29,7 @@ def block_to_iframe(block: BaseElement) -> str:
 
 
 def read_notebook_json(path: Path) -> dict:
-    """Read a notebook IPYNB file
-
-    Args:
-        path: Path to the notebook IPYNB file
-
-    Returns:
-        Notebook JSON
-    """
+    """Read a notebook IPYNB file"""
     with open(path, encoding="utf-8") as f:
         notebook_json = json.load(f)
 
@@ -51,11 +37,7 @@ def read_notebook_json(path: Path) -> dict:
 
 
 def get_jupyter_notebook_json() -> dict:
-    """Get the JSON for the current Jupyter notebook
-
-    Returns:
-        Notebook JSON
-    """
+    """Get the JSON for the current Jupyter notebook"""
     import ipynbname
 
     try:
@@ -70,11 +52,7 @@ def get_jupyter_notebook_json() -> dict:
 
 
 def get_vscode_notebook_json() -> dict:
-    """Get the JSON for the current VSCode notebook
-
-    Returns:
-        Notebook JSON
-    """
+    """Get the JSON for the current VSCode notebook"""
     import ipynbname
 
     try:
@@ -91,11 +69,7 @@ def get_vscode_notebook_json() -> dict:
 
 
 def get_colab_notebook_json() -> dict:
-    """Get the JSON for the current Colab notebook
-
-    Returns:
-        Notebook JSON
-    """
+    """Get the JSON for the current Colab notebook"""
     import ipynbname
     from google.colab import auth
     from googleapiclient.discovery import build
@@ -129,11 +103,7 @@ def get_colab_notebook_json() -> dict:
 
 
 def get_notebook_json() -> dict:
-    """Get the JSON for the current Jupyter, Colab, or VSCode notebook
-
-    Returns:
-        Notebook JSON
-    """
+    """Get the JSON for the current Jupyter, Colab, or VSCode notebook"""
     if "COLAB_GPU" in os.environ:
         notebook_json = get_colab_notebook_json()
     elif "VSCODE_PID" in os.environ:
@@ -147,14 +117,7 @@ def get_notebook_json() -> dict:
 
 
 def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optional[BaseElement]:
-    """Convert a IPython notebook output cell to a Datapane Block
-
-    Args:
-        cell: IPython notebook cell dict
-
-    Returns:
-        Datapane Block
-    """
+    """Convert a IPython notebook output cell to a Datapane Block"""
     from .report.blocks import wrap_block
 
     # Get the output object from the IPython output cache
@@ -176,13 +139,6 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
         - `dp-exclude` - Exclude this cell (when opt_out=True)
         - `dp-include` - Include this cell (when opt_out=False)
         - `dp-show-code` - Show the input code for this cell
-
-    Args:
-        ipython_output_cache: The output cache (Out or _oh) dict from a IPython notebook
-        opt_out: When True, all cells are converted to blocks unless explicitly opted out with the tag `dp-exclude`. When False, only cells with the tag `dp-include` are converted to blocks.
-
-    Returns:
-        List of Datapane Blocks
 
     ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
