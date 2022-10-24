@@ -53,8 +53,6 @@
 
     posthog.init("{{ config.extra.analytics.api_key }}", {
         api_host: "https://events.datapane.com",
-        persistence: "localStorage",
-        persistence_name: "datapane_store",
     });
 </script>
 {% endif %}
