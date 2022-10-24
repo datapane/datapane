@@ -116,7 +116,6 @@ plugins:
       redirect_maps:
         "tutorials/basics/create-a-report.md": "tutorials/basics/create-an-app.ipynb"
         "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
-        "tutorials/datapane-enterprise/report-notifications.md": "tutorials/datapane-enterprise/app-notifications.ipynb"
 
   #- tags
   # Currently a sponsor-only feature
