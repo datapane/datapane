@@ -1,7 +1,3 @@
-# Managing members
-
-You can invite members to your Workspace so your whole team has access to a shared environment for apps.
-
 ### Inviting members
 
 You can invite members to your Workspace by going to the _Members_ tab in _Workspace settings_. Invited members will receive an email with a secure signup link valid for 72 hours.
