@@ -19,7 +19,7 @@ To use this feature, you'll need to have Admin Access. Head over to Settings -&g
 </style>
 ```
 
-You can edit this block to add your brand colours, load in a custom font or even add a logo. Any assets that you add will be displayed in a bar at the top of your app, and these changes will apply retroactively to your old apps.
+You can edit this block to add your brand colors, load in a custom font or even add a logo. Any assets that you add will be displayed in a bar at the top of your app, and these changes will apply retroactively to your old apps.
 
 ### **Adding a custom font**
 
