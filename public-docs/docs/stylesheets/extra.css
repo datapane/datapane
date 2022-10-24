@@ -1,3 +1,7 @@
+* {
+    --md-footer-bg-color: #312e81;
+}
+
 @media screen and (max-width: 76.1875em) {
     .md-nav--primary .md-nav__title[for="__drawer"] {
         --tw-gradient-to: #09091a;
@@ -23,9 +27,7 @@ md-nav__title {
 .md-header__topic {
     font-weight: 600;
 }
-* {
-    --md-footer-bg-color: #312e81;
-}
+
 [data-md-color-scheme="default"] {
     --md-primary-fg-color: #312e81;
     --md-accent-fg-color: #581c87;
@@ -114,14 +116,6 @@ md-nav__title {
 .md-typeset h2 {
     font-weight: 700;
 }
-/*
-.md-typeset h1 {
-    color: #312e81;
-}
-
-.md-typeset h2 {
-    color: #581c87;
-} */
 
 .md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
 .md-typeset .grid > .card {
