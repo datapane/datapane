@@ -25,9 +25,9 @@ With this release, Datapane Cloud users can now securely share reports with thei
 
 ### :octicons-repo-template-24: Templates and Components Catalogs
 
-<a src="/catalogues/blocks/table"><img class="docs-image" src="https://user-images.githubusercontent.com/15690380/183948469-c76fa50f-e0a2-438a-b13c-9e58d6071c1c.png"></a>
+<a src="/catalogs/blocks/table"><img class="docs-image" src="https://user-images.githubusercontent.com/15690380/183948469-c76fa50f-e0a2-438a-b13c-9e58d6071c1c.png"></a>
 
-Starting from this release, we are providing a series of templates and components which lower the barrier to building something awesome using Datapane and Python. Check them out in our new [Catalogue](catalogues/index.ipynb).
+Starting from this release, we are providing a series of templates and components which lower the barrier to building something awesome using Datapane and Python. Check them out in our new [Catalog](catalogs/index.ipynb).
 
 Our first templates include:
 
@@ -280,7 +280,7 @@ Read our [installation guide](https://github.com/datapane/datapane-onpremise) on
 
 ### :octicons-bug-24: Other Bug Fixes and Improvements
 
--   LaTeX equations can now be added to your apps! Check out the [Formula](catalogues/blocks/formula.ipynb) block for more info.
+-   LaTeX equations can now be added to your apps! Check out the [Formula](catalogs/blocks/formula.ipynb) block for more info.
 -   Increased the maximum size of an app from 25MB to 100MB
 -   Enterprise Scripts can now specify environment variables directly from their `datapane.yaml` file - these can be static value or user variables that are dynamically injected into your script e.g. DB parameters.
 -   Datapane Enterprise users can now set their private report sharing timeout (previously this was fixed at 48 hours)
