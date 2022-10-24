@@ -9,31 +9,23 @@ nav:
   - Quickstart: "quickstart.ipynb"
   - Release Notes: releasenotes.md
   - Tutorials:
-      - 🌱 Getting started:
-          - Install Datapane: "tutorials/basics/install-datapane.md"
-          - Create an app: "tutorials/basics/create-an-app.ipynb"
-      - 🧱 Blocks types:
-          - tutorials/blocks/index.ipynb
-      - ☁️ Datapane Cloud:
+      - Install Datapane: "tutorials/basics/install-datapane.md"
+      - Create an app: "tutorials/basics/create-an-app.ipynb"
+      - Add blocks to your app: "tutorials/blocks.ipynb"
+      - Datapane Cloud:
           - tutorials/datapane-cloud/index.md
-          - Authentication: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
-          - Upload an app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
-          - App visibility: "tutorials/datapane-cloud/app-visibility.ipynb"
+          - Login to Cloud: "tutorials/datapane-cloud/authenticate-datapane.ipynb"
+          - Upload your app: "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
+          - Share your app: "tutorials/datapane-cloud/sharing.ipynb"
           - Workspaces:
               - "tutorials/datapane-cloud/workspaces/index.md"
               - Workspace settings: "tutorials/datapane-cloud/workspaces/workspace-settings.md"
               - Managing members: "tutorials/datapane-cloud/workspaces/managing-members.md"
           - Projects: "tutorials/datapane-cloud/projects.md"
-      - 🏢 Datapane Enterprise:
-          - tutorials/datapane-enterprise/index.md
-          - Authentication: "tutorials/datapane-enterprise/authenticate-datapane.ipynb"
-          - App notifications: "tutorials/datapane-enterprise/app-notifications.ipynb"
-          - Files: "tutorials/datapane-enterprise/files.md"
-          - Managing members: "tutorials/datapane-enterprise/managing-members.md"
-      - 🎨 Styling:
-          - tutorials/styling/index.ipynb
+      - Styling:
+          - Styling a single app: "tutorials/styling/index.ipynb"
           - Global styling: "tutorials/styling/global-styling.md"
-      - 🤖 Automation:
+      - Automation:
           - tutorials/automation/index.md
 
   - Catalogues:
@@ -68,24 +60,13 @@ nav:
           - Timeline: "catalogues/components/timeline.ipynb"
       - 📑 Templates:
           - "catalogues/templates/index.ipynb"
-
-  - Guides:
-      - Adding interactive filters to plots: "guides/adding-interactive-filters-to-plots/adding-interactive-filters-to-plots.ipynb"
-      - Accessing data in Python: "guides/accessing-data-in-python/accessing-data-in-python.ipynb"
-
-  - Explanations:
-      - Datapane Enterprise:
-          - "concepts/datapane-enterprise/index.md"
-          - Deployment and hosting: "concepts/datapane-enterprise/deployment-and-hosting.md"
-          - Authentication and sharing: "concepts/datapane-enterprise/authentication-and-sharing.md"
-      - Support policy: "concepts/support-policy.md"
-
   - Reference:
       - API reference: "https://datapane.github.io/datapane/"
 
 theme:
   name: material
   logo: img/logo.png
+  custom_dir: overrides
   features:
     - navigation.sections
     - navigation.top
@@ -108,8 +89,8 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   font:
-    text: Roboto
-    code: Roboto Mono
+    text: Inter
+    code: IBM Plex Mono
   favicon: img/favicon.png
 
 extra_css:
@@ -135,7 +116,6 @@ plugins:
       redirect_maps:
         "tutorials/basics/create-a-report.md": "tutorials/basics/create-an-app.ipynb"
         "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
-        "tutorials/datapane-cloud/report-visibility.md": "tutorials/datapane-cloud/app-visibility.ipynb"
         "tutorials/datapane-enterprise/report-notifications.md": "tutorials/datapane-enterprise/app-notifications.ipynb"
 
   #- tags
@@ -168,6 +148,9 @@ markdown_extensions:
 
 extra:
   generator: false
+  analytics:
+    provider: posthog
+    api_key: phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/datapane/datapane
