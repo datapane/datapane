@@ -116,13 +116,27 @@ plugins:
       redirect_maps:
         "tutorials/basics/create-a-report.md": "tutorials/basics/create-an-app.ipynb"
         "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
-
-  #- tags
-  # Currently a sponsor-only feature
-  # - social:
-  #     cards_color:
-  #       fill: "#131329"
-  #       text: "#F2F2FD"
+        "catalogues/index.md": "catalogs/index.ipynb"
+        "catalogues/blocks/index.md": "catalogs/blocks/index.ipynb"
+        "catalogues/blocks/bignumber.md": "catalogs/blocks/bignumber.ipynb"
+        "catalogues/blocks/datatable.md": "catalogs/blocks/datatable.ipynb"
+        "catalogues/blocks/table.md": "catalogs/blocks/table.ipynb"
+        "catalogues/blocks/plot.md": "catalogs/blocks/plot.ipynb"
+        "catalogues/blocks/map.md": "catalogs/blocks/map.ipynb"
+        "catalogues/blocks/text.md": "catalogs/blocks/text.ipynb"
+        "catalogues/blocks/code.md": "catalogs/blocks/code.ipynb"
+        "catalogues/blocks/formula.md": "catalogs/blocks/formula.ipynb"
+        "catalogues/blocks/html.md": "catalogs/blocks/html.ipynb"
+        "catalogues/blocks/group.md": "catalogs/blocks/group.ipynb"
+        "catalogues/blocks/page.md": "catalogs/blocks/page.ipynb"
+        "catalogues/blocks/select.md": "catalogs/blocks/select.ipynb"
+        "catalogues/blocks/attachment.md": "catalogs/blocks/attachment.ipynb"
+        "catalogues/blocks/embed.md": "catalogs/blocks/embed.ipynb"
+        "catalogues/blocks/media.md": "catalogs/blocks/media.ipynb"
+        "catalogues/components/index.md": "catalogs/components/index.ipynb"
+        "catalogues/components/calendar-heatmap.md": "catalogs/components/calendar-heatmap.ipynb"
+        "catalogues/components/timeline.md": "catalogs/components/timeline.ipynb"
+        "catalogues/templates/index.md": "catalogs/templates/index.ipynb"
 
 markdown_extensions:
   - pymdownx.highlight:
