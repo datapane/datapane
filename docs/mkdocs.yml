@@ -28,38 +28,38 @@ nav:
       - Automation:
           - tutorials/automation/index.md
 
-  - Catalogues:
-      - "catalogues/index.ipynb"
+  - Catalogs:
+      - "catalogs/index.ipynb"
       - 🧱 Blocks:
-          - "catalogues/blocks/index.ipynb"
+          - "catalogs/blocks/index.ipynb"
           - Tables and data:
-              - Big Number: "catalogues/blocks/bignumber.ipynb"
-              - Data Table: "catalogues/blocks/datatable.ipynb"
-              - Table: "catalogues/blocks/table.ipynb"
+              - Big Number: "catalogs/blocks/bignumber.ipynb"
+              - Data Table: "catalogs/blocks/datatable.ipynb"
+              - Table: "catalogs/blocks/table.ipynb"
           - Plots and visualizations:
-              - Plots: "catalogues/blocks/plot.ipynb"
-              - Maps: "catalogues/blocks/map.ipynb"
+              - Plots: "catalogs/blocks/plot.ipynb"
+              - Maps: "catalogs/blocks/map.ipynb"
           - Text and HTML:
-              - Text: "catalogues/blocks/text.ipynb"
-              - Code: "catalogues/blocks/code.ipynb"
-              - Formula: "catalogues/blocks/formula.ipynb"
-              - HTML: "catalogues/blocks/html.ipynb"
+              - Text: "catalogs/blocks/text.ipynb"
+              - Code: "catalogs/blocks/code.ipynb"
+              - Formula: "catalogs/blocks/formula.ipynb"
+              - HTML: "catalogs/blocks/html.ipynb"
           - Layout and pages:
-              - Groups: "catalogues/blocks/group.ipynb"
-              - Pages: "catalogues/blocks/page.ipynb"
-              - Selects: "catalogues/blocks/select.ipynb"
-          # - Divider: "catalogues/blocks/divider.ipynb"
-          # - Toggle: "catalogues/blocks/toggle.ipynb"
+              - Groups: "catalogs/blocks/group.ipynb"
+              - Pages: "catalogs/blocks/page.ipynb"
+              - Selects: "catalogs/blocks/select.ipynb"
+          # - Divider: "catalogs/blocks/divider.ipynb"
+          # - Toggle: "catalogs/blocks/toggle.ipynb"
           - Media and embeds:
-              - Attachments: "catalogues/blocks/attachment.ipynb"
-              - Embeds: "catalogues/blocks/embed.ipynb"
-              - Media: "catalogues/blocks/media.ipynb"
+              - Attachments: "catalogs/blocks/attachment.ipynb"
+              - Embeds: "catalogs/blocks/embed.ipynb"
+              - Media: "catalogs/blocks/media.ipynb"
       - 🗃 Components:
-          - "catalogues/components/index.ipynb"
-          - Calendar heatmap: "catalogues/components/calendar-heatmap.ipynb"
-          - Timeline: "catalogues/components/timeline.ipynb"
+          - "catalogs/components/index.ipynb"
+          - Calendar heatmap: "catalogs/components/calendar-heatmap.ipynb"
+          - Timeline: "catalogs/components/timeline.ipynb"
       - 📑 Templates:
-          - "catalogues/templates/index.ipynb"
+          - "catalogs/templates/index.ipynb"
   - Reference:
       - API reference: "https://datapane.github.io/datapane/"
 
