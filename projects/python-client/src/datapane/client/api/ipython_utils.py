@@ -6,6 +6,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import sys
 import typing
 from contextlib import suppress
 from pathlib import Path
@@ -104,7 +105,7 @@ def get_colab_notebook_json() -> dict:
 
 def get_notebook_json() -> dict:
     """Get the JSON for the current Jupyter, Colab, or VSCode notebook"""
-    if "COLAB_GPU" in os.environ:
+    if "google.colab" in sys.modules:
         notebook_json = get_colab_notebook_json()
     elif "VSCODE_PID" in os.environ:
         notebook_json = get_vscode_notebook_json()

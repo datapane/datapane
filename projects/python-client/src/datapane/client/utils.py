@@ -73,7 +73,7 @@ def get_environment_type() -> str:
     """Try and get the name of the IDE the script is running in"""
     if "PYCHARM_HOSTED" in os.environ:
         return "pycharm"
-    if "COLAB_GPU" in os.environ:
+    if "google.colab" in sys.modules:
         return "colab"
     elif "VSCODE_PID" in os.environ:
         return "vscode"
