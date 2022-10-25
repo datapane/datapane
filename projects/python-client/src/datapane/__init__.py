@@ -63,6 +63,7 @@ from .client.api import (
     build,
     builtins,
     by_datapane,
+    cells_to_blocks,
     hello_world,
     login,
     logout,
@@ -126,6 +127,7 @@ __all__ = [
     "save_report",
     "serve",
     "build",
+    "cells_to_blocks",
 ]
 
 
