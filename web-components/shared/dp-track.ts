@@ -136,6 +136,9 @@ export const trackReportView = (properties: ReportViewPayload) => {
 export const trackLocalReportView = (
     event: "CLI_REPORT_VIEW" | "SERVED_REPORT_VIEW"
 ) => {
+    if (!window.dpLocalViewEvent) {
+        return;
+    }
     asyncDPTrackEvent(
         event,
         {
