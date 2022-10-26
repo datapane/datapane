@@ -44,8 +44,6 @@ export const setupPostHog = async (
                 userId && (await identifyUser(posthog, userId));
                 await mutex.release(LOCK_NAME);
             },
-            persistence: "localStorage",
-            persistence_name: "datapane_store",
         });
     } catch (e) {
         console.error("Posthog setup error", e);
