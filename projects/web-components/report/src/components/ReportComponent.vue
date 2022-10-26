@@ -29,9 +29,9 @@ const pageNumber = ref(0);
 
 onMounted(() => {
     /* View tracking */
-    if (window.dpLocal && window.dpLocalViewEvent) {
+    if (window.dpLocal) {
         trackLocalReportView("CLI_REPORT_VIEW");
-    } else if (window.dpServed && window.dpLocalViewEvent) {
+    } else if (window.dpServed) {
         trackLocalReportView("SERVED_REPORT_VIEW");
     } else {
         const { web_url, id, published, username, num_blocks } = p.report;
