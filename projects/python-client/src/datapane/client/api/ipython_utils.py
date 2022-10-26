@@ -44,6 +44,8 @@ def get_jupyter_notebook_json() -> dict:
     try:
         nb_path = ipynbname.path()
         notebook_json = read_notebook_json(nb_path)
+    except IndexError:
+        raise DPError("Environment not supported.")
     except FileNotFoundError as e:
         raise DPError(
             "Notebook not found. This command must be executed from within a Jupyter notebook environment."
