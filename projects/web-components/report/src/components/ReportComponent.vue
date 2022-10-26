@@ -21,7 +21,6 @@ import sanitizeHtml from "sanitize-html";
 const p = defineProps<{
     isOrg: ReportProps["isOrg"];
     mode: ReportProps["mode"];
-    disableTrackViews?: ReportProps["disableTrackViews"];
     htmlHeader?: ReportProps["htmlHeader"];
     report: ReportProps["report"];
 }>();
@@ -34,11 +33,7 @@ onMounted(() => {
         trackLocalReportView("CLI_REPORT_VIEW");
     } else if (window.dpServed && window.dpLocalViewEvent) {
         trackLocalReportView("SERVED_REPORT_VIEW");
-    }
-    {
-        if (p.disableTrackViews) {
-            return;
-        }
+    } else {
         const { web_url, id, published, username, num_blocks } = p.report;
         trackReportView({
             id: id,
