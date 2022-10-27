@@ -60,7 +60,7 @@ The docs include many Jupyter notebook (`ipynb`) files that must have their outp
 The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
 
 ```bash
-git config filter.clear-notebook-output.clean "cd docs/; poetry run jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --ClearMetadataPreprocessor.preserve_cell_metadata_mask tags --to=notebook --stdin --stdout --log-level=ERROR"
+git config filter.clear-notebook-output.clean "cd docs/; ./clear-notebook-output.sh"
 ```
 
 ## Deploying
