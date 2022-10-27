@@ -44,6 +44,8 @@ def get_jupyter_notebook_json() -> dict:
     try:
         nb_path = ipynbname.path()
         notebook_json = read_notebook_json(nb_path)
+    except IndexError:
+        raise DPError("Environment not supported.")
     except FileNotFoundError as e:
         raise DPError(
             "Notebook not found. This command must be executed from within a Jupyter notebook environment."
@@ -54,14 +56,22 @@ def get_jupyter_notebook_json() -> dict:
 
 def get_vscode_notebook_json() -> dict:
     """Get the JSON for the current VSCode notebook"""
-    import ipynbname
+    from IPython import get_ipython
+    ip = get_ipython()
+    
+    if '__vsc_ipynb_file__' in ip.user_ns:
+        nb_path = ip.user_ns['__vsc_ipynb_file__']
+    else:
+        import ipynbname
+        try:     
+            nb_path = ipynbname.path()
+
+            # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
+            nb_path = Path(str(nb_path).split("-jvsc-")[0] + ".ipynb")
+        except Exception as e:
+            raise DPError("Environment not supported.") from e
 
     try:
-        nb_path = ipynbname.path()
-
-        # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
-        nb_path = Path(str(nb_path).split("-jvsc-")[0] + ".ipynb")
-
         notebook_json = read_notebook_json(nb_path)
     except FileNotFoundError as e:
         raise DPError("Notebook not found. This command must be executed from within a notebook environment.") from e
