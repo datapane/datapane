@@ -32,6 +32,7 @@ def test_auth(runner: CliRunner):
     assert "Logged out" in result.output
 
 
+@pytest.mark.skip("LeagacyApp tests disabled")
 @pytest.mark.org
 @pytest.mark.timeout(5 * 60)  # allow 5m
 def test_cli_app(runner: CliRunner, tmp_path: Path, monkeypatch):
