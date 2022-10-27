@@ -5,7 +5,8 @@ import datapane as dp
 
 from .common import deletable, gen_name
 
-pytestmark = pytest.mark.usefixtures("dp_login")
+# pytestmark = pytest.mark.usefixtures("dp_login")
+pytestmark = pytest.mark.skip("LeagacyApp tests disabled")
 
 
 def test_login_fixture():
