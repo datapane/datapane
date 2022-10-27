@@ -60,7 +60,7 @@ The docs include many Jupyter notebook (`ipynb`) files that must have their outp
 The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
 
 ```bash
-git config filter.clear-notebook-output.clean "cd docs/; ./clear-notebook-output.sh"
+git config filter.clear-notebook-output.clean "./docs/clear-notebook-output.sh"
 ```
 
 ## Deploying
