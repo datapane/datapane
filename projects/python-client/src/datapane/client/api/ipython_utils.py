@@ -57,13 +57,15 @@ def get_jupyter_notebook_json() -> dict:
 def get_vscode_notebook_json() -> dict:
     """Get the JSON for the current VSCode notebook"""
     from IPython import get_ipython
+
     ip = get_ipython()
-    
-    if '__vsc_ipynb_file__' in ip.user_ns:
-        nb_path = ip.user_ns['__vsc_ipynb_file__']
+
+    if "__vsc_ipynb_file__" in ip.user_ns:
+        nb_path = ip.user_ns["__vsc_ipynb_file__"]
     else:
         import ipynbname
-        try:     
+
+        try:
             nb_path = ipynbname.path()
 
             # VSCode path name in sesssion is suffixed with -jvsc-[identifier]
