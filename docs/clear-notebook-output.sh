@@ -1,0 +1,1 @@
+jq --indent 1 "(.cells[] | select(has(\"outputs\")) | .outputs) = [] | (.cells[] | select(has(\"execution_count\")) | .execution_count) = null | .metadata = {\"language_info\": {\"name\": \"python\"}} | .cells[].metadata |= if has(\"tags\") then {tags} else {} end" $1
