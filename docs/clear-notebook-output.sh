@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+# takes a notebook as stdin, and strips known flakiness for stdout.
+# example: `./clear-notebook-output.sh < docs/quickstart.ipynb`
 
 # pass the stdin directly to jq (<&0)
 exec jq --indent 1 "$(cat <<'EOF'
