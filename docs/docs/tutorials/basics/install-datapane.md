@@ -15,13 +15,13 @@ If you use `conda`, you can install it with:
 === "Bash"
 
     ``` bash
-    conda install -c conda-forge "datapane>=0.15.3"
+    conda install -c conda-forge "datapane>=0.15.4"
     ```
 
 === "Jupyter"
 
     ``` bash
-    !conda install -c conda-forge "datapane>=0.15.3"
+    !conda install -c conda-forge "datapane>=0.15.4"
     ```
 
 !!! warning
