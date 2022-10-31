@@ -8,6 +8,12 @@ set -euo pipefail
 dp_version="$(poetry run python -c 'print(__import__("datapane").__version__)')"
 export DATAPANE_CDN_BASE="https://staging.datapane-cdn.com/v${dp_version}"
 
+# Prevent a real browser from being discovered for Apps that request `open=True`.
+# We never want it during the docs build
+# we use `true`, as it should always be available, and always give a '0' exit code
+export BROWSER='true'
+
+
 # remove artifacts before building
 find docs -type f \( -name '*.html' -o -name '*-preview.png' \) -delete
 
