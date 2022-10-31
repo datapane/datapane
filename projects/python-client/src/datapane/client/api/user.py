@@ -35,22 +35,19 @@ from datapane.common.utils import pushd
 from .. import DPError
 from .. import config as c
 from ..analytics import capture, capture_event
-from ..utils import display_msg, success_msg
+from ..utils import display_msg, failure_msg, success_msg
 from .common import _process_res
 
 __all__ = ["login", "logout", "ping", "hello_world", "template"]
 
 
-def login(
-    token: t.Optional[str], server: str = c.DEFAULT_SERVER, env: str = c.DEFAULT_ENV, cli_login: bool = True
-) -> str:
+def login(token: t.Optional[str], server: str = c.DEFAULT_SERVER, cli_login: bool = True) -> str:
     """
     Login to the specified Datapane Server, storing the token within a config-file called `env` for future use
 
     Args:
         token: Token to use when logging in
         server: Datapane Server to connect to (default: Datapane Community at https://datapane.com/)
-        env: The environment profile to store these login details to (default: `default`)
         cli_login: Toggle if this login is occuring via the CLI (optional)
 
     Returns:
@@ -74,27 +71,26 @@ def login(
 
     # update config with valid values
     config.email = email
-    config.save(env=env)
+    config.save()
     c.init(config=config)
     capture("CLI Login", token_type=token_type)
     return config.email
 
 
-def logout(env: str = c.DEFAULT_ENV) -> None:
+def logout() -> None:
     """
     Logout from Datapane Server, removing local credentials
 
-    Args:
-        env: Environment profile to logout from
-
     ..note:: Can also be ran via CLI as `"datapane logout"`
     """
+    if c.config is None:
+        failure_msg("Not logged in", do_exit=True)
+        return
+
     success_msg(f"Logged out from {c.config.server}")
-    # TODO - remove this assert
-    assert c.config._env == env
     c.config.remove()
     c.set_config(None)  # ??
-    c.init(config_env=c.DEFAULT_ENV)
+    c.init()
 
 
 def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: bool = True) -> str:
