@@ -25,9 +25,8 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILENAME = "config.ini"
 LEGACY_CONFIG_FILENAME = "default.yaml"
 CONFIG_PATH = APP_DIR / CONFIG_FILENAME
-CONFIG_SECTION = "global"
-# TODO: remove DEFAULT_ENV
-DEFAULT_ENV = "default"
+LEGACY_CONFIG_PATH = APP_DIR / LEGACY_CONFIG_FILENAME
+CONFIG_SECTION = "default"
 PAST_DEFAULT_SERVER = "https://datapane.com"
 DEFAULT_SERVER = "https://cloud.datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
@@ -35,7 +34,6 @@ LATEST_VERSION = 6
 
 
 # TODO - wrap into a singleton object that includes callable?
-# TODO - switch to pydantic
 @dc.dataclass
 class Config:
     """
@@ -87,6 +85,7 @@ class Config:
         parser = configparser.ConfigParser()
         parser.read(CONFIG_PATH)
         if CONFIG_SECTION not in parser:
+            log.error(f"Config file at {CONFIG_PATH} does not contain a {CONFIG_SECTION} section")
             raise ValueError(f"Config file does not contain a {CONFIG_SECTION} section")
 
         # Process config into a new dataclass
@@ -96,7 +95,11 @@ class Config:
         }
         for field in dc.fields(cls):
             if field.name in raw_conf:
-                kwargs[field.name] = field.type(raw_conf[field.name])
+                if field.type is bool:
+                    value = raw_conf[field.name].lower() == "true"
+                else:
+                    value = field.type(raw_conf[field.name])
+                kwargs[field.name] = value
 
         config: Config = Config(**kwargs)
         log.debug(f"Loaded client environment from {CONFIG_PATH}")
@@ -135,7 +138,7 @@ class Config:
             return
 
         # Look for YAML from Version 5 and earlier
-        yaml_path = APP_DIR / LEGACY_CONFIG_FILENAME
+        yaml_path = LEGACY_CONFIG_PATH
         if yaml_path.exists():
             # Migrate
             log.info(f"Found legacy config file at {yaml_path}")
@@ -150,7 +153,6 @@ class Config:
     def upgrade_config_format(self):
         """Handles updating the older config format
         - we default to the oldest version with default values, and upgrade here
-        - TODO - switch this to stdlib configparser
         """
         # this isn't tied to a particular config version
         if self.server == PAST_DEFAULT_SERVER:
@@ -230,6 +232,6 @@ def get_config() -> Config:
     """Get the current config object, doesn't attempt to re-init the API token"""
     global config
     if config is None:
-        raise RuntimeError("Config must be initialised before it can be checked")
+        raise RuntimeError("Config must be initialised before it can be used")
 
     return config
