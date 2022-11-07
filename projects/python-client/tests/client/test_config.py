@@ -34,9 +34,8 @@ class Expected:
 @pytest.fixture
 def posthog():
     """Mock analytics, returning a fn to check posthog calls"""
-    with (
-        mock.patch("datapane.client.analytics.posthog", autospec=True) as posthog,
-        mock.patch("datapane.client.analytics._NO_ANALYTICS", False),
+    with mock.patch("datapane.client.analytics.posthog", autospec=True) as posthog, mock.patch(
+        "datapane.client.analytics._NO_ANALYTICS", False
     ):
         yield posthog
 
@@ -58,10 +57,9 @@ def write_config(raw_config, config_path: Path | None = None):
 @pytest.fixture(autouse=True)
 def mock_config_defaults():
     """Mock calculated defaults so we can assert against them"""
-    with (
-        mock.patch("uuid.uuid4", autospec=True) as uuid4,
-        mock.patch("datapane.client.api.user.ping", autospec=True) as ping,
-    ):
+    with mock.patch("uuid.uuid4", autospec=True) as uuid4, mock.patch(
+        "datapane.client.api.user.ping", autospec=True
+    ) as ping:
         uuid4.return_value = mock.Mock(hex=Expected.session_id)
         ping.return_value = Expected.email
         yield
