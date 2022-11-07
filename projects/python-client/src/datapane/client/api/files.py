@@ -164,7 +164,7 @@ class MatplotBasePlot(PlotAsset):
 
         fn = DPTmpFile(self.ext)
         x = x or plt.gcf()
-        x.savefig(str(fn))
+        x.savefig(str(fn), bbox_inches="tight")
         return fn
 
 
