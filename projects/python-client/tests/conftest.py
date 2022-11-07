@@ -13,6 +13,7 @@ def dp_setup(request, monkeypatch, tmp_path):
 
         @pytest.mark.skip_init
     """
+    print("dp_setup")
     # Monkeypatch config file into a tmp dir
     config_dir = tmp_path / "config"
     config_dir.mkdir(parents=True)
@@ -26,4 +27,5 @@ def dp_setup(request, monkeypatch, tmp_path):
 
     # Optional init steps
     if "skip_dp_init" not in request.keywords:
+        print("dp_setup initialising config")
         config.init()
