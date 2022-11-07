@@ -1,6 +1,3 @@
-from pathlib import Path
-from typing import Optional
-
 import pytest
 
 import datapane as dp
