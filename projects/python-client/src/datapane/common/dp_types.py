@@ -37,7 +37,6 @@ class DPMode(enum.Enum):
 
     SCRIPT = enum.auto()  # run from the cmd-line
     LIBRARY = enum.auto()  # imported into a process
-    FRAMEWORK = enum.auto()  # running dp-runner
 
 
 # default in Library mode

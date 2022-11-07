@@ -113,7 +113,6 @@ pytest-dotenv = "^0.5.2"
 
 [tool.poetry.scripts]
 datapane = "datapane.client.__main__:main"
-dp-runner = "datapane.runner.__main__:main"
 
 [tool.black]
 # The same config should be duplicated in other pyproject.toml files so that

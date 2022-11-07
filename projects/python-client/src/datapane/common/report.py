@@ -1,8 +1,10 @@
 import dataclasses as dc
+import os
 import re
 import typing as t
 
 import importlib_resources as ir
+import stringcase
 from lxml import etree
 from lxml.etree import DocumentInvalid
 from micawber import ProviderException, bootstrap_basic, bootstrap_noembed, cache
@@ -15,6 +17,7 @@ from .utils import log
 
 local_report_def = ir.files("datapane.resources.report_def")
 rng_validator = etree.RelaxNG(file=str(local_report_def / "full_schema.rng"))
+re_check_name = re.compile(r"^[\S ]+$")
 
 dp_namespace: str = "https://datapane.com/schemas/report/1/"
 
@@ -27,6 +30,17 @@ def load_doc(x: str) -> etree._Element:
 def is_valid_id(id: str) -> bool:
     """(cached) regex to check for a xsd:ID name"""
     return re.fullmatch(r"^[a-zA-Z_][\w.-]*$", id) is not None
+
+
+def generate_name(postfix: str) -> str:
+    dir_name = stringcase.titlecase(os.path.basename(os.getcwd()))
+    return f"{dir_name} {postfix}"
+
+
+# TODO(obsolete) - not really needed now, can remove in future
+def validate_name(x: str):
+    if re_check_name.match(x) is None:
+        raise DPError(f"'{x}' is not a valid service name")
 
 
 def validate_report_doc(

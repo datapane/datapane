@@ -89,25 +89,6 @@ def test_arbitrary_arguments_from_cli():
     assert p.returncode == 0
 
 
-def test_parameter_parsing_for_library():
-    """Running a Python program which uses load_params_from_command_line should work"""
-    test_command = [
-        sys.executable,
-        "-c",
-        "import datapane; datapane.load_params_from_command_line(); print(datapane.Params)",
-        "--parameter",
-        "my_param=123",
-    ]
-
-    p = subprocess.run(test_command, capture_output=True)
-
-    # Should have loaded the parameter:
-    assert p.stdout.strip() == b"{'my_param': 123}"
-
-    # And finished without error
-    assert p.returncode == 0
-
-
 def test_datapane_init_from_cli():
     """This test is run by keyword expression from other CLI tests.
     It explicitly imports datapane to ensure __init__ is always executed."""

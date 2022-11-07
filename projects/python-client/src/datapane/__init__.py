@@ -36,24 +36,18 @@ from .client.api import (
     Divider,
     Embed,
     Empty,
-    Environment,
     File,
     FontChoice,
     Formula,
     Group,
-    LegacyApp,
     Media,
     Page,
     PageLayout,
-    Params,
     Plot,
     Processor,
     Report,
     ReportFormatting,
     ReportWidth,
-    Result,
-    Run,
-    Schedule,
     Select,
     SelectType,
     Table,
@@ -62,7 +56,6 @@ from .client.api import (
     Toggle,
     build,
     builtins,
-    by_datapane,
     cells_to_blocks,
     hello_world,
     login,
@@ -88,24 +81,18 @@ __all__ = [
     "Divider",
     "Embed",
     "Empty",
-    "Environment",
     "File",
     "FontChoice",
     "Formula",
     "Group",
-    "LegacyApp",
     "Media",
     "Page",
     "PageLayout",
-    "Params",
     "Plot",
     "Processor",
     "Report",
     "ReportFormatting",
     "ReportWidth",
-    "Result",
-    "Run",
-    "Schedule",
     "Select",
     "SelectType",
     "Table",
@@ -113,7 +100,6 @@ __all__ = [
     "TextAlignment",
     "Toggle",
     "builtins",
-    "by_datapane",
     "hello_world",
     "login",
     "logout",
@@ -122,7 +108,6 @@ __all__ = [
     "_setup_dp_logging",
     "enable_logging",
     "log",
-    "load_params_from_command_line",
     "upload",
     "save_report",
     "serve",
@@ -136,8 +121,6 @@ script_exe = Path(script_name).stem
 if script_exe == "datapane" or script_name == "-m":  # or "pytest" in script_name:
     # argv[0] will be "-m" as client module as submodule of this module
     set_dp_mode(DPMode.SCRIPT)
-elif by_datapane or script_exe == "dp-runner":
-    set_dp_mode(DPMode.FRAMEWORK)
 else:
     set_dp_mode(DPMode.LIBRARY)
 
@@ -145,11 +128,3 @@ else:
 # only init fully in library-mode, as framework and app init explicitly
 if get_dp_mode() == DPMode.LIBRARY and not _IN_PYTEST:
     init()
-
-
-def load_params_from_command_line() -> None:
-    """Call this from your own scripts to read any CLI parameters into the global Params object"""
-    from .client.utils import parse_command_line
-
-    config = parse_command_line()
-    Params.replace(config)

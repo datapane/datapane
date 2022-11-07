@@ -5,36 +5,10 @@ import pytest
 from glom import glom
 
 import datapane as dp
-from datapane.client import DPError, api
+from datapane.client import DPError
 
 from ....client.e2e.common import gen_df, gen_plot
 from .test_reports import element_to_str
-
-
-def test_params_loading(datadir: Path):
-    """Test that the API allows loading params from the datapane file"""
-    config_fn = datadir / "datapane.yaml"
-    initial_vals = dict(p1="a", p3=3)
-
-    assert len(dp.Params) == 0
-
-    # load some values
-    api._reset_runtime(initial_vals)
-    assert len(dp.Params) == 2
-    assert dp.Params["p1"] == initial_vals["p1"]
-
-    # clear and load again
-    api._reset_runtime({})
-    assert len(dp.Params) == 0
-    api._reset_runtime(initial_vals)
-
-    # load from file
-    dp.Params.load_defaults(config_fn=config_fn)
-    # ensure values are merged
-    assert len(dp.Params) == 3
-    assert dp.Params["p1"] == "hello"
-    assert dp.Params["p2"] == 4
-    assert dp.Params["p3"] == initial_vals["p3"]
 
 
 def test_markdown_format(datadir: Path):

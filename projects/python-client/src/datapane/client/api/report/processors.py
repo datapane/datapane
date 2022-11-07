@@ -27,7 +27,6 @@ from markupsafe import Markup  # used by Jinja
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import Resource
-from datapane.client.api.runtime import _report
 from datapane.client.utils import DPError, InvalidReportError, display_msg
 from datapane.common import NPath, SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
@@ -349,9 +348,6 @@ class Uploader(Processor):
         # Set dto based on new URL
         self.app.url = res.url
         self.app.refresh()
-
-        # add report to internal API handler for use by_datapane
-        _report.append(self.app)
 
 
 class Saver(LocalProcessor):

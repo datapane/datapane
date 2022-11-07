@@ -1,28 +1,25 @@
 import dataclasses as dc
-import tarfile
-import time
 import typing as t
 import uuid
 from contextlib import contextmanager
 from distutils.dir_util import copy_tree
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 
 import click
-import click_spinner
 import importlib_resources as ir
 from jinja2 import Environment, FileSystemLoader
 from requests import HTTPError
 from tabulate import tabulate
 
 from datapane import __rev__, __version__
-from datapane.common import DPError, SDict, _setup_dp_logging, dict_drop_empty, log
+from datapane.common import DPError, SDict, _setup_dp_logging, log
 from datapane.common.dp_types import URL, add_help_text
+from datapane.common.report import generate_name, validate_name
 
-from . import analytics, api, apps
+from . import analytics, api
 from . import config as c
-from .apps import config as sc
-from .utils import failure_msg, process_cmd_param_vals, success_msg
+from .utils import failure_msg, success_msg
 
 EXTRA_OUT: bool = False
 
@@ -206,10 +203,10 @@ def file_list():
 
 
 ###############################################################################
-# Apps
+# Reports
 @cli.group()
-def app():
-    """Commands to work with Apps"""
+def report():
+    """Commands to work with Reports"""
     pass
 
 
@@ -235,134 +232,6 @@ def write_templates(scaffold_name: str, context: SDict):
             render_file(f, context=context)
 
 
-@app.command(name="init")
-@click.argument("name", default=lambda: sc.generate_name("Report"))
-def app_init(name: str):
-    """Initialise a new app project"""
-    if sc.DATAPANE_YAML.exists():
-        failure_msg("Found existing project, cancelling", do_exit=True)
-
-    sc.validate_name(name)
-    _context = dict(name=name)
-
-    write_templates("app", _context)
-    success_msg(f"Created dp_app.py for project '{name}', edit as needed and upload")
-
-
-@app.command()
-@click.option("--config", type=click.Path(exists=True))
-@click.option("--script", type=click.Path(exists=True))
-@click.option("--name")
-@click.option("--environment")
-@click.option("--project")
-@click.option("--overwrite", is_flag=True)
-def deploy(
-    name: Optional[str],
-    script: Optional[str],
-    config: Optional[str],
-    environment: Optional[str],
-    project: Optional[str],
-    overwrite: Optional[bool],
-):
-    """Package and deploy a Python script or Jupyter notebook as a Datapane App bundle"""
-    script_path = script and Path(script)
-    config_path = config and Path(config)
-    init_kwargs = dict(name=name, script=script_path, config_file=config_path, environment=environment, project=project)
-    kwargs = dict_drop_empty(init_kwargs, none_only=True)
-
-    # if not (script or config or sc.DatapaneCfg.exists()):
-    #     raise DPError(f"Not valid project dir")
-
-    dp_cfg = apps.DatapaneCfg.create_initial(**kwargs)
-    log.debug(f"Packaging and uploading Datapane project {dp_cfg.name}")
-
-    # start the build process
-    with apps.build_bundle(dp_cfg) as sdist:
-        if EXTRA_OUT:
-            tf: tarfile.TarFile
-            log.debug("Bundle from following files:")
-            with tarfile.open(sdist) as tf:
-                for n in tf.getnames():
-                    log.debug(f"  {n}")
-        r: api.LegacyApp = api.LegacyApp.upload_pkg(sdist, dp_cfg, overwrite)
-        success_msg(f"Uploaded {click.format_filename(str(dp_cfg.script))} to {r.web_url}")
-
-
-@app.command()  # type: ignore[no-redef]
-@click.argument("name")
-@click.option("--project")
-def download(name: str, project: str):
-    """Download app referenced by NAME to FILE"""
-    s = api.LegacyApp.get(name, project=project)
-    fn = s.download_pkg()
-    success_msg(f"Downloaded {s.url} to {click.format_filename(str(fn))}")
-
-
-@app.command()  # type: ignore[no-redef]
-@click.argument("name")
-@click.option("--project")
-def delete(name: str, project: str):
-    """Delete an app"""
-    api.LegacyApp.get(name, project).delete()
-    success_msg(f"Deleted App {name}")
-
-
-@app.command("list")
-def app_list():
-    """List Apps"""
-    print_table(api.LegacyApp.list(), "Apps")
-
-
-@app.command()
-@click.option("--parameter", "-p", multiple=True)
-@click.option("--cache/--disable-cache", default=True)
-@click.option("--wait/--no-wait", default=True)
-@click.option("--project")
-@click.option("--show-output", is_flag=True, default=False, help="Display the run output")
-@click.argument("name")
-def run(
-    name: str,
-    parameter: Tuple[str],
-    cache: bool,
-    wait: bool,
-    project: str,
-    show_output: bool,
-):
-    """Run a report"""
-    params = process_cmd_param_vals(parameter)
-    log.info(f"Running app with parameters {params}")
-    app = api.LegacyApp.get(name, project=project)
-    with api_error_handler("Error running app"):
-        r = app.run(parameters=params, cache=cache)
-    if wait:
-        with click_spinner.spinner():  # type: ignore[call-arg]
-            while not r.is_complete():
-                time.sleep(5)
-                r.refresh()
-            log.debug(f"Run completed with status {r.status}")
-            if show_output:
-                click.echo(r.output)
-            if r.status == "SUCCESS":
-                if r.result:
-                    success_msg(f"App result - '{r.result}'")
-                if r.report:
-                    report = api.Report.by_id(r.report)
-                    success_msg(f"Report generated at {report.web_url}")
-            else:
-                failure_msg(f"App run failed/cancelled\n{r.error_msg}: {r.error_detail}")
-
-    else:
-        success_msg(f"App run started, view at {app.web_url}")
-
-
-###############################################################################
-# Reports
-@cli.group()
-def report():
-    """Commands to work with Reports"""
-    pass
-
-
 # NOTE - CLI Report creation disabled for now until we have a replacement for Asset
 # @report.command()
 # @click.argument("name")
@@ -376,7 +245,7 @@ def report():
 
 
 @report.command(name="init")
-@click.argument("name", default=lambda: sc.generate_name("Script"))
+@click.argument("name", default=lambda: generate_name("Script"))
 @click.option("--format", type=click.Choice(["notebook", "script"]), default="notebook")
 def report_init(name: str, format: str):
     """Initialise a new report"""
@@ -389,7 +258,7 @@ def report_init(name: str, format: str):
     if len(list(Path(".").glob("dp_report.*"))):
         failure_msg("Found existing project, cancelling", do_exit=True)
 
-    sc.validate_name(name)
+    validate_name(name)
     _context = dict(name=name)
 
     write_templates(template, _context)
@@ -419,133 +288,3 @@ def report_list():
 # def render(name: str, project: str, filename: str):
 #     """Render a report to a static file"""
 #     api.Report.get(name, project=project).render()
-
-
-#############################################################################
-# Environments
-@cli.group()
-def environment():
-    """Commands to work with Environments"""
-    pass
-
-
-@environment.command()
-@click.argument("name", required=True)
-@click.option("--environment", "-env", multiple=True)
-@click.option("--docker-image")
-@click.option("--project")
-@click.option("--overwrite", is_flag=True)
-def create(name: str, environment: Tuple[str], docker_image: str, project: str, overwrite: bool):
-    """
-    Create an environment
-
-    NAME: name of environment
-    ENVIRONMENT: environment variables
-    DOCKER IMAGE: docker image to be used inside apps
-    PROJECT: Project name (optional)
-    """
-    proccessed_environment = process_cmd_param_vals(environment)
-    api.Environment.create(name, proccessed_environment, docker_image, project, overwrite)
-    success_msg(f"Created environment: {name}")
-
-
-@environment.command("list")
-def environment_list():
-    """List all environments"""
-    print_table(api.Environment.list(), "Environments")
-
-
-@environment.command()
-@click.argument("name", required=True)
-@click.option("--project")
-def get(name: str, project: str):
-    """Get environment value using environment name"""
-    res = api.Environment.get(name, project=project)
-    environment = "\n".join([f"{k}={v}" for k, v in res.environment.items()])
-    success_msg(f"Available {res.name}:")
-    print(f"\nProject - {res.project}")
-    print(f"\nEnvironment Variables-----------\n{environment}")
-    print(f"\nDocker Image - {res.docker_image}")
-
-
-@environment.command()  # type: ignore[no-redef]
-@click.argument("name")
-@click.option("--project")
-def delete(name: str, project: str):
-    """Delete an environment using environment name"""
-    api.Environment.get(name, project).delete()
-    success_msg(f"Deleted environment {name}")
-
-
-#############################################################################
-# Schedules
-@cli.group()
-def schedule():
-    """Commands to work with Schedules"""
-    pass
-
-
-@schedule.command()  # type: ignore[no-redef]
-@click.option("--parameter", "-p", multiple=True)
-@click.argument("name", required=True)
-@click.argument("cron", required=True)
-@click.option("--project")
-def create(name: str, cron: str, parameter: Tuple[str], project: str):
-    """
-    Create a schedule
-
-    NAME: Name of the App to run
-    CRON: crontab representing the schedule interval
-    PARAMETERS: key/value list of parameters to use when running the app on schedule
-    [Project]: Project in which the app is present
-    """
-    params = process_cmd_param_vals(parameter)
-    log.info(f"Adding schedule with parameters {params}")
-    app_obj = api.LegacyApp.get(name, project=project)
-    schedule_obj = api.Schedule.create(app_obj, cron, params)
-    success_msg(f"Created schedule: {schedule_obj.id} ({schedule_obj.url})")
-
-
-@schedule.command()
-@click.option("--parameter", "-p", multiple=True)
-@click.argument("id", required=True)
-@click.argument("cron", required=False)
-def update(id: str, cron: str, parameter: Tuple[str]):
-    """
-    Add a schedule
-
-    ID: ID/URL of the Schedule
-    CRON: crontab representing the schedule interval
-    PARAMETERS: key/value list of parameters to use when running the app on schedule
-    """
-
-    params = process_cmd_param_vals(parameter)
-    assert cron or parameter, "Must update either cron or parameters"
-
-    log.info(f"Updating schedule with parameters {params}")
-
-    schedule_obj = api.Schedule.by_id(id)
-    schedule_obj.update(cron, params)
-    success_msg(f"Updated schedule: {schedule_obj.id} ({schedule_obj.url})")
-
-
-@schedule.command("list")
-def schedule_list():
-    """List all schedules"""
-    print_table(api.Schedule.list(), "Schedules", showindex=False)
-
-
-# @schedule.command()
-# @click.argument("id", required=True)
-# def get(id: str):
-#     """Get variable value using variable name"""
-#     res = api.Schedule.by_id(id)
-#     print_table([res.dto], "Schedule")
-
-
-@schedule.command()  # type: ignore[no-redef]
-@click.argument("id", required=True)
-def delete(id: str):
-    """Delete a schedule by its id/url"""
-    api.Schedule.by_id(id).delete()
-    success_msg(f"Deleted schedule {id}")

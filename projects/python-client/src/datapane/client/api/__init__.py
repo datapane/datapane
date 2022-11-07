@@ -26,16 +26,6 @@ The core document APIs, these are found in `datapane.client.api.report`, includi
     - `datapane.client.api.report.blocks.Code`
     - `datapane.client.api.report.blocks.HTML`
 
-### Datapane Enterprise (beta)
-
-Additional API docs are found in `datapane.client.api.teams` that provide building, deployment, and sharing of data analytics apps and workflows
-
-  - `datapane.client.api.teams.File`
-  - `datapane.client.api.teams.Environment`
-  - `datapane.client.api.teams.LegacyApp`
-  - `datapane.client.api.teams.Schedule`
-
-
 ..note::  These docs describe the latest version of the datapane API available on [pypi](https://pypi.org/project/datapane/)
     <a href="https://pypi.org/project/datapane/">
         <img src="https://img.shields.io/pypi/v/datapane?color=blue" alt="Latest release" />
@@ -49,6 +39,7 @@ import warnings
 from ..utils import IncompatibleVersionError
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
+from .file import File
 from .ipython_utils import cells_to_blocks
 from .report.blocks import (
     HTML,
@@ -82,8 +73,6 @@ from .report.core import (
     TextAlignment,
 )
 from .report.processors import Processor, build, save_report, serve, upload
-from .runtime import Params, Result, _report, _reset_runtime, by_datapane
-from .teams import Environment, File, LegacyApp, Run, Schedule
 from .user import hello_world, login, logout, ping, template
 
 from ..config import init  # isort:skip  otherwise circular import issue
@@ -110,7 +99,6 @@ __all__ = [
     "Empty",
     "Formula",
     "Group",
-    "LegacyApp",
     "Media",
     "Page",
     "Plot",
@@ -126,16 +114,8 @@ __all__ = [
     "ReportFormatting",
     "ReportWidth",
     "TextAlignment",
-    "Params",
-    "Result",
-    "_report",
-    "_reset_runtime",
-    "by_datapane",
     "App",
-    "Environment",
     "File",
-    "Run",
-    "Schedule",
     "hello_world",
     "login",
     "logout",
