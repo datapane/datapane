@@ -89,8 +89,8 @@ class Config:
             raise ValueError(f"Config file does not contain a {CONFIG_SECTION} section")
 
         # Process config into a new dataclass
-        raw_conf: configparser._Section = parser[CONFIG_SECTION]
-        kwargs = {
+        raw_conf: configparser.SectionProxy = parser[CONFIG_SECTION]
+        kwargs: dict[str, t.Any] = {
             "from_file": True,
         }
         for field in dc.fields(cls):
