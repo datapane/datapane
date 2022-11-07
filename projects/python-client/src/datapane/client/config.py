@@ -90,7 +90,7 @@ class Config:
 
         # Process config into a new dataclass
         raw_conf: configparser.SectionProxy = parser[CONFIG_SECTION]
-        kwargs: dict[str, t.Any] = {
+        kwargs: t.Dict[str, t.Any] = {
             "from_file": True,
         }
         for field in dc.fields(cls):
