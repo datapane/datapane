@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://datapane.com">Datapane.com</a> |
   <a href="https://docs.datapane.com">Docs</a> |
-      <a href="https://datapane.com/showcase">Examples</a> |
+      <a href="#demos-and-examples">Examples</a> |
   <a href="https://datapane.nolt.io">Roadmap & Feature Suggestions</a> |
   <a href="https://chat.datapane.com">Discord</a>
 </p>
@@ -23,10 +23,9 @@
 </p>
 
 <p align='center'>
-  <h1 align='center'> Build interactive reports in 3 lines of Python</h1>
+  <h1 align='center'> From Jupyter to shareable data app in 10 seconds? Yep.</h1>
 </p>
-Datapane is an open-source framework makes it easy to create beautiful reports from anywhere you can run Python.
-Love analyzing data in Python but struggle to share results and insights? Datapane is for you!
+Datapane is a python framework that makes it super easy to build, host, and share interactive data apps straight from your Jupyter notebook.
 <br>
 <br>
 <br>
@@ -39,9 +38,9 @@ Love analyzing data in Python but struggle to share results and insights? Datapa
 
 ### What makes Datapane special?
 
--   **Static generation:** Sharing a report shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
--   **API-first and programmatic:** Programmatically generate reports from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
--   **Dynamic front-end components**: Say goodbye to writing HTML. Build reports from a set of interactive components, like DataTables, tabs, and selects.
+-   **Static generation:** Sharing an app shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
+-   **API-first and programmatic:** Programmatically generate apps from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
+-   **Dynamic front-end components**: Say goodbye to writing HTML. Build apps from a set of interactive components, like DataTables, tabs, and selects.
 
 # Getting Started
 
@@ -62,7 +61,7 @@ $ pip3 install -U datapane
 #### conda
 
 ```
-$ conda install -c conda-forge "datapane>=0.15.1"
+$ conda install -c conda-forge "datapane>=0.15.4"
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
@@ -71,15 +70,15 @@ Datapane also works well in hosted Jupyter environments such as Colab or Binder,
 !pip3 install --quiet datapane
 ```
 
-# Creating reports
+# Creating apps
 
 ### 📊 Include plots and data
 
-Create a report from pandas DataFrames, plots from your favorite libraries, and text.
+Create an app from pandas DataFrames, plots from your favorite libraries, and text.
 
 <p>
 
-<img width='485px' align='left' alt="Simple Datapane report example with text, plot and table" src="https://user-images.githubusercontent.com/3541695/176251650-f49ea9f8-3cd4-4eda-8e78-ccba77e8e02f.png">
+<img width='485px' align='left' alt="Simple Datapane app example with text, plot and table" src="https://user-images.githubusercontent.com/3541695/176251650-f49ea9f8-3cd4-4eda-8e78-ccba77e8e02f.png">
 
 <p>
 
@@ -98,18 +97,18 @@ fig = (
       color="species:N"
     )
 )
-report = dp.Report(
+app = dp.App(
     dp.Plot(fig),
     dp.DataTable(df)
 )
-report.save(path="my_report.html")
+app.save(path="my_app.html")
 ```
 
 </p>
 
 ### 🎛 Layout using interactive blocks
 
-Add dropdowns, selects, grid, pages, and 10+ other blocks to make your reports dynamic.
+Add dropdowns, selects, grid, pages, and 10+ other blocks to enhance your apps.
 
 <p>
 
@@ -122,7 +121,7 @@ Add dropdowns, selects, grid, pages, and 10+ other blocks to make your reports d
 
 ...
 
-dp.Report(
+dp.App(
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(
         dp.BigNumber(
@@ -139,7 +138,7 @@ dp.Report(
         dp.Plot(fig, label="Chart"),
         dp.DataTable(df, label="Data")
     ),
-).save(path="Layout_example.html")
+).save(path="layout_example.html")
 
 ```
 
@@ -154,26 +153,26 @@ dp.Report(
 
 ## Discord
 
-Our Discord community is for people who believe that insights, visualizations, and reports are better created with Python instead of drag-and-drop tools. Get help from the team, share what you're building, and get to know others in the space!
+Our Discord community is for people who believe that insights, visualizations, and apps are better created with Python instead of drag-and-drop tools. Get help from the team, share what you're building, and get to know others in the space!
 
 ### 💬 [Join our discord server](https://chat.datapane.com)
 
-## Forums
+## Feedback
 
-Got feature requests, feedback, or questions? Visit our Forum.
+Leave us some feedback, ask questions and request features.
 
-### 📮 [Join our forum](https://forum.datapane.com/)
+### 📮 [Give feedback](https://datapane.nolt.io)
 
-# Hosting Reports
+# Hosting Apps
 
-In addition to saving documents locally or hosting them yourself, you can host and share your reports using [Datapane Cloud](https://datapane.com/cloud).
+In addition to saving apps locally or hosting them yourself, you can host and share your apps using [Datapane Cloud](https://datapane.com/cloud).
 
 To get your API key, [create a free account](https://datapane.com/accounts/signup/).
 
 Next, in your Python notebook or script, change the `save` function to `upload`:
 
 ```python
-dp.Report(
+dp.App(
  ...
 #).save(path="hello_world.html")
 ).upload(name="Hello world")
@@ -181,13 +180,13 @@ dp.Report(
 
 # Demos and Examples
 
-Here a few samples of the top reports created by the Datapane community.
+Here a few samples of the top apps created by the Datapane community.
 
--   [Coindesk analysis](https://datapane.com/u/greg/reports/initial-coindesk-article-data/) by Greg Allan
--   [COVID-19 Trends by Quarter](https://datapane.com/u/keith8/reports/covid-19-trends-by-quarter/) by Keith Johnson
--   [Ecommerce Report](https://datapane.com/u/leo/reports/e-commerce-report/) by Leo Anthias
--   [Example Academic Paper](https://datapane.com/u/kalru/reports/supplementary-material/) by Kalvyn Roux
--   [Exploration of Restaurants in Kyoto](https://datapane.com/u/ryancahildebrandt/reports/kyoto-in-stations-and-restaurants/) by Ryan Hildebrandt
+-   [Coindesk analysis](https://cloud.datapane.com/apps/wAwZqpk/initial-coindesk-article-data/) by Greg Allan
+-   [COVID-19 Trends by Quarter](https://cloud.datapane.com/apps/q34yW57/covid-19-trends-by-quarter-with-data-through-march-2021/) by Keith Johnson
+-   [Ecommerce Report](https://cloud.datapane.com/apps/dA9yQwA/e-commerce-report/) by Leo Anthias
+-   [Example Academic Paper](https://cloud.datapane.com/apps/wAwneRk/towards-orientation-invariant-sensorimotor-object-recognition-based-on-hierarchical-temporal-memory-with-cortical-grid-cells/) by Kalvyn Roux
+-   [Exploration of Restaurants in Kyoto](https://cloud.datapane.com/apps/0kz48Y3/exploration-of-restaurants-in-kyoto-and-the-stations-theyre-closest-to/) by Ryan Hildebrandt
 
 # Next Steps
 
