@@ -12,26 +12,26 @@ describe("Report rendering", () => {
         Cypress.Cookies.preserveOnce("sessionid", "djdt");
     });
 
-    it("Should switch between section tabs successfully", () => {
-        cy.scrollToFirst("[data-cy=page-1]").click();
-
-        cy.get("[data-cy=section-tabs]", { timeout: 20000 })
-            .eq(2)
-            .scrollIntoView()
-            .within(() => {
-                // Tab 0 state
-                cy.get("[data-cy=block-shadow]").should("not.exist");
-                cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
-                cy.scrollToFirst("[data-cy=tab-1]").click();
-                // Tab 1 state
-                cy.scrollToFirst("[data-cy=block-shadow]").should("be.visible");
-                cy.get("[data-cy=block-vega]").should("not.exist");
-                cy.scrollToFirst("[data-cy=tab-0]").click();
-                // Tab 0 state
-                cy.get("[data-cy=block-shadow]").should("not.exist");
-                cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
-            });
-    });
+    // it("Should switch between section tabs successfully", () => {
+    //     cy.scrollToFirst("[data-cy=page-1]").click();
+    //
+    //     cy.get("[data-cy=section-tabs]", { timeout: 20000 })
+    //         .eq(2)
+    //         .scrollIntoView()
+    //         .within(() => {
+    //             // Tab 0 state
+    //             cy.get("[data-cy=block-shadow]").should("not.exist");
+    //             cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
+    //             cy.scrollToFirst("[data-cy=tab-1]").click();
+    //             // Tab 1 state
+    //             cy.scrollToFirst("[data-cy=block-shadow]").should("be.visible");
+    //             cy.get("[data-cy=block-vega]").should("not.exist");
+    //             cy.scrollToFirst("[data-cy=tab-0]").click();
+    //             // Tab 0 state
+    //             cy.get("[data-cy=block-shadow]").should("not.exist");
+    //             cy.scrollToFirst("[data-cy=block-vega]").should("be.visible");
+    //         });
+    // });
 
     it("Should find a rendered markdown block", () => {
         cy.scrollToFirst("[data-cy=page-0]").click();
