@@ -4,7 +4,6 @@ import {
     CodeBlock,
     Elem,
     Group,
-    isGroup,
     LayoutBlock,
     Page,
     Report,
@@ -24,6 +23,7 @@ import {
     FoliumBlock,
     PlotapiBlock,
     BigNumberBlock,
+    isLayoutBlock,
 } from "./blocks";
 import convert from "xml-js";
 import * as maps from "./test-maps";
@@ -56,11 +56,11 @@ const isSingleBlockEmbed = (pages: Page[], mode: AppViewMode): boolean => {
      */
     const checkAllGroupsSingle = (node: BlockTree): boolean => {
         /* Check there's a single route down to one leaf node */
-        if (isGroup(node) && node.children.length === 1) {
-            // Node is a Group with a single child
+        if (isLayoutBlock(node) && node.children.length === 1) {
+            // Node is a layout block with a single child
             return checkAllGroupsSingle(node.children[0]);
-        } else if (isGroup(node)) {
-            // Node is a Group with multiple children
+        } else if (isLayoutBlock(node)) {
+            // Node is a layout block with multiple children
             return false;
         } else {
             // Node is a Select or leaf
