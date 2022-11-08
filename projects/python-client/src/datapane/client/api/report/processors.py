@@ -284,7 +284,7 @@ class Uploader(Processor):
             source_url,
             publicly_visible=publicly_visible,
             tags=tags,
-            tag=project,
+            project=project,
             formatting=formatting,
             overwrite=overwrite,
             **kwargs,
