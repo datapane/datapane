@@ -478,4 +478,7 @@ export const isSelect = (obj: any): obj is Select => obj.name === "Select";
 
 export const isToggle = (obj: any): obj is Toggle => obj.name === "Toggle";
 
+export const isLayoutBlock = (obj: any): obj is LayoutBlock =>
+    isGroup(obj) || isSelect(obj) || isToggle(obj);
+
 export const isAssetBlock = (obj: any): obj is AssetBlock => !!obj.src;
