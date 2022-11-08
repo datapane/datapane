@@ -1,0 +1,13 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:base"],
+  baseBranches: ["master"],
+  packageRules: [
+    {
+      matchManagers: ["github-actions"],
+      matchDepTypes: ["action"],
+      groupName: "github-actions",
+    },
+  ],
+  enabledManagers: ["github-actions"],
+}
