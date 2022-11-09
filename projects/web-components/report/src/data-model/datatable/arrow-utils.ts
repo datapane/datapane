@@ -1,4 +1,4 @@
-import { DataType, Precision, Type, Table } from "apache-arrow";
+import { DataType, Precision, Type, tableFromIPC } from "apache-arrow";
 import { Coerce } from "./Coerce";
 import { DatasetResponse } from "./datatable-block";
 
@@ -89,7 +89,7 @@ const extractArrowSchema = (sch: any): FormattedNsSchemaField[] => {
 
 export const apiResponseToArrow = (r: any): DatasetResponse => {
     const d: any[] = [];
-    const table: any = Table.from(r);
+    const table: any = tableFromIPC(r);
     const coerce = new Coerce(table.schema.fields);
 
     for (const row of table) {
