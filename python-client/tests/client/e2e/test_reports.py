@@ -83,6 +83,33 @@ def test_report_update_metadata():
             assert report.dto[x] == orig_dto[x]
 
 
+def test_report_visibility():
+    report = gen_report_simple()
+    name = gen_name()
+
+    dp.upload(report, name)
+
+    with deletable(report):
+
+        def assert_visibility(visible: bool):
+            assert report.dto["publicly_visible"] is visible
+
+        # check initial report with no specified visibility defaults to `False`
+        assert_visibility(False)
+
+        # overwrite and upload again, setting public visibility
+        dp.upload(report, name, overwrite=True, publicly_visible=True)
+
+        # check updated report is publicly visible
+        assert_visibility(True)
+
+        # overwrite and upload, leaving visibility unspecified
+        dp.upload(report, name, overwrite=True)
+
+        # check visibility is unchanged
+        assert_visibility(True)
+
+
 def test_report_with_single_file(datadir: Path):
     report = gen_report_complex_with_files(datadir, single_file=True, local_report=True)
     # Test we can save, build then upload
