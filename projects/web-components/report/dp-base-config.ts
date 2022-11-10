@@ -35,3 +35,9 @@ export const esLib = (entry: string) => ({
     entry: path.resolve(__dirname, entry),
     formats: ["es"] as LibraryFormats[],
 });
+
+export const RESOLVE_ALIAS = {
+    alias: {
+        emitter: require.resolve("emitter-component"),
+    },
+};
