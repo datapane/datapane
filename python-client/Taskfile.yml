@@ -9,10 +9,9 @@ vars:
   POETRY_SKIP_INSTALL: ""
 
   # assign defaults to our test configurations
-  ## for use by e2e + cypress
+  ## for use by cypress
   DP_TEST_SERVER: '{{.DP_TEST_SERVER | default "http://localhost:8090"}}'
   DP_TEST_TOKEN: '{{.DP_TEST_TOKEN | default ""}}'
-  ## for use by cypress
   DP_TEST_PASSWORD: '{{.DP_TEST_PASSWORD | default ""}}'
   DP_STAFF_PASSWORD: '{{.DP_STAFF_PASSWORD | default ""}}'
 
@@ -32,25 +31,7 @@ tasks:
     desc: "Run self-contained tests"
     deps: [install]
     cmds:
-      - cmd: "{{.PYTEST}} -v --ignore=tests/client/e2e/ tests"
-
-  test:e2e:public:
-    desc: "Run all the e2e tests relating to the 'public' focused APIs"
-    deps: [install]
-    cmds:
-      - cmd: "{{.PYTEST}} tests/client/e2e/ -m 'not org'"
-    env: &e2e-env
-      DP_TEST_SERVER: '{{.DP_TEST_SERVER}}'
-      DP_TEST_TOKEN: '{{.DP_TEST_TOKEN}}'
-      DP_TEST_PASSWORD: '{{.DP_TEST_PASSWORD}}'
-      DP_STAFF_PASSWORD: '{{.DP_STAFF_PASSWORD}}'
-
-  test:e2e:org:
-    desc: "Run all the e2e tests relating to the 'Org' focused APIs"
-    deps: [install]
-    cmds:
-      - cmd: "{{.PYTEST}} tests/client/e2e/"
-    env: *e2e-env
+      - cmd: "{{.PYTEST}} -v tests"
 
   system-check:
     desc: Run checks to make sure you're ready for development

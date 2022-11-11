@@ -6,8 +6,8 @@ from glom import glom
 
 import datapane as dp
 from datapane.client import DPError, api
+from datapane.client.api.builtins import gen_df, gen_plot
 
-from ....client.e2e.common import gen_df, gen_plot
 from .test_reports import element_to_str
 
 
