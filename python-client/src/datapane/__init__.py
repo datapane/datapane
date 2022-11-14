@@ -1,6 +1,5 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
-import os
 import sys
 from pathlib import Path
 
@@ -12,54 +11,52 @@ except ImportError:
 
 __version__ = "0.15.6"
 
-_TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
-_IN_PYTEST = "pytest" in sys.modules
-_IN_DPSERVER = "dp" in sys.modules
-# we're running on datapane platform
-ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
-_USING_CONDA = os.path.exists(os.path.join(sys.prefix, "conda-meta", "history"))
-
-
-# Other useful re-exports
-from .common.utils import _setup_dp_logging, enable_logging, log  # isort:skip  otherwise circular import issue
 
 # Public API re-exports
-from .client.api import (
+from .client import (  # isort:skip  otherwise circular import issue
+    IN_PYTEST,
+    DPClientError,
+    DPMode,
+    enable_logging,
+    get_dp_mode,
+    set_dp_mode,
+)  # isort:skip  otherwise circular import issue
+
+from .app.server import serve
+from .blocks import (
     HTML,
-    App,
-    AppFormatting,
-    AppWidth,
     Attachment,
     BigNumber,
+    Choice,
     Code,
+    Controls,
     DataTable,
+    Date,
+    DateTime,
     Divider,
     Embed,
     Empty,
-    Environment,
     File,
-    FontChoice,
     Formula,
     Group,
-    LegacyApp,
+    Interactive,
     Media,
-    Page,
-    PageLayout,
-    Params,
+    MultiChoice,
     Plot,
-    Processor,
-    Report,
-    ReportFormatting,
-    ReportWidth,
-    Result,
-    Run,
-    Schedule,
+    Range,
     Select,
     SelectType,
+    Swap,
+    Switch,
     Table,
+    Tags,
+    TargetMode,
     Text,
-    TextAlignment,
+    TextBox,
+    Time,
     Toggle,
+    Trigger,
+    wrap_block,
     build,
     builtins,
     by_datapane,
@@ -74,67 +71,78 @@ from .client.api import (
     template,
     upload,
 )
-from .client.config import init
-from .common.dp_types import DPMode, get_dp_mode, set_dp_mode
+from .cloud_api import App, AppFormatting, AppWidth
+from .cloud_api import File as CloudFile
+from .cloud_api import FontChoice, TextAlignment, hello_world, login, logout, ping, signup
+from .processors import build, save_report, stringify_report, upload
+from .view import View
+
+# Other useful re-exports
+from . import builtins  # isort:skip  otherwise circular import issue
+
+X = wrap_block
 
 __all__ = [
     "App",
     "AppFormatting",
     "AppWidth",
-    "HTML",
-    "Attachment",
-    "BigNumber",
-    "Code",
-    "DataTable",
-    "Divider",
-    "Embed",
-    "Empty",
-    "Environment",
-    "File",
+    "DPClientError",
+    "CloudFile",
     "FontChoice",
-    "Formula",
-    "Group",
-    "LegacyApp",
-    "Media",
-    "Page",
-    "PageLayout",
-    "Params",
-    "Plot",
-    "Processor",
-    "Report",
-    "ReportFormatting",
-    "ReportWidth",
-    "Result",
-    "Run",
-    "Schedule",
-    "Select",
-    "SelectType",
-    "Table",
-    "Text",
     "TextAlignment",
-    "Toggle",
     "builtins",
-    "by_datapane",
     "hello_world",
     "login",
     "logout",
     "ping",
     "signup",
-    "template",
-    "_setup_dp_logging",
     "enable_logging",
-    "log",
     "load_params_from_command_line",
+    "Attachment",
+    "BigNumber",
+    "Empty",
+    "DataTable",
+    "Media",
+    "Plot",
+    "Table",
+    "Select",
+    "SelectType",
+    "Formula",
+    "HTML",
+    "Code",
+    "Divider",
+    "Embed",
+    "Group",
+    "Text",
+    "Toggle",
+    "Controls",
+    "Interactive",
+    "View",
     "upload",
     "save_report",
     "serve",
     "build",
-    "cells_to_blocks",
+    "stringify_report",
+    "X",
+    "Range",
+    "Switch",
+    "TextBox",
+    "Choice",
+    "MultiChoice",
+    "Tags",
+    "Date",
+    "DateTime",
+    "Time",
+    "File",
+    "Swap",
+    "Trigger",
+    "TargetMode",
 ]
 
 
 script_name = sys.argv[0]
 script_exe = Path(script_name).stem
+by_datapane = False  # hardcode for now as not using legacy runner
 if script_exe == "datapane" or script_name == "-m":  # or "pytest" in script_name:
     # argv[0] will be "-m" as client module as submodule of this module
     set_dp_mode(DPMode.SCRIPT)
@@ -145,13 +153,15 @@ else:
 
 # TODO - do we want to init only in jupyter / interactive / etc.
 # only init fully in library-mode, as framework and app init explicitly
-if get_dp_mode() == DPMode.LIBRARY and not _IN_PYTEST:
+if get_dp_mode() == DPMode.LIBRARY and not IN_PYTEST:
+    from .client.config import init
+
     init()
 
 
 def load_params_from_command_line() -> None:
     """Call this from your own scripts to read any CLI parameters into the global Params object"""
-    from .client.utils import parse_command_line
-
-    config = parse_command_line()
-    Params.replace(config)
+    # from .client.utils import parse_command_line
+    #
+    # config = parse_command_line()
+    # Params.replace(config)

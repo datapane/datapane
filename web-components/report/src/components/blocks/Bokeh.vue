@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { onUnmounted, inject, onMounted } from "vue";
+import { onUnmounted, onMounted } from "vue";
 import { v4 as uuid4 } from "uuid";
 import * as Bokeh from "@bokeh/bokehjs";
 
 const docIds: any[] = [];
 const divId = uuid4();
 
-const singleBlockEmbed = inject("singleBlockEmbed");
-
-const p = defineProps<{ plotJson: any; responsive: boolean }>();
+const p = defineProps<{
+    plotJson: any;
+    responsive: boolean;
+    singleBlockEmbed?: boolean;
+}>();
 
 const makeResponsive = (json: any) => {
     /**
@@ -16,10 +18,10 @@ const makeResponsive = (json: any) => {
      * if the responsive property is set
      */
     const plotJson = json.doc.roots.references.find(
-        (r: any) => r.type === "Plot"
+        (r: any) => r.type === "Plot",
     );
     if (plotJson) {
-        plotJson.attributes.sizing_mode = singleBlockEmbed
+        plotJson.attributes.sizing_mode = p.singleBlockEmbed
             ? "stretch_both"
             : "stretch_width";
     }
@@ -46,7 +48,7 @@ const addPlotToDom = async () => {
         p.responsive && makeResponsive(p.plotJson);
         const plotViews = await Bokeh.embed.embed_item(
             p.plotJson as any,
-            divId
+            divId,
         );
         // Generate uuids for Bokeh Documents so they can be referenced on dismount
         plotViews.forEach((pv: any) => {

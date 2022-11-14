@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 from pandas.errors import ParserError
 
-from datapane import log
+from datapane.client import log
 from datapane.common.df_processor import process_df
 
 

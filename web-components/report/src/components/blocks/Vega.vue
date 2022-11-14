@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onUnmounted, inject, onMounted, ref } from "vue";
+import { onUnmounted, onMounted, ref } from "vue";
 import vegaEmbed, { Result } from "vega-embed";
 import { v4 as uuid4 } from "uuid";
 
-const p = defineProps<{ plotJson: any; responsive: boolean }>();
+const p = defineProps<{
+    plotJson: any;
+    responsive: boolean;
+    singleBlockEmbed?: boolean;
+}>();
 const divId = `vega_${uuid4()}`;
-const singleBlockEmbed = inject("singleBlockEmbed");
 
 // Vega view object to be stored for cleanup on unmount
 const vegaView = ref<Result | undefined>();
@@ -16,7 +19,7 @@ const makeResponsive = (json: any) => {
      * if the responsive property is set
      */
     json.width = "container";
-    if (singleBlockEmbed) {
+    if (p.singleBlockEmbed) {
         json.height = "container";
     }
 };
@@ -48,7 +51,7 @@ const addPlotToDom = async () => {
             actions: false, // disable the altair action menu
         });
         vegaView.value = view;
-        singleBlockEmbed && adjustHeightFromBindings();
+        p.singleBlockEmbed && adjustHeightFromBindings();
     } catch (e) {
         console.error("An error occurred while rendering an Altair chart: ", e);
     }

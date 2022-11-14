@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { inject } from "vue";
+import { storeToRefs } from "pinia";
+import { useRootStore } from "../../data-model/root-store";
 
-const p = defineProps<{ columns: number }>();
+const p = defineProps<{ columns: number; store: any }>();
 
-const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
+const rootStore = useRootStore();
+const { singleBlockEmbed } = storeToRefs(rootStore);
+const { children } = storeToRefs(p.store);
 
 const gridLayoutStyle =
     +p.columns > 0
@@ -14,7 +17,7 @@ const gridLayoutStyle =
 <template>
     <div
         :class="[
-            'sm:grid sm:gap-4',
+            'w-full sm:grid sm:gap-4',
             {
                 'grid-flow-col grid-cols-fit': !p.columns,
                 'py-4': !singleBlockEmbed,
@@ -22,6 +25,11 @@ const gridLayoutStyle =
         ]"
         :style="gridLayoutStyle"
     >
-        <slot />
+        <component
+            :is="child.component"
+            v-for="child in children"
+            v-bind="child.componentProps"
+            :key="child.refId"
+        />
     </div>
 </template>

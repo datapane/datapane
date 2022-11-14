@@ -48,7 +48,7 @@ export type IReportDocuments = {
 export type RetryApiFunction = (
     retry: (error: AxiosError) => never,
     number: number,
-    err: AxiosError
+    err: AxiosError,
 ) => never;
 
 export const isReportDocuments = (obj: any): obj is IReportDocuments =>
@@ -56,7 +56,7 @@ export const isReportDocuments = (obj: any): obj is IReportDocuments =>
 
 export const retryPromise = <T>(
     callApi: () => Promise<AxiosResponse<T>>,
-    retryApiFunction: RetryApiFunction
+    retryApiFunction: RetryApiFunction,
 ): Promise<AxiosResponse<T>> => {
     return promiseRetry(
         (retry, number) => {
@@ -69,6 +69,6 @@ export const retryPromise = <T>(
             minTimeout: 200,
             maxTimeout: 5000,
             factor: 3,
-        }
+        },
     );
 };

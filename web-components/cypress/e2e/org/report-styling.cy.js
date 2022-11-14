@@ -25,7 +25,7 @@ describe("Changing a report's style", () => {
         cy.get("[data-cy=page-0]").should(
             "have.css",
             "color",
-            "rgb(0, 128, 0)"
+            "rgb(0, 128, 0)",
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
@@ -35,7 +35,7 @@ describe("Changing a report's style", () => {
         cy.get("[data-cy=report-component").should(
             "have.css",
             "background-color",
-            "rgb(0, 0, 0)"
+            "rgb(0, 0, 0)",
         );
     });
 
@@ -62,7 +62,7 @@ describe("Changing a report's style", () => {
         cy.get("[data-cy=page-0]").should(
             "have.css",
             "color",
-            "rgb(255, 0, 0)"
+            "rgb(255, 0, 0)",
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
@@ -90,7 +90,7 @@ describe("Changing a report's style", () => {
         cy.get("[data-cy=page-0]").should(
             "have.css",
             "color",
-            "rgb(78, 70, 229)"
+            "rgb(78, 70, 229)",
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
@@ -98,12 +98,12 @@ describe("Changing a report's style", () => {
             .and(
                 "have.css",
                 "font-family",
-                '"Inter var", ui-sans-serif, system-ui'
+                '"Inter var", ui-sans-serif, system-ui',
             );
         cy.get("[data-cy=report-component").should(
             "have.css",
             "background-color",
-            "rgb(255, 255, 255)"
+            "rgb(255, 255, 255)",
         );
     });
 });

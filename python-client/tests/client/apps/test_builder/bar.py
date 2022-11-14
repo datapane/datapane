@@ -1,6 +1,7 @@
 """test_proj1 app"""
 import pandas as pd
 
+import datapane.blocks.text
 from datapane.client import api
 
 # TODO - enter your code here...
@@ -11,6 +12,6 @@ def render():
     """Render and return your datapane report components"""
     return [
         # api.Markdown("Dummy Markdown block - {parameters.val}"),
-        api.Text("Dummy Markdown block"),
+        datapane.blocks.inline_text.Text("Dummy Markdown block"),
         api.Asset.upload_df(df),
     ]

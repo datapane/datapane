@@ -5,8 +5,8 @@ import pytest
 from glom import glom
 
 import datapane as dp
-from datapane.client import DPError, api
-from datapane.client.api.builtins import gen_df, gen_plot
+from datapane import cloud_api as api
+from datapane.builtins import gen_df, gen_plot
 
 from .test_reports import element_to_str
 
@@ -57,9 +57,9 @@ Here's the dataset used...
     select_asset = dp.Select(dp.Text("Hello"), "World")
 
     # missing context
-    with pytest.raises(DPError):
+    with pytest.raises(dp.DPClientError):
         dp.Text(text).format(table_asset, plot=plot_asset, select1=select_asset)
-    with pytest.raises(DPError):
+    with pytest.raises(dp.DPClientError):
         dp.Text(text).format(plot=plot_asset, select=select_asset)
 
     # test string

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         <!-- Plotapi - Chord
@@ -107,7 +107,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             a,
                             b,
                             d,
-                            c
+                            c,
                         ) {
                             (window.d3 = a),
                                 (window.tippy = b),
@@ -190,7 +190,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                 "0 0 " +
                                     (width + margin.left + margin.right) +
                                     " " +
-                                    (height + margin.top + margin.bottom)
+                                    (height + margin.top + margin.bottom),
                             )
                             .attr("class", "plotapi-plot")
                             .attr("preserveAspectRatio", "xMinYMin meet")
@@ -201,7 +201,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                     (width / 2 + margin.left) +
                                     "," +
                                     (height / 2 + margin.top) +
-                                    ") rotate(0)"
+                                    ") rotate(0)",
                             );
                     function k(a) {
                         return (
@@ -228,7 +228,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                               a.source.startAngle) /
                                               2 +
                                               a.source.startAngle -
-                                              Math.PI / 2
+                                              Math.PI / 2,
                                       );
                         })
                         .attr("y1", function (a, b) {
@@ -238,7 +238,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                     (a.source.endAngle - a.source.startAngle) /
                                         2 +
                                         a.source.startAngle -
-                                        Math.PI / 2
+                                        Math.PI / 2,
                                 )
                             );
                         })
@@ -249,7 +249,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                     (a.target.endAngle - a.target.startAngle) /
                                         2 +
                                         a.target.startAngle -
-                                        Math.PI / 2
+                                        Math.PI / 2,
                                 )
                             );
                         })
@@ -260,7 +260,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                     (a.target.endAngle - a.target.startAngle) /
                                         2 +
                                         a.target.startAngle -
-                                        Math.PI / 2
+                                        Math.PI / 2,
                                 )
                             );
                         });
@@ -326,27 +326,27 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             a++
                         )
                             await new Promise((a) =>
-                                setTimeout(a, 555.5555555555555)
+                                setTimeout(a, 555.5555555555555),
                             ),
                                 d3
                                     .select(
                                         d3
                                             .selectAll(
-                                                "#plotapi-chart-24dcb8bd .group"
+                                                "#plotapi-chart-24dcb8bd .group",
                                             )
-                                            .nodes()[a]
+                                            .nodes()[a],
                                     )
                                     .dispatch("mouseover");
                         await new Promise((a) =>
-                            setTimeout(a, 555.5555555555555)
+                            setTimeout(a, 555.5555555555555),
                         ),
                             d3
                                 .select(
                                     d3
                                         .selectAll(
-                                            "#plotapi-chart-24dcb8bd .group"
+                                            "#plotapi-chart-24dcb8bd .group",
                                         )
-                                        .nodes()[0]
+                                        .nodes()[0],
                                 )
                                 .dispatch("mouseout");
                     }
@@ -359,7 +359,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                         .each(function (c, d) {
                             c.angle = (c.startAngle + c.endAngle) / 2 + offset;
                             var a = /(^.+?)L/.exec(
-                                d3.select(this).attr("d")
+                                d3.select(this).attr("d"),
                             )[1];
                             if (
                                 ((a = a.replace(/,/g, " ")),
@@ -433,7 +433,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                             .transition()
                                             .style("opacity", 1),
                                         (num_instances = Number(
-                                            a.source.value
+                                            a.source.value,
                                         )),
                                         (tippy_content =
                                             "<span style='font-weight:900'>" +
@@ -462,14 +462,14 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                             Array.isArray(
                                                 g[a.source.index][
                                                     a.target.index
-                                                ]
+                                                ],
                                             ) &&
                                             g[a.source.index][a.target.index]
                                                 .length &&
                                             Array.isArray(
                                                 h[a.source.index][
                                                     a.target.index
-                                                ]
+                                                ],
                                             ) &&
                                             h[a.source.index][a.target.index]
                                                 .length
@@ -500,7 +500,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                         }
                                     } else if (Array.isArray(g) && g.length)
                                         Array.isArray(
-                                            g[a.source.index][a.target.index]
+                                            g[a.source.index][a.target.index],
                                         ) &&
                                             g[a.source.index][a.target.index]
                                                 .length &&
@@ -516,7 +516,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                         Array.isArray(h) &&
                                         h.length &&
                                         Array.isArray(
-                                            h[a.source.index][a.target.index]
+                                            h[a.source.index][a.target.index],
                                         ) &&
                                         h[a.source.index][a.target.index].length
                                     ) {
@@ -549,7 +549,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                                             maxWidth: 350,
                                             theme: "translucent",
                                         });
-                                })
+                                }),
                             )
                             .on("mouseout", function (a, b) {
                                 d3.select(this.ownerSVGElement)
@@ -566,7 +566,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             .append("image")
                             .attr(
                                 "xlink:href",
-                                "https://plotapi.com/gallery/icon/plotapi.svg"
+                                "https://plotapi.com/gallery/icon/plotapi.svg",
                             )
                             .attr("width", 20)
                             .attr("height", 20)
@@ -583,7 +583,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             .on("mouseover", function (a, b) {
                                 d3.select("#plotapi-chart-24dcb8bd_icon").style(
                                     "opacity",
-                                    1
+                                    1,
                                 );
                             }),
                         d3
@@ -591,7 +591,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             .on("mouseout", function (a, b) {
                                 d3.select("#plotapi-chart-24dcb8bd_icon").style(
                                     "opacity",
-                                    0.6
+                                    0.6,
                                 );
                             }),
                         d3
@@ -599,7 +599,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             .on("mouseenter", function () {
                                 d3.select("#plotapi-chart-24dcb8bd_icon").style(
                                     "opacity",
-                                    0.6
+                                    0.6,
                                 );
                             }),
                         d3
@@ -607,7 +607,7 @@ Copyright (C) 2021  Dr. Shahin Rostami
                             .on("mouseleave", function () {
                                 d3.select("#plotapi-chart-24dcb8bd_icon").style(
                                     "opacity",
-                                    0
+                                    0,
                                 );
                             });
                 }

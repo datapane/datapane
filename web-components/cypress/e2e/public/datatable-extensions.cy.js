@@ -22,7 +22,7 @@ const validateExcel = (excelDoc) => {
 const interceptExport = (format, doc) => {
     const urlPattern = new RegExp(
         `.*\\/extensions\\/export\/.*\\/\\?export_format=${format}$`,
-        "g"
+        "g",
     );
     return cy.intercept("GET", urlPattern, (req) => {
         req.reply((res) => {

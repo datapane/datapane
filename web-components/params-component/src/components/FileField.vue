@@ -10,7 +10,7 @@ const p = defineProps<{
 }>();
 
 const validation: ComputedRef = computed(() =>
-    p.required ? [["+required"]] : []
+    p.required ? [["+required"]] : [],
 );
 
 const setupListeners = (node: any) => {

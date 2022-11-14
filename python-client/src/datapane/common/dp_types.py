@@ -1,6 +1,7 @@
-import enum
+import logging
 import typing as t
 from datetime import timedelta
+from enum import Enum
 from os import PathLike
 from pathlib import Path
 
@@ -32,35 +33,15 @@ SECS_1_WEEK: int = int(timedelta(weeks=1).total_seconds())
 SIZE_1_MB: int = 1024 * 1024
 
 
-class DPMode(enum.Enum):
-    """DP can operate in multiple modes as specified by this Enum"""
-
-    SCRIPT = enum.auto()  # run from the cmd-line
-    LIBRARY = enum.auto()  # imported into a process
-    FRAMEWORK = enum.auto()  # running dp-runner
-
-
-# default in Library mode
-__dp_mode: DPMode = DPMode.LIBRARY
-
-
-def get_dp_mode() -> DPMode:
-    global __dp_mode
-    return __dp_mode
-
-
-def set_dp_mode(dp_mode: DPMode) -> None:
-    global __dp_mode
-    __dp_mode = dp_mode
-
-
-################################################################################
-# Built-in exceptions
-def add_help_text(x: str) -> str:
-    return f"{x}\nPlease run with `dp.enable_logging()`, restart your Jupyter kernel/Python instance, and/or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
-
-
-class DPError(Exception):
+class StrEnum(str, Enum):
+    # TODO - replace with StrEnum in py3.11 stdlib
     def __str__(self):
-        # update the error message with help text
-        return add_help_text(super().__str__())
+        return str(self.value)
+
+
+# Errors
+class DPError(Exception):
+    """Base DP Error"""
+
+
+log = logging.getLogger("datapane")

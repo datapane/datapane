@@ -33,37 +33,37 @@ declare module "react-table" {
             Record<string, any> {}
 
     export interface Hooks<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UseSortByHooks<D> {}
 
     export interface TableInstance<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UsePaginationInstanceProps<D>,
             UseSortByInstanceProps<D> {}
 
     export interface TableState<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UsePaginationState<D>,
             UseSortByState<D> {}
 
     export interface ColumnInterface<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UseFiltersColumnOptions<D>,
             UseSortByColumnOptions<D> {}
 
     export interface ColumnInstance<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UseFiltersColumnProps<D>,
             UseSortByColumnProps<D> {}
 
     export interface Cell<
         D extends Record<string, unknown> = Record<string, unknown>,
-        V = any
+        V = any,
     > extends UseGroupByCellProps<D>,
             UseRowStateCellProps<D> {}
 
     export interface Row<
-        D extends Record<string, unknown> = Record<string, unknown>
+        D extends Record<string, unknown> = Record<string, unknown>,
     > extends UseExpandedRowProps<D>,
             UseGroupByRowProps<D>,
             UseRowSelectRowProps<D>,

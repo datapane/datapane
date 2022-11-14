@@ -1,6 +1,9 @@
 import { createApp, defineCustomElement } from "vue";
-import Report from "./src/components/ReportComponent.vue";
+import { plugin as formkitPlugin, defaultConfig } from "@formkit/vue";
+import { formkitConfig } from "./src/components/controls/formkit";
+import Report from "./src/components/ReportContainer.vue";
 import TableBlock from "./src/components/blocks/Table.ce.vue";
+import { createPinia } from "pinia";
 import "./src/styles/report.scss";
 import "highlight.js/styles/stackoverflow-light.css";
 import "codemirror/lib/codemirror.css";
@@ -18,6 +21,9 @@ const parseElementProps = (elId: string): any => {
 
 const mountReport = (props: any) => {
     const app = createApp(Report, props);
+    const pinia = createPinia();
+    app.use(pinia);
+    app.use(formkitPlugin, defaultConfig(formkitConfig));
     app.mount("#report");
     return app;
 };

@@ -15,7 +15,7 @@ const onChange = (event: any) => {
 };
 
 const validation: ComputedRef = computed(() =>
-    p.required ? [["+required"]] : []
+    p.required ? [["+required"]] : [],
 );
 </script>
 

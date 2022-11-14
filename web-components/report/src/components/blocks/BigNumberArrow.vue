@@ -8,11 +8,11 @@ const p = defineProps<{
 }>();
 
 const bgColor: ComputedRef<string> = computed(() =>
-    p.isPositiveIntent ? "bg-green-100" : "bg-red-100"
+    p.isPositiveIntent ? "bg-green-100" : "bg-red-100",
 );
 
 const textColor: ComputedRef<string> = computed(() =>
-    p.isPositiveIntent ? "text-green-800" : "text-red-800"
+    p.isPositiveIntent ? "text-green-800" : "text-red-800",
 );
 </script>
 

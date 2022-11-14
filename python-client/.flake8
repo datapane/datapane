@@ -8,8 +8,6 @@ suppress-none-returning = true
 max-annotations-complexity = 4
 mypy-init-return = true
 per-file-ignores =
-    src/datapane/client/commands.py:F811
-    tests/*:ANN001,ANN201,ANN206,ANN205,ANN206
-    # Eveything above duplicated, because pre-commit runs from root.
-    projects/python-client/src/datapane/client/commands.py:F811
-    projects/python-client/tests/*:ANN001,ANN201,ANN206,ANN205,ANN206
+    # full path, as pre-commit runs from root.
+    # python-client/src/datapane/client/commands.py:F811
+    python-client/tests/*:ANN001,ANN201,ANN206,ANN205,ANN206

@@ -1,16 +1,15 @@
 """Dataset Format handling"""
 import abc
 import enum
-from typing import IO, Dict, Type, Union, cast
+from typing import IO, Dict, Type, Union
 
 import pandas as pd
 import pyarrow as pa
 from pandas.errors import ParserError
 from pyarrow import RecordBatchFileWriter
 
-from .config import log
 from .df_processor import process_df, str_to_arrow_str
-from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME
+from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME, log
 from .utils import guess_encoding
 
 
@@ -70,7 +69,10 @@ class CSVFormat(DFFormatter):
 
     @staticmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
-        fn = cast(str, fn)
+        # TODO - fix
+        if not isinstance(fn, str):
+            raise ValueError("FObj not yet supported")
+
         try:
             return pd.read_csv(fn, engine="c", sep=",")
         except UnicodeDecodeError:

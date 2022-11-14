@@ -1,7 +1,8 @@
 import datapane as dp
+import datapane.blocks.text
 
 app = dp.App(
-    dp.Text("__REPORT_RENDERED__"),
+    datapane.blocks.inline_text.Text("__REPORT_RENDERED__"),
 )
 
 dp.upload(app, name="no-params-test-report", overwrite=True)

@@ -13,7 +13,7 @@ export const tabsToSpaces = (cm: any) => {
                 ? "\t"
                 : Array(cm.getOption("indentUnit") + 1).join(" "),
             "end",
-            "+input"
+            "+input",
         );
     }
 };

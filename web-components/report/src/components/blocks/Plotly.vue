@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { inject, onMounted } from "vue";
+import { onMounted } from "vue";
 import Plotly from "plotly.js-dist-min";
 import { v4 as uuid4 } from "uuid";
 
-const p = defineProps<{ plotJson: any; responsive: boolean }>();
-const singleBlockEmbed = inject("singleBlockEmbed");
-const divId = `vega_${uuid4()}`;
+const p = defineProps<{
+    plotJson: any;
+    responsive: boolean;
+    singleBlockEmbed?: boolean;
+}>();
+const divId = `plotly_${uuid4()}`;
 
 const makeResponsive = (json: any) => {
     /**
@@ -16,7 +19,7 @@ const makeResponsive = (json: any) => {
     if (layout) {
         delete layout.autosize;
         delete layout.width;
-        if (singleBlockEmbed) {
+        if (p.singleBlockEmbed) {
             delete layout.height;
         }
     }

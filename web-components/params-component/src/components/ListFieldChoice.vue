@@ -11,7 +11,7 @@ const p = defineProps<{
 }>();
 
 const validation: ComputedRef = computed(() =>
-    p.required ? [["+required"]] : []
+    p.required ? [["+required"]] : [],
 );
 
 const onChange = (items: string[]) => void p.setValue(items);

@@ -45,7 +45,7 @@ export class ParamsStore {
     public load(
         paramsJson: Param[],
         updatedFields: Param[],
-        isSchedule?: boolean
+        isSchedule?: boolean,
     ): f.Field[] {
         /**
          * Performs the deserialization and necessary side effects on initial loading of the params JSON data
@@ -69,7 +69,7 @@ export class ParamsStore {
         // Merge all fields into a single object
         this.serialized = filtered.reduce(
             (acc, curr) => ({ ...acc, ...curr }),
-            {}
+            {},
         );
         return this.serialized;
     }
@@ -80,7 +80,7 @@ export class ParamsStore {
          */
         return params.map((param: any) => {
             const fieldTest: FieldTest | undefined = ParamsStore.fieldMap.find(
-                (f) => f.test(param)
+                (f) => f.test(param),
             );
             if (fieldTest) {
                 const { class_, opts } = fieldTest;
@@ -97,7 +97,7 @@ export class ParamsStore {
          */
         reaction(
             () => toJS(this.fields),
-            () => this.serialize()
+            () => this.serialize(),
         );
     }
 
@@ -123,7 +123,7 @@ export class ParamsStore {
                 paramsJson.some((p) => p.type === "file" && p.required);
             dispatchDatapaneEvent(
                 EventType.SCHEDULE_DISABLED,
-                scheduleDisabled
+                scheduleDisabled,
             );
         });
     }

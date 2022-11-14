@@ -32,7 +32,7 @@ const highlighter = (code: string, lang: string) => {
     text: string,
     pre: HTMLPreElement,
     code: HTMLElement,
-    lang: string
+    lang: string,
 ) {
     const language = lang || "python";
     pre.className = "language-" + language;

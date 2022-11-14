@@ -110,7 +110,7 @@ nb.Input.prototype.render = function () {
         escapeHTML(joinText(this.raw)),
         pre_el,
         code_el,
-        lang
+        lang,
     );
     pre_el.appendChild(code_el);
     holder.appendChild(pre_el);
@@ -309,8 +309,8 @@ nb.Cell.prototype.renderers = {
             root.renderMathInElement(el, { delimiters: math_delimiters });
             el.innerHTML = nb.sanitizer(
                 nb.markdown(
-                    el.innerHTML.replace(/&gt;/g, ">") // Necessary to enable blockquote syntax
-                )
+                    el.innerHTML.replace(/&gt;/g, ">"), // Necessary to enable blockquote syntax
+                ),
             );
         } else {
             el.innerHTML = nb.sanitizer(nb.markdown(joined));

@@ -39,7 +39,7 @@ Cypress.Commands.add("dpLogin", (opts = { isStaff: false }) => {
         body: {
             login: Cypress.env(opts.isStaff ? "staffEmail" : "testEmail"),
             password: Cypress.env(
-                opts.isStaff ? "staffPassword" : "testPassword"
+                opts.isStaff ? "staffPassword" : "testPassword",
             ),
         },
     });

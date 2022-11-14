@@ -19,16 +19,16 @@ const required = (node: any) => {
 };
 
 const validation: ComputedRef = computed(() =>
-    p.required ? [["+required"]] : []
+    p.required ? [["+required"]] : [],
 );
 
 watch(
     () => tags,
     () => p.setValue(tags),
-    { deep: true }
+    { deep: true },
 );
 
-const listFieldInput = createInput(ListFieldView, {
+const tagsField = createInput(ListFieldView, {
     props: ["tags", "tagCount"],
 });
 
@@ -46,7 +46,7 @@ const removeTag = (idx: number) => {
 <template>
     <div :data-cy="`list-field-${p.name}`">
         <form-kit
-            :type="listFieldInput"
+            :type="tagsField"
             :label="p.name"
             :name="p.name"
             :help="p.helpText"

@@ -1,3 +1,5 @@
+@import "vue-multiselect/dist/vue-multiselect.css";
+
 .h-iframe {
     /*
      * 100vh : iframe height
@@ -8,4 +10,34 @@
 
 .prose {
     max-width: 100% !important;
+}
+
+:root {
+    --fk-max-width-input: none !important;
+    --fk-bg-input: white !important;
+}
+
+/* vue-multiselect overrides */
+
+.multiselect__tag,
+.multiselect__option--highlight {
+    background: var(--dp-accent-color) !important;
+}
+
+.multiselect__tag-icon:after,
+.multiselect__option--highlight {
+    color: var(--dp-accent-text) !important;
+}
+
+.multiselect__input[type="text"]:focus {
+    border: 1px solid black !important;
+    box-shadow: none !important;
+}
+
+.multiselect__tags {
+    @apply shadow-sm border-gray-300 rounded-md;
+}
+
+.multiselect__tag {
+    margin-top: 1px;
 }

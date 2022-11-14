@@ -1,4 +1,10 @@
+from __future__ import annotations
+
 import argparse
+import enum
+import logging
+import logging.config
+import os
 import string
 import sys
 import typing as t
@@ -9,23 +15,88 @@ import click
 
 from datapane.common import JDict
 
+##############
+# Client constants
+TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
+IN_PYTEST = "pytest" in sys.modules
+# we're running on datapane platform
+ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
+
+
+################################################################################
+# Logging
+# export the application logger at WARNING level by default
+log: logging.Logger = logging.getLogger("datapane")
+if log.level == logging.NOTSET:
+    log.setLevel(logging.WARNING)
+
+
+_have_setup_logging: bool = False
+
+
+def _setup_dp_logging(verbosity: int = 0, logs_stream: t.TextIO = None) -> None:
+    global _have_setup_logging
+
+    log_level = "WARNING"
+    if verbosity == 1:
+        log_level = "INFO"
+    elif verbosity > 1:
+        log_level = "DEBUG"
+
+    # don't configure global logging config when running as a library
+    if get_dp_mode() == DPMode.LIBRARY:
+        log.warning("Configuring datapane logging in library mode")
+        # return None
+
+    # TODO - only allow setting once?
+    if _have_setup_logging:
+        log.warning(f"Reconfiguring datapane logger when running as {get_dp_mode().name}")
+        # raise AssertionError("Attempting to reconfigure datapane logger")
+        return None
+
+    # initial setup via dict-config
+    _have_setup_logging = True
+    log_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "colored": {
+                "()": "colorlog.ColoredFormatter",
+                "format": "[%(blue)s%(asctime)s%(reset)s] [%(log_color)s%(levelname)-5s%(reset)s] %(message)s",
+                "datefmt": "%H:%M:%S",
+                "reset": True,
+                "log_colors": {
+                    "DEBUG": "cyan",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "red,bg_white",
+                },
+                "style": "%",
+            }
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": log_level,
+                "formatter": "colored",
+                "stream": logs_stream or sys.stderr,
+            }
+        },
+        "loggers": {"datapane": {"level": log_level, "propagate": True}},
+        # only show INFO for anything else
+        "root": {"handlers": ["console"], "level": "INFO"},
+    }
+    logging.config.dictConfig(log_config)
+
+
+def enable_logging():
+    """Enable logging for debug purposes"""
+    _setup_dp_logging(verbosity=2)
+
 
 ################################################################################
 # Output
-def success_msg(msg: str):
-    click.secho(msg, fg="green")
-
-
-def failure_msg(msg: str, do_exit: bool = False):
-    click.secho(msg, fg="red")
-    if do_exit:
-        ctx: click.Context = click.get_current_context(silent=True)
-        if ctx:
-            ctx.exit(2)
-        else:
-            exit(2)
-
-
 def open_in_browser(url: str):
     """Open the given URL in the user's browser"""
     from datapane.client.environment import environment
@@ -77,7 +148,7 @@ def display_msg(text: str, **params: str):
 
 
 ################################################################################
-# Misc
+# cmd line parsing
 def process_cmd_param_vals(params: Tuple[str, ...]) -> JDict:
     """Convert a list of k=v to a typed JSON dict"""
 
@@ -131,3 +202,26 @@ def parse_command_line() -> t.Dict[str, t.Any]:
     sys.argv.extend(remaining_args)
 
     return process_cmd_param_vals(dp_args.parameter)
+
+
+############################################################
+class DPMode(enum.Enum):
+    """DP can operate in multiple modes as specified by this Enum"""
+
+    SCRIPT = enum.auto()  # run from the cmd-line
+    LIBRARY = enum.auto()  # imported into a process
+    FRAMEWORK = enum.auto()  # running dp-runner
+
+
+# default in Library mode
+__dp_mode: DPMode = DPMode.LIBRARY
+
+
+def get_dp_mode() -> DPMode:
+    global __dp_mode
+    return __dp_mode
+
+
+def set_dp_mode(dp_mode: DPMode) -> None:
+    global __dp_mode
+    __dp_mode = dp_mode

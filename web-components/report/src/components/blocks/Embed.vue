@@ -4,8 +4,15 @@ import { computed, ComputedRef, onMounted } from "vue";
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw";
 import { v4 as uuid4 } from "uuid";
 import iframeResize from "iframe-resizer/js/iframeResizer";
+import { BlockFigureProps } from "../../data-model/blocks";
+import BlockWrapper from "../layout/BlockWrapper.vue";
 
-const p = defineProps<{ html: string; isIframe: boolean }>();
+const p = defineProps<{
+    html: string;
+    isIframe: boolean;
+    figure: BlockFigureProps;
+    singleBlockEmbed?: boolean;
+}>();
 const iframeId = `iframe_${uuid4()}`;
 
 // Unescape script tags when embedding
@@ -36,16 +43,18 @@ onMounted(() => {
 </script>
 
 <template>
-    <div
-        v-if="isIframe"
-        v-html="decodedHtml"
-        class="flex justify-center items-center"
-        data-cy="block-embed"
-    />
-    <iframe
-        v-else
-        :id="iframeId"
-        :srcdoc="iframeDoc"
-        class="flex justify-center items-center"
-    />
+    <block-wrapper :figure="p.figure" :single-block-embed="singleBlockEmbed">
+        <div
+            v-if="isIframe"
+            v-html="decodedHtml"
+            class="flex justify-center items-center"
+            data-cy="block-embed"
+        />
+        <iframe
+            v-else
+            :id="iframeId"
+            :srcdoc="iframeDoc"
+            class="flex justify-center items-center"
+        />
+    </block-wrapper>
 </template>

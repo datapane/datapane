@@ -2,7 +2,7 @@
 import altair as alt
 import pandas as pd
 
-import datapane as dp
+import datapane.blocks.asset
 
 df = pd.read_csv(
     "https://query1.finance.yahoo.com/v7/finance/download/GOOG?period2=1585222905&interval=1mo&events=history"
@@ -21,4 +21,4 @@ chart = (
 )
 
 
-report = [dp.Plot(chart)]
+report = [datapane.blocks.asset.Plot(chart)]

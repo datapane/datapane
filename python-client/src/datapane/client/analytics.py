@@ -1,7 +1,9 @@
 """This module provides a simple interface to capture analytics data"""
+import os
 import atexit
 import platform
 import queue
+import sys
 import threading
 from contextlib import suppress
 from functools import wraps
@@ -11,10 +13,10 @@ from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 import posthog
 
-from datapane import _IN_DPSERVER, _IN_PYTEST, _USING_CONDA, ON_DATAPANE, __version__, log
 from datapane.client.environment import environment
 
 from . import config as c
+from .utils import IN_PYTEST, ON_DATAPANE, log
 
 posthog.sync_mode = True
 posthog.api_key = "phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy"
@@ -22,6 +24,8 @@ posthog.host = "https://events.datapane.com/"
 _NO_ANALYTICS_FILE: Path = c.APP_DIR / "no_analytics"
 MAX_QUEUE_SIZE = 250
 QUEUE_TIMEOUT = 10
+IN_DPSERVER = "dp" in sys.modules
+USING_CONDA = os.path.exists(os.path.join(sys.prefix, "conda-meta", "history"))
 
 
 class Consumer(threading.Thread):
@@ -59,25 +63,29 @@ class Consumer(threading.Thread):
 def is_analytics_disabled() -> bool:
     """Determine the initial state for analytics if not already set"""
     # disable if globally disabled or in certain envs
-    if _NO_ANALYTICS_FILE.exists() or ON_DATAPANE or _IN_PYTEST or _IN_DPSERVER:
+    if _NO_ANALYTICS_FILE.exists() or ON_DATAPANE or IN_PYTEST or IN_DPSERVER:
         log.debug("Analytics disabled")
         return True
     return False
 
 
+_NO_ANALYTICS: bool = is_analytics_disabled()
+
+
 def user_properties() -> Dict:
     """User properties to be added on `identify`, and amended on `capture`"""
+    from datapane import __version__
+
     return dict(
         os=platform.system(),
         python_version=platform.python_version(),
         dp_version=__version__,
         environment_type=environment.name,
         in_jupyter=environment.is_notebook_environment,
-        using_conda=_USING_CONDA,
+        using_conda=USING_CONDA,
     )
 
 
-_NO_ANALYTICS: bool = is_analytics_disabled()
 
 _consumer = None
 
@@ -97,18 +105,10 @@ def capture(event: str, config: Optional[c.Config] = None, **properties) -> None
     if _NO_ANALYTICS:
         return None
     config = config or c.get_config()
+    user_props = user_properties()
 
-    properties.update(
-        {
-            "source": "cli",
-            "dp_version": __version__,
-            "environment_type": environment.name,
-            "in_jupyter": environment.is_notebook_environment,
-            "using_conda": _USING_CONDA,
-            # Note "$" isn't a valid char in `dict(k=v)` keys
-            "$set": user_properties(),
-        }
-    )
+    # Note "$" isn't a valid char in `dict(k=v)` keys
+    properties.update({"source": "cli", **user_props, "$set": user_props.copy()})
 
     _consumer.send(posthog.capture, args=[config.session_id, event, properties])
 

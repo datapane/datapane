@@ -4,6 +4,7 @@ import altair as alt
 import pandas as pd
 
 import datapane as dp
+import datapane.blocks.asset
 
 # download data & group by manufacturer
 df = pd.read_csv('https://covid.ourworldindata.org/data/vaccinations/vaccinations-by-manufacturer.csv', parse_dates=['date'])
@@ -24,9 +25,9 @@ total_styled = total_df.style.bar(subset=["total_vaccinations"], color='#5fba7d'
 # embed into a Datapane Report
 report = dp.App(
     "## Vaccination Report",
-    dp.Plot(plot, caption="Vaccinations by manufacturer over time"),
-    dp.Table(total_styled, caption="Current vaccination totals by manufacturer"),
-    dp.Table(df, caption="Initial Dataset")
+    datapane.blocks.asset.Plot(plot, caption="Vaccinations by manufacturer over time"),
+    datapane.blocks.asset.Table(total_styled, caption="Current vaccination totals by manufacturer"),
+    datapane.blocks.asset.Table(df, caption="Initial Dataset")
 )
 report.upload(name='Covid Vaccinations Demo {{ name }}',
                description="Covid Vaccinations report, using data from ourworldindata", open=True)

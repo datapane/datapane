@@ -73,9 +73,7 @@ dominate = "^2.4.0"  # latest on conda
 dulwich = "^0.20.0"
 furl = "^2.0.0"
 glom = ">=20.11.0,<24.0.0"
-# httpx = "^0.7.5"
 importlib_resources = ">=3.0.0,<6.0.0"
-Jinja2 = "^3.0.0"  # includes markupsafe dep
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
@@ -92,6 +90,12 @@ tabulate = "^0.8.0"
 toolz = ">=0.11.0,<0.13.0"
 validators = ">=0.18.0,<0.21.0"
 ipynbname = "^2021.3.2"
+# Using `master` for bottle as is highly stable and has newer fixes for eventual 0.13 release
+bottle = { git = "https://github.com/bottlepy/bottle.git", branch = "master" }
+cheroot = "^8.6.0"
+base64io = "^1.0.3"
+multimethod = "^1.9"
+typing-extensions = "^4.4.0"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi"]

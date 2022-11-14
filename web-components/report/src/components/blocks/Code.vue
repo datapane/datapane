@@ -30,7 +30,7 @@ onUnmounted(() => {
             class="absolute top-2 right-2 text-gray-700 h-5 w-5 opacity-75"
             ref="copyBtn"
         >
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <title>Copy</title>
                 <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
                 <path

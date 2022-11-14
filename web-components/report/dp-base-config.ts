@@ -28,7 +28,7 @@ export const pluginVue = (customEls: string[]) =>
 
 // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
 export const PACKAGE_VERSION_BOKEH = JSON.stringify(
-    process.env.npm_package_version
+    process.env.npm_package_version,
 );
 
 export const esLib = (entry: string) => ({

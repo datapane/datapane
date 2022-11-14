@@ -2,7 +2,7 @@
 from glom import T, glom
 
 import datapane as dp
-from datapane.client.api.builtins import gen_df
+from datapane.builtins import gen_df
 
 from .test_reports import assert_report, element_to_str, md_block
 

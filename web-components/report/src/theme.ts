@@ -32,11 +32,11 @@ export const setTheme = (isLightProse?: boolean) => {
         const color = chroma(accentColor);
         root.style.setProperty(
             "--dp-accent-secondary-color",
-            color.alpha(0.14).hex()
+            color.alpha(0.14).hex(),
         );
         root.style.setProperty(
             "--dp-accent-text",
-            color.get("lab.l") < 70 ? "white" : "black"
+            color.get("lab.l") < 70 ? "white" : "black",
         );
         root.style.setProperty("--dp-light-gray", lightFontColor);
         root.style.setProperty("--dp-dark-gray", darkFontColor);

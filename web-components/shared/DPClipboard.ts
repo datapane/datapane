@@ -27,7 +27,7 @@ export class DPClipboard {
             },
         });
         this.clip.on("error", () =>
-            console.error("An error occurred while copying to clipboard")
+            console.error("An error occurred while copying to clipboard"),
         );
         this.clip.on("success", DPClipboard.onSuccess);
     }

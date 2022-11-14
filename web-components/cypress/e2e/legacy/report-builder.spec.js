@@ -47,7 +47,7 @@ describe("Report builder", () => {
                     cy.get("[data-cy=block-shadow]").should("exist");
                     cy.get("[data-cy=report-component]").should(
                         "contain",
-                        REPORT_TEXT
+                        REPORT_TEXT,
                     );
                 });
         });

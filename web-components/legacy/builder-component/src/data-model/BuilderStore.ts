@@ -83,7 +83,7 @@ export class BuilderStore {
                 this.report = initialReport;
                 // TODO(xml): what should the initial empty document be?
                 this.editorContent = cDataToBraces(
-                    initialEditableDocument || ""
+                    initialEditableDocument || "",
                 );
                 this.refreshAssets();
             });
@@ -107,7 +107,7 @@ export class BuilderStore {
     }, DEBOUNCE_MS);
 
     public refreshAssets = async (
-        opts: { remote: boolean } = { remote: false }
+        opts: { remote: boolean } = { remote: false },
     ): Promise<any> => {
         /**
          * Refreshes the report from the BE or uses the provided report,
@@ -123,7 +123,7 @@ export class BuilderStore {
             this.assets = extractAssets(reportToExtract.report_files);
             if (opts.remote && isReportDocuments(reportToExtract)) {
                 const newEditorContent = cDataToBraces(
-                    reportToExtract.editable_document
+                    reportToExtract.editable_document,
                 );
                 overwriteEditor(newEditorContent);
             }
@@ -150,7 +150,7 @@ export class BuilderStore {
         this.saving = true;
         try {
             const newReport: IReport = await this.postUpdatedRemoteReport(
-                action
+                action,
             );
             this.report = newReport;
             if (action === UpdateAction.SAVE) {
@@ -184,7 +184,7 @@ export class BuilderStore {
             {
                 editable_document: transformedContent,
                 perform_save: action === UpdateAction.SAVE,
-            }
+            },
         );
     }
 
@@ -195,7 +195,7 @@ export class BuilderStore {
                 this.unsavedChanges = true;
                 (this.editorContent || this.editorContent === "") &&
                     this.preview();
-            }
+            },
         );
     }
 }

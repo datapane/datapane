@@ -13,9 +13,9 @@ from pathlib import Path
 from typing import Optional
 
 import click
+from typing_extensions import Self
 
-from datapane import _IN_PYTEST, log
-
+from .utils import IN_PYTEST, log
 from .exceptions import InvalidTokenError
 
 APP_NAME = "datapane"
@@ -77,7 +77,7 @@ class Config:
 
     # MANAGER functions
     @classmethod
-    def load(cls) -> "Config":
+    def load(cls) -> Self:
         """Load config for an environment and set globally"""
         # Read config file
         cls.ensure_config_file()
@@ -212,7 +212,7 @@ def check_get_config() -> Config:
         _config = init()
         if _config.token == DEFAULT_TOKEN:
             # still don't have a token set, open up the browser and wait for login
-            if not _IN_PYTEST:
+            if not IN_PYTEST:
                 from datapane.client.api import signup
 
                 signup()

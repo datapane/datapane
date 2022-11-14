@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { defineAsyncComponent, inject, ref } from "vue";
-import { DatasetResponse } from "../../../data-model/datatable/datatable-block";
-import { ExportType } from "../../../data-model/blocks";
+import { defineAsyncComponent, ref } from "vue";
+import { DatasetResponse, ExportType } from "../../../data-model/blocks";
+import { useRootStore } from "../../../data-model/root-store";
+import { storeToRefs } from "pinia";
 const DataTableBlock = defineAsyncComponent(() => import("./DataTable.vue"));
 
 const p = defineProps<{
@@ -14,7 +15,8 @@ const p = defineProps<{
     downloadRemote: (type: ExportType) => Promise<void>;
 }>();
 
-const singleBlockEmbed = inject<boolean>("singleBlockEmbed");
+const rootStore = useRootStore();
+const { singleBlockEmbed } = storeToRefs(rootStore);
 const previewMode = ref(p.deferLoad);
 const dsData = ref([]);
 const dsSchema = ref({});

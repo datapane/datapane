@@ -1,7 +1,8 @@
 import pytest
 
+from datapane import DPMode, set_dp_mode
 from datapane.client import config
-from datapane.common import DPMode, _setup_dp_logging, set_dp_mode
+from datapane.common import _setup_dp_logging
 
 
 @pytest.fixture(autouse=True)

@@ -1,0 +1,122 @@
+"""
+Datapane Blocks API
+
+Describes the collection of `Block` objects that can be combined together to make a `datapane.client.api.report.core.Report`.
+"""
+from __future__ import annotations
+
+import typing as t
+from abc import ABC
+
+from lxml.builder import ElementMaker
+
+from datapane.client import DPClientError, log
+
+pass
+from datapane.common.viewxml_utils import is_valid_id, mk_attribs
+
+if t.TYPE_CHECKING:
+    from datapane.blocks import Block
+    from datapane.view import ViewVisitor
+
+E = ElementMaker()  # XML Tag Factory
+
+# only these types will be documented by default
+# __all__ = [
+#     "BaseElement",
+#     "SelectType",
+#     "View",
+# ]
+#
+# __pdoc__ = {
+#     "Media.caption": False,
+#     "Media.file": False,
+#     "Attachment.caption": False,
+#     "Attachment.file": False,
+#     "Plot.file": False,
+#     "DataTable.file": False,
+# }
+
+
+BlockId = str
+
+
+class BaseElement(ABC):
+    """Base Block class - subclassed by all Block types
+
+    ..note:: The class is not used directly.
+    """
+
+    _tag: str
+
+    def __init__(self, name: t.Optional[BlockId] = None, **kwargs: t.Any):
+        """
+        Args:
+            name: A unique name to reference the block, used when referencing blocks via the report editor and when embedding
+        """
+        self._block_name: str = self._tag.lower()
+        self.name = name
+
+        # validate name
+        if name and not is_valid_id(name):
+            raise DPClientError(f"Invalid name '{name}' for block")
+
+        self._attributes: t.Dict[str, str] = dict()
+        self._add_attributes(name=name, **kwargs)
+
+        self._truncate_strings(kwargs, "caption", 512)
+        self._truncate_strings(kwargs, "label", 256)
+
+    @staticmethod
+    def _truncate_strings(kwargs: dict, key: str, max_length: int):
+        if key in kwargs:
+            x: str = kwargs[key]
+            if x and len(x) > max_length:
+                kwargs[key] = f"{x[:max_length-3]}..."
+                log.warning(f"{key} currently '{x}'")
+                log.warning(f"{key} must be less than {max_length} characters, truncating")
+                # raise DPError(f"{key} must be less than {max_length} characters, '{x}'")
+
+    def _add_attributes(self, **kwargs):
+        self._attributes.update(mk_attribs(**kwargs))
+
+    def _ipython_display_(self):
+        """Display the block as a side effect within a Jupyter notebook"""
+        from IPython.display import HTML, display
+
+        from datapane.processors.api import stringify_report
+        from datapane.view import View
+
+        html_str = stringify_report(View(self))
+        display(HTML(html_str))
+
+    def accept(self, visitor: ViewVisitor) -> ViewVisitor:
+        visitor.visit(self)
+        return visitor
+
+    def __str__(self) -> str:
+        return f"<{self._tag} attribs={self._attributes}>"
+
+
+class DataBlock(BaseElement):
+    """Abstract block that represents a leaf-node in the tree, e.g. a Plot or Table
+
+    ..note:: This class is not used directly.
+    """
+
+
+BlockOrPrimitive = t.Union["Block", t.Any]  # TODO - expand
+BlockList = t.List["Block"]
+
+
+def wrap_block(b: BlockOrPrimitive) -> Block:
+    from .wrappers import convert_to_block
+
+    # if isinstance(b, Page):
+    #     raise DPError("Page objects can only be at the top-level")
+    if not isinstance(b, BaseElement):
+        # import here as a very slow module due to nested imports
+        # from ..files import convert
+
+        return convert_to_block(b)
+    return t.cast("Block", b)

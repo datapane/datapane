@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://datapane.com">
-    <img src="https://cloud.datapane.com/static/datapane-logo-dark.png" width="250px" alt="Datapane" />
+    <img src="https://datapane-cdn.com/static/v1/datapane-logo-dark.png" width="250px" alt="Datapane" />
   </a>
 </p>
 <p align="center">
@@ -61,7 +61,7 @@ $ pip3 install -U datapane
 #### conda
 
 ```
-$ conda install -c conda-forge "datapane>=0.15.5"
+$ conda install -c conda-forge "datapane>=0.15.6"
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
@@ -92,16 +92,16 @@ fig = (
     alt.Chart(df)
     .mark_point()
     .encode(
-      x="petalLength:Q",
-      y="petalWidth:Q",
-      color="species:N"
+        x="petalLength:Q",
+        y="petalWidth:Q",
+        color="species:N"
     )
 )
-app = dp.App(
+view = dp.View(
     dp.Plot(fig),
     dp.DataTable(df)
 )
-app.save(path="my_app.html")
+dp.save_report(path="my_app.html")
 ```
 
 </p>
@@ -114,14 +114,12 @@ Add dropdowns, selects, grid, pages, and 10+ other blocks to enhance your apps.
 
 <img width='485px' align='left' alt="Complex layout" src="https://user-images.githubusercontent.com/3541695/176288321-44f7e76f-5032-434b-a3b0-ed7e3911b5d5.png">
 
-<p >
+<p>
 
 ```python
+import datapane as dp
 
-
-...
-
-dp.App(
+view = dp.View(
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(
         dp.BigNumber(
@@ -138,16 +136,9 @@ dp.App(
         dp.Plot(fig, label="Chart"),
         dp.DataTable(df, label="Data")
     ),
-).save(path="layout_example.html")
-
+)
+dp.save_report(view, path="layout_example.html")
 ```
-
-</p>
-</p>
-
-<br>
-<br>
-<br>
 
 # Get involved
 
@@ -184,10 +175,10 @@ To get your API key, [create a free account](https://cloud.datapane.com/accounts
 Next, in your Python notebook or script, change the `save` function to `upload`:
 
 ```python
-dp.App(
+view = dp.View(
  ...
-#).save(path="hello_world.html")
-).upload(name="Hello world")
+)
+dp.upload(view, name="Hello world")
 ```
 
 # Demos and Examples

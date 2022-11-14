@@ -26,7 +26,7 @@ export const jsonParseIfStr = (fields: any): any => {
 
 export const dispatchDatapaneEvent = (
     eventType: EventType,
-    payload: any
+    payload: any,
 ): void => {
     const event = new CustomEvent(eventType, { detail: payload });
     window.dispatchEvent(event);

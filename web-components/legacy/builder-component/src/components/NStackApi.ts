@@ -14,7 +14,7 @@ const semaphore = new Semaphore(1);
 const defaultRetryApiFunction: RetryApiFunction = (
     retry: any,
     number: any,
-    err: any
+    err: any,
 ) => {
     // The default behaviour controlling when to retry an API request if it fails is
     // to retry only if a 401 error is returned.
@@ -28,7 +28,7 @@ export class NStackApi {
     protected apiClient: AxiosInstance;
 
     public constructor(
-        options: { baseEndpoint: string } = { baseEndpoint: "api/" }
+        options: { baseEndpoint: string } = { baseEndpoint: "api/" },
     ) {
         this.apiClient = axios.create({
             baseURL: environment["url"] + options.baseEndpoint,
@@ -47,14 +47,14 @@ export class NStackApi {
             (response) => response,
             (error: AxiosError): Promise<AxiosError> => {
                 return Promise.reject(error);
-            }
+            },
         );
     }
 
     public get<T>(
         url: string,
         config?: AxiosRequestConfig,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<T> {
         return retryPromise(() => {
             return this.apiClient.get<T>(url, config);
@@ -65,7 +65,7 @@ export class NStackApi {
 
     public delete<T>(
         url: string,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<T> {
         return retryPromise(() => {
             return this.apiClient.delete(url);
@@ -78,7 +78,7 @@ export class NStackApi {
         url: string,
         postObj: T,
         config?: any,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<U> {
         return retryPromise(() => {
             return this.apiClient.post<U>(url, postObj, config);
@@ -88,7 +88,7 @@ export class NStackApi {
     public postReturnWholeResponse<T, U>(
         url: string,
         postObj: T,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<AxiosResponse<U>> {
         return retryPromise(() => {
             return this.apiClient.post<U>(url, postObj);
@@ -97,7 +97,7 @@ export class NStackApi {
 
     public patch<T extends { url: string }, TError = string | object>(
         patchObj: T,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<T> {
         return retryPromise(() => {
             return this.apiClient.patch<T>(patchObj.url, patchObj);
@@ -108,7 +108,7 @@ export class NStackApi {
 
     public put<T extends { url: string }>(
         putObj: T,
-        retryApiFunction = defaultRetryApiFunction
+        retryApiFunction = defaultRetryApiFunction,
     ): Promise<T> {
         return retryPromise(() => {
             return this.apiClient.put<T>(putObj.url, putObj);
@@ -119,7 +119,7 @@ export class NStackApi {
 
     public blockingGet<T>(
         url: string,
-        config?: AxiosRequestConfig
+        config?: AxiosRequestConfig,
     ): Promise<T> {
         return semaphore.acquire().then((release) => {
             return this.get<T>(url, config).finally(release);

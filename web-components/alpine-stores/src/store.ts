@@ -73,7 +73,7 @@ window.addEventListener("alpine:init", () => {
                 document.addEventListener(
                     "mousemove",
                     this.resizeListener,
-                    false
+                    false,
                 );
 
                 // Disable text/image highlighting while dragging
@@ -84,7 +84,7 @@ window.addEventListener("alpine:init", () => {
             document.removeEventListener(
                 "mousemove",
                 this.resizeListener,
-                false
+                false,
             );
             document.removeEventListener("selectstart", disableSelect);
         },

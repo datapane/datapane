@@ -40,14 +40,14 @@ const AssetsContent = observer((p: Pick<Props, "assets" | "closeModal">) => {
             `<${asset.tagName} ${Object.entries(asset.props)
                 .filter(([k, _]) => allowedProps.includes(k))
                 .map(([k, v]) => `${k}="${v}"`)
-                .join(" ")}/>`
+                .join(" ")}/>`,
         );
         p.closeModal();
     };
 
     const atomicAssets = useMemo(
         () => (p.assets ? p.assets.filter(dropAssets) : []),
-        [p.assets]
+        [p.assets],
     );
 
     return atomicAssets && atomicAssets.length ? (
@@ -73,7 +73,7 @@ const AssetsContent = observer((p: Pick<Props, "assets" | "closeModal">) => {
 });
 
 const exampleCode = (
-    id: string
+    id: string,
 ) => `import datapane as dp  # Import datapane's Python library
 import altair as alt
 from vega_datasets import data
@@ -139,7 +139,7 @@ export const AssetsBar = observer((p: Props) => {
     const { report } = c.store;
 
     const [currentTab, changeTab] = useState(
-        p.assets && p.assets.length > 0 ? tabs[0] : tabs[1]
+        p.assets && p.assets.length > 0 ? tabs[0] : tabs[1],
     );
 
     return (
@@ -169,7 +169,7 @@ export const AssetsBar = observer((p: Props) => {
                                     currentTab === tab
                                         ? "border-indigo-500 text-indigo-600"
                                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                                    "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                                    "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",
                                 )}
                             >
                                 {tab}

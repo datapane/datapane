@@ -1,5 +1,3 @@
-import { Report } from "./blocks";
-
 export type IReport = {
     document: any;
     web_url: string;
@@ -13,14 +11,37 @@ export type IReport = {
 
 export type ReportProps = {
     isOrg: boolean;
+    isLightProse: boolean;
     mode: "VIEW" | "EMBED";
-    htmlHeader?: string;
+    htmlHeader: string;
     report: IReport;
+    assetStore: any;
 };
 
-export type ReportStoreState = {
-    report: Report;
-    singleBlockEmbed: boolean;
+export type AppData = {
+    data: {
+        result: {
+            view_xml: string;
+            assets: any;
+        };
+    };
 };
 
-export type AppViewMode = "VIEW" | "EDIT" | "EMBED";
+export type AppMetaData = {
+    isLightProse: ReportProps["isLightProse"];
+    isOrg: ReportProps["isOrg"];
+    mode: ReportProps["mode"];
+    webUrl: string;
+};
+
+export enum SwapType {
+    REPLACE = "replace",
+    INNER = "inner",
+    APPEND = "append",
+    PREPEND = "prepend",
+}
+
+export enum TriggerType {
+    SUBMIT = "submit",
+    SCHEDULE = "schedule",
+}

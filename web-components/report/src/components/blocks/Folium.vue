@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const p = defineProps<{ iframeContent: string; singleBlockEmbed: boolean }>();
+const p = defineProps<{ iframeContent: string; singleBlockEmbed?: boolean }>();
 const IFRAME_HEIGHT = "35rem";
 </script>
 

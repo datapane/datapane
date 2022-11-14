@@ -65,7 +65,7 @@ const getBlockType = (tagName: string, mimetype: string = ""): string => {
 const getBlockMetadata = (
     tagName: string,
     attributes: any,
-    mimetype?: string // TODO - mimetype not currently used, remove?
+    mimetype?: string, // TODO - mimetype not currently used, remove?
 ): string[] => {
     /**
      * Gets misc metadata from the JSON like type, dimensions, etc.

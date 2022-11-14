@@ -16,7 +16,7 @@ const API_HOST = "https://events.datapane.com";
 // NOTE - this will use prod as the url for local reports
 const KPIS_ENDPOINT = urljoin(
     environment.url ?? "https://cloud.datapane.com/",
-    "dp-kpis/"
+    "dp-kpis/",
 );
 //const KPIS_ENDPOINT = "http://localhost:8090/dp-kpis/";
 const LOCK_NAME = "ph_datapane_store";
@@ -25,7 +25,7 @@ const mutex = new FastMutex();
 export const setupPostHog = async (
     apiKey: string,
     userId?: string,
-    groupId?: string
+    groupId?: string,
 ): Promise<void> => {
     try {
         await mutex.lock(LOCK_NAME);
@@ -99,7 +99,7 @@ const asyncPosthogCapture = async (event_name: string, properties: any) => {
 const asyncDPTrackEvent = async (
     event: string,
     properties: object,
-    includeDeviceId: boolean = true
+    includeDeviceId: boolean = true,
 ) => {
     try {
         // create the payload
@@ -128,7 +128,7 @@ export const trackReportView = (properties: ReportViewPayload) => {
 };
 
 export const trackLocalReportView = (
-    event: "CLI_REPORT_VIEW" | "SERVED_REPORT_VIEW"
+    event: "CLI_REPORT_VIEW" | "SERVED_REPORT_VIEW",
 ) => {
     if (!window.dpLocalViewEvent) {
         return;
@@ -139,6 +139,6 @@ export const trackLocalReportView = (
             author_id: window.dpAuthorId,
             report_id: window.dpReportId,
         },
-        false
+        false,
     );
 };

@@ -1,6 +1,6 @@
 import { DataType, Precision, Type, tableFromIPC } from "apache-arrow";
 import { Coerce } from "./Coerce";
-import { DatasetResponse } from "./datatable-block";
+import { DatasetResponse } from "../blocks";
 
 export type FormattedNsSchemaField = {
     name: string;
@@ -101,7 +101,7 @@ export const apiResponseToArrow = (r: any): DatasetResponse => {
         data: d,
         // For now we want to disable sanddance for datasets containing int64 columns
         containsBigInt: table.schema.fields.some(
-            (f: any) => f.type.bitWidth && f.type.bitWidth >= 64
+            (f: any) => f.type.bitWidth && f.type.bitWidth >= 64,
         ),
     };
 };

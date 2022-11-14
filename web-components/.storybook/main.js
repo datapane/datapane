@@ -1,5 +1,6 @@
 const vue = require("@vitejs/plugin-vue");
 const replace = require("@rollup/plugin-replace");
+const tailwindcss = require("tailwindcss");
 
 module.exports = {
     stories: [
@@ -12,6 +13,16 @@ module.exports = {
         builder: "@storybook/builder-vite",
     },
     async viteFinal(config, { configType }) {
+        config.css = {
+            postcss: {
+                plugins: [
+                    tailwindcss({
+                        config: "./report.tailwind.config.js",
+                    }),
+                ],
+            },
+        };
+
         config.plugins = config.plugins.filter((p) => p.name !== "vite:vue");
         config.plugins.push(
             vue({
@@ -29,7 +40,7 @@ module.exports = {
                     jQuery: "window.jQuery",
                 },
                 preventAssignment: false,
-            })
+            }),
         );
 
         if (configType === "PRODUCTION") {

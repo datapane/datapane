@@ -1,20 +1,12 @@
 <script setup lang="ts">
-import { ReportStore } from "../data-model/report-store";
-import GridGenerator from "./GridGenerator.vue";
 import HPages from "./layout/HPages.vue";
 import VPages from "./layout/VPages.vue";
 import PrevNext from "./layout/PrevNext.vue";
 import MobilePages from "./layout/MobilePages.vue";
-import { ref, provide, computed, ComputedRef, onMounted } from "vue";
-import { createGridKey } from "./utils";
-import { LayoutBlock } from "../data-model/blocks";
-import { setTheme } from "../theme";
-import {
-    trackLocalReportView,
-    trackReportView,
-} from "../../../shared/dp-track";
+import { computed, ComputedRef } from "vue";
 import { ReportProps } from "../data-model/types";
-import sanitizeHtml from "sanitize-html";
+import { storeToRefs } from "pinia";
+import { Block, View } from "../data-model/blocks";
 
 // Vue can't use a ts interface as props
 // see https://github.com/vuejs/core/issues/4294
@@ -22,130 +14,86 @@ const p = defineProps<{
     isOrg: ReportProps["isOrg"];
     mode: ReportProps["mode"];
     htmlHeader?: ReportProps["htmlHeader"];
-    report: ReportProps["report"];
+    report: View;
 }>();
 
-const pageNumber = ref(0);
+// Set up deserialised report object
 
-onMounted(() => {
-    /* View tracking */
-    if (window.dpLocal) {
-        trackLocalReportView("CLI_REPORT_VIEW");
-    } else if (window.dpServed) {
-        trackLocalReportView("SERVED_REPORT_VIEW");
-    } else {
-        const { web_url, id, published, username, num_blocks } = p.report;
-        trackReportView({
-            id: id,
-            web_url: web_url,
-            published,
-            author_username: username,
-            num_blocks,
-            is_embed: window.location.href.includes("/embed/"),
-        });
-    }
-});
+const { children, tabNumber, hasPages, layout } = storeToRefs(p.report.store);
 
-// Set up deserialised report object and embed properties
-const store = new ReportStore(p);
-const { report, singleBlockEmbed } = store.state;
-const multiBlockEmbed = p.mode === "EMBED" && !singleBlockEmbed;
-
-provide("singleBlockEmbed", singleBlockEmbed);
-
-const rootGroup: ComputedRef<LayoutBlock> = computed(
-    () => report.children[pageNumber.value].children[0]
+const pages: ComputedRef<Block[]> = computed(() =>
+    hasPages.value ? children.value[0].children : [],
 );
 
-const htmlHeader = computed(() => {
-    // HTML header is taken from the report object, unless overwritten via props
-    const dirtyHeader = p.htmlHeader || p.report.output_style_header;
-    return p.isOrg
-        ? dirtyHeader
-        : sanitizeHtml(dirtyHeader, {
-              allowedTags: ["style"],
-              allowedAttributes: {
-                  style: [],
-              },
-              allowVulnerableTags: true, // Suppress warning for allowing `style`
-          });
-});
+const pageLabels: ComputedRef<string[]> = computed(() =>
+    pages.value.map((pa: Block, i: number) => pa.label || `Page ${i + 1}`),
+);
 
-const htmlHeaderRef = (node: any) => {
-    /**
-     * Set report theme on HTML header node load
-     */
-    if (node !== null) {
-        setTheme(p.report.output_is_light_prose);
-    }
-};
-
-const pageLabels = report.children.map(
-    (page, idx) => page.label || `Page ${idx + 1}`
+const currentPage: ComputedRef<Block[]> = computed(() =>
+    hasPages.value ? [pages.value[tabNumber.value]] : children.value,
 );
 
 const handlePageChange = (newPageNumber: number) =>
-    (pageNumber.value = newPageNumber);
+    p.report!.store.setTab(newPageNumber);
 </script>
 
 <template>
-    <div
-        v-if="!singleBlockEmbed"
-        :ref="htmlHeaderRef"
-        id="html-header"
-        v-html="htmlHeader"
-    />
-    <div
-        v-if="pageLabels.length > 1 && report.layout === 'top'"
-        class="hidden sm:block w-full mb-6"
-    >
-        <h-pages
-            :labels="pageLabels"
-            :page-number="pageNumber"
-            @page-change="handlePageChange"
-        />
-    </div>
-    <div class="w-full bg-dp-background" data-cy="report-component">
+    <template v-if="p.report">
         <div
-            :class="{
-                'flex flex-col justify-end bg-dp-background': true,
-                'pb-10': p.isOrg && multiBlockEmbed,
-                'pb-6': !p.isOrg && multiBlockEmbed,
-            }"
+            v-if="pages.length > 1 && layout === 'top'"
+            class="hidden sm:block w-full mb-6"
         >
-            <div className="sm:hidden p-2" v-if="pageLabels.length > 1">
-                <mobile-pages
-                    :labels="pageLabels"
-                    :page-number="pageNumber"
-                    @page-change="handlePageChange"
-                />
-            </div>
-            <div class="sm:flex block">
-                <div
-                    v-if="pageLabels.length > 1 && report.layout === 'side'"
-                    class="hiddeLan sm:block w-1/6 bg-gray-100 px-4"
-                >
-                    <v-pages
+            <h-pages
+                :labels="pageLabels"
+                :page-number="tabNumber"
+                @page-change="handlePageChange"
+            />
+        </div>
+        <div class="w-full bg-dp-background" data-cy="report-component">
+            <div
+                :class="[
+                    'flex flex-col justify-end bg-dp-background',
+                    {
+                        'pb-6': p.mode === 'EMBED',
+                    },
+                ]"
+            >
+                <div class="sm:hidden p-2" v-if="pages.length > 1">
+                    <mobile-pages
                         :labels="pageLabels"
-                        :page-number="pageNumber"
+                        :page-number="tabNumber"
                         @page-change="handlePageChange"
                     />
                 </div>
-                <div class="flex-1 flex flex-col">
-                    <div :class="['flex-grow', { 'px-4': !singleBlockEmbed }]">
-                        <grid-generator
-                            :key="createGridKey(rootGroup, 0)"
-                            :tree="rootGroup"
+                <div class="sm:flex block">
+                    <div
+                        v-if="pages.length > 1 && layout === 'side'"
+                        class="hidden sm:block w-1/6 bg-gray-100 px-4"
+                    >
+                        <v-pages
+                            :labels="pageLabels"
+                            :page-number="tabNumber"
+                            @page-change="handlePageChange"
                         />
                     </div>
-                    <prev-next
-                        v-if="pageLabels.length > 1"
-                        :page-number="pageNumber"
-                        :num-pages="pageLabels.length"
-                        @page-change="handlePageChange"
-                    />
+                    <div class="flex-1 flex flex-col">
+                        <div class="flex-grow px-4">
+                            <component
+                                :is="child.component"
+                                v-for="child in currentPage"
+                                :key="child.refId"
+                                v-bind="child.componentProps"
+                            />
+                        </div>
+                        <prev-next
+                            v-if="pages.length > 1"
+                            :page-number="tabNumber"
+                            :num-pages="pageLabels.length"
+                            @page-change="handlePageChange"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </template>
 </template>

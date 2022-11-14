@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
 const p = defineProps<{
     html: string;
-    singleBlockEmbed: string;
+    singleBlockEmbed?: boolean;
     class: string;
 }>();
 
-const singleBlockEmbed = computed(() => JSON.parse(p.singleBlockEmbed));
-const { dpLocal, dpServed } = window;
+const { dpLocal } = window;
 
 const tableRef = (node: any): void => {
     /**
@@ -23,14 +21,10 @@ const tableRef = (node: any): void => {
 </script>
 
 <template>
-    <link
-        v-if="!dpLocal && !dpServed"
-        rel="stylesheet"
-        href="/static/report/style.css"
-    />
+    <link v-if="!dpLocal" rel="stylesheet" href="/static/report/style.css" />
     <div
         :ref="tableRef"
-        :class="['w-full', { 'h-full absolute top-0': singleBlockEmbed }]"
+        :class="['w-full', { 'h-full absolute top-0': p.singleBlockEmbed }]"
         v-html="p.html"
         data-cy="block-shadow"
     />

@@ -28,11 +28,11 @@ export default () => ({
         await Promise.all([
             fs.promises.copyFile(
                 path.resolve(vuePath, VUE_DEV_FNAME),
-                path.resolve(distPath, VUE_DEV_FNAME)
+                path.resolve(distPath, VUE_DEV_FNAME),
             ),
             fs.promises.copyFile(
                 path.resolve(vuePath, VUE_PROD_FNAME),
-                prodVueFile
+                prodVueFile,
             ),
         ]);
     },

@@ -5,7 +5,6 @@
   <xsl:output omit-xml-declaration="no" indent="no" encoding="utf-8"
               method='xml' cdata-section-elements="Text HTML Code Formula Embed Description"/>
   <xsl:strip-space elements="*"/>
-  <xsl:param name="embedded"/>
 
   <!--  Match and copy across everything, i.e. id -->
   <xsl:template match="@* | node()">
@@ -20,7 +19,7 @@
   <!-- Drop blocks if embedded -->
   <!-- Disabled for now as local report rendering handles Blocks -->
   <!--
-  <xsl:template match="/Report/Pages//Blocks">
+  <xsl:template match="/View//Blocks">
     <xsl:choose>
       <xsl:when test="$embedded">
         <xsl:apply-templates/>
@@ -32,7 +31,6 @@
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>
-
   </xsl:template>
   -->
 

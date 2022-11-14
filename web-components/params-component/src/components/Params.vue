@@ -15,9 +15,9 @@ watch(
         void paramsStore.load(
             p.parameters_def,
             p.updated_fields,
-            p.is_schedule
+            p.is_schedule,
         ),
-    { immediate: true }
+    { immediate: true },
 );
 </script>
 

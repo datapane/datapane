@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
-const p = defineProps<{ label?: string }>();
+import { storeToRefs } from "pinia";
+
+const p = defineProps<{ label?: string; store: any }>();
+
 const isOpen = ref(false);
+
+const { children } = storeToRefs(p.store);
 </script>
 
 <template>
@@ -25,7 +30,12 @@ const isOpen = ref(false);
         <div
             :class="['w-full pt-2 m-auto overflow-hidden', { hidden: !isOpen }]"
         >
-            <slot />
+            <component
+                :is="child.component"
+                v-for="child in children"
+                v-bind="child.componentProps"
+                :key="child.refId"
+            />
         </div>
     </div>
 </template>

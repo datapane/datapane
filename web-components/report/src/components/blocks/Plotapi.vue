@@ -5,14 +5,14 @@ import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?ra
 import { v4 as uuid4 } from "uuid";
 import iframeResize from "iframe-resizer/js/iframeResizer";
 
-const p = defineProps<{ iframeContent: string; singleBlockEmbed: boolean }>();
+const p = defineProps<{ iframeContent: string; singleBlockEmbed?: boolean }>();
 const iframeId = `iframe_${uuid4()}`;
 
 // Unescape script tags when embedding
 const iframeDoc: ComputedRef<string> = computed(() => {
     return p.iframeContent.replace(
         "<body>",
-        `<body><script>${contentWindowJs}<\/script>`
+        `<body><script>${contentWindowJs}<\/script>`,
     );
 });
 

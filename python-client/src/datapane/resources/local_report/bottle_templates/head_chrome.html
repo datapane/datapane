@@ -1,0 +1,26 @@
+<meta charset="UTF-8" />
+<script src="https://kit.fontawesome.com/256c714d9a.js"></script>
+<link
+  href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700|Inconsolata|Karla|Rubik&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="{{ cdn_base }}/style.css" />
+<script>
+  // analytics config
+  // TODO -- pass these in as props for consistency?
+  window.dpAppRunner = {{ app_runner }};
+  window.dpLocal = true;
+  % if events:
+    window.dpLocalViewEvent = {{events}};
+    window.dpReportId = "{{report_id}}";
+    window.dpAuthorId = "{{author_id}}";
+  % end
+  // construct the View
+  const appData = { data: { result: { view_xml: "{{report_doc}}", assets: {{!assets}} } }};
+  const htmlHeader = `<style type="text/css">{{ !css_header }}</style>`;
+  window.reportProps = { htmlHeader, appData, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW" };
+</script>
+<script type="module">
+  import { mountReport } from "{{ cdn_base }}/index.es.js";
+  mountReport(window.reportProps);
+</script>

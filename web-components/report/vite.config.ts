@@ -17,9 +17,13 @@ module.exports = defineConfig(({ mode }) => ({
     define: {
         // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
-        "process.env": process.env,
+        // Pinia expects the node `process` global to be defined but support for this
+        // was removed in Vite 3
+        "process.env.NODE_ENV": `"${process.env.NODE_ENV}"`,
     },
     build: {
+        // TODO - disable sourcemap in prod
+        sourcemap: true,
         outDir: "./dist/report/",
         lib: { ...esLib("index.ts"), fileName: "index" },
         rollupOptions: {
