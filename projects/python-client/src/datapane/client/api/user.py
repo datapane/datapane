@@ -11,13 +11,13 @@ $ datapane logout
 ```
 
 """
-
 import os
 import runpy
 import shutil
 import sys
 import time
 import typing as t
+import warnings
 import webbrowser
 from pathlib import Path
 
@@ -41,7 +41,9 @@ from .common import _process_res
 __all__ = ["login", "logout", "ping", "hello_world", "template"]
 
 
-def login(token: t.Optional[str], server: str = c.DEFAULT_SERVER, cli_login: bool = True) -> str:
+def login(
+    token: t.Optional[str], server: str = c.DEFAULT_SERVER, env: t.Optional[str] = None, cli_login: bool = True
+) -> str:
     """
     Login to the specified Datapane Server, storing the token within a config-file called `env` for future use
 
@@ -55,6 +57,9 @@ def login(token: t.Optional[str], server: str = c.DEFAULT_SERVER, cli_login: boo
 
     ..note:: Can also be ran via CLI as `"datapane login"`
     """
+    # TODO: 0.16: Remove deprecated argument
+    if env is not None:
+        warnings.warn("The env argument for login() is deprecated and will be removed in 0.16", FutureWarning)
 
     config = c.Config(server=server)
 
@@ -77,12 +82,16 @@ def login(token: t.Optional[str], server: str = c.DEFAULT_SERVER, cli_login: boo
     return config.email
 
 
-def logout() -> None:
+def logout(env: t.Optional[str] = None) -> None:
     """
     Logout from Datapane Server, removing local credentials
 
     ..note:: Can also be ran via CLI as `"datapane logout"`
     """
+    # TODO: 0.16: Remove deprecated argument
+    if env is not None:
+        warnings.warn("The env argument for logout() is deprecated and will be removed in 0.16", FutureWarning)
+
     if c.config is None:
         failure_msg("Not logged in", do_exit=True)
         return
