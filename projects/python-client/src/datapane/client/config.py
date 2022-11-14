@@ -9,6 +9,7 @@ import typing as t
 import uuid
 import webbrowser
 from contextlib import suppress
+from os import getenv
 from pathlib import Path
 from typing import Optional
 
@@ -20,11 +21,11 @@ from datapane import _IN_PYTEST, log
 from .utils import InvalidTokenError
 
 APP_NAME = "datapane"
-APP_DIR = Path(click.get_app_dir(APP_NAME))
+APP_DIR = Path(getenv("DATAPANE_APP_DIR", click.get_app_dir(APP_NAME)))
 APP_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILENAME = "config.ini"
 LEGACY_CONFIG_FILENAME = "default.yaml"
-CONFIG_PATH = APP_DIR / CONFIG_FILENAME
+CONFIG_PATH = Path(getenv("DATAPANE_CONFIG", APP_DIR / CONFIG_FILENAME))
 LEGACY_CONFIG_PATH = APP_DIR / LEGACY_CONFIG_FILENAME
 CONFIG_SECTION = "default"
 PAST_DEFAULT_SERVER = "https://datapane.com"
