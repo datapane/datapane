@@ -145,7 +145,7 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
 
 
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.List[BaseElement]:
+def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -155,10 +155,16 @@ def cells_to_blocks(ipython_output_cache: dict, opt_out: bool = True) -> typing.
 
     ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
+    from IPython import get_ipython
+
     display_msg("Converting cells to blocks.")
     display_msg(
         "Please ensure all cells in the notebook have been executed and then saved before running this command."
     )
+
+    ip = get_ipython()
+    user_ns = ip.user_ns
+    ipython_output_cache = user_ns["_oh"]
 
     notebook_json = get_notebook_json()
 
