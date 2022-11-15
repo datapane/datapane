@@ -205,7 +205,7 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     return blocks
 
 
-@capture_event("IPython Cells to Blocks")
+@capture_event("Notebook to App")
 def notebook_to_app(opt_out: bool = True) -> App:
     """Transforms an IPython Notebook to a Datapane App"""
     from .report.core import App
