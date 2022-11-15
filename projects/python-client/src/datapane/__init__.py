@@ -67,6 +67,7 @@ from .client.api import (
     hello_world,
     login,
     logout,
+    notebook_to_app,
     ping,
     save_report,
     serve,
@@ -128,6 +129,7 @@ __all__ = [
     "serve",
     "build",
     "cells_to_blocks",
+    "notebook_to_app",
 ]
 
 

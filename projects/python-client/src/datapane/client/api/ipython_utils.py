@@ -17,6 +17,7 @@ from datapane.client.utils import display_msg, is_jupyter
 
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement
+    from .report.core import App
 
 
 def block_to_iframe(block: BaseElement) -> str:
@@ -187,7 +188,9 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
                     code_block: BaseElement = Code("".join(cell["source"]))
                     blocks.append(code_block)
 
-                if cells_to_blocks.__name__ not in "".join(cell["source"]):
+                if (cells_to_blocks.__name__ not in "".join(cell["source"])) and (
+                    notebook_to_app.__name__ not in "".join(cell["source"])
+                ):
                     output_block = output_cell_to_block(cell, ipython_output_cache)
                     if output_block:
                         blocks.append(output_block)
@@ -200,3 +203,14 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
         display_msg("No blocks found.")
 
     return blocks
+
+
+@capture_event("IPython Cells to Blocks")
+def notebook_to_app(opt_out: bool = True) -> App:
+    """Transforms an IPython Notebook to a Datapane App"""
+    from .report.core import App
+
+    blocks = cells_to_blocks(opt_out=opt_out)
+    app = App(blocks=blocks)
+
+    return app
