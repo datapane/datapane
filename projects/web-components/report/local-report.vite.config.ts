@@ -4,6 +4,7 @@ import {
     PACKAGE_VERSION_BOKEH,
     PLUGIN_REPLACE_BOKEH,
     pluginVue,
+    RESOLVE_ALIAS,
 } from "./dp-base-config";
 import tailwindcss from "tailwindcss";
 import minBundle from "../shared/rollup-plugin-min-bundle";
@@ -11,6 +12,7 @@ import minBundle from "../shared/rollup-plugin-min-bundle";
 const ENTRY_NAME = "local-report-base.fat.js";
 
 module.exports = defineConfig({
+    resolve: RESOLVE_ALIAS,
     css: {
         postcss: {
             plugins: [

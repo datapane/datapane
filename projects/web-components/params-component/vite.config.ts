@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
+import { RESOLVE_ALIAS } from "../report/dp-base-config";
 
 module.exports = defineConfig(({ mode }) => ({
+    resolve: RESOLVE_ALIAS,
     css: {
         postcss: {},
     },
@@ -16,6 +18,8 @@ module.exports = defineConfig(({ mode }) => ({
         },
         rollupOptions: {
             output: {
+                entryFileNames: "[name].[format].js",
+                chunkFileNames: "[name].[hash].[format].js",
                 paths: {
                     vue:
                         mode === "development"
