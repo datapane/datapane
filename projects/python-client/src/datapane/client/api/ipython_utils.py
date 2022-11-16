@@ -146,7 +146,7 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
 
 
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
+def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = None) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -162,6 +162,9 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     display_msg(
         "Please ensure all cells in the notebook have been executed and then saved before running this command."
     )
+
+    if not caller_name:
+        caller_name = cells_to_blocks.__name__
 
     ip = get_ipython()
     user_ns = ip.user_ns
@@ -188,9 +191,7 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
                     code_block: BaseElement = Code("".join(cell["source"]))
                     blocks.append(code_block)
 
-                if (cells_to_blocks.__name__ not in "".join(cell["source"])) and (
-                    notebook_to_app.__name__ not in "".join(cell["source"])
-                ):
+                if caller_name not in "".join(cell["source"]):
                     output_block = output_cell_to_block(cell, ipython_output_cache)
                     if output_block:
                         blocks.append(output_block)
@@ -206,11 +207,14 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
 
 
 @capture_event("Notebook to App")
-def notebook_to_app(opt_out: bool = True) -> App:
+def notebook_to_app(opt_out: bool = True, caller_name: typing.Optional[str] = None) -> App:
     """Transforms an IPython Notebook to a Datapane App"""
     from .report.core import App
 
-    blocks = cells_to_blocks(opt_out=opt_out)
+    if not caller_name:
+        caller_name = notebook_to_app.__name__
+
+    blocks = cells_to_blocks(opt_out=opt_out, caller_name=caller_name)
     app = App(blocks=blocks)
 
     return app
