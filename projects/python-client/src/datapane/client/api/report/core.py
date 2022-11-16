@@ -166,6 +166,13 @@ class App(DPObjectRef):
 
         save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
+    def from_notebook(opt_out: bool = True):
+        from ..ipython_utils import notebook_to_app
+
+        app = notebook_to_app(opt_out)
+
+        return app
+
     def stringify(
         self,
         standalone: bool = False,
