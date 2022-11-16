@@ -4,6 +4,8 @@ Datapane Reports Object
 Describes the `Report` object
 """
 
+from __future__ import annotations
+
 import dataclasses as dc
 import os
 import typing as t
@@ -166,7 +168,7 @@ class App(DPObjectRef):
 
         save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
-    def from_notebook(opt_out: bool = True):
+    def from_notebook(opt_out: bool = True) -> App:
         from ..ipython_utils import notebook_to_app
 
         app = notebook_to_app(opt_out)
