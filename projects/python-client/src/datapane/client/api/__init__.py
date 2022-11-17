@@ -49,7 +49,7 @@ import warnings
 from ..utils import IncompatibleVersionError
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
-from .ipython_utils import cells_to_blocks, notebook_to_app
+from .ipython_utils import cells_to_blocks
 from .report.blocks import (
     HTML,
     Attachment,
@@ -146,5 +146,4 @@ __all__ = [
     "serve",
     "build",
     "cells_to_blocks",
-    "notebook_to_app",
 ]

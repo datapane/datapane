@@ -145,6 +145,7 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     return None
 
 
+@capture_event("IPython Cells to Blocks")
 def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
@@ -199,14 +200,3 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
         display_msg("No blocks found.")
 
     return blocks
-
-
-@capture_event("Notebook to App")
-def notebook_to_app(opt_out: bool = True) -> App:
-    """Transforms an IPython Notebook to a Datapane App"""
-    from .report.core import App
-
-    blocks = cells_to_blocks(opt_out=opt_out)
-    app = App(blocks=blocks)
-
-    return app

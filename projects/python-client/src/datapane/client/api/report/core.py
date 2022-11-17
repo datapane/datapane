@@ -16,6 +16,7 @@ from uuid import uuid4
 from datapane import __version__ as dp_version
 from datapane.client.api.common import DPTmpFile
 from datapane.client.api.dp_object import DPObjectRef
+from datapane.client.api.ipython_utils import cells_to_blocks
 from datapane.client.utils import DPError
 
 from .blocks import BlockOrPrimitive, Page, PageOrPrimitive
@@ -170,9 +171,10 @@ class App(DPObjectRef):
 
     @staticmethod
     def from_notebook(opt_out: bool = True) -> App:
-        from ..ipython_utils import notebook_to_app
+        from ..ipython_utils import cells_to_blocks
 
-        app = notebook_to_app(opt_out)
+        blocks = cells_to_blocks(opt_out=opt_out)
+        app = App(blocks=blocks)
 
         return app
 
