@@ -162,8 +162,8 @@ def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = No
         "Please ensure all cells in the notebook have been executed and then saved before running this command."
     )
 
-    if not caller_name:
-        caller_name = cells_to_blocks.__name__
+    # this is used to determine and ignore the source of the conversion
+    caller_name = caller_name or cells_to_blocks.__name__
 
     ip = get_ipython()
     user_ns = ip.user_ns
@@ -210,8 +210,7 @@ def notebook_to_app(opt_out: bool = True, caller_name: typing.Optional[str] = No
     """Transforms an IPython Notebook to a Datapane App"""
     from .report.core import App
 
-    if not caller_name:
-        caller_name = notebook_to_app.__name__
+    caller_name = caller_name or notebook_to_app.__name__
 
     blocks = cells_to_blocks(opt_out=opt_out, caller_name=caller_name)
     app = App(blocks=blocks)
