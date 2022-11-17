@@ -172,7 +172,7 @@ class App(DPObjectRef):
     def from_notebook(opt_out: bool = True) -> App:
         from ..ipython_utils import notebook_to_app
 
-        app = notebook_to_app(opt_out, caller_name=App.from_notebook.__name__)
+        app = notebook_to_app(opt_out)
 
         return app
 

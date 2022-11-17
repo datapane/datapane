@@ -145,7 +145,7 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     return None
 
 
-def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = None) -> typing.List[BaseElement]:
+def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -161,9 +161,6 @@ def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = No
     display_msg(
         "Please ensure all cells in the notebook have been executed and then saved before running this command."
     )
-
-    # this is used to determine and ignore the source of the conversion
-    caller_name = caller_name or cells_to_blocks.__name__
 
     ip = get_ipython()
     user_ns = ip.user_ns
@@ -190,14 +187,13 @@ def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = No
                     code_block: BaseElement = Code("".join(cell["source"]))
                     blocks.append(code_block)
 
-                if caller_name not in "".join(cell["source"]):
-                    output_block = output_cell_to_block(cell, ipython_output_cache)
-                    if output_block:
-                        blocks.append(output_block)
-                    elif "dp-include" in tags:
-                        display_msg(
-                            f'Cell output of type {type(ipython_output_cache.get(cell["execution_count"]))} not supported. Skipping.',
-                        )
+                output_block = output_cell_to_block(cell, ipython_output_cache)
+                if output_block:
+                    blocks.append(output_block)
+                elif "dp-include" in tags:
+                    display_msg(
+                        f'Cell output of type {type(ipython_output_cache.get(cell["execution_count"]))} not supported. Skipping.',
+                    )
 
     if not blocks:
         display_msg("No blocks found.")
@@ -206,13 +202,11 @@ def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = No
 
 
 @capture_event("Notebook to App")
-def notebook_to_app(opt_out: bool = True, caller_name: typing.Optional[str] = None) -> App:
+def notebook_to_app(opt_out: bool = True) -> App:
     """Transforms an IPython Notebook to a Datapane App"""
     from .report.core import App
 
-    caller_name = caller_name or notebook_to_app.__name__
-
-    blocks = cells_to_blocks(opt_out=opt_out, caller_name=caller_name)
+    blocks = cells_to_blocks(opt_out=opt_out)
     app = App(blocks=blocks)
 
     return app
