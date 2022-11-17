@@ -145,7 +145,6 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     return None
 
 
-@capture_event("IPython Cells to Blocks")
 def cells_to_blocks(opt_out: bool = True, caller_name: typing.Optional[str] = None) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
