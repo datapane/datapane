@@ -17,7 +17,6 @@ from datapane.client.utils import display_msg, is_jupyter
 
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement
-    from .report.core import App
 
 
 def block_to_iframe(block: BaseElement) -> str:
