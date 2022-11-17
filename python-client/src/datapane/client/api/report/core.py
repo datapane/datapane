@@ -4,6 +4,8 @@ Datapane Reports Object
 Describes the `Report` object
 """
 
+from __future__ import annotations
+
 import dataclasses as dc
 import os
 import typing as t
@@ -165,6 +167,15 @@ class App(DPObjectRef):
         from .processors import save_report
 
         save_report(self, path, open, standalone, name, author, formatting, cdn_base)
+
+    @staticmethod
+    def from_notebook(opt_out: bool = True) -> App:
+        from ..ipython_utils import cells_to_blocks
+
+        blocks = cells_to_blocks(opt_out=opt_out)
+        app = App(blocks=blocks)
+
+        return app
 
     def stringify(
         self,
