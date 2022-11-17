@@ -79,9 +79,9 @@ export class ParamsStore {
          * Deserializes an array of `Param` JSON objects into render-able `Field` instances
          */
         return params.map((param: any) => {
-            const fieldTest:
-                | FieldTest
-                | undefined = ParamsStore.fieldMap.find((f) => f.test(param));
+            const fieldTest: FieldTest | undefined = ParamsStore.fieldMap.find(
+                (f) => f.test(param)
+            );
             if (fieldTest) {
                 const { class_, opts } = fieldTest;
                 return new class_(param, opts);

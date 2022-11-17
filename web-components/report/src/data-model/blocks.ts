@@ -356,9 +356,8 @@ export class EmbedBlock extends AssetBlock {
                 this.html,
                 "text/html"
             );
-            const root: HTMLBodyElement | null = doc.documentElement.querySelector(
-                "body"
-            );
+            const root: HTMLBodyElement | null =
+                doc.documentElement.querySelector("body");
             this._isIFrame =
                 !!root &&
                 root.childElementCount === 1 &&

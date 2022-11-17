@@ -377,8 +377,6 @@ class DataBlock(BaseElement):
     ..note:: This class is not used directly.
     """
 
-    pass
-
 
 class EmbeddedTextBlock(DataBlock):
     """

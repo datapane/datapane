@@ -192,7 +192,6 @@ def _check_repo_url(url: URL):
         else:
             # Update the URL with absolute URI
             url = URL(full_url)
-        pass
     return url
 
 

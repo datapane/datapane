@@ -37,8 +37,7 @@ module.exports = defineConfig(({ mode }) => ({
                         mode === "development"
                             ? "../vue.esm-browser.js"
                             : "../vue.esm-browser.prod.js",
-                    katex:
-                        "https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.mjs",
+                    katex: "https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.mjs",
                 },
             },
             external: ["vue", "katex"],

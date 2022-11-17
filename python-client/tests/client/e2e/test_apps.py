@@ -139,4 +139,3 @@ def test_app_complex_report(shared_datadir: Path, monkeypatch):
 @pytest.mark.org
 def test_run_linked_app():
     """Test running a code snippet calling other ones"""
-    pass

@@ -38,9 +38,9 @@ Love analyzing data in Python but struggle to share results and insights? Datapa
 
 ### What makes Datapane special?
 
--   **Static generation:** Sharing a report shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
--   **API-first and programmatic:** Programmatically generate reports from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
--   **Dynamic front-end components**: Say goodbye to writing HTML. Build reports from a set of interactive components, like DataTables, tabs, and selects.
+- **Static generation:** Sharing a report shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
+- **API-first and programmatic:** Programmatically generate reports from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
+- **Dynamic front-end components**: Say goodbye to writing HTML. Build reports from a set of interactive components, like DataTables, tabs, and selects.
 
 # Getting Started
 
@@ -182,17 +182,17 @@ dp.Report(
 
 Here a few samples of the top reports created by the Datapane community.
 
--   [Coindesk analysis](https://datapane.com/u/greg/reports/initial-coindesk-article-data/) by Greg Allan
--   [COVID-19 Trends by Quarter](https://datapane.com/u/keith8/reports/covid-19-trends-by-quarter/) by Keith Johnson
--   [Ecommerce Report](https://datapane.com/u/leo/reports/e-commerce-report/) by Leo Anthias
--   [Example Academic Paper](https://datapane.com/u/kalru/reports/supplementary-material/) by Kalvyn Roux
--   [Exploration of Restaurants in Kyoto](https://datapane.com/u/ryancahildebrandt/reports/kyoto-in-stations-and-restaurants/) by Ryan Hildebrandt
+- [Coindesk analysis](https://datapane.com/u/greg/reports/initial-coindesk-article-data/) by Greg Allan
+- [COVID-19 Trends by Quarter](https://datapane.com/u/keith8/reports/covid-19-trends-by-quarter/) by Keith Johnson
+- [Ecommerce Report](https://datapane.com/u/leo/reports/e-commerce-report/) by Leo Anthias
+- [Example Academic Paper](https://datapane.com/u/kalru/reports/supplementary-material/) by Kalvyn Roux
+- [Exploration of Restaurants in Kyoto](https://datapane.com/u/ryancahildebrandt/reports/kyoto-in-stations-and-restaurants/) by Ryan Hildebrandt
 
 # Next Steps
 
--   [Join Discord](https://chat.datapane.com)
--   [Sign up for a free account](https://datapane.com/accounts/signup)
--   [Read the documentation](https://docs.datapane.com)
+- [Join Discord](https://chat.datapane.com)
+- [Sign up for a free account](https://datapane.com/accounts/signup)
+- [Read the documentation](https://docs.datapane.com)
 
 ## Analytics
 

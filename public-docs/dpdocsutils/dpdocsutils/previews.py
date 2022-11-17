@@ -1,11 +1,11 @@
+import asyncio
 import os
 import shutil
-import asyncio
-import nest_asyncio
-from pyppeteer import launch
-from IPython.display import IFrame, display, HTML
 from pathlib import Path
 
+import nest_asyncio
+from IPython.display import HTML, IFrame, display
+from pyppeteer import launch
 
 nest_asyncio.apply()
 
@@ -13,7 +13,7 @@ nest_asyncio.apply()
 async def screenshot_html(app_path, image_path, width, height):
     # Pyppeteer doesn't package an M1 version of Chromium for MacOS yet, allow for using the system package.
     # 'chromium' is for MacOS, 'chromium-browser' is for Fedora.
-    chromium_path = shutil.which('chromium') or shutil.which('chromium-browser')  # or None
+    chromium_path = shutil.which("chromium") or shutil.which("chromium-browser")  # or None
 
     browser = await launch(headless=True, executablePath=chromium_path)
     page = await browser.newPage()
@@ -31,9 +31,7 @@ async def screenshot_html(app_path, image_path, width, height):
 
 
 def app_to_image(app_path, image_path, width, height):
-    asyncio.get_event_loop().run_until_complete(
-        screenshot_html(app_path, image_path, width, height)
-    )
+    asyncio.get_event_loop().run_until_complete(screenshot_html(app_path, image_path, width, height))
 
 
 def embed_local_app(app_path, width, height, iframe=True):

@@ -1,7 +1,7 @@
-import datapane as dp
-
 import altair as alt
 from vega_datasets import data
+
+import datapane as dp
 
 df = data.iris()
 fig = alt.Chart(df).mark_point().encode(x="petalLength:Q", y="petalWidth:Q", color="species:N")
