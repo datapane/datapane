@@ -18,19 +18,27 @@ from datapane.client.utils import display_msg, is_jupyter
 if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement
 
+
 class NotebookException(Exception):
     """Exception raised when a Notebook to Datapane conversion fails."""
-    def _render_traceback_(self):
-        display_msg(f"""**Conversion failed**
 
-{str(self)}""")
+    def _render_traceback_(self):
+        display_msg(
+            f"""**Conversion failed**
+
+{str(self)}"""
+        )
+
 
 class NotebookParityException(NotebookException):
     """Exception raised when IPython output cache is not in sync with the saved notebook"""
+
     pass
+
 
 class BlocksNotFoundException(NotebookException):
     """Exception raised when no blocks are found during conversion"""
+
     pass
 
 
@@ -159,38 +167,43 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     return None
 
 
-def check_notebook_cache_parity(notebook_json, ipython_input_cache) -> typing.Tuple[bool, typing.List[int]]:
+def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) -> typing.Tuple[bool, typing.List[int]]:
     """Check that the IPython output cache is in sync with the saved notebook"""
     is_dirty = False
     dirty_cells = []
 
-    # inline !bang commands (get_ipython().system), %line magics, and %%cell magics are not cached 
+    # inline !bang commands (get_ipython().system), %line magics, and %%cell magics are not cached
     # exclude these from conversion
     ignored_cell_functions = ["get_ipython().system", "get_ipython().run_line_magic", "get_ipython().run_cell_magic"]
 
     # broad check: check the execution count is the same
-    execution_counts = [cell.get('execution_count') if cell.get('execution_count', None) else 0 for cell in notebook_json["cells"]]
+    execution_counts = [
+        cell.get("execution_count") if cell.get("execution_count", None) else 0 for cell in notebook_json["cells"]
+    ]
     cell_execution_count = max(execution_counts)
-    cache_execution_count = len(ipython_input_cache)-2  # -2 to account for zero-based indexing and the invoking cell not being saved
-    if(cache_execution_count != cell_execution_count):
+    cache_execution_count = (
+        len(ipython_input_cache) - 2
+    )  # -2 to account for zero-based indexing and the invoking cell not being saved
+    if cache_execution_count != cell_execution_count:
         is_dirty = True
 
     # narrow check: check the cell source is the same for executed cells
-    if(not is_dirty):
+    if not is_dirty:
         for cell in notebook_json["cells"]:
-            if cell["cell_type"] == "code" and cell.get('execution_count', None):
-                if(cell['execution_count'] < len(ipython_input_cache)):
-                    input_cache_source = ipython_input_cache[cell['execution_count']]
+            if cell["cell_type"] == "code" and cell.get("execution_count", None):
+                if cell["execution_count"] < len(ipython_input_cache):
+                    input_cache_source = ipython_input_cache[cell["execution_count"]]
 
                     # skip and mark cells containing ignored functions
                     if any(ignored_function in input_cache_source for ignored_function in ignored_cell_functions):
                         cell["contains_ignored_functions"] = True
-                    # dirty because input has changed between execution and save.    
-                    elif(''.join(cell["source"]) != input_cache_source):
+                    # dirty because input has changed between execution and save.
+                    elif "".join(cell["source"]) != input_cache_source:
                         is_dirty = True
-                        dirty_cells.append(cell['execution_count'])
+                        dirty_cells.append(cell["execution_count"])
 
     return is_dirty, dirty_cells
+
 
 @capture_event("IPython Cells to Blocks")
 def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
@@ -214,14 +227,16 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
 
     notebook_is_dirty, dirty_cells = check_notebook_cache_parity(notebook_json, ipython_input_cache)
 
-    if(notebook_is_dirty):
-        notebook_parity_message = f"Please ensure all cells in the notebook have been executed and saved before running the conversion."
-        
-        if(dirty_cells):
+    if notebook_is_dirty:
+        notebook_parity_message = (
+            "Please ensure all cells in the notebook have been executed and saved before running the conversion."
+        )
+
+        if dirty_cells:
             notebook_parity_message += f"""
 
 The following cells have not been executed and saved: {''.join(map(str, dirty_cells))}"""
-        
+
         raise NotebookParityException(notebook_parity_message)
 
     blocks = []
