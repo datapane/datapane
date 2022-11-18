@@ -43,8 +43,6 @@ class DPContext:
     easier to just use globals in general tho
     """
 
-    pass
-
 
 @contextmanager
 def api_error_handler(err_msg: str):
