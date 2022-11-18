@@ -9,7 +9,7 @@ tasks:
     desc: "Install dependencies ready for development on the codebase"
     run: once
     cmds:
-      - cmd: git config filter.clear-notebook-output.clean "./docs/clear-notebook-output.sh"
+      - cmd: git config filter.clear-notebook-output.clean "./public-docs/clear-notebook-output.sh"
       - cmd: poetry install
 
   test:
