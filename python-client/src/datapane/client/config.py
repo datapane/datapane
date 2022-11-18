@@ -3,17 +3,17 @@ Config subsystem
 We use a module-level singleton pattern here, where top-level functions and globals
 act like the state for a "Manager" class around the internal Config object
 """
+import configparser
 import dataclasses as dc
 import typing as t
 import uuid
 import webbrowser
 from contextlib import suppress
+from os import getenv
 from pathlib import Path
 from typing import Optional
 
 import click
-import dacite
-import yaml
 from furl import furl
 
 from datapane import _IN_PYTEST, log
@@ -21,17 +21,20 @@ from datapane import _IN_PYTEST, log
 from .utils import InvalidTokenError
 
 APP_NAME = "datapane"
-APP_DIR = Path(click.get_app_dir(APP_NAME))
+APP_DIR = Path(getenv("DATAPANE_APP_DIR", click.get_app_dir(APP_NAME)))
 APP_DIR.mkdir(parents=True, exist_ok=True)
-DEFAULT_ENV = "default"
+CONFIG_FILENAME = "config.ini"
+LEGACY_CONFIG_FILENAME = "default.yaml"
+CONFIG_PATH = Path(getenv("DATAPANE_CONFIG", APP_DIR / CONFIG_FILENAME))
+LEGACY_CONFIG_PATH = APP_DIR / LEGACY_CONFIG_FILENAME
+CONFIG_SECTION = "default"
 PAST_DEFAULT_SERVER = "https://datapane.com"
 DEFAULT_SERVER = "https://cloud.datapane.com"
 DEFAULT_TOKEN = "TOKEN_HERE"
-LATEST_VERSION = 4
+LATEST_VERSION = 6
 
 
 # TODO - wrap into a singleton object that includes callable?
-# TODO - switch to pydantic
 @dc.dataclass
 class Config:
     """
@@ -51,9 +54,6 @@ class Config:
     completed_action: bool = False  # only active on first action
 
     from_file: dc.InitVar[bool] = False
-
-    _env: Optional[str] = None
-    _path: Optional[Path] = None
 
     def __post_init__(self, from_file: bool):
         self.server = self.server.rstrip("/")  # server should be a valid origin
@@ -79,23 +79,31 @@ class Config:
 
     # MANAGER functions
     @classmethod
-    def load(cls, env: str = "default") -> "Config":
+    def load(cls) -> "Config":
         """Load config for an environment and set globally"""
-        config_f = cls.get_config_file(env)
-        if not config_f.exists():
-            cls.create_default(env, config_f)
+        # Read config file
+        cls.ensure_config_file()
+        parser = configparser.ConfigParser()
+        parser.read(CONFIG_PATH)
+        if CONFIG_SECTION not in parser:
+            log.error(f"Config file at {CONFIG_PATH} does not contain a {CONFIG_SECTION} section")
+            raise ValueError(f"Config file does not contain a {CONFIG_SECTION} section")
 
-        with config_f.open("r") as f:
-            c_yaml = yaml.safe_load(f)
+        # Process config into a new dataclass
+        raw_conf: configparser.SectionProxy = parser[CONFIG_SECTION]
+        kwargs: t.Dict[str, t.Any] = {
+            "from_file": True,
+        }
+        for field in dc.fields(cls):
+            if field.name in raw_conf:
+                if field.type is bool:
+                    value = raw_conf[field.name].lower() == "true"
+                else:
+                    value = field.type(raw_conf[field.name])
+                kwargs[field.name] = value
 
-        # load config obj from file
-        c_yaml["from_file"] = True
-
-        # NOTE - type checker doesn't like us setting class variables on instance
-        config: Config = dacite.from_dict(Config, c_yaml)
-        config._env = env
-        config._path = config_f
-        log.debug(f"Loaded client environment from {config._path}")
+        config: Config = Config(**kwargs)
+        log.debug(f"Loaded client environment from {CONFIG_PATH}")
 
         # check if stored file is out of date
         config.upgrade_config_format()
@@ -105,39 +113,47 @@ class Config:
         return config
 
     @classmethod
-    def create_default(cls, env: str, config_f: Path) -> None:
+    def create_default(cls) -> None:
         """Create an default config file"""
         # create default file
         _config = Config()
-        _config.save(env)
-        log.info(f"Created config file at {config_f}")
+        _config.save()
+        log.info(f"Created config file at {CONFIG_PATH}")
 
-    def save(self, env: t.Optional[str] = None):
-        assert env or self._path
-
-        if env:
-            # NOTE - type checker doesn't like us setting class variables on instance
-            # don't think this will cause issues
-            self._env = env
-            self._path = self.get_config_file(env)
-
-        with self._path.open("w") as f:
-            config_dictionary = dc.asdict(self)
-            del config_dictionary["_path"]
-            del config_dictionary["_env"]
-            yaml.safe_dump(config_dictionary, f)
+    def save(self):
+        data = dc.asdict(self)
+        parser = configparser.ConfigParser()
+        parser[CONFIG_SECTION] = data
+        with CONFIG_PATH.open("w") as file:
+            parser.write(file)
 
     def remove(self):
-        self._path.unlink()
+        CONFIG_PATH.unlink()
 
-    @staticmethod
-    def get_config_file(env: str) -> Path:
-        return APP_DIR / f"{env}.yaml"
+    @classmethod
+    def ensure_config_file(cls) -> None:
+        """
+        Ensure the config file exists at CONFIG_PATH
+        """
+        if CONFIG_PATH.exists():
+            return
+
+        # Look for YAML from Version 5 and earlier
+        yaml_path = LEGACY_CONFIG_PATH
+        if yaml_path.exists():
+            # Migrate
+            log.info(f"Found legacy config file at {yaml_path}")
+            CONFIG_PATH.write_text(f"[{CONFIG_SECTION}]\n" + yaml_path.read_text())
+            yaml_path.unlink()
+            log.info(f"Successfully migrated to {CONFIG_PATH}")
+
+        else:
+            # Neither exist - create new
+            cls.create_default()
 
     def upgrade_config_format(self):
         """Handles updating the older config format
         - we default to the oldest version with default values, and upgrade here
-        - TODO - switch this to stdlib configparser
         """
         # this isn't tied to a particular config version
         if self.server == PAST_DEFAULT_SERVER:
@@ -160,13 +176,11 @@ class Config:
 
                     capture("CLI Login", config=self, with_token=True)
 
-            self.version = 5
+            self.version = LATEST_VERSION
             self.save()
-        elif self.version == 4:
-            self.version = 5
+        elif self.version in (4, 5):
+            self.version = LATEST_VERSION
             self.save()  # trigger removal of _env & _pass from file
-        elif self.version == 5:
-            pass  # current
 
 
 # TODO - create a ConfigMgr singleton object?
@@ -175,18 +189,18 @@ config: Optional[Config] = None
 
 ################################################################################
 # MODULE LEVEL INTERFACE
-def init(config_env: str = "default", config: t.Optional[Config] = None) -> Config:
+def init(config: t.Optional[Config] = None) -> Config:
     """
     Init an API config
      - this MUST handle being called multiple times and only from the main-thread
     """
-    if get_config() is not None:
+    if globals().get("config") is not None:
         log.debug("Reinitialising client config")
 
     if config:
         set_config(config)
     else:
-        config = Config.load(config_env)
+        config = Config.load()
 
     return config
 
@@ -194,12 +208,12 @@ def init(config_env: str = "default", config: t.Optional[Config] = None) -> Conf
 def check_get_config() -> Config:
     """Attempt to get a config object, reloading if necessary
     - used when we need a valid API token, e.g. when performing a network action"""
-    global config
+    config = get_config()
     if config.token == DEFAULT_TOKEN:
         # try reinit, as may have ran login in another terminal/subprocess
-        _config = init(config._env)
+        _config = init()
         if _config.token == DEFAULT_TOKEN:
-            # still don't have a token set for the env, open up the browser
+            # still don't have a token set, open up the browser
             if not _IN_PYTEST:
                 f = furl(path="/accounts/login/", origin=_config.server)
                 webbrowser.open(url=str(f), new=2)
@@ -218,4 +232,7 @@ def set_config(c: Optional[Config]):
 def get_config() -> Config:
     """Get the current config object, doesn't attempt to re-init the API token"""
     global config
+    if config is None:
+        raise RuntimeError("Config must be initialised before it can be used")
+
     return config

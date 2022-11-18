@@ -30,15 +30,10 @@ EXTRA_OUT: bool = False
 # TODO
 #  - add info subcommand
 #  - convert to use typer (https://github.com/tiangolo/typer) or autoclick
-def init(verbosity: int, config_env: str):
+def init(verbosity: int):
     """Init the cmd-line env"""
-    c.init(config_env=config_env)
+    c.init()
     _setup_dp_logging(verbosity=verbosity)
-
-    # config_f = c.load_from_envfile(config_env)
-    # _debug = debug if debug is not None else c.config.debug
-    # setup_logging(verbose_mode=_debug)
-    # log.debug(f"Loaded environment from {config_f}")
 
 
 @dc.dataclass(frozen=True)
@@ -48,7 +43,7 @@ class DPContext:
     easier to just use globals in general tho
     """
 
-    env: str
+    pass
 
 
 @contextmanager
@@ -104,15 +99,14 @@ def recursive_help(cmd, parent=None):  # noqa: ANN001
     count=True,
     help="Increase logging verbosity - can add multiple times",
 )
-@click.option("--env", default=c.DEFAULT_ENV, help="Alternate config environment to use.")
 @click.version_option(version=f"{__version__} ({__rev__})")
 @click.pass_context
-def cli(ctx: click.core.Context, verbose: int, env: str):
+def cli(ctx: click.core.Context, verbose: int):
     """Datapane CLI Tool"""
     global EXTRA_OUT
     EXTRA_OUT = verbose > 0
-    init(verbosity=verbose, config_env=env)
-    ctx.obj = DPContext(env=env)
+    init(verbosity=verbose)
+    ctx.obj = DPContext()
 
 
 # @cli.command()
@@ -128,7 +122,7 @@ def cli(ctx: click.core.Context, verbose: int, env: str):
 @click.pass_obj
 def login(obj: DPContext, token: str, server: str):
     """Login to a server with the given API token."""
-    api.login(token, server, env=obj.env)
+    api.login(token, server)
     # click.launch(f"{server}/settings/")
 
 
@@ -136,7 +130,7 @@ def login(obj: DPContext, token: str, server: str):
 @click.pass_obj
 def logout(obj: DPContext):
     """Logout from the server and reset the config file"""
-    api.logout(obj.env)
+    api.logout()
 
 
 @cli.command()

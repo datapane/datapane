@@ -33,7 +33,6 @@ tasks:
     deps: [install]
     cmds:
       - cmd: "{{.PYTEST}} -v --ignore=tests/client/e2e/ tests"
-      - cmd: "{{.PYTEST}} -v tests_toplevel"
 
   test:e2e:public:
     desc: "Run all the e2e tests relating to the 'public' focused APIs"

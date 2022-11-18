@@ -143,7 +143,7 @@ else:
 
 # TODO - do we want to init only in jupyter / interactive / etc.
 # only init fully in library-mode, as framework and app init explicitly
-if get_dp_mode() == DPMode.LIBRARY:
+if get_dp_mode() == DPMode.LIBRARY and not _IN_PYTEST:
     init()
 
 
