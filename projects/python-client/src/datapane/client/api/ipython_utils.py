@@ -21,7 +21,9 @@ if typing.TYPE_CHECKING:
 class NotebookException(Exception):
     """Exception raised when a Notebook to Datapane conversion fails."""
     def _render_traceback_(self):
-        display_msg(f"<strong>Conversion failed</strong><p>{str(self)}</p>")
+        display_msg(f"""**Conversion failed**
+
+{str(self)}""")
 
 class NotebookParityException(NotebookException):
     """Exception raised when IPython output cache is not in sync with the saved notebook"""
@@ -162,6 +164,10 @@ def check_notebook_cache_parity(notebook_json, ipython_input_cache) -> typing.Tu
     is_dirty = False
     dirty_cells = []
 
+    # inline !bang commands (get_ipython().system), %line magics, and %%cell magics are not cached 
+    # exclude these from conversion
+    ignored_cell_functions = ["get_ipython().system", "get_ipython().run_line_magic", "get_ipython().run_cell_magic"]
+
     # broad check: check the execution count is the same
     execution_counts = [cell.get('execution_count') if cell.get('execution_count', None) else 0 for cell in notebook_json["cells"]]
     cell_execution_count = max(execution_counts)
@@ -174,8 +180,13 @@ def check_notebook_cache_parity(notebook_json, ipython_input_cache) -> typing.Tu
         for cell in notebook_json["cells"]:
             if cell["cell_type"] == "code" and cell.get('execution_count', None):
                 if(cell['execution_count'] < len(ipython_input_cache)):
-                    # dirty because input has changed between execution and save
-                    if(''.join(cell["source"]) != ipython_input_cache[cell['execution_count']]):
+                    input_cache_source = ipython_input_cache[cell['execution_count']]
+
+                    # skip and mark cells containing ignored functions
+                    if any(ignored_function in input_cache_source for ignored_function in ignored_cell_functions):
+                        cell["contains_ignored_functions"] = True
+                    # dirty because input has changed between execution and save.    
+                    elif(''.join(cell["source"]) != input_cache_source):
                         is_dirty = True
                         dirty_cells.append(cell['execution_count'])
 
@@ -207,7 +218,9 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
         notebook_parity_message = f"Please ensure all cells in the notebook have been executed and saved before running the conversion."
         
         if(dirty_cells):
-            notebook_parity_message += f"<br>The following cells have not been executed and saved: {''.join(map(str, dirty_cells))}"
+            notebook_parity_message += f"""
+
+The following cells have not been executed and saved: {''.join(map(str, dirty_cells))}"""
         
         raise NotebookParityException(notebook_parity_message)
 
@@ -222,7 +235,7 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
 
                 markdown_block: BaseElement = Text("".join(cell["source"]))
                 blocks.append(markdown_block)
-            elif cell["cell_type"] == "code":
+            elif cell["cell_type"] == "code" and not cell.get("contains_ignored_functions", False):
                 if "dp-show-code" in tags:
                     from .report.blocks import Code
 
