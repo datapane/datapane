@@ -19,6 +19,25 @@ if typing.TYPE_CHECKING:
     from .report.blocks import BaseElement
 
 
+class NotebookException(Exception):
+    """Exception raised when a Notebook to Datapane conversion fails."""
+
+    def _render_traceback_(self):
+        display_msg(
+            f"""**Conversion failed**
+
+{str(self)}"""
+        )
+
+
+class NotebookParityException(NotebookException):
+    """Exception raised when IPython output cache is not in sync with the saved notebook"""
+
+
+class BlocksNotFoundException(NotebookException):
+    """Exception raised when no blocks are found during conversion"""
+
+
 def block_to_iframe(block: BaseElement) -> str:
     """Convert a Block to HTML, placed within an iFrame"""
     from .report.core import App
@@ -144,6 +163,44 @@ def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optio
     return None
 
 
+def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) -> typing.Tuple[bool, typing.List[int]]:
+    """Check that the IPython output cache is in sync with the saved notebook"""
+    is_dirty = False
+    dirty_cells: typing.List[int] = []
+
+    # inline !bang commands (get_ipython().system), %line magics, and %%cell magics are not cached
+    # exclude these from conversion
+    ignored_cell_functions = ["get_ipython().system", "get_ipython().run_line_magic", "get_ipython().run_cell_magic"]
+
+    # broad check: check the execution count is the same
+    execution_counts = [cell.get("execution_count", 0) or 0 for cell in notebook_json["cells"]]
+
+    latest_cell_execution_count = max(execution_counts)
+
+    # -2 to account for zero-based indexing and the invoking cell not being saved
+    latest_cache_execution_count = len(ipython_input_cache) - 2
+    if latest_cache_execution_count != latest_cell_execution_count:
+        is_dirty = True
+        return is_dirty, dirty_cells
+
+    # narrow check: check the cell source is the same for executed cells
+    for cell in notebook_json["cells"]:
+        cell_execution_count = cell.get("execution_count", None)
+        if cell["cell_type"] == "code" and cell_execution_count:
+            if cell_execution_count < len(ipython_input_cache):
+                input_cache_source = ipython_input_cache[cell_execution_count]
+
+                # skip and mark cells containing ignored functions
+                if any(ignored_function in input_cache_source for ignored_function in ignored_cell_functions):
+                    cell["contains_ignored_functions"] = True
+                # dirty because input has changed between execution and save.
+                elif "".join(cell["source"]) != input_cache_source:
+                    is_dirty = True
+                    dirty_cells.append(cell_execution_count)
+
+    return is_dirty, dirty_cells
+
+
 @capture_event("IPython Cells to Blocks")
 def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
@@ -157,16 +214,26 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
     """
     from IPython import get_ipython
 
-    display_msg("Converting cells to blocks.")
-    display_msg(
-        "Please ensure all cells in the notebook have been executed and then saved before running this command."
-    )
-
     ip = get_ipython()
     user_ns = ip.user_ns
     ipython_output_cache = user_ns["_oh"]
+    ipython_input_cache = user_ns["_ih"]
 
     notebook_json = get_notebook_json()
+
+    notebook_is_dirty, dirty_cells = check_notebook_cache_parity(notebook_json, ipython_input_cache)
+
+    if notebook_is_dirty:
+        notebook_parity_message = (
+            "Please ensure all cells in the notebook have been executed and saved before running the conversion."
+        )
+
+        if dirty_cells:
+            notebook_parity_message += f"""
+
+The following cells have not been executed and saved: {''.join(map(str, dirty_cells))}"""
+
+        raise NotebookParityException(notebook_parity_message)
 
     blocks = []
 
@@ -174,13 +241,12 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
-
             if cell["cell_type"] == "markdown":
                 from .report.blocks import Text
 
                 markdown_block: BaseElement = Text("".join(cell["source"]))
                 blocks.append(markdown_block)
-            elif cell["cell_type"] == "code":
+            elif cell["cell_type"] == "code" and not cell.get("contains_ignored_functions", False):
                 if "dp-show-code" in tags:
                     from .report.blocks import Code
 
@@ -196,6 +262,8 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
                     )
 
     if not blocks:
-        display_msg("No blocks found.")
+        raise BlocksNotFoundException("No blocks found.")
+
+    display_msg("Notebook converted to blocks.")
 
     return blocks
