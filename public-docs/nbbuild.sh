@@ -2,11 +2,9 @@
 set -euo pipefail
 
 # TODO: we should probably bundle the statics within the docs build
-# We build against the datpane source, so reference a CDN that has statics
-# that match closer to what we build against
-# Note that Staging can be a few hours out of step with source.
-dp_version="$(poetry run python -c 'print(__import__("datapane").__version__)')"
-export DATAPANE_CDN_BASE="https://staging.datapane-cdn.com/v${dp_version}"
+# We build against the datpane source, so reference the assets in /dev
+# which are continously relased
+export DATAPANE_CDN_BASE="https://datapane-cdn.com/dev"
 
 # Prevent a real browser from being discovered for Apps that request `open=True`.
 # We never want it during the docs build
