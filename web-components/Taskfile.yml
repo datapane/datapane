@@ -70,6 +70,8 @@ tasks:
           gsutil -m setmeta -h '{{.CACHE_CONTROL_HEADER}}' '{{.CDN_BUCKET_PATH}}/**/*'
 
     preconditions:
+      - sh: command -v gsutil
+        msg: "gsutil not found, please install it"
       - sh: echo '{{.ENV_NAME}}' | grep -E '^(prod|staging|test)$'
         msg: "ENV_NAME must be 'prod', 'staging', or 'test'"
       - sh: test -n '{{.PYTHON_CLIENT_VERSION}}'
