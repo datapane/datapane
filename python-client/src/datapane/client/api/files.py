@@ -98,12 +98,6 @@ class BaseTable(BaseAsset, Generic[U]):
     block_type = Table
 
     def write_file(self, f: IO, x: U):
-        n_cells = self._get_cells(x)
-        if n_cells > self.TABLE_CELLS_LIMIT:
-            raise ValueError(
-                f"Dataframe over limit of {self.TABLE_CELLS_LIMIT} cells for dp.Table, consider using dp.DataTable instead or aggregating the df first"
-            )
-
         f.write(self.render_html(x))
 
     def to_block(self, x: T) -> DataBlock:
