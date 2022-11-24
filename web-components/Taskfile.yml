@@ -35,5 +35,51 @@ tasks:
     cmds:
       - npm run build:storybook
 
+  publish-cdn:
+    desc: "Publish to the CDN"
+    vars:
+      DRY_RUN: '{{.DRY_RUN | default "false"}}'
+      ENV_NAME: '{{.ENV_NAME | default ""}}'
+      PYTHON_CLIENT_VERSION: '{{.PYTHON_CLIENT_VERSION | default "dev"}}'
+      CDN_BUCKET: 'gs://datapane-static-hosting-{{.ENV_NAME}}'
+      CDN_BUCKET_PATH: '{{.CDN_BUCKET}}/{{.PYTHON_CLIENT_VERSION}}'
+      IMMUTABLE_TARGET: '{{ and (eq .ENV_NAME "prod") (ne .PYTHON_CLIENT_VERSION "dev") }}'
+      ALLOW_OVERWRITING: '{{.ALLOW_OVERWRITING | default (eq .IMMUTABLE_TARGET "false") }}'
+      CACHE_CONTROL_HEADER: '{{
+          (eq .IMMUTABLE_TARGET "true")
+          | ternary
+            "Cache-Control: public, max-age=315360000, immutable"
+            "Cache-Control: public, max-age=1800, proxy-revalidate"
+        }}'
+    cmds:
+      - echo 'Publishing to CDN bucket {{.CDN_BUCKET_PATH}}'
+      - echo 'Allow Overwriting = {{.ALLOW_OVERWRITING}}'
+      - echo 'Immutable Target = {{.IMMUTABLE_TARGET}}'
+      - echo 'Cache-Control Header = {{.CACHE_CONTROL_HEADER}}'
+
+      - cmd: |
+          gsutil -m -h '{{.CACHE_CONTROL_HEADER}}' rsync \
+            -d -r -c \
+            {{if ne .DRY_RUN "false"}} -n {{end}} \
+            -x '^(storybook|alpine-stories)/.*$' \
+            'dist' \
+            '{{.CDN_BUCKET_PATH}}'
+      # rsync doesn't consistently set metadata
+      - cmd: |
+          {{ if ne .DRY_RUN "false"}}exit 0{{end}}
+          gsutil -m setmeta -h '{{.CACHE_CONTROL_HEADER}}' '{{.CDN_BUCKET_PATH}}/**/*'
+
+    preconditions:
+      - sh: echo '{{.ENV_NAME}}' | grep -E '^(prod|staging|test)$'
+        msg: "ENV_NAME must be 'prod', 'staging', or 'test'"
+      - sh: test -n '{{.PYTHON_CLIENT_VERSION}}'
+        msg: "PYTHON_CLIENT_VERSION must be set"
+      - sh: test '{{.PYTHON_CLIENT_VERSION}}' = 'dev' || echo '{{.PYTHON_CLIENT_VERSION}}' | grep -E '^v'
+        msg: "PYTHON_CLIENT_VERSION must be either 'dev' or 'vX.Y.Z'"
+      - sh: gsutil ls -b '{{.CDN_BUCKET}}'
+        msg: "CDN bucket '{{.CDN_BUCKET}}' does not exist"
+      - sh: test '{{.ALLOW_OVERWRITING}}' = 'true' || ! gsutil stat '{{.CDN_BUCKET}}/{{.PYTHON_CLIENT_VERSION}}/.exists'
+        msg: "Version '{{.PYTHON_CLIENT_VERSION}}' already exists in CDN bucket '{{.CDN_BUCKET}}'"
+
   deploy:
     desc: "Deploy the package"
