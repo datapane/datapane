@@ -33,6 +33,32 @@ tasks:
     cmds:
       - cmd: "{{.PYTEST}} -v tests"
 
+  build:
+    desc: "Build a package ready for a deploy"
+    deps: [install]
+    cmds:
+      - cmd: poetry build -vv
+
+  publish:
+    desc: "Publish to PyPI"
+    cmds:
+      - cmd: poetry publish -vv
+
+  publish:dev:
+    desc: "Publish dev build to the CDN"
+    vars:
+      CDN_BUCKET: 'gs://datapane-static-hosting-prod/python-client-dev'
+    cmds:
+      - |
+        gsutil -h 'Cache-Control: no-cache' \
+          cp dist/datapane-"$(poetry version -s)"-py3-none-any.whl \
+             '{{.CDN_BUCKET}}/datapane--py3-none-any.whl'
+    preconditions:
+      - sh: command -v gsutil
+        msg: "gsutil is not installed"
+      - sh: test -f dist/datapane-"$(poetry version -s)"-py3-none-any.whl
+        msg: Make sure you build the package first
+
   system-check:
     desc: Run checks to make sure you're ready for development
     cmds:
