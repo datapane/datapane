@@ -19,7 +19,7 @@ from time import sleep
 from uuid import uuid4
 
 import importlib_resources as ir
-from jinja2 import Environment, FileSystemLoader, Template, pass_context
+from jinja2 import Environment, FileSystemLoader, Template
 from lxml import etree
 from lxml.etree import Element, _Element
 from markupsafe import Markup  # used by Jinja
@@ -35,6 +35,15 @@ from datapane.common.utils import compress_file
 
 from .blocks import BuilderState, E
 from .core import CDN_BASE, App, AppFormatting, AppWidth
+
+try:
+    from jinja2 import pass_context
+except ImportError:
+    # jinja2 =~ 2.11
+    # Google Colab has 2.11.3 installed by default
+    # Leave this in to avoid catastrpohic failure before restarting the kernel.
+    from jinja2 import contextfunction as pass_context  # type: ignore
+
 
 __all__ = ["upload", "save_report", "stringify_report", "serve", "build"]
 
