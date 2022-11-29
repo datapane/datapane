@@ -35,7 +35,6 @@ tasks:
 
   build:
     desc: "Build a package ready for a deploy"
-    deps: [install]
     cmds:
       - cmd: poetry build -vv
 
