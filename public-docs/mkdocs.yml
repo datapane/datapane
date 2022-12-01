@@ -115,6 +115,7 @@ plugins:
       lang: en
   - redirects:
       redirect_maps:
+        "tutorials/index.md": "tutorials/basics/install-datapane.md"
         "tutorials/basics/create-a-report.md": "tutorials/basics/create-an-app.ipynb"
         "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "tutorials/datapane-cloud/upload-an-app-to-datapane-cloud.ipynb"
         "catalogues/index.md": "catalogs/index.ipynb"
