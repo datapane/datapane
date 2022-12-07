@@ -113,3 +113,36 @@ h3 {
   overflow-x: hidden;
   height: 100%;
 } */
+
+/* Components */
+
+/* We prefer tailwind normally, but for missing or poor support in tailwind this can be necessary */
+
+/** App grid component **/
+
+/* tailwind support: it is difficult to work with tailwind+flexbox in dev tools as you can't set
+   all flex item properties at once  */
+
+/* Flex parent */
+.dp-app-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: stretch;
+    row-gap: 24px;
+    column-gap: 12px;
+}
+
+/* Flex items */
+.dp-app-grid > * {
+    /* Small screens: 2 columns = half the available space, accounting for column gap */
+    width: calc(50% - 12px);
+}
+
+@media (min-width: 800px) {
+    /* Medium screens - flexbox with wrapping, so as many columns as will fit */
+    .dp-app-grid > * {
+        /* Force apps with long titles to fit: */
+        width: 240px;
+    }
+}
