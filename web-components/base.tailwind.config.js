@@ -1,11 +1,24 @@
 /* eslint-disable */
 
 const defaultTheme = require("tailwindcss/defaultTheme");
+const { colors: fontFamily } = defaultTheme;
 
 module.exports = {
     darkMode: "class",
     theme: {
+        fontFamily: {
+            ...fontFamily,
+            "dp-prose": "var(--dp-font-family)",
+        },
         extend: {
+            colors: {
+                "dp-accent-light": "var(--dp-accent-secondary-color)",
+                "dp-accent": "var(--dp-accent-color)",
+                "dp-accent-text": "var(--dp-accent-text)",
+                "dp-background": "var(--dp-bg-color)",
+                "dp-light-gray": "var(--dp-light-gray)",
+                "dp-dark-gray": "var(--dp-dark-gray)",
+            },
             typography: {
                 DEFAULT: {
                     // Disable prose being applied to code elements

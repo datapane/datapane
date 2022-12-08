@@ -6,19 +6,12 @@ import {
     pluginVue,
     RESOLVE_ALIAS,
 } from "./dp-base-config";
-import tailwindcss from "tailwindcss";
 import vueESM from "../shared/rollup-plugin-vue-esm";
 
 module.exports = defineConfig(({ mode }) => ({
     resolve: RESOLVE_ALIAS,
     css: {
-        postcss: {
-            plugins: [
-                tailwindcss({
-                    config: "./report.tailwind.config.js",
-                }) as any,
-            ],
-        },
+        postcss: {},
     },
     plugins: [pluginVue(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {

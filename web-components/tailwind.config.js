@@ -9,6 +9,9 @@ config.content = [
     "../dp-server/src/dp/apps/dp_org/templates/**/*.html",
     "../dp-server/src/dp/apps/dp_public/templates/**/*.html",
     "../dp-server/templates/**/*.html",
+    // Report renderer
+    "./report/src/**/*.{vue,js,ts}",
+    "./node_modules/@variantjs/**/*.ts",
 ];
 
 module.exports = config;
