@@ -286,9 +286,11 @@ export class ReportStore {
                 test: maps.jsonIsHTML,
                 opts: { isOrg: this.isOrg },
             },
+            // NOTE - `MediaBlock` check should go before `SVGBlock` check,
+            // as SVGs in a `Media` tag have precedence over plot SVGs
+            { class_: MediaBlock, test: maps.jsonIsMedia },
             { class_: SVGBlock, test: maps.jsonIsSvg },
             { class_: FormulaBlock, test: maps.jsonIsFormula },
-            { class_: MediaBlock, test: maps.jsonIsMedia },
             { class_: EmbedBlock, test: maps.jsonIsEmbed },
             { class_: FoliumBlock, test: maps.jsonIsIFrameHTML },
             { class_: PlotapiBlock, test: maps.jsonIsPlotapi },

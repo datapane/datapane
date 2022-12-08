@@ -25,6 +25,7 @@ module.exports = defineConfig({
     plugins: [pluginVue(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
     define: {
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
+        "process.env": process.env,
     },
     build: {
         minify: "esbuild",

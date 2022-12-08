@@ -17,6 +17,7 @@ module.exports = defineConfig(({ mode }) => ({
     define: {
         // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
         PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
+        "process.env": process.env,
     },
     build: {
         outDir: "./dist/report/",
