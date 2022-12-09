@@ -20,7 +20,7 @@
         {% include "local-report-base.css" %}
       </style>
     {% else %}
-      <link rel="stylesheet" href="{{ cdn_base }}/report/style.css">
+      <link rel="stylesheet" href="{{ cdn_base }}/local-report/local-report-base.css">
     {% endif %}
     <script>
       const report = { document: {{ report_doc|tojson }}, width: "{{ report_width }}", output_is_light_prose: {{ is_light_prose|tojson }} };

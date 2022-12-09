@@ -498,6 +498,7 @@ class Server(LocalProcessor):
         # Copy across symlinked app bundle.
         # Ignore `call-arg` as CI errors on `dirs_exist_ok`
         copytree(self.assets / "report", bundle_path / "app", dirs_exist_ok=True)  # type: ignore[call-arg]
+        copy(self.assets / "local-report-base.css", bundle_path / "app" / "local-report-base.css")
 
         # Copy across symlinked Vue module
         copy(self.assets / VUE_ESM_FILE, bundle_path / VUE_ESM_FILE)
