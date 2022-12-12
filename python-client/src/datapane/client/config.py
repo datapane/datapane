@@ -7,14 +7,12 @@ import configparser
 import dataclasses as dc
 import typing as t
 import uuid
-import webbrowser
 from contextlib import suppress
 from os import getenv
 from pathlib import Path
 from typing import Optional
 
 import click
-from furl import furl
 
 from datapane import _IN_PYTEST, log
 
@@ -213,13 +211,17 @@ def check_get_config() -> Config:
         # try reinit, as may have ran login in another terminal/subprocess
         _config = init()
         if _config.token == DEFAULT_TOKEN:
-            # still don't have a token set, open up the browser
+            # still don't have a token set, open up the browser and wait for login
             if not _IN_PYTEST:
-                f = furl(path="/accounts/login/", origin=_config.server)
-                webbrowser.open(url=str(f), new=2)
+                from datapane.client.api import signup
+
+                signup()
+                _config = init()
+                return _config
             raise InvalidTokenError(
                 "Please sign-up and login - if you already have then please restart your Jupyter kernel/Python instance to initialize your new token"
             )
+
         return _config
     return config
 

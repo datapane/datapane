@@ -84,7 +84,7 @@ from .report.core import (
 from .report.processors import Processor, build, save_report, serve, upload
 from .runtime import Params, Result, _report, _reset_runtime, by_datapane
 from .teams import Environment, File, LegacyApp, Run, Schedule
-from .user import hello_world, login, logout, ping, template
+from .user import hello_world, login, logout, ping, signup, template
 
 from ..config import init  # isort:skip  otherwise circular import issue
 from . import builtins  # isort:skip
@@ -140,6 +140,7 @@ __all__ = [
     "login",
     "logout",
     "ping",
+    "signup",
     "template",
     "upload",
     "save_report",

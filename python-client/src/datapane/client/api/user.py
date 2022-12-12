@@ -29,6 +29,7 @@ from furl import furl
 from munch import Munch
 
 from datapane import __version__
+from datapane.client.utils import is_jupyter
 from datapane.common import URL
 from datapane.common.utils import pushd
 
@@ -38,11 +39,18 @@ from ..analytics import capture, capture_event
 from ..utils import display_msg, failure_msg, success_msg
 from .common import _process_res
 
-__all__ = ["login", "logout", "ping", "hello_world", "template"]
+__all__ = ["login", "signup", "logout", "ping", "hello_world", "template"]
+
+
+def signup(server: str = c.DEFAULT_SERVER):
+    """Signup and link your account to the Datapane CLI automatically"""
+    token = token_connect(server=server, action="signup")
+    # login and re-init against the signed-up server
+    login(token, server=server)
 
 
 def login(
-    token: t.Optional[str], server: str = c.DEFAULT_SERVER, env: t.Optional[str] = None, cli_login: bool = True
+    token: t.Optional[str] = None, server: str = c.DEFAULT_SERVER, env: t.Optional[str] = None, cli_login: bool = True
 ) -> str:
     """
     Login to the specified Datapane Server, storing the token within a config-file called `env` for future use
@@ -239,7 +247,7 @@ def template(url: URL, execute: bool):
     )
 
 
-def token_connect(server: str) -> t.Optional[str]:
+def token_connect(server: str, action: str = "login") -> t.Optional[str]:
     """
     Creates a login token, and prompts the user to login while polling for completion.
     Then log the user into the CLI with the retrieved API token.
@@ -261,12 +269,16 @@ def token_connect(server: str) -> t.Optional[str]:
 
     with requests.Session() as s:
         login_token = create_token(s)
-        url = furl(path="/accounts/api-login-token-accept", origin=server).add({"login_token": login_token}).url
-
-        print(
-            f"\nOpening login page.. please login via this page and return to the terminal\n\nIf the page didn't open, use the link below\n{url}"
+        url = (
+            furl(path="/accounts/api-login-token-accept", origin=server)
+            .add({"login_token": login_token, "action": action, "jupyter": is_jupyter()})
+            .url
         )
-        webbrowser.open(url=url, new=2)
+
+        display_msg(f"Opening {action} page.. please login or create an account via this page to proceed.")
+        display_msg("If the page didn't open, use the link {login_url:l}", login_url=url)
+
+        webbrowser.open(url=url, new=1)
 
         # Declare the endpoint outside the poll_token function to save rebuilding on each poll
         poll_endpoint = furl(path=f"/api/api-login-tokens/{login_token}/", origin=server).url

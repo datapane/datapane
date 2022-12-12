@@ -125,6 +125,13 @@ def login(obj: DPContext, token: str, server: str):
 
 
 @cli.command()
+@click.option("--server", default=c.DEFAULT_SERVER, help="Datapane API Server URL.")
+def signup(server: str):
+    """Signup and link your account to the Datapane CLI"""
+    api.signup(server)
+
+
+@cli.command()
 @click.pass_obj
 def logout(obj: DPContext):
     """Logout from the server and reset the config file"""

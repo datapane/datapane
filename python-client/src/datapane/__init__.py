@@ -70,6 +70,7 @@ from .client.api import (
     ping,
     save_report,
     serve,
+    signup,
     template,
     upload,
 )
@@ -118,6 +119,7 @@ __all__ = [
     "login",
     "logout",
     "ping",
+    "signup",
     "template",
     "_setup_dp_logging",
     "enable_logging",

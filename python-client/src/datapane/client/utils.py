@@ -64,7 +64,7 @@ def failure_msg(msg: str, do_exit: bool = False):
 def is_jupyter() -> bool:
     """Checks if inside ipython shell inside browser"""
     try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell"  # type: ignore [name-defined]  # noqa: F821
+        return get_ipython().__class__.__name__ == "ZMQInteractiveShell" or "google.colab" in sys.modules  # type: ignore [name-defined]  # noqa: F821
     except Exception:
         return False
 
