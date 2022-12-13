@@ -169,10 +169,20 @@ class App(DPObjectRef):
         save_report(self, path, open, standalone, name, author, formatting, cdn_base)
 
     @staticmethod
-    def from_notebook(opt_out: bool = True) -> App:
+    def from_notebook(
+        opt_out: bool = True, show_code: bool = False, show_markdown: bool = True, template: str = "auto"
+    ) -> App:
+        from datapane.client.ipython_template import _registry, guess_template
+
         from ..ipython_utils import cells_to_blocks
 
-        blocks = cells_to_blocks(opt_out=opt_out)
+        blocks = cells_to_blocks(opt_out=opt_out, show_code=show_code, show_markdown=show_markdown)
+        app_template_cls = _registry.get(template) or guess_template(blocks)
+        app_template = app_template_cls(blocks)
+        app_template.transform()
+        app_template.validate()
+        blocks = app_template.blocks
+
         app = App(blocks=blocks)
 
         return app

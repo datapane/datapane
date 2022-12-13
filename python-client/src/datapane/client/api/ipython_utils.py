@@ -13,29 +13,12 @@ from pathlib import Path
 
 from datapane.client import DPError
 from datapane.client.analytics import capture_event
+from datapane.client.api.exceptions import BlocksNotFoundException, NotebookException, NotebookParityException
 from datapane.client.utils import display_msg, is_jupyter
 
 if typing.TYPE_CHECKING:
+
     from .report.blocks import BaseElement
-
-
-class NotebookException(Exception):
-    """Exception raised when a Notebook to Datapane conversion fails."""
-
-    def _render_traceback_(self):
-        display_msg(
-            f"""**Conversion failed**
-
-{str(self)}"""
-        )
-
-
-class NotebookParityException(NotebookException):
-    """Exception raised when IPython output cache is not in sync with the saved notebook"""
-
-
-class BlocksNotFoundException(NotebookException):
-    """Exception raised when no blocks are found during conversion"""
 
 
 def block_to_iframe(block: BaseElement) -> str:
@@ -113,7 +96,7 @@ def get_colab_notebook_json() -> dict:
     try:
         auth.authenticate_user()
     except Exception as e:
-        raise DPError(
+        raise NotebookException(
             "Google Drive authentication failed. Please allow this notebook to access your Google Drive."
         ) from e
 
@@ -175,7 +158,7 @@ def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) 
     # broad check: check the execution count is the same
     execution_counts = [cell.get("execution_count", 0) or 0 for cell in notebook_json["cells"]]
 
-    latest_cell_execution_count = max(execution_counts)
+    latest_cell_execution_count = max(execution_counts, default=0)
 
     # -2 to account for zero-based indexing and the invoking cell not being saved
     latest_cache_execution_count = len(ipython_input_cache) - 2
@@ -188,13 +171,13 @@ def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) 
         cell_execution_count = cell.get("execution_count", None)
         if cell["cell_type"] == "code" and cell_execution_count:
             if cell_execution_count < len(ipython_input_cache):
-                input_cache_source = ipython_input_cache[cell_execution_count]
+                input_cache_source = ipython_input_cache[cell_execution_count].strip()
 
                 # skip and mark cells containing ignored functions
                 if any(ignored_function in input_cache_source for ignored_function in ignored_cell_functions):
                     cell["contains_ignored_functions"] = True
                 # dirty because input has changed between execution and save.
-                elif "".join(cell["source"]) != input_cache_source:
+                elif "".join(cell["source"]).strip() != input_cache_source:
                     is_dirty = True
                     dirty_cells.append(cell_execution_count)
 
@@ -202,13 +185,16 @@ def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) 
 
 
 @capture_event("IPython Cells to Blocks")
-def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
+def cells_to_blocks(
+    opt_out: bool = True, show_code: bool = False, show_markdown: bool = True
+) -> typing.List[BaseElement]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
         - `dp-exclude` - Exclude this cell (when opt_out=True)
         - `dp-include` - Include this cell (when opt_out=False)
         - `dp-show-code` - Show the input code for this cell
+        - `dp-show-markdown` - Show the markdown for this cell
 
     ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
@@ -231,7 +217,7 @@ def cells_to_blocks(opt_out: bool = True) -> typing.List[BaseElement]:
         if dirty_cells:
             notebook_parity_message += f"""
 
-The following cells have not been executed and saved: {''.join(map(str, dirty_cells))}"""
+The following cells have not been executed and saved: {', '.join(map(str, dirty_cells))}"""
 
         raise NotebookParityException(notebook_parity_message)
 
@@ -241,19 +227,22 @@ The following cells have not been executed and saved: {''.join(map(str, dirty_ce
         tags = cell["metadata"].get("tags", [])
 
         if (opt_out and "dp-exclude" not in tags) or (not opt_out and "dp-include" in tags):
-            if cell["cell_type"] == "markdown":
+            if (cell["cell_type"] == "markdown" and cell.get("source")) and (
+                show_markdown or "dp-show-markdown" in tags
+            ):
                 from .report.blocks import Text
 
                 markdown_block: BaseElement = Text("".join(cell["source"]))
                 blocks.append(markdown_block)
             elif cell["cell_type"] == "code" and not cell.get("contains_ignored_functions", False):
-                if "dp-show-code" in tags:
+                if "dp-show-code" in tags or show_code:
                     from .report.blocks import Code
 
                     code_block: BaseElement = Code("".join(cell["source"]))
                     blocks.append(code_block)
 
                 output_block = output_cell_to_block(cell, ipython_output_cache)
+
                 if output_block:
                     blocks.append(output_block)
                 elif "dp-include" in tags:
