@@ -17,14 +17,34 @@ tasks:
 
   build:
     desc: "Build a package ready for a deploy"
+    env:
+      DATAPANE_CDN_BASE: '{{ .DATAPANE_CDN_BASE | default "" }}'
     cmds:
       - cmd: poetry run ./nbbuild.sh
       - cmd: poetry run mkdocs build
+
+  build:inline-statics:
+    desc: "Build a package ready for a deploy, with report statics loaded into the build"
+    cmds:
+      - cmd: ln -s ../../web-components/dist docs/_report-statics
+      - defer: rm docs/_report-statics
+      - task: build
+        vars:
+          DATAPANE_CDN_BASE: /_report-statics
 
   serve:
     desc: "Serve the site locally"
     cmds:
       - cmd: poetry run mkdocs serve
+
+  serve:inline-statics:
+    desc: "Serve the site locally, with report statics loaded into the build"
+    cmds:
+      - cmd: ln -s ../../web-components/dist docs/_report-statics
+      - defer: rm docs/_report-statics
+      - task: serve
+        vars:
+          DATAPANE_CDN_BASE: /_report-statics
 
   deploy:
     desc: "Deploy the package"

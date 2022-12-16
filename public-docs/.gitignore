@@ -451,9 +451,6 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,node,jupyternotebooks,pycharm
 
-
-
-
 # Copyright (c) 2016-2022 Martin Donath <martin.donath@squidfunk.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -528,3 +525,5 @@ tmp
 
 /docs/**/*.html
 /docs/**/*-preview.png
+
+docs/_report-statics

@@ -4,7 +4,9 @@ set -euo pipefail
 # TODO: we should probably bundle the statics within the docs build
 # We build against the datpane source, so reference the assets in /dev
 # which are continously relased
-export DATAPANE_CDN_BASE="https://datapane-cdn.com/dev"
+export DATAPANE_CDN_BASE="${DATAPANE_CDN_BASE:-https://datapane-cdn.com/dev}"
+
+echo "Building against CDN: ${DATAPANE_CDN_BASE}"
 
 # Prevent a real browser from being discovered for Apps that request `open=True`.
 # We never want it during the docs build

@@ -35,8 +35,7 @@ wrangler pages dev --live-reload
 
 2. Use `dpdocsutils` to:
 
-    - embed the interactive app (`iframe=True`),
-    - or insert a generated preview image that hyperlinks to the interactive app (`iframe=False`, default)
+    - embed the interactive app,
 
     ```python
     from dpdocsutils import previews

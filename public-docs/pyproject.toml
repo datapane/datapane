@@ -10,8 +10,6 @@ python = ">=3.10,<3.11.0"
 jupyterlab = "^3.4.3"
 mkdocs-material = "^8.3.7"
 mknotebooks = "^0.7.1"
-pyppeteer = "^1.0.2"
-nest-asyncio = "^1.5.5"
 dpdocsutils = {path = "dpdocsutils", develop = true}
 altair = "^4.0.0"
 vega-datasets = ">=0.9.0,<1.0.0"
