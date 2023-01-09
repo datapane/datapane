@@ -210,7 +210,7 @@ We've had a ton of feedback from users wanting to create more custom reports. No
 
 ### Report Styling & Whitelabelling on Datapane Enterprise
 
-Now you can add your own fonts, colours, custom headers and more on your Datapane Enterprise reports. This is great for organizations who have brand guidelines to follow, or want to experiment with their own defaults
+Now you can add your own fonts, colors, custom headers and more on your Datapane Enterprise reports. This is great for organizations who have brand guidelines to follow, or want to experiment with their own defaults
 
 ### :octicons-bug-24: Other Bug Fixes and Improvements
 

@@ -99,7 +99,7 @@ BlockDict = t.Dict[str, BlockOrPrimitive]
 class App(DPObjectRef):
     """
     App documents collate plots, text, tables, and files into an interactive document that
-    can be analysed and shared by users in their Browser
+    can be analyzed and shared by users in their Browser
     """
 
     _tmp_report: t.Optional[Path] = None  # Temp local report

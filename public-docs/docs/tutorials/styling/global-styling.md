@@ -1,8 +1,8 @@
-This section describes how to add custom colours and fonts to all the apps in your workspace.
+This section describes how to add custom colors and fonts to all the apps in your workspace.
 
 ## Styles
 
-Datapane allows you to define a global style block which will apply to all of your apps. In this block you can \(re\)define the default font, background colour and more.
+Datapane allows you to define a global style block which will apply to all of your apps. In this block you can \(re\)define the default font, background color and more.
 
 ![Example of a styled app](../../img/tutorials/styling-whitelabelling-1.png)
 
