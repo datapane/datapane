@@ -167,12 +167,12 @@ class Config:
                     # get the email for v4 of spec
                     self.email = ping(config=self, cli_login=True, verbose=False)
 
-                if not self.completed_action:
-                    # we could be on older version, but with a valid token
-                    # but haven't completed an action, so force it
-                    from .analytics import capture
-
-                    capture("CLI Login", config=self, with_token=True)
+                # if not self.completed_action:
+                #     # we could be on older version, but with a valid token
+                #     # but haven't completed an action, so force it
+                #     from .analytics import capture
+                #
+                #     capture("CLI Login", config=self, with_token=True)
 
             self.version = LATEST_VERSION
             self.save()

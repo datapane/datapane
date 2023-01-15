@@ -1,9 +1,13 @@
 """This module provides a simple interface to capture analytics data"""
+import atexit
 import platform
+import queue
+import threading
 from contextlib import suppress
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Optional, TypeVar, cast
+from time import sleep, time
+from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 import posthog
 
@@ -12,9 +16,44 @@ from datapane.client.utils import get_environment_type, is_jupyter
 
 from . import config as c
 
+posthog.sync_mode = True
 posthog.api_key = "phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy"
 posthog.host = "https://events.datapane.com/"
 _NO_ANALYTICS_FILE: Path = c.APP_DIR / "no_analytics"
+MAX_QUEUE_SIZE = 250
+QUEUE_TIMEOUT = 10
+
+
+class Consumer(threading.Thread):
+    """Maintains and consumes queue for posthog requests"""
+
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw, name="Analytics event consumer", daemon=True)
+        self.queue = queue.Queue(MAX_QUEUE_SIZE)
+
+    def run(self):
+        """
+        Run the next function at the start of the queue whenever the queue is non-empty.
+        Note `self.queue.get()` is blocking while the queue is empty
+        """
+        while True:
+            (f, args) = self.queue.get()
+            with suppress(Exception):
+                f(*args)
+            self.queue.task_done()
+
+    def send(self, f: Callable[..., None], args: Any):
+        """Add analytics function and arguments to the thread queue"""
+        self.queue.put((f, args))
+
+    def join_queue(self):
+        """
+        Poll `queue.unfinished_tasks` until a max time is reached,
+        rather than calling `queue.join`, as `queue.Queue.join` has no `timeout` parameter
+        """
+        end_time = time() + QUEUE_TIMEOUT
+        while self.queue.unfinished_tasks and time() < end_time:
+            sleep(1)
 
 
 def is_analytics_disabled() -> bool:
@@ -26,7 +65,31 @@ def is_analytics_disabled() -> bool:
     return False
 
 
+def user_properties() -> Dict:
+    """User properties to be added on `identify`, and amended on `capture`"""
+    return dict(
+        os=platform.system(),
+        python_version=platform.python_version(),
+        dp_version=__version__,
+        environment_type=get_environment_type(),
+        in_jupyter=is_jupyter(),
+        using_conda=_USING_CONDA,
+    )
+
+
 _NO_ANALYTICS: bool = is_analytics_disabled()
+
+_consumer = None
+
+
+def start_queue():
+    global _consumer
+    _consumer = Consumer()
+    _consumer.start()
+
+
+if not _NO_ANALYTICS:
+    start_queue()
 
 
 def capture(event: str, config: Optional[c.Config] = None, **properties) -> None:
@@ -35,37 +98,24 @@ def capture(event: str, config: Optional[c.Config] = None, **properties) -> None
         return None
     config = config or c.get_config()
 
-    # run identify on first action, (NOTE - don't change the order here)
-    if not config.completed_action:
-        config.completed_action = True
-        identify(config)
-        config.save()
-
     properties.update(
-        source="cli",
-        dp_version=__version__,
-        environment_type=get_environment_type(),
-        in_jupyter=is_jupyter(),
-        using_conda=_USING_CONDA,
+        {
+            "source": "cli",
+            "dp_version": __version__,
+            "environment_type": get_environment_type(),
+            "in_jupyter": is_jupyter(),
+            "using_conda": _USING_CONDA,
+            # Note "$" isn't a valid char in `dict(k=v)` keys
+            "$set": user_properties(),
+        }
     )
 
-    with suppress(Exception):
-        posthog.capture(config.session_id, event, properties)
+    _consumer.send(posthog.capture, args=[config.session_id, event, properties])
 
 
-def identify(config: c.Config, **properties) -> None:
-    properties.update(
-        os=platform.system(),
-        python_version=platform.python_version(),
-        dp_version=__version__,
-        environment_type=get_environment_type(),
-        in_jupyter=is_jupyter(),
-        using_conda=_USING_CONDA,
-    )
-    with suppress(Exception):
-        posthog.identify(config.session_id, properties)
-    # Also generate a CLI identify event to help disambiguation
-    capture("CLI Identify", config=config)
+# def identify(config: c.Config, **properties) -> None:
+#     properties.update(user_properties())
+#     _consumer.send(posthog.identify, args=[config.session_id, properties])
 
 
 # def capture_init(config: c.Config) -> None:
@@ -92,3 +142,11 @@ def capture_event(name: str) -> Callable[[F], F]:
         return cast(F, _wrapper)
 
     return _decorator
+
+
+@atexit.register
+def finish_queue():
+    """Block main thread until analytics queue is clear"""
+    global _consumer
+    _consumer.join_queue()
+    del _consumer

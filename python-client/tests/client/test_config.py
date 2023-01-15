@@ -8,6 +8,7 @@ from unittest import mock
 import pytest
 
 import datapane as dp
+from datapane.client import analytics
 from datapane.client import config as c
 
 # Disable automatic c.init() - all tests in this file need to initialise their own configs
@@ -19,7 +20,6 @@ class Expected:
     """Expected data for tests"""
 
     # Posthog usage
-    identify_calls: int
     capture_calls: int
 
     # Stored attributes of Config, using different defaults to ensure we're getting loaded values
@@ -28,7 +28,7 @@ class Expected:
     email: str = "test@datapane.com"
     session_id: str = "test_session_id"
     version: int = c.LATEST_VERSION
-    completed_action: bool = True
+    completed_action: bool = False
 
 
 @pytest.fixture
@@ -37,7 +37,9 @@ def posthog():
     with mock.patch("datapane.client.analytics.posthog", autospec=True) as posthog, mock.patch(
         "datapane.client.analytics._NO_ANALYTICS", False
     ):
+        analytics.start_queue()
         yield posthog
+        analytics.finish_queue()
 
 
 def strip_indent(multiline: str) -> str:
@@ -97,7 +99,7 @@ def assert_config_object(posthog, config: c.Config, expected: Expected):
     assert config.version == expected.version
     assert config.completed_action == expected.completed_action
 
-    assert posthog.identify.call_count == expected.identify_calls
+    analytics._consumer.join_queue()
     assert posthog.capture.call_count == expected.capture_calls
 
 
@@ -117,8 +119,7 @@ def test_load_v0(posthog):
         posthog,
         raw_config,
         Expected(
-            identify_calls=1,
-            capture_calls=2,
+            capture_calls=0,
         ),
         config_path=c.LEGACY_CONFIG_PATH,
     )
@@ -134,8 +135,7 @@ def test_upgrade_v1(posthog):
         posthog,
         raw_config,
         Expected(
-            identify_calls=1,
-            capture_calls=2,
+            capture_calls=0,
         ),
         config_path=c.LEGACY_CONFIG_PATH,
     )
@@ -153,8 +153,7 @@ def test_upgrade_v2(posthog):
         posthog,
         raw_config,
         Expected(
-            identify_calls=1,
-            capture_calls=2,
+            capture_calls=0,
         ),
         config_path=c.LEGACY_CONFIG_PATH,
     )
@@ -173,27 +172,6 @@ def test_upgrade_v3(posthog):
         posthog,
         raw_config,
         Expected(
-            identify_calls=1,
-            capture_calls=2,
-        ),
-        config_path=c.LEGACY_CONFIG_PATH,
-    )
-
-
-def test_upgrade_v3_completed(posthog):
-    raw_config = f"""
-    completed_action: true
-    server: {Expected.server}
-    session_id: {Expected.session_id}
-    token: {Expected.token}
-    username: datapane-test
-    version: 3
-    """
-    assert_config(
-        posthog,
-        raw_config,
-        Expected(
-            identify_calls=0,
             capture_calls=0,
         ),
         config_path=c.LEGACY_CONFIG_PATH,
@@ -204,7 +182,7 @@ def test_upgrade_v4(posthog):
     raw_config = f"""
     _env: null
     _path: null
-    completed_action: true
+    completed_action: false
     email: {Expected.email}
     server: {Expected.server}
     session_id: {Expected.session_id}
@@ -215,7 +193,6 @@ def test_upgrade_v4(posthog):
         posthog,
         raw_config,
         Expected(
-            identify_calls=0,
             capture_calls=0,
         ),
         config_path=c.LEGACY_CONFIG_PATH,
@@ -239,7 +216,6 @@ def test_load_v5(posthog):
         posthog,
         raw_config_v5,
         Expected(
-            identify_calls=0,
             capture_calls=0,
             completed_action=False,
         ),
@@ -273,7 +249,7 @@ completed_action = False
 
 
 def test_load_v6(posthog):
-    assert_config(posthog, raw_config_v6, Expected(identify_calls=0, capture_calls=0, completed_action=False))
+    assert_config(posthog, raw_config_v6, Expected(capture_calls=0, completed_action=False))
 
 
 def test_new_config__pre_invariants(posthog):
@@ -284,7 +260,6 @@ def test_new_config__pre_invariants(posthog):
         posthog,
         config,
         Expected(
-            identify_calls=0,
             capture_calls=0,
             server=c.DEFAULT_SERVER,
             token=c.DEFAULT_TOKEN,
@@ -302,11 +277,11 @@ def test_new_config__login_event(posthog):
     assert_config_object(
         posthog,
         c.config,
-        expected=Expected(identify_calls=1, capture_calls=2, server=c.DEFAULT_SERVER),
+        expected=Expected(capture_calls=1, server=c.DEFAULT_SERVER),
     )
 
     config = c.Config.load()
-    assert_config_object(posthog, config, expected=Expected(identify_calls=1, capture_calls=2, server=c.DEFAULT_SERVER))
+    assert_config_object(posthog, config, expected=Expected(capture_calls=1, server=c.DEFAULT_SERVER))
 
 
 @pytest.mark.skipif("CI" in os.environ, reason="depends on fe-components - only run locally")
@@ -319,5 +294,6 @@ def test_new_config__additional_event(posthog, monkeypatch, tmp_path):
 
     report = gen_report_simple()
     report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
-    assert posthog.identify.call_count == 1
-    assert posthog.capture.call_count == 3
+
+    analytics._consumer.join_queue()
+    assert posthog.capture.call_count == 2

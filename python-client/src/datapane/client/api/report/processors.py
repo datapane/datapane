@@ -302,6 +302,8 @@ class Uploader(Processor):
         if open:
             webbrowser.open_new_tab(self.app.web_url)
 
+        capture("CLI App Upload", report_id=self.app.id)
+
         display_msg(
             "App successfully uploaded. View and share your app at {web_url:l}.",
             web_url=self.app.web_url,
