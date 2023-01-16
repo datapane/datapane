@@ -166,7 +166,7 @@ export const useRootStore = defineStore("root", () => {
         { functionId, params } = { functionId: "app.main", params: undefined },
     ) =>
         await axios.post(
-            "http://localhost:8080/dispatch/",
+            "/dispatch/",
             {
                 jsonrpc: "2.0",
                 id: 2,
