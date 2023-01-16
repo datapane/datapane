@@ -33,21 +33,32 @@ from .runtime import GlobalState, InteractiveRef, f_cache, get_session_state
 # TODO
 #  - caching
 
-app: bt.Bottle = bt.Bottle()
-# Update app config
-app.config.update(
-    {
-        # 'autojson': True,
-        # "dp_bottle.session_timeout": SECS_1_HOUR,
-        "dp_bottle.CORS": "*",
-    }
-)
 
+def create_bottle_app() -> bt.Bottle:
+    app: bt.Bottle = bt.Bottle()
+    # Update app config
+    app.config.update(
+        {
+            # 'autojson': True,
+            # "dp_bottle.session_timeout": SECS_1_HOUR,
+            "dp_bottle.CORS": "*",
+        }
+    )
 
-# Test API endpoint
-@app.get("/hello/")
-def hello():
-    return "Hello World!"
+    # Test API endpoint
+    @app.get("/hello/")
+    def hello():
+        return "Hello World!"
+
+    @app.get("/")
+    def initial_app() -> str:
+        # TODO - cache this
+        # this is kinda hacky, reusing the template system
+        # for exporting reports here for the chrome only
+        html = ExportBaseHTMLOnly().generate_chrome()
+        return html
+
+    return app
 
 
 # @app.get("/assets/<filename>")
@@ -63,15 +74,6 @@ def serve_file(global_state: GlobalState, filename: str):
     mime = guess_type(root / filename)
     log.info(f"Serving asset file {filename=} ({mime=})")
     return bt.static_file(filename=filename, root=root, mimetype=mime, headers=headers)
-
-
-@app.get("/")
-def initial_app() -> str:
-    # TODO - cache this
-    # this is kinda hacky, reusing the template system
-    # for exporting reports here for the chrome only
-    html = ExportBaseHTMLOnly().generate_chrome()
-    return html
 
 
 class DPCherootServer(bt.ServerAdapter):
@@ -127,6 +129,7 @@ def serve(
     g_s = GlobalState(app_dir, main_entry)
 
     # TODO - move the app inside main func?
+    app = create_bottle_app()
     app.route("/dispatch/", ["POST"], lambda: dispatch(g_s))
     app.route("/assets/<filename>", ["GET"], lambda filename: serve_file(g_s, filename))
 
