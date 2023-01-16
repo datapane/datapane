@@ -5,20 +5,17 @@ Basic app server implementation, using,
 - custom json-rpc dispatcher
 """
 import inspect
-import os
 import shutil
-import sys
 import tempfile
-import time
 import typing as t
 from pathlib import Path
 
 import bottle as bt
-from cheroot.ssl import builtin
-from cheroot.wsgi import Server
+import cheroot.ssl
+import cheroot.wsgi
 
 from datapane.blocks import Controls
-from datapane.client import display_msg, log
+from datapane.client import log
 from datapane.common.dp_types import SECS_1_HOUR
 from datapane.common.utils import guess_type
 from datapane.processors.processors import ExportBaseHTMLOnly
@@ -76,41 +73,18 @@ def serve_file(global_state: GlobalState, filename: str):
     return bt.static_file(filename=filename, root=root, mimetype=mime, headers=headers)
 
 
-class DPCherootServer(bt.ServerAdapter):
-    # Customised CherootServer to allow us to use port 0 and still print
-    # the port name
-    def prepare(self, handler):
-
-        from cheroot import wsgi
-        from cheroot.ssl import builtin
-
-        self.options["bind_addr"] = (self.host, self.port)
-        self.options["wsgi_app"] = handler
-        certfile = self.options.pop("certfile", None)
-        keyfile = self.options.pop("keyfile", None)
-        chainfile = self.options.pop("chainfile", None)
-        server = wsgi.Server(**self.options)
-        if certfile and keyfile:
-            server.ssl_adapter = builtin.BuiltinSSLAdapter(certfile, keyfile, chainfile)
-
-        # Correct the displayed port:
-        server.prepare()
-        self.host = server.bind_addr[0]
-        self.port = server.bind_addr[1]
-
-        self.server = server
-
-    def run(self, handler):
-        try:
-            self.server.serve()
-        finally:
-            self.server.stop()
-
-
 def serve(
-    entry: t.Union[View, t.Callable[[], View]], port: int = 0, host: str = "localhost", debug: bool = False
+    entry: t.Union[View, t.Callable[[], View]],
+    port: t.Optional[int] = None,
+    host: str = "localhost",
+    debug: bool = False,
 ) -> None:
-    """Main app serve entrypoint"""
+    """
+    Main app serve entrypoint.
+
+    Pass `port` to run on a specific port, otherwise one will be chosen automatically.
+
+    """
     # setup GlobalState
     f_cache.clear()
     # set up the initial env
@@ -138,14 +112,7 @@ def serve(
     app.install(DPBottlePlugin(g_s))
 
     try:
-        if debug:
-            # TODO - add the CDN route here too
-            display_msg(f"Server started at {host}:{port}")
-            bt.run(app, server="wsgiref", host=host, port=port, debug=True)
-        else:
-            dp_bottle_run(app, server=DPCherootServer, host=host, port=port, interval=1, reloader=False)
-    except KeyboardInterrupt:
-        pass
+        dp_bottle_run(app, host=host, port=port, interval=1)
     finally:
         app.close()
         shutil.rmtree(app_dir, ignore_errors=True)
@@ -154,16 +121,14 @@ def serve(
     # start_server(app)
 
 
-# This is mostly copied from bottle.run, with a few simplifications for things
-# we don't need, and fixes to enable running on unknown ports
+# This is based on bottle.run, with simplifications for things we don't need,
+# or don't yet support, and fixes to enable our features.
 def dp_bottle_run(
     app,
     *,
-    server,
-    host="127.0.0.1",
-    port=8080,
+    host: str = "127.0.0.1",
+    port: t.Optional[int] = None,
     interval=1,
-    reloader=False,
     quiet=False,
     plugins=None,
     debug=None,
@@ -174,117 +139,113 @@ def dp_bottle_run(
 
     :param app: WSGI application or target string supported by
            :func:`load_app`. (default: :func:`default_app`)
-    :param server: Server adapter to use. See :data:`server_names` keys
-           for valid names or pass a :class:`ServerAdapter` subclass.
-           (default: `wsgiref`)
     :param host: Server address to bind to. Pass ``0.0.0.0`` to listens on
            all interfaces including the external one. (default: 127.0.0.1)
     :param port: Server port to bind to. Values below 1024 require root
-           privileges. (default: 8080)
-    :param reloader: Start auto-reloading server? (default: False)
+           privileges. (default: automatic)
     :param interval: Auto-reloader interval in seconds (default: 1)
     :param quiet: Suppress output to stdout and stderr? (default: False)
     :param options: Options passed to the server adapter.
     """
-    if bt.NORUN:
-        return
-    if reloader and not os.environ.get("BOTTLE_CHILD"):
-        import subprocess
+    if debug is not None:
+        bt._debug(debug)
+    if not callable(app):
+        raise ValueError(f"Application is not callable: {app!r}")
 
-        fd, lockfile = tempfile.mkstemp(prefix="bottle.", suffix=".lock")
-        environ = os.environ.copy()
-        environ["BOTTLE_CHILD"] = "true"
-        environ["BOTTLE_LOCKFILE"] = lockfile
-        args = [sys.executable] + sys.argv
-        # If a package was loaded with `python -m`, then `sys.argv` needs to be
-        # restored to the original value, or imports might break. See #1336
-        if getattr(sys.modules.get("__main__"), "__package__", None):
-            args[1:1] = ["-m", sys.modules["__main__"].__package__]
+    for plugin in plugins or []:
+        if isinstance(plugin, str):
+            plugin = bt.load(plugin)
+        app.install(plugin)
 
-        try:
-            os.close(fd)  # We never write to this file
-            while os.path.exists(lockfile):
-                p = subprocess.Popen(args, env=environ)
-                while p.poll() is None:
-                    os.utime(lockfile, None)  # Tell child we are still alive
-                    time.sleep(interval)
-                if p.returncode == 3:  # Child wants to be restarted
-                    continue
-                sys.exit(p.returncode)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            if os.path.exists(lockfile):
-                os.unlink(lockfile)
-        return
+    if config:
+        app.config.update(config)
+
+    server_starter = CherootServerStarter(app, host=host, port=port, preferred_port=8080, **kargs)
+    server_starter.quiet = server_starter.quiet or quiet
+
+    server_starter.acquire_port()
+    if not server_starter.quiet:
+        bt._stderr(f"Bottle v{bt.__version__} server starting up (using {server_starter.__class__.__name__})...")
+        if server_starter.host.startswith("unix:"):
+            bt._stderr(f"App running on {server_starter.host}")
+        else:
+            bt._stderr("App running on http://%s:%d/" % (server_starter.host, server_starter.port))
+        bt._stderr("Hit Ctrl-C to quit.\n")
 
     try:
-        if debug is not None:
-            bt._debug(debug)
-        if not callable(app):
-            raise ValueError(f"Application is not callable: {app!r}")
-
-        for plugin in plugins or []:
-            if isinstance(plugin, str):
-                plugin = bt.load(plugin)
-            app.install(plugin)
-
-        if config:
-            app.config.update(config)
-
-        if server in bt.server_names:
-            server = bt.server_names.get(server)
-        if isinstance(server, type):
-            server = server(host=host, port=port, **kargs)
-        if not isinstance(server, bt.ServerAdapter):
-            raise ValueError(f"Unknown or unsupported server: {server!r}")
-
-        server.quiet = server.quiet or quiet
-
-        if reloader:
-            lockfile = os.environ.get("BOTTLE_LOCKFILE")
-            bgcheck = bt.FileCheckerThread(lockfile, interval)
-            with bgcheck:
-                server.run(app)
-            if bgcheck.status == "reload":
-                sys.exit(3)
-        else:
-
-            server.prepare(app)
-            if not server.quiet:
-                bt._stderr(f"Bottle v{bt.__version__} server starting up (using {server.__class__.__name__})...")
-                if server.host.startswith("unix:"):
-                    bt._stderr(f"App running on {server.host}")
-                else:
-                    bt._stderr("App running on http://%s:%d/" % (server.host, server.port))
-                bt._stderr("Hit Ctrl-C to quit.\n")
-
-            server.run(app)
+        server_starter.run()
     except KeyboardInterrupt:
         pass
-    except (SystemExit, MemoryError):
-        raise
-    except:  # noqa:E722
-        if not reloader:
-            raise
-        if not getattr(server, "quiet", quiet):
-            bt.print_exc()
-        time.sleep(interval)
-        sys.exit(3)
 
 
-def start_server(app, host: str = "localhost", port: int = 0, **kwargs):
-    """Start the dedicated, performant, cheroot server for the WSGI bottle app"""
-    log.info(f"Starting server on {host}:{port}")
+MAX_ACQUIRE_PORT_ATTEMPTS = 1000
 
-    certfile = kwargs.pop("certfile", None)
-    keyfile = kwargs.pop("keyfile", None)
-    chainfile = kwargs.pop("chainfile", None)
 
-    server = Server(bind_addr=(host, port), wsgi_app=app)
-    if certfile and keyfile:
-        server.ssl_adapter = builtin.BuiltinSSLAdapter(certfile, keyfile, chainfile)
-    try:
-        server.start()
-    finally:
-        server.stop()
+# This class is similar to bottle's ServerAdapter abstraction, but with our own
+# needs:
+# - automatic port numbering
+class CherootServerStarter:
+    quiet = False
+
+    def __init__(
+        self, handler, host="127.0.0.1", port: t.Optional[int] = None, preferred_port: t.Optional[int] = None, **options
+    ):
+        """
+        Pass port to specify an exact port, or None for automatic
+        Pass preferred_port to specify a port that you prefer, but accept others.
+        """
+
+        self.handler = handler
+        self.options = options
+        self.host = host
+        self.port = port
+        self.preferred_port = preferred_port
+
+    def _make_server(self, port: int):
+        options = self.options.copy()
+        options["bind_addr"] = (self.host, port)
+        options["wsgi_app"] = self.handler
+        certfile = options.pop("certfile", None)
+        keyfile = options.pop("keyfile", None)
+        chainfile = options.pop("chainfile", None)
+        server = cheroot.wsgi.Server(**options)
+        if certfile and keyfile:
+            server.ssl_adapter = cheroot.ssl.builtin.BuiltinSSLAdapter(certfile, keyfile, chainfile)
+        server.prepare()  # This will raise an error on failure to bind port
+        self.host = server.bind_addr[0]
+        self.port = server.bind_addr[1]
+        return server
+
+    def acquire_port(self):
+        """
+        Bind to the requested or an automatic port. Raises an exception if not possible.
+        """
+        server = None
+        if self.port is None:
+            if self.preferred_port is None:
+                # Fully automatic, any port will do.
+                desired_port = 0
+                server = self._make_server(desired_port)
+            else:
+                # Automatic, starting from preferred_port
+                desired_port = self.preferred_port
+                # Start with desired_port, or next available if it is taken
+                for i in range(0, MAX_ACQUIRE_PORT_ATTEMPTS):
+                    try:
+                        server = self._make_server(desired_port)
+                    except OSError:
+                        desired_port += 1
+                    else:
+                        break
+                if server is None:
+                    raise
+        else:
+            server = self._make_server(self.port)
+
+        self.server = server
+
+    def run(self):  # pragma: no cover
+        try:
+            self.server.serve()
+        finally:
+            self.server.stop()
