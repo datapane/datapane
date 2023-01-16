@@ -4,10 +4,15 @@ Basic app server implementation, using,
 - bottle as a WSGI micro-framework
 - custom json-rpc dispatcher
 """
+from __future__ import annotations
+
+import atexit
 import inspect
 import os
 import shutil
+import sys
 import tempfile
+import threading
 import typing as t
 from pathlib import Path
 
@@ -20,8 +25,14 @@ from datapane.blocks import Controls
 from datapane.client import log
 from datapane.common.dp_types import SECS_1_HOUR, SIZE_1_MB
 from datapane.common.utils import guess_type
+from datapane.ipython.environment import get_environment
 from datapane.processors.processors import ExportBaseHTMLOnly
 from datapane.view import View
+
+try:
+    import ipywidgets
+except ImportError:
+    ipywidgets = None
 
 from .json_rpc import dispatch
 from .plugins import DPBottlePlugin
@@ -90,11 +101,15 @@ def serve_file(global_state: GlobalState, filename: str):
     return bt.static_file(filename=filename, root=root, mimetype=mime, headers=headers)
 
 
+# See tests/client/test_server.py for important info on testing this code.
+
+
 def serve(
     entry: t.Union[View, t.Callable[[], View]],
     port: t.Optional[int] = None,
     host: str = "127.0.0.1",
     debug: bool = False,
+    ui: str = None,
 ) -> None:
     """
     Main app serve entrypoint.
@@ -127,85 +142,92 @@ def serve(
     app.config.update({})
     app.install(DPBottlePlugin(g_s))
 
-    try:
-        dp_bottle_run(app, host=host, port=port, interval=1)
-    finally:
-        app.close()
+    def app_cleanup():
         shutil.rmtree(app_dir, ignore_errors=True)
+        app.close()
         log.info("Shutting down server")
 
-    # start_server(app)
-
-
-# This is based on bottle.run, with simplifications for things we don't need,
-# or don't yet support, and fixes to enable our features.
-def dp_bottle_run(
-    app,
-    *,
-    host: str = "127.0.0.1",
-    port: t.Optional[int] = None,
-    interval=1,
-    quiet=False,
-    plugins=None,
-    debug=None,
-    config=None,
-    **kargs,
-):
-    """Start a server instance. This method blocks until the server terminates.
-
-    :param app: WSGI application or target string supported by
-           :func:`load_app`. (default: :func:`default_app`)
-    :param host: Server address to bind to. Pass ``0.0.0.0`` to listens on
-           all interfaces including the external one. (default: 127.0.0.1)
-    :param port: Server port to bind to. Values below 1024 require root
-           privileges. (default: automatic)
-    :param interval: Auto-reloader interval in seconds (default: 1)
-    :param quiet: Suppress output to stdout and stderr? (default: False)
-    :param options: Options passed to the server adapter.
-    """
     if debug is not None:
         bt._debug(debug)
-    if not callable(app):
-        raise ValueError(f"Application is not callable: {app!r}")
 
-    for plugin in plugins or []:
-        if isinstance(plugin, str):
-            plugin = bt.load(plugin)
-        app.install(plugin)
-
-    if config:
-        app.config.update(config)
-
-    server_starter = CherootServerStarter(app, host=host, port=port, preferred_port=8080, **kargs)
-    server_starter.quiet = server_starter.quiet or quiet
-
-    server_starter.acquire_port()
-    if not server_starter.quiet:
-        bt._stderr(f"Bottle v{bt.__version__} server starting up (using {server_starter.__class__.__name__})...")
-        bt._stderr(f"App running on {server_starter.get_url()}")
-        bt._stderr("Hit Ctrl-C to quit.\n")
-
-    try:
-        server_starter.run()
-    except KeyboardInterrupt:
-        pass
+    server = CherootServer(app, host=host, port=port, preferred_port=8080, quiet=False)
+    ui_cls: t.Type[ControllerUI]
+    if ui is None:
+        ui_cls = _choose_ui_class()
+    else:
+        if ui not in CONTROLLER_UIS:
+            raise ValueError(f"UI choice '{ui}' is not a known option. Choose from: {', '.join(CONTROLLER_UIS.keys())}")
+        ui_cls = CONTROLLER_UIS[ui]
+    controller = ServerController(server, cleanup=app_cleanup, ui_cls=ui_cls)
+    controller.go()
 
 
 MAX_ACQUIRE_PORT_ATTEMPTS = 1000
 
 
+def _choose_ui_class() -> t.Type[ControllerUI]:
+    env = get_environment()
+    if env.is_notebook_environment:
+        if env.supports_ipywidgets:
+            if ipywidgets is not None:
+                return IPyWidgetsControllerUI
+            else:
+                print(
+                    "Please install Jupyter Widgets for an improved experienced with apps in Notebook environments: "
+                    + "https://ipywidgets.readthedocs.io/en/latest/user_install.html",
+                    file=sys.stderr,
+                )
+                return FallbackNotebookControllerUI
+        else:
+            print(
+                "You can run this notebook in Jupyter Lab or Jupyter Notebook for an improved experience.\n",
+                file=sys.stderr,
+            )
+            return FallbackNotebookControllerUI
+
+    else:
+        return ConsoleControllerUI
+
+
+# Server/controller/UI classes:
+
+# CherootServer
+# -------------
+#
 # This class is similar to bottle's ServerAdapter abstraction, but with our own
-# needs:
+# needs, specifically:
+#
 # - automatic port numbering
-class CherootServerStarter:
+# - communicates with a controller to display messages
+
+# Internally it wraps the `cheroot.wsgi.Server` to provide all HTTP functionality
+
+
+# ServerController
+# ----------------
+
+# Responsible for starting and stopping the server. Connects with both
+# CherootServer and the UI class
+
+# ControllerUI
+# ------------
+#
+# Abstract, has implementations for console, ipywidgets and other notebook fallbacks
+#
+# Responsible for displaying messages to the user, and "Stop server" controls.
+# Communicates with ServerController.
+
+
+class CherootServer:
     quiet = False
 
     def __init__(
         self,
-        handler,
+        handler: t.Callable,
         host: str = "127.0.0.1",
         port: t.Optional[int] = None,
         preferred_port: t.Optional[int] = None,
+        quiet: bool = False,
         **options,
     ):
         """
@@ -220,8 +242,10 @@ class CherootServerStarter:
         self.host = host.strip().lower()
         self.port = port
         self.preferred_port = preferred_port
+        self.quiet = quiet
+        self.server: cheroot.wsgi.Server | None = None
 
-    def _make_server(self, port: int):
+    def _make_server(self, port: int) -> None:
         options = self.options.copy()
         options["bind_addr"] = (self.host, port)
         options["wsgi_app"] = self.handler
@@ -232,11 +256,13 @@ class CherootServerStarter:
         if certfile and keyfile:
             server.ssl_adapter = cheroot.ssl.builtin.BuiltinSSLAdapter(certfile, keyfile, chainfile)
         server.prepare()  # This will raise an error on failure to bind port
+        self.server = server
+        # Having successfully acquired a port, copy it back to self.
         self.host = server.bind_addr[0]
         self.port = server.bind_addr[1]
-        return server
 
-    def get_url(self) -> str:
+    @property
+    def url(self) -> str:
         if self.host.startswith("unix:"):
             return self.host
         elif ":" in self.host:  # IPv6
@@ -248,32 +274,190 @@ class CherootServerStarter:
         """
         Bind to the requested or an automatic port. Raises an exception if not possible.
         """
-        server = None
         if self.port is None:
             if self.preferred_port is None:
                 # Fully automatic, any port will do.
                 desired_port = 0
-                server = self._make_server(desired_port)
+                self._make_server(desired_port)
             else:
                 # Automatic, starting from preferred_port
                 desired_port = self.preferred_port
                 # Start with desired_port, or next available if it is taken
                 for i in range(0, MAX_ACQUIRE_PORT_ATTEMPTS):
                     try:
-                        server = self._make_server(desired_port)
+                        self._make_server(desired_port)
                     except OSError:
                         desired_port += 1
                     else:
                         break
-                if server is None:
+                if self.server is None:
+                    # None of the attempts succeeded
                     raise
         else:
-            server = self._make_server(self.port)
+            self._make_server(self.port)
 
-        self.server = server
-
-    def run(self):  # pragma: no cover
+    def serve(self):  # pragma: no cover
         try:
             self.server.serve()
         finally:
             self.server.stop()
+
+    def stop(self):
+        self.server.stop()
+
+
+class ControllerUI:
+    server_needs_background_thread: bool = False
+
+    def __init__(self, controller: ServerController) -> None:
+        self.controller = controller
+
+    def display(self):
+        """
+        Display the UI
+        """
+        raise NotImplementedError()
+
+    def show_message(self, value: str):
+        """
+        Print a message onto the UI
+        """
+        raise NotImplementedError()
+
+
+class ServerController:
+    def __init__(self, server: CherootServer, *, cleanup: t.Callable, ui_cls: t.Type[ControllerUI]) -> None:
+        self.server: CherootServer = server
+        self.cleanup = cleanup
+        self.thread: threading.Thread = None
+        self.ui: ControllerUI = ui_cls(self)
+
+    def go(self):
+        self.server.acquire_port()
+        self.ui.display()
+        if self.ui.server_needs_background_thread:
+            self.run_server_in_thread()
+        else:
+            self.run_server()
+
+    def run_server(self):
+        try:
+            self.server.serve()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.cleanup()
+
+    def run_server_in_thread(self):
+        assert self.thread is None
+        thread = threading.Thread(target=self.server.serve, daemon=True)
+        thread.start()
+        self.thread = thread
+        # To cover the case of non-clean shutdown:
+        atexit.register(self.cleanup)
+
+    def stop_background_server(self):
+        # This is only used for threaded mode
+        self.server.stop()
+        if self.thread is not None:
+            self.thread.join()
+        self.cleanup()
+        atexit.unregister(self.cleanup)
+
+    @property
+    def server_url(self) -> str:
+        return self.server.url
+
+
+class ConsoleControllerUI(ControllerUI):
+    server_needs_background_thread = False
+
+    def display(self):
+        self.show_message(f"App running on {self.controller.server_url}/\n")
+        self.show_message("Hit Ctrl-C to quit.\n")
+
+    def show_message(self, value: str):
+        print(value, file=sys.stderr, end="")
+
+
+class FallbackNotebookControllerUI(ControllerUI):
+    server_needs_background_thread = False
+
+    def display(self):
+        from IPython.display import HTML, display
+
+        server_url = self.controller.server_url
+        display(
+            HTML(
+                f'<p>Your app is running on: <a href="{server_url}">{server_url}</a></p>'
+                + "<p>Use notebook ⏹ or 'Stop/Interrupt' button to halt.</p>"
+            )
+        )
+
+    def show_message(self, value: str):
+        # we don't have a proper updatable display, but it's better to print somewhere than nowhere
+        print(value, file=sys.stdout, end="")
+
+
+if ipywidgets is not None:
+
+    class WarningWidget(ipywidgets.VBox):
+        """
+        Container widget that shows a fallback message for the case where Jupyter Widgets is not installed.
+        """
+
+        def __init__(self, child, html_message):
+            super().__init__(children=[child])
+            self.html_message = html_message
+
+        def _repr_html_(self):
+            return self.html_message
+
+
+class IPyWidgetsControllerUI(ControllerUI):
+    server_needs_background_thread = True
+
+    def __init__(self, controller: ServerController) -> None:
+        super().__init__(controller)
+
+        self.button = ipywidgets.Button(description="Stop app server", icon="stop")
+        self.output = ipywidgets.Output()
+
+        def on_button_clicked(b):
+            self.show_message("Stopping server...")
+            self.controller.stop_background_server()
+            self.show_message("stopped.\n")
+            self.show_message("Re-run cell to run server again.\n")
+            self.button.disabled = True
+            self.button.description = "Stopped"
+
+        self.button.on_click(on_button_clicked)
+
+    def show_message(self, value: str):
+        self.output.append_stdout(value)
+
+    def display(self):
+        from IPython.display import display
+
+        server_url = self.controller.server_url
+        display(
+            WarningWidget(
+                ipywidgets.VBox([self.button, self.output]),
+                (
+                    "<ul>"
+                    + f'  <li>Your app is running on: <a href="{server_url}">{server_url}</a></li>'
+                    + "   <li>You're seeing this message because 'Jupyer Widgets' is not installed in your Jupyter notebook/lab environment. "
+                    + "    so the UI for controlling the app server is not visible. See "
+                    + '    <a href="https://ipywidgets.readthedocs.io/en/latest/user_install.html">Jupyter Widgets Installation instructions</a></li>'
+                    + '  <li>Use <code>dp.serve(ui="console")</code> to use the console UI instead.</li>'
+                    + "</ul>"
+                ),
+            )
+        )
+        self.show_message(f"App running on {server_url}/\n")
+
+
+CONTROLLER_UIS = {
+    "console": ConsoleControllerUI,
+    "ipywidgets": IPyWidgetsControllerUI,
+}

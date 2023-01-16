@@ -62,6 +62,7 @@ class PythonEnvironment:
     can_open_links_from_python: bool = True
     is_notebook_environment: bool = False
     support_rich_display: bool = True
+    supports_ipywidgets: bool = False
 
     def get_notebook_json(self) -> dict:
         raise DPClientError("The current notebook environment is not supported.")
@@ -98,6 +99,7 @@ class UnsupportedNotebookEnvironment(IPythonZQMEnvironment):
 
 class JupyterLabEnvironment(IPythonZQMEnvironment):
     name = "JupyterLab Environment"
+    supports_ipywidgets = True
 
     def get_notebook_json(self) -> dict:
         """Get the JSON for the current Jupyter notebook"""
@@ -119,10 +121,19 @@ class JupyterLabEnvironment(IPythonZQMEnvironment):
 
 class JupyterNotebookEnvironment(JupyterLabEnvironment):
     name = "Jupyter Notebook Environment"
+    supports_ipywidgets = True
 
 
 class VSCodeJupyterEnvironment(IPythonZQMEnvironment):
     name = "VSCode Jupyter Environment"
+
+    # Attempting to use IPyWidgetsControllerUI from within VSCode Jupyter extension
+    # seems extremely flakey:
+    # - server often fails to start or stop
+    # - once it has failed once, it can require restarting VSCode to fix things.
+    # So it's better to fall back to something that seems to work better.
+    #
+    # supports_ipywidgets = False
 
     def get_notebook_json(self) -> dict:
         """Get the JSON for the current VSCode notebook"""
