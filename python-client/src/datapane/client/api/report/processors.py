@@ -7,7 +7,6 @@ Describes an API for serializing a Report object, rendering it locally and publi
 import os
 import threading
 import typing as t
-import webbrowser
 from abc import ABC
 from base64 import b64encode
 from functools import reduce
@@ -28,7 +27,8 @@ from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture, capture_event
 from datapane.client.api.common import Resource
 from datapane.client.api.runtime import _report
-from datapane.client.utils import DPError, InvalidReportError, display_msg
+from datapane.client.exceptions import DPError, InvalidReportError
+from datapane.client.utils import display_msg, open_in_browser
 from datapane.common import NPath, SDict, dict_drop_empty, log, timestamp
 from datapane.common.report import local_report_def, validate_report_doc
 from datapane.common.utils import compress_file
@@ -300,7 +300,7 @@ class Uploader(Processor):
         )
 
         if open:
-            webbrowser.open_new_tab(self.app.web_url)
+            open_in_browser(self.app.web_url)
 
         capture("CLI App Upload", report_id=self.app.id)
 
@@ -432,7 +432,7 @@ class Saver(LocalProcessor):
 
         if open:
             path_uri = f"file://{osp.realpath(osp.expanduser(path))}"
-            webbrowser.open_new_tab(path_uri)
+            open_in_browser(path_uri)
 
         return report_id
 
@@ -531,7 +531,7 @@ class Server(LocalProcessor):
     def _open_server(host: str, port: int) -> None:
         """Opens localserver endpoint, should be called in its own thread"""
         sleep(1)  # yield to main thread in order to allow start server process to run
-        webbrowser.open_new_tab(f"http://{host}:{port}")
+        open_in_browser(f"http://{host}:{port}")
 
 
 class Stringify(LocalProcessor):

@@ -1,5 +1,4 @@
 import argparse
-import os
 import string
 import sys
 import typing as t
@@ -8,41 +7,7 @@ from typing import Iterator, Tuple
 
 import click
 
-from datapane.common import DPError, JDict
-
-
-################################################################################
-# Built-in exceptions
-class IncompatibleVersionError(DPError):
-    pass
-
-
-class UnsupportedResourceError(DPError):
-    pass
-
-
-class ReportTooLargeError(DPError):
-    pass
-
-
-class InvalidTokenError(DPError):
-    pass
-
-
-class UnsupportedFeatureError(DPError):
-    pass
-
-
-class InvalidReportError(DPError):
-    pass
-
-
-class MissingCloudPackagesError(DPError):
-    def __init__(self, *a, **kw):
-        # quick hack until we setup a conda meta-package for cloud
-        self.args = (
-            "Cloud packages not found, please run `pip install datapane[cloud]` or `conda install -c conda-forge nbconvert flit-core`",
-        )
+from datapane.common import JDict
 
 
 ################################################################################
@@ -61,26 +26,20 @@ def failure_msg(msg: str, do_exit: bool = False):
             exit(2)
 
 
-def is_jupyter() -> bool:
-    """Checks if inside ipython shell inside browser"""
-    try:
-        return get_ipython().__class__.__name__ == "ZMQInteractiveShell" or "google.colab" in sys.modules  # type: ignore [name-defined]  # noqa: F821
-    except Exception:
-        return False
+def open_in_browser(url: str):
+    """Open the given URL in the user's browser"""
+    from datapane.client.environment import environment
 
+    # TODO - this is a bit of a hack, but works for now. JupyterLab (Codespaces) doesn't support webbrowser.open.
+    if environment.is_notebook_environment and not environment.can_open_links_from_python:
+        from IPython import get_ipython
 
-def get_environment_type() -> str:
-    """Try and get the name of the IDE the script is running in"""
-    if "PYCHARM_HOSTED" in os.environ:
-        return "pycharm"
-    if "google.colab" in sys.modules:
-        return "colab"
-    elif "VSCODE_PID" in os.environ:
-        return "vscode"
-    elif is_jupyter():
-        return "jupyter"
+        ip = get_ipython()
+        ip.run_cell_magic("javascript", "", f'window.open("{url}", "_blank")')
+    else:
+        import webbrowser
 
-    return "unknown"
+        webbrowser.open(url, new=1)
 
 
 class MarkdownFormatter(string.Formatter):
@@ -106,8 +65,10 @@ class MarkdownFormatter(string.Formatter):
 
 
 def display_msg(text: str, **params: str):
-    msg = MarkdownFormatter(is_jupyter()).format(text, **params)
-    if is_jupyter():
+    from datapane.client.environment import environment
+
+    msg = MarkdownFormatter(environment.is_notebook_environment).format(text, **params)
+    if environment.is_notebook_environment:
         from IPython.display import Markdown, display
 
         display(Markdown(msg))

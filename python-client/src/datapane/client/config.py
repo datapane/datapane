@@ -16,7 +16,7 @@ import click
 
 from datapane import _IN_PYTEST, log
 
-from .utils import InvalidTokenError
+from .exceptions import InvalidTokenError
 
 APP_NAME = "datapane"
 APP_DIR = Path(getenv("DATAPANE_APP_DIR", click.get_app_dir(APP_NAME)))

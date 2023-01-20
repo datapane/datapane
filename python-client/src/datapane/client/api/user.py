@@ -18,7 +18,6 @@ import sys
 import time
 import typing as t
 import warnings
-import webbrowser
 from pathlib import Path
 
 import click_spinner
@@ -29,14 +28,14 @@ from furl import furl
 from munch import Munch
 
 from datapane import __version__
-from datapane.client.utils import is_jupyter
+from datapane.client.environment import environment
 from datapane.common import URL
 from datapane.common.utils import pushd
 
 from .. import DPError
 from .. import config as c
 from ..analytics import capture, capture_event
-from ..utils import display_msg, failure_msg, success_msg
+from ..utils import display_msg, failure_msg, open_in_browser, success_msg
 from .common import _process_res
 
 __all__ = ["login", "signup", "logout", "ping", "hello_world", "template"]
@@ -271,14 +270,14 @@ def token_connect(server: str, action: str = "login") -> t.Optional[str]:
         login_token = create_token(s)
         url = (
             furl(path="/accounts/api-login-token-accept", origin=server)
-            .add({"login_token": login_token, "action": action, "jupyter": is_jupyter()})
+            .add({"login_token": login_token, "action": action, "jupyter": environment.is_notebook_environment})
             .url
         )
 
         display_msg(f"Opening {action} page.. please login or create an account via this page to proceed.")
         display_msg("If the page didn't open, use the link {login_url:l}", login_url=url)
 
-        webbrowser.open(url=url, new=1)
+        open_in_browser(url)
 
         # Declare the endpoint outside the poll_token function to save rebuilding on each poll
         poll_endpoint = furl(path=f"/api/api-login-tokens/{login_token}/", origin=server).url

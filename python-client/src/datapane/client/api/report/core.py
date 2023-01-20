@@ -16,7 +16,7 @@ from uuid import uuid4
 from datapane import __version__ as dp_version
 from datapane.client.api.common import DPTmpFile
 from datapane.client.api.dp_object import DPObjectRef
-from datapane.client.utils import DPError
+from datapane.client.exceptions import DPError
 
 from .blocks import BlockOrPrimitive, Page, PageOrPrimitive
 

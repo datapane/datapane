@@ -13,7 +13,7 @@ import stringcase
 import yaml
 
 from datapane.client import DPError
-from datapane.client.utils import MissingCloudPackagesError
+from datapane.client.exceptions import MissingCloudPackagesError
 from datapane.common import SDict, log, utf_read_text
 
 # script paths

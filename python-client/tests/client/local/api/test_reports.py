@@ -13,7 +13,7 @@ from lxml.etree import DocumentInvalid
 import datapane as dp
 from datapane.client.api.builtins import gen_df, gen_plot
 from datapane.client.api.report.blocks import BaseElement, BuilderState
-from datapane.client.utils import DPError
+from datapane.client.exceptions import DPError
 from datapane.common.report import load_doc, validate_report_doc
 
 ################################################################################

@@ -10,7 +10,7 @@ import typing as t
 from abc import abstractmethod
 
 import datapane.client.api.report.blocks as b
-from datapane.client.api.exceptions import BlocksNotFoundException
+from datapane.client.exceptions import BlocksNotFoundException
 from datapane.client.utils import display_msg
 
 BlockFilterF = t.Callable[[b.BaseElement], bool]

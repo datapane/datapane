@@ -22,7 +22,7 @@ from datapane.common import PKL_MIMETYPE, ArrowFormat, NPath, SDict, SList, SSDi
 from datapane.common.datafiles import DFFormatterCls, df_ext_map
 from datapane.common.utils import dict_drop_empty, get_app_file_params
 
-from ..utils import DPError
+from ..exceptions import DPError
 from .common import DPTmpFile, do_download_file
 from .dp_object import DPObjectRef, save_df
 

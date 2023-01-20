@@ -46,7 +46,7 @@ Additional API docs are found in `datapane.client.api.teams` that provide buildi
 # Internal API re-exports
 import warnings
 
-from ..utils import IncompatibleVersionError
+from ..exceptions import IncompatibleVersionError
 from .common import HTTPError, Resource
 from .dp_object import DPObjectRef
 from .ipython_utils import cells_to_blocks

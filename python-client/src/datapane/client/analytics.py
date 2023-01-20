@@ -12,7 +12,7 @@ from typing import Any, Callable, Dict, Optional, TypeVar, cast
 import posthog
 
 from datapane import _IN_DPSERVER, _IN_PYTEST, _USING_CONDA, ON_DATAPANE, __version__, log
-from datapane.client.utils import get_environment_type, is_jupyter
+from datapane.client.environment import environment
 
 from . import config as c
 
@@ -71,8 +71,8 @@ def user_properties() -> Dict:
         os=platform.system(),
         python_version=platform.python_version(),
         dp_version=__version__,
-        environment_type=get_environment_type(),
-        in_jupyter=is_jupyter(),
+        environment_type=environment.name,
+        in_jupyter=environment.is_notebook_environment,
         using_conda=_USING_CONDA,
     )
 
@@ -102,8 +102,8 @@ def capture(event: str, config: Optional[c.Config] = None, **properties) -> None
         {
             "source": "cli",
             "dp_version": __version__,
-            "environment_type": get_environment_type(),
-            "in_jupyter": is_jupyter(),
+            "environment_type": environment.name,
+            "in_jupyter": environment.is_notebook_environment,
             "using_conda": _USING_CONDA,
             # Note "$" isn't a valid char in `dict(k=v)` keys
             "$set": user_properties(),

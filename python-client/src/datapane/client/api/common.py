@@ -28,7 +28,8 @@ from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 
 from datapane import _TEST_ENV, __version__
 from datapane.client import config as c
-from datapane.client.utils import IncompatibleVersionError, ReportTooLargeError, UnsupportedResourceError, failure_msg
+from datapane.client.exceptions import IncompatibleVersionError, ReportTooLargeError, UnsupportedResourceError
+from datapane.client.utils import failure_msg
 from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
 from datapane.common.utils import compress_file, log
 
