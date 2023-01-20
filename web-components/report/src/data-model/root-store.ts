@@ -47,14 +47,16 @@ const mkBlockMap = (
             test: maps.jsonIsHTML,
             opts: { isOrg },
         },
+        // NOTE - `MediaBlock` check should go before `SVGBlock` check,
+        // as SVGs in a `Media` tag have precedence over plot SVGs
+        { class_: b.MediaBlock, test: maps.jsonIsMedia },
         { class_: b.SVGBlock, test: maps.jsonIsSvg },
         { class_: b.FormulaBlock, test: maps.jsonIsFormula },
-        { class_: b.MediaBlock, test: maps.jsonIsMedia },
         { class_: b.EmbedBlock, test: maps.jsonIsEmbed },
         { class_: b.FoliumBlock, test: maps.jsonIsIFrameHTML },
         { class_: b.PlotapiBlock, test: maps.jsonIsPlotapi },
         { class_: b.BigNumberBlock, test: maps.jsonIsBigNumber },
-        { class_: b.Interactive, test: maps.jsonIsInteractive },
+        { class_: b.FunctionBlock, test: maps.jsonIsFunction },
         { class_: b.InputField, test: maps.jsonIsInputField },
         { class_: b.RangeField, test: maps.jsonIsRangeField },
         { class_: b.TagsField, test: maps.jsonIsTagsField },
@@ -145,17 +147,17 @@ export const useRootStore = defineStore("root", () => {
         /**
          * Deserialize leaf block node into relevant `Block` class
          */
-        const captionType = "Figure"; // TODO
-        const { caption } = getAttributes(elem);
-        const count = caption ? updateFigureCount(captionType) : undefined;
-        const figure = { caption, count };
-
         const blockTest: BlockTest | undefined = blockMap.find((b) =>
             b.test(elem),
         );
 
         if (blockTest) {
             const { class_, opts } = blockTest;
+            const { caption } = getAttributes(elem);
+            const count = caption
+                ? updateFigureCount(class_.captionType)
+                : undefined;
+            const figure = { caption, count, captionType: class_.captionType };
             return new class_(elem, figure, opts);
         } else {
             throw `Couldn't deserialize from JSON ${elem}`;
@@ -215,7 +217,7 @@ export const useRootStore = defineStore("root", () => {
             elem.attributes = {};
         }
 
-        if (b.isInteractive(elem)) {
+        if (b.isFunction(elem)) {
             // Skip inner `Controls` block.
             // Can assert not-null as layout block JSON always contains `elements`
             const controlBlock = elem.elements![0];

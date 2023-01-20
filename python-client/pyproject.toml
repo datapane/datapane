@@ -38,7 +38,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7.1, < 3.11.0"
+python = ">=3.8.0, < 3.12.0"
 
 # DS
 # numpy = "^1.21.2"
@@ -51,8 +51,10 @@ vega-datasets = ">=0.9.0,<1.0.0"
 matplotlib = { version = "^3.2.0", optional = true }
 plotly = { version = "^5.0.0", optional = true }
 bokeh = { version = "^2.3.0", optional = true }
-folium = { version = "0.12.*", optional = true }
+folium = { version = ">=0.12.0, <0.15.0", optional = true }
 plotapi = { version = "^6.0.0", optional = true }
+nbconvert = { version = "^7.0.0", optional = true }
+
 # ipython = "^7.7.0" # needed for nbconvert?
 
 # cloud support
@@ -70,35 +72,34 @@ dacite = "^1.0.2"
 datacommons = "^1.4.3"
 datacommons-pandas = "^0.0.3"
 dominate = "^2.4.0"  # latest on conda
-dulwich = "^0.20.0"
+dulwich = ">=0.20.0, < 0.22.0"
 furl = "^2.0.0"
-glom = ">=20.11.0,<24.0.0"
+glom = ">=22.1.0,<24.0.0"
 importlib_resources = ">=3.0.0,<6.0.0"
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
-munch = "^2.3.0"
-nbconvert = ">=6.1.0,<7.0.0"
+munch = { git = "https://github.com/Infinidat/munch.git", rev = "28c1256e76c00f42aa9315015283f0bba8819c4c" }
 packaging = ">=21.0.0,<24.0.0"
 posthog = ">=1.4.0, <3.0.0"
 pydantic = "^1.6.0"
 PyYAML = ">=5.4.0,<7.0.0"
 requests = "^2.19.0"
-requests-toolbelt = "^0.9.1"
+requests-toolbelt = ">=0.9.1, <0.11.0"
 stringcase = "^1.2.0"
-tabulate = "^0.8.0"
+tabulate = ">=0.8.9, < 0.10.0"
 toolz = ">=0.11.0,<0.13.0"
 validators = ">=0.18.0,<0.21.0"
 ipynbname = "^2021.3.2"
 # Using `master` for bottle as is highly stable and has newer fixes for eventual 0.13 release
 bottle = { git = "https://github.com/bottlepy/bottle.git", branch = "master" }
-cheroot = "^8.6.0"
+cheroot = "^9.0.0"
 base64io = "^1.0.3"
 multimethod = "^1.9"
 typing-extensions = "^4.4.0"
 
 [tool.poetry.extras]
-plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi"]
+plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi", "nbconvert"]
 cloud = ["flit-core"]
 
 [tool.poetry.dev-dependencies]
@@ -113,7 +114,7 @@ types-chardet = "^5.0.1"
 types-PyYAML = "^6.0.9"
 types-click-spinner = "^0.1.12"
 types-requests = "^2.28.0"
-types-tabulate = "^0.8.11"
+types-tabulate = ">=0.8.9, < 0.10.0"
 pytest-dotenv = "^0.5.2"
 
 [tool.poetry.scripts]

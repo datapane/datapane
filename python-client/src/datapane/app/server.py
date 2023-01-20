@@ -5,6 +5,7 @@ Basic app server implementation, using,
 - custom json-rpc dispatcher
 """
 import inspect
+import os
 import shutil
 import tempfile
 import typing as t
@@ -13,25 +14,29 @@ from pathlib import Path
 import bottle as bt
 import cheroot.ssl
 import cheroot.wsgi
+import importlib_resources as ir
 
 from datapane.blocks import Controls
 from datapane.client import log
-from datapane.common.dp_types import SECS_1_HOUR
+from datapane.common.dp_types import SECS_1_HOUR, SIZE_1_MB
 from datapane.common.utils import guess_type
 from datapane.processors.processors import ExportBaseHTMLOnly
 from datapane.view import View
 
 from .json_rpc import dispatch
 from .plugins import DPBottlePlugin
-from .runtime import GlobalState, InteractiveRef, f_cache, get_session_state
+from .runtime import FunctionRef, GlobalState, f_cache, get_session_state
 
 ########################################################################
 # App Server
 # TODO
 #  - caching
 
+# globally set the max request size to 100 MB
+bt.BaseRequest.MEMFILE_MAX = int(os.getenv("MAX_REQUEST_BODY", 100 * SIZE_1_MB))
 
-def create_bottle_app() -> bt.Bottle:
+
+def create_bottle_app(debug: bool) -> bt.Bottle:
     app: bt.Bottle = bt.Bottle()
     # Update app config
     app.config.update(
@@ -52,8 +57,20 @@ def create_bottle_app() -> bt.Bottle:
         # TODO - cache this
         # this is kinda hacky, reusing the template system
         # for exporting reports here for the chrome only
-        html = ExportBaseHTMLOnly().generate_chrome()
+        html = ExportBaseHTMLOnly(debug).generate_chrome()
         return html
+
+    if debug:
+        root_dir: Path = t.cast(Path, ir.files("datapane"))
+        web_dist_dir = root_dir.parent.parent.parent / "web-components" / "dist"
+
+        @app.get("/web-static/<fpath:path>")
+        def serve_web_static(fpath):
+            # headers = {
+            #     "Cache-Control": f"private, max-age={SECS_1_HOUR}, must-revalidate, no-transform, immutable",
+            # }
+            headers = {}
+            return bt.static_file(filename=fpath, root=web_dist_dir, headers=headers)
 
     return app
 
@@ -76,7 +93,7 @@ def serve_file(global_state: GlobalState, filename: str):
 def serve(
     entry: t.Union[View, t.Callable[[], View]],
     port: t.Optional[int] = None,
-    host: str = "localhost",
+    host: str = "127.0.0.1",
     debug: bool = False,
 ) -> None:
     """
@@ -99,11 +116,10 @@ def serve(
     else:
         entry_f = lambda params: entry  # noqa: E731
         cache = True
-    main_entry = InteractiveRef(f=entry_f, controls=Controls.empty(), f_id="app.main", cache=cache)
+    main_entry = FunctionRef(f=entry_f, controls=Controls.empty(), f_id="app.main", cache=cache)
     g_s = GlobalState(app_dir, main_entry)
 
-    # TODO - move the app inside main func?
-    app = create_bottle_app()
+    app = create_bottle_app(debug)
     app.route("/dispatch/", ["POST"], lambda: dispatch(g_s))
     app.route("/assets/<filename>", ["GET"], lambda filename: serve_file(g_s, filename))
 
@@ -166,10 +182,7 @@ def dp_bottle_run(
     server_starter.acquire_port()
     if not server_starter.quiet:
         bt._stderr(f"Bottle v{bt.__version__} server starting up (using {server_starter.__class__.__name__})...")
-        if server_starter.host.startswith("unix:"):
-            bt._stderr(f"App running on {server_starter.host}")
-        else:
-            bt._stderr("App running on http://%s:%d/" % (server_starter.host, server_starter.port))
+        bt._stderr(f"App running on {server_starter.get_url()}")
         bt._stderr("Hit Ctrl-C to quit.\n")
 
     try:
@@ -188,7 +201,12 @@ class CherootServerStarter:
     quiet = False
 
     def __init__(
-        self, handler, host="127.0.0.1", port: t.Optional[int] = None, preferred_port: t.Optional[int] = None, **options
+        self,
+        handler,
+        host: str = "127.0.0.1",
+        port: t.Optional[int] = None,
+        preferred_port: t.Optional[int] = None,
+        **options,
     ):
         """
         Pass port to specify an exact port, or None for automatic
@@ -197,7 +215,9 @@ class CherootServerStarter:
 
         self.handler = handler
         self.options = options
-        self.host = host
+        # force IPv4 for localhost
+        # self.host = "127.0.0.1" if host.strip().lower() == "localhost" else host
+        self.host = host.strip().lower()
         self.port = port
         self.preferred_port = preferred_port
 
@@ -215,6 +235,14 @@ class CherootServerStarter:
         self.host = server.bind_addr[0]
         self.port = server.bind_addr[1]
         return server
+
+    def get_url(self) -> str:
+        if self.host.startswith("unix:"):
+            return self.host
+        elif ":" in self.host:  # IPv6
+            return f"http://[{self.host}]:{self.port}"
+        else:
+            return f"http://{self.host}:{self.port}"
 
     def acquire_port(self):
         """

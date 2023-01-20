@@ -38,10 +38,11 @@ from .blocks import (
     Empty,
     File,
     Formula,
+    Function,
     Group,
-    Interactive,
     Media,
     MultiChoice,
+    Page,
     Plot,
     Range,
     Select,
@@ -57,19 +58,6 @@ from .blocks import (
     Toggle,
     Trigger,
     wrap_block,
-    build,
-    builtins,
-    by_datapane,
-    cells_to_blocks,
-    hello_world,
-    login,
-    logout,
-    ping,
-    save_report,
-    serve,
-    signup,
-    template,
-    upload,
 )
 from .cloud_api import App, AppFormatting, AppWidth
 from .cloud_api import File as CloudFile
@@ -116,7 +104,7 @@ __all__ = [
     "Text",
     "Toggle",
     "Controls",
-    "Interactive",
+    "Function",
     "View",
     "upload",
     "save_report",
@@ -137,6 +125,7 @@ __all__ = [
     "Swap",
     "Trigger",
     "TargetMode",
+    "Page",
 ]
 
 
@@ -165,3 +154,4 @@ def load_params_from_command_line() -> None:
     #
     # config = parse_command_line()
     # Params.replace(config)
+    pass

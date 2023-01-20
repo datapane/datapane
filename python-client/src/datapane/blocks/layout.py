@@ -10,13 +10,14 @@ from glom import glom
 from datapane.client import DPClientError
 
 from .base import BaseElement, BlockId, BlockList, BlockOrPrimitive, wrap_block
-from .interactive import Empty, gen_name
+from .function import Empty, gen_name
 
 if t.TYPE_CHECKING:
     from typing_extensions import Self
 
     from datapane.blocks import Block
-    from datapane.view import ViewVisitor
+
+    from .base import VV
 
 
 class SelectType(enum.Enum):
@@ -51,51 +52,51 @@ class ContainerBlock(BaseElement):
         self.blocks.extend(other.blocks)
         return self
 
+    def __copy__(self) -> Self:
+        inst = super().__copy__()
+        inst.blocks = self.blocks.copy()
+        return inst
+
     @classmethod
     def empty(cls) -> Self:
         return cls(blocks=[Empty(gen_name())])
 
-    def traverse(self, visitor: ViewVisitor) -> ViewVisitor:
+    def traverse(self, visitor: VV) -> VV:
+        # perform a depth-first traversal of the contained blocks
         return reduce(lambda _visitor, block: block.accept(_visitor), self.blocks, visitor)
 
 
-# class Page(LayoutBlock):
-#     """
-#     All `datapane.client.api.report.core.Report`s consist of a list of Pages.
-#     A Page itself is a Block, but is only allowed at the top-level and cannot be nested.
-#
-#     Page objects take a list of blocks which make up the Page.
-#
-#     ..note:: You can pass ordinary Blocks to a page, e.g. Plots or DataTables.
-#       Additionally, if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
-#     """
-#
-#     # NOTE - technically a higher-level layoutblock but we keep here to maximise reuse
-#     _tag = "Page"
-#
-#     def __init__(
-#         self,
-#         *arg_blocks: BlockOrPrimitive,
-#         blocks: t.List[BlockOrPrimitive] = None,
-#         title: str = None,
-#         name: BlockId = None,
-#     ):
-#         """
-#         Args:
-#             *arg_blocks: Blocks to add to Page
-#             blocks: Allows providing the report blocks as a single list
-#             title: The page title (optional)
-#             name: A unique id for the Page to aid querying (optional)
-#
-#         ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
-#           `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
-#         """
-#         super().__init__(*arg_blocks, blocks=blocks, label=title, name=name)
-#         # error checking
-#         if len(self.blocks) < 1:
-#             raise DPError("Can't create Page with no objects")
-#         if any(isinstance(b, Page) for b in self.blocks):
-#             raise DPError("Page objects can only be at the top-level")
+class Page(ContainerBlock):
+    """
+    Page objects take a list of blocks which make up the Page.
+    This is included for backwards-compatability, and can be replaced by using Selects going forwards
+
+    ..note:: You can pass ordinary Blocks to a page, e.g. Plots or DataTables.
+      Additionally, if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
+    """
+
+    # BC-only helper - converted into a Select + Group within the post-XML processor
+    _tag = "_Page"
+
+    def __init__(
+        self,
+        *arg_blocks: BlockOrPrimitive,
+        blocks: t.List[BlockOrPrimitive] = None,
+        title: str = None,
+        name: BlockId = None,
+    ):
+        """
+        Args:
+            *arg_blocks: Blocks to add to Page
+            blocks: Allows providing the report blocks as a single list
+            title: The page title (optional)
+            name: A unique id for the Page to aid querying (optional)
+
+        ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
+          `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
+        """
+        self.title = title
+        super().__init__(*arg_blocks, blocks=blocks, label=title, name=name)
 
 
 class Select(ContainerBlock):
@@ -119,7 +120,6 @@ class Select(ContainerBlock):
         type: t.Optional[SelectType] = None,
         name: BlockId = None,
         label: str = None,
-        title: str = None,
     ):
         """
         Args:
@@ -133,7 +133,6 @@ class Select(ContainerBlock):
           `dp.Select(table, plot, type=dp.SelectType.TABS)` or `dp.Select(blocks=[table, plot])`
         """
         _type = glom(type, "value", default=None)
-        label = label or title
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=_type)
         if len(self.blocks) < 2:
             raise DPClientError("Can't create Select with less than 2 objects")
@@ -173,6 +172,7 @@ class Group(ContainerBlock):
         """
 
         # columns = columns or len(self.blocks)
+        self.columns = columns
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, columns=columns)
 
 

@@ -309,9 +309,3 @@ const clearQuery = () => {
         </div>
     </div>
 </template>
-
-<style>
-revo-grid {
-    background-color: white;
-}
-</style>

@@ -5,8 +5,6 @@ import dataclasses as dc
 import typing as t
 from collections import namedtuple
 
-pass
-
 from lxml import etree
 from lxml.builder import ElementMaker
 from multimethod import DispatchError, multimethod
@@ -14,7 +12,7 @@ from multimethod import DispatchError, multimethod
 from datapane import DPClientError
 from datapane.blocks import BaseElement
 from datapane.blocks.asset import AssetBlock
-from datapane.blocks.interactive import Interactive, TargetMode, gen_name
+from datapane.blocks.function import Function, TargetMode, gen_name
 from datapane.blocks.layout import ContainerBlock
 from datapane.blocks.text import EmbeddedTextBlock
 from datapane.common.viewxml_utils import mk_attribs
@@ -24,16 +22,14 @@ from datapane.view.visitors import ViewVisitor
 if t.TYPE_CHECKING:
     from datapane.processors import FileEntry, FileStore
 
-    # from typing_extensions import "XMLBuilder"
+    # from typing_extensions import Self
 
 E = ElementMaker()  # XML Tag Factory
 
 
 @dc.dataclass
 class XMLBuilder(ViewVisitor):
-    """Hold state whilst building the Report XML document"""
-
-    dispatch_to: t.ClassVar[str] = "as_xml"
+    """Convert the Blocks into an XML document"""
 
     store: FileStore
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
@@ -69,9 +65,6 @@ class XMLBuilder(ViewVisitor):
 
     @multimethod
     def visit(self, b: View) -> XMLBuilder:
-        # we should only ever be at the start of a view
-        assert len(self.elements) == 0
-
         b.traverse(self)  # visit subnodes
 
         # create top-level structure
@@ -90,11 +83,11 @@ class XMLBuilder(ViewVisitor):
         return self.add_element(b, _E(etree.CDATA(b.content), **b._attributes))
 
     @multimethod
-    def visit(self, b: Interactive) -> XMLBuilder:
+    def visit(self, b: Function) -> XMLBuilder:
         c_e = b.controls._to_xml()
 
         # Special Target handling - this occurs at the lower IR level for now,
-        # should move to OptimiseAST pass
+        # TODO - move to PreProcess processor
         if b.target == TargetMode.SELF:
             name = gen_name()
             e = E.Interactive(c_e, **{**b._attributes, "target": name, "name": name})
@@ -103,13 +96,13 @@ class XMLBuilder(ViewVisitor):
             cols = "1" if b.target == TargetMode.BELOW else "2"
             name = gen_name()
             e = E.Group(
-                E.Interactive(c_e, **{**b._attributes, "target": name}),
+                E.Function(c_e, **{**b._attributes, "target": name}),
                 E.Group(E.Empty(name=name), columns="1"),
                 columns=cols,
             )
         else:
             # use default target
-            e = E.Interactive(c_e, **b._attributes)
+            e = E.Function(c_e, **b._attributes)
 
         return self.add_element(b, e)
 

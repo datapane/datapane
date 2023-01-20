@@ -21,10 +21,10 @@ from pandas import DataFrame
 from pandas.io.formats.style import Styler
 
 from datapane.client import log
+from datapane.client.exceptions import DPClientError
 
 from ... import Attachment, DataTable, Plot, Table
 from ...blocks.text import Text
-from .. import DPError
 from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, Visualisation
 from .report.blocks import DataBlock
@@ -295,7 +295,7 @@ asset_types: List = [
 @singledispatch
 def get_wrapper(x: Any, error_msg: Optional[str] = None) -> BaseAsset:
     if error_msg:
-        raise DPError(error_msg)
+        raise DPClientError(error_msg)
 
     # The base writer is a pickle writer
     return BasePickleWriter()

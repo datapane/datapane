@@ -15,7 +15,6 @@ from typing_extensions import Self
 
 from datapane.common import guess_type
 
-SERVED_REPORT_BUNDLE_DIR = "static"
 SERVED_REPORT_ASSETS_DIR = "assets"
 GZIP_MTIME = datetime.datetime(year=2000, month=1, day=1).timestamp()
 
@@ -56,6 +55,30 @@ class FileEntry:
         if self.hash:
             return self.hash == other.hash
         raise NotImplementedError()
+
+
+class NullWriter(io.BytesIO):
+    def write(self, s):
+        pass
+
+    def writelines(self, *a, **kw) -> None:
+        pass
+
+
+class DummyFileEntry(FileEntry):
+    """File emtry that discards all data - for internal use"""
+
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self.file = NullWriter()
+
+    def freeze(self):
+        self.size = 0
+        self.hash = "abcdef"
+        self.frozen = True
+
+    def src(self) -> str:
+        return "/dev/null"
 
 
 class B64FileEntry(FileEntry):

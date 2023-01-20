@@ -27,7 +27,8 @@ from datapane.legacy_apps import config as sc
 
 from . import analytics
 from . import config as c
-from .utils import DPClientError, add_help_text, process_cmd_param_vals
+from .exceptions import DPClientError, add_help_text
+from .utils import process_cmd_param_vals
 
 EXTRA_OUT: bool = False
 
@@ -232,7 +233,7 @@ def write_templates(scaffold_name: str, context: SDict):
 
     # copy the scaffolds into the service
     def copy_scaffold() -> List[Path]:
-        dir_path = ir.files("datapane.resources.templates") / scaffold_name
+        dir_path = ir.files("datapane.resources.app_templates") / scaffold_name
         copy_tree(str(dir_path), ".")
         return [Path(x.name) for x in dir_path.iterdir()]
 
@@ -279,7 +280,7 @@ def deploy(
     kwargs = dict_drop_empty(init_kwargs, none_only=True)
 
     # if not (script or config or sc.DatapaneCfg.exists()):
-    #     raise DPError(f"Not valid project dir")
+    #     raise DPClientError(f"Not valid project dir")
 
     dp_cfg = apps.DatapaneCfg.create_initial(**kwargs)
     log.debug(f"Packaging and uploading Datapane project {dp_cfg.name}")

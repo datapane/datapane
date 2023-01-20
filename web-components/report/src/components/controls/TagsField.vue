@@ -23,7 +23,7 @@ const multiSelectProps = {
 
 const setListeners = (node: any) => {
     /**
-     * Overwrite tags with updated value and send to parent `Interactive` component
+     * Overwrite tags with updated value and send to parent `Function` component
      */
     node.on("newTag", ({ payload }: { payload: string[] }) => {
         emit("change", { name: p.name, value: payload });

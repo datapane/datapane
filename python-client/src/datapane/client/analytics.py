@@ -1,6 +1,6 @@
 """This module provides a simple interface to capture analytics data"""
-import os
 import atexit
+import os
 import platform
 import queue
 import sys
@@ -12,8 +12,6 @@ from time import sleep, time
 from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 import posthog
-
-from datapane.client.environment import environment
 
 from . import config as c
 from .utils import IN_PYTEST, ON_DATAPANE, log
@@ -75,6 +73,7 @@ _NO_ANALYTICS: bool = is_analytics_disabled()
 def user_properties() -> Dict:
     """User properties to be added on `identify`, and amended on `capture`"""
     from datapane import __version__
+    from datapane.ipython.environment import environment
 
     return dict(
         os=platform.system(),
@@ -86,8 +85,7 @@ def user_properties() -> Dict:
     )
 
 
-
-_consumer = None
+_consumer: Optional[Consumer] = None
 
 
 def start_queue():

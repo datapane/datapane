@@ -1,7 +1,13 @@
 import { markRaw } from "vue";
-import { AssetBlock, BlockFigure, Elem, ExportType } from "../blocks/index";
+import {
+    AssetBlock,
+    BlockFigure,
+    CaptionType,
+    Elem,
+    ExportType,
+} from "../blocks/index";
 import VDataTableBlock from "../../components/blocks/DataTable/DataTable.connector.vue";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import download from "downloadjs";
 import urljoin from "url-join";
 import env from "../../environment";
@@ -63,8 +69,7 @@ export type DatasetResponse = {
 
 export class DataTableBlock extends AssetBlock {
     public component = markRaw(VDataTableBlock);
-    public captionType = "Table";
-    public componentProps: any;
+    public static captionType: CaptionType = "Table";
     public rows: number;
     public columns: number;
     public size: number;
@@ -95,6 +100,7 @@ export class DataTableBlock extends AssetBlock {
         this.webUrl = opts.webUrl;
 
         this.componentProps = {
+            ...this.componentProps,
             streamContents: this.streamContents,
             getCsvText: this.getCsvText,
             downloadLocal: this.downloadLocal,
@@ -105,7 +111,7 @@ export class DataTableBlock extends AssetBlock {
         };
     }
 
-    private fetchDataset(opts: AxiosRequestConfig): Promise<any> {
+    private fetchDataset(opts: Record<string, string>): Promise<any> {
         return axios.get(this.src, opts).then((r: AxiosResponse) => {
             return r.data;
         });
@@ -115,7 +121,7 @@ export class DataTableBlock extends AssetBlock {
         /**
          * Fetch dataset and convert to arrow format
          */
-        const opts: AxiosRequestConfig = {
+        const opts = {
             responseType: "arraybuffer",
         };
         const { apiResponseToArrow } = await import("../datatable/arrow-utils");

@@ -22,6 +22,10 @@ tasks:
     desc: "Build a package ready for a deploy"
     cmds:
       - npm run build
+  build:local-report:
+    desc: "Build local-report artifacts for inclusion in other projects"
+    cmds:
+      - npm run build:local-report
   build:report:
     desc: "Build report artifacts for inclusion in served local reports"
     cmds:

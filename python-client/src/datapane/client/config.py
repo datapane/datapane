@@ -15,8 +15,8 @@ from typing import Optional
 import click
 from typing_extensions import Self
 
-from .utils import IN_PYTEST, log
 from .exceptions import InvalidTokenError
+from .utils import IN_PYTEST, log
 
 APP_NAME = "datapane"
 APP_DIR = Path(getenv("DATAPANE_APP_DIR", click.get_app_dir(APP_NAME)))
@@ -213,7 +213,7 @@ def check_get_config() -> Config:
         if _config.token == DEFAULT_TOKEN:
             # still don't have a token set, open up the browser and wait for login
             if not IN_PYTEST:
-                from datapane.client.api import signup
+                from datapane.cloud_api import signup
 
                 signup()
                 _config = init()

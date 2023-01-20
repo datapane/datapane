@@ -1,7 +1,7 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
 # flake8: noqa:F401
-from .analytics import capture, capture_event, identify
+from .analytics import capture, capture_event
 from .exceptions import DPClientError
 from .utils import IN_PYTEST, DPMode, display_msg, enable_logging, get_dp_mode, log, set_dp_mode
 

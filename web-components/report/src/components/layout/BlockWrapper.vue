@@ -21,7 +21,7 @@ const singleBlockEmbed = false;
             'w-full relative flex flex-col justify-center items-center',
             { 'h-iframe': singleBlockEmbed },
             { 'py-3 px-1': !singleBlockEmbed },
-            // TODO - why does overflow-x-auto create auto-y overflow in `Interactive` block?
+            // TODO - why does overflow-x-auto create auto-y overflow in `Function` block?
             { 'overflow-x-auto': !p.showOverflow },
             { 'overflow-visible': p.showOverflow },
         ]"

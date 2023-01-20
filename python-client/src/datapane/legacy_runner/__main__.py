@@ -10,11 +10,12 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, TextIO, Tuple
 
 from datapane import __version__
-from datapane.client import api
-from datapane.common import _setup_dp_logging, log
-from datapane.common.config import RunnerConfig, decode
+from datapane import cloud_api as api
+from datapane.client.utils import _setup_dp_logging
+from datapane.common import log
 from datapane.common.versioning import is_version_compatible
 
+from .config import RunnerConfig, decode
 from .exceptions import ModelRunError
 from .typedefs import ErrorResult, RunResult
 

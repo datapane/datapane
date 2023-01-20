@@ -252,7 +252,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
 
 
     """
-    logo = ir.files("datapane.resources.templates") / "datapane-logo.png"
+    logo = ir.files("datapane.resources.app_templates") / "datapane-logo.png"
     other = b.Group(
         b.Media(file=str(logo)),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),

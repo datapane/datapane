@@ -4,7 +4,7 @@ import VGroup from "../../components/layout/Group.vue";
 import VSelect from "../../components/layout/SelectBlock.vue";
 import VToggle from "../../components/layout/Toggle.vue";
 import { Block, BlockFigure } from "./leaf-blocks";
-import VInteractive from "../../components/controls/Interactive.connector.vue";
+import VFunction from "../../components/controls/Function.connector.vue";
 import { ControlsField } from "./interactive";
 import * as b from "./index";
 import { SwapType } from "../types";
@@ -121,9 +121,9 @@ export class Toggle extends LayoutBlock {
     }
 }
 
-export class Interactive extends LayoutBlock<ControlsField> {
-    public component = markRaw(VInteractive);
-    public name = "Interactive";
+export class FunctionBlock extends LayoutBlock<ControlsField> {
+    public component = markRaw(VFunction);
+    public name = "Function";
 
     public constructor(elem: any, figure: BlockFigure) {
         super(elem, figure);
@@ -174,8 +174,8 @@ export const isSelect = (obj: any): obj is Select => obj.name === "Select";
 
 export const isToggle = (obj: any): obj is Toggle => obj.name === "Toggle";
 
-export const isInteractive = (obj: any): obj is Interactive =>
-    obj.name === "Interactive";
+export const isFunction = (obj: any): obj is FunctionBlock =>
+    obj.name === "Function";
 
 export const isLayoutBlock = (obj: any): obj is LayoutBlock =>
     isView(obj) ||
@@ -183,4 +183,4 @@ export const isLayoutBlock = (obj: any): obj is LayoutBlock =>
     isToggle(obj) ||
     isView(obj) ||
     isGroup(obj) ||
-    isInteractive(obj);
+    isFunction(obj);

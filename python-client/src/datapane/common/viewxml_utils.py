@@ -58,9 +58,7 @@ def conv_attrib(v: t.Any) -> t.Optional[str]:
 
 def mk_attribs(**attribs: t.Any) -> SSDict:
     """convert attributes, dropping None values"""
-    # TODO - uncomment when 3.8+ only
-    # self.attributes = {str(k): v1 for (k, v) in kwargs.items() if (v1 := _conv_attrib(v)) is not None}
-    return {str(k): conv_attrib(v) for (k, v) in attribs.items() if conv_attrib(v) is not None}
+    return {str(k): v1 for (k, v) in attribs.items() if (v1 := conv_attrib(v)) is not None}
 
 
 #####################################################################

@@ -1,53 +1,47 @@
-from datapane.client.utils import display_msg
 from datapane.common import DPError
 
 
-class IncompatibleVersionError(DPError):
+def add_help_text(x: str) -> str:
+    return f"{x}\nPlease run with `dp.enable_logging()`, restart your Jupyter kernel/Python instance, and/or visit https://www.github.com/datapane/datapane to raise issue / discuss if error repeats"
+
+
+class DPClientError(DPError):
+    def __str__(self):
+        # update the error message with help text
+        return add_help_text(super().__str__())
+
+
+class IncompatibleVersionError(DPClientError):
     pass
 
 
-class UnsupportedResourceError(DPError):
+class UnsupportedResourceError(DPClientError):
     pass
 
 
-class ReportTooLargeError(DPError):
+class ReportTooLargeError(DPClientError):
     pass
 
 
-class InvalidTokenError(DPError):
+class InvalidTokenError(DPClientError):
     pass
 
 
-class UnsupportedFeatureError(DPError):
+class UnsupportedFeatureError(DPClientError):
     pass
 
 
-class InvalidReportError(DPError):
+class InvalidReportError(DPClientError):
     pass
 
 
-class MissingCloudPackagesError(DPError):
+class ViewError(DPClientError):
+    pass
+
+
+class MissingCloudPackagesError(DPClientError):
     def __init__(self, *a, **kw):
         # quick hack until we setup a conda meta-package for cloud
         self.args = (
             "Cloud packages not found, please run `pip install datapane[cloud]` or `conda install -c conda-forge nbconvert flit-core`",
         )
-
-
-class NotebookException(Exception):
-    """Exception raised when a Notebook to Datapane conversion fails."""
-
-    def _render_traceback_(self):
-        display_msg(
-            f"""**Conversion failed**
-
-{str(self)}"""
-        )
-
-
-class NotebookParityException(NotebookException):
-    """Exception raised when IPython output cache is not in sync with the saved notebook"""
-
-
-class BlocksNotFoundException(NotebookException):
-    """Exception raised when no blocks are found during conversion"""

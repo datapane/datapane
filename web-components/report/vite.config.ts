@@ -1,33 +1,63 @@
-import { defineConfig } from "vite";
-import {
-    esLib,
-    PACKAGE_VERSION_BOKEH,
-    PLUGIN_REPLACE_BOKEH,
-    pluginVue,
-    RESOLVE_ALIAS,
-} from "./dp-base-config";
+import { defineConfig, LibraryFormats } from "vite";
+import replace from "@rollup/plugin-replace";
 import vueESM from "../shared/rollup-plugin-vue-esm";
+import path from "path";
+import tailwindcss from "tailwindcss";
+import vue from "@vitejs/plugin-vue";
 
 module.exports = defineConfig(({ mode }) => ({
-    resolve: RESOLVE_ALIAS,
-    css: {
-        postcss: {},
+    resolve: {
+        alias: {
+            emitter: require.resolve("emitter-component"),
+        },
     },
-    plugins: [pluginVue(["revo", "x"]), PLUGIN_REPLACE_BOKEH],
+    css: {
+        postcss: {
+            plugins: [
+                tailwindcss({
+                    config: "./local-report.tailwind.config.js",
+                }) as any,
+            ],
+        },
+    },
+    plugins: [
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) =>
+                        ["revo", "x"].some((ce) => tag.startsWith(`${ce}-`)),
+                },
+            },
+        }),
+        replace({
+            include: ["node_modules/@bokeh/**/*.js"],
+            values: {
+                // shim jquery to window object for bokehjs
+                jQuery: "window.jQuery",
+            },
+            preventAssignment: false,
+        }) as any,
+    ],
     define: {
         // Bokeh 2.4 expects a global PACKAGE_VERSION to be defined
-        PACKAGE_VERSION: PACKAGE_VERSION_BOKEH,
+        PACKAGE_VERSION: JSON.stringify(process.env.npm_package_version),
         // Pinia expects the node `process` global to be defined but support for this
         // was removed in Vite 3
         "process.env.NODE_ENV": `"${process.env.NODE_ENV}"`,
     },
     build: {
-        // TODO - disable sourcemap in prod
-        sourcemap: true,
+        sourcemap: process.env.NODE_ENV === "development",
+        // Enabled in order to split out report `tailwind.css` file
+        cssCodeSplit: true,
         outDir: "./dist/report/",
-        lib: { ...esLib("index.ts"), fileName: "index" },
+        lib: {
+            entry: [path.resolve(__dirname, "index.ts")],
+            formats: ["es"] as LibraryFormats[],
+            fileName: "[name]",
+        },
         rollupOptions: {
             output: {
+                assetFileNames: "[name].[ext]",
                 entryFileNames: "[name].[format].js",
                 chunkFileNames: "[name].[hash].[format].js",
                 paths: {

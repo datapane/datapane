@@ -3,7 +3,7 @@ from typing import Union
 from packaging import version as v
 from packaging.specifiers import SpecifierSet
 
-from datapane.client import log
+from .dp_types import log
 
 
 class VersionMismatch(Exception):

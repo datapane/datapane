@@ -7,10 +7,10 @@ from pathlib import Path
 from datapane.common import ViewXML
 from datapane.view import View
 
-from .file_store import FileEntry, FileStore
+from .file_store import DummyFileEntry, FileEntry, FileStore
 
 if t.TYPE_CHECKING:
-    from datapane.app.runtime import InteractiveRef
+    from datapane.app.runtime import FunctionRef
 
 
 @dc.dataclass
@@ -20,7 +20,7 @@ class ViewState:
     file_entry_klass: dc.InitVar[t.Type[FileEntry]]
     store: FileStore = dc.field(init=False)
     view_xml: ViewXML = ""
-    entries: t.Dict[str, InteractiveRef] = dc.field(default_factory=dict)
+    entries: t.Dict[str, FunctionRef] = dc.field(default_factory=dict)
     dir_path: dc.InitVar[t.Optional[Path]] = None
 
     def __post_init__(self, file_entry_klass, dir_path):
@@ -28,14 +28,23 @@ class ViewState:
         self.store = FileStore(fw_klass=file_entry_klass, assets_dir=dir_path)
 
 
-# Step = t.Callable[[ViewState, t.Any], t.Tuple[ViewState, t.Any]]
+class BaseProcessor:
+    """Processor class that handles pipeline operations"""
+
+    s: ViewState
+
+    def __call__(self, _: t.Any) -> t.Any:
+        raise NotImplementedError("Implement in subclass")
 
 
 # TODO - type this properly
 class Pipeline:
-    """A simple, programmable, eagerly-evaluated, pipeline specialised on ViewAST transformations"""
+    """
+    A simple, programmable, eagerly-evaluated, pipeline specialised on ViewAST transformations
+    similar to f :: State s => s ViewState x -> s ViewState y
+    """
 
-    # TODO - should we just use a lib for this?
+    # NOTE - toolz has an untyped function for this
 
     def __init__(self, s: ViewState, x: t.Any = None):
         self._state = s
@@ -56,27 +65,6 @@ class Pipeline:
         return self._x
 
 
-class BaseProcessor:
-    """
-    Processor class that handles pipeline operations
-    # TODO - should we just make state an attribute here instead of threading?
-    """
-
-    s: ViewState
-    #
-    # @contextmanager
-    # def update_state(self):
-    #     # return a copy of state
-    #     yield self.state
-    #     # modifiy state here??
-    #
-    # @property
-    # def sstate(self) -> ViewState:
-    #     return self.state
-    #
-    # @sstate.setter
-    # def sstate(self, x: ViewState):
-    #     self.state = x
-
-    def __call__(self, _: t.Any) -> t.Any:
-        raise NotImplementedError("Implement in subclass")
+def mk_null_pipe(view: View) -> Pipeline:
+    s = ViewState(view, file_entry_klass=DummyFileEntry)
+    return Pipeline(s)

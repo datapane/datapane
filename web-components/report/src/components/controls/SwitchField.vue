@@ -13,14 +13,20 @@ const onChange = (value: boolean) => {
 </script>
 
 <template>
-    <form-kit
-        type="checkbox"
-        :value="initial"
-        :label="label || name"
-        :name="name"
-        @input="onChange"
-        data-cy="boolean-field"
-    />
+    <!--
+         TODO - formkit checkbox sets its validation to `required` regardless of validation settings,
+         if it is the sole parent element of a component. Hacky solution for now is to wrap the component in `span`s.
+     -->
+    <span>
+        <form-kit
+            type="checkbox"
+            :value="initial"
+            :label="label || name"
+            :name="name"
+            @input="onChange"
+            data-cy="boolean-field"
+        />
+    </span>
 </template>
 
 <style>

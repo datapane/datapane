@@ -68,7 +68,7 @@ const readGcsTextOrJsonFile = <T = string | object | null>(
 export class Block {
     public refId = uuid4();
     public id?: string;
-    public captionType = "Figure";
+    public static captionType: CaptionType = "Figure";
     public caption?: string;
     public label?: string;
     public count?: number;
@@ -86,7 +86,7 @@ export class Block {
         this.caption = figure.caption;
         const rootStore = useRootStore();
         this.componentProps = {
-            figure: { ...figure, captionType: this.captionType },
+            figure,
             singleBlockEmbed: rootStore.singleBlockEmbed,
         };
 
@@ -222,17 +222,17 @@ export abstract class AssetBlock extends Block {
 
 export class TableBlock extends AssetBlock {
     public component = markRaw(VTableBlock);
-    public captionType = "Table";
+    public static captionType: CaptionType = "Table";
 }
 
 export class FoliumBlock extends AssetBlock {
     public component = markRaw(VFoliumBlock);
-    public captionType = "Plot";
+    public static captionType: CaptionType = "Plot";
 }
 
 export class PlotapiBlock extends AssetBlock {
     public component = markRaw(VPlotapiBlock);
-    public captionType = "Plot";
+    public static captionType: CaptionType = "Plot";
 }
 
 export class EmbedBlock extends AssetBlock {
@@ -306,7 +306,7 @@ export class MediaBlock extends AssetBlock {
 }
 
 export abstract class PlotAssetBlock extends AssetBlock {
-    public captionType = "Plot";
+    public static captionType: CaptionType = "Plot";
     public responsive: boolean;
 
     public constructor(elem: Elem, figure: BlockFigure) {

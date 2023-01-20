@@ -28,13 +28,13 @@ from furl import furl
 from munch import Munch
 
 from datapane import __version__
-from datapane.client.environment import environment
 from datapane.client import DPClientError, capture, capture_event
 from datapane.client import config as c
 from datapane.client import display_msg
 from datapane.client.commands import failure_msg, success_msg
 from datapane.client.utils import open_in_browser
 from datapane.common import URL, pushd
+from datapane.ipython.environment import environment
 
 from .common import _process_res
 
@@ -129,7 +129,7 @@ def ping(config: t.Optional[c.Config] = None, cli_login: bool = False, verbose: 
 
 def _run_script(script: Path):
     """Run the template script and copy it locally to cwd"""
-    script_path = ir.files("datapane.resources.templates.hello") / script
+    script_path = ir.files("datapane.resources.app_templates.hello") / script
     shutil.copyfile(str(script_path), script_path.name)
     runpy.run_path(str(script_path), run_name="__datapane__")
 

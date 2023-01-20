@@ -251,7 +251,7 @@ class DateTime(Parameter[datetime]):
 class B64Path(Path):
     """Pydantic custom type based upon Path object"""
 
-    # HACk to deal with Path not being directly subclassable (fix in Py3.12)
+    # Hack to deal with Path not being directly subclassable (fixed in Py3.12)
     _flavour = type(Path())._flavour
 
     @classmethod

@@ -99,7 +99,7 @@ def enable_logging():
 # Output
 def open_in_browser(url: str):
     """Open the given URL in the user's browser"""
-    from datapane.client.environment import environment
+    from datapane.ipython.environment import environment
 
     # TODO - this is a bit of a hack, but works for now. JupyterLab (Codespaces) doesn't support webbrowser.open.
     if environment.is_notebook_environment and not environment.can_open_links_from_python:
@@ -136,7 +136,7 @@ class MarkdownFormatter(string.Formatter):
 
 
 def display_msg(text: str, **params: str):
-    from datapane.client.environment import environment
+    from datapane.ipython.environment import environment
 
     msg = MarkdownFormatter(environment.is_notebook_environment).format(text, **params)
     if environment.is_notebook_environment:

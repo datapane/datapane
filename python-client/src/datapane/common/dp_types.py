@@ -43,5 +43,7 @@ class StrEnum(str, Enum):
 class DPError(Exception):
     """Base DP Error"""
 
+    pass
+
 
 log = logging.getLogger("datapane")

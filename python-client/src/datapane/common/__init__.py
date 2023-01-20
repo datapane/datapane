@@ -28,6 +28,7 @@ from .dp_types import (
     SDict,
     SList,
     SSDict,
+    log,
 )
 from .ops_utils import pushd, timestamp
 from .utils import dict_drop_empty, guess_type, utf_read_text

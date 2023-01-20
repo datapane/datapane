@@ -14,7 +14,7 @@ import stringcase
 import yaml
 
 from datapane.client.exceptions import DPClientError, MissingCloudPackagesError
-from datapane.client.utils import log
+from datapane.client import log
 from datapane.common import SDict, utf_read_text
 
 # script paths

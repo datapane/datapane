@@ -83,7 +83,7 @@
     <choice>
       <ref name="LayoutBlock"/>
       <ref name="DataBlock"/>
-      <ref name="Interactive"/>
+      <ref name="Function"/>
       <ref name="Empty"/>
     </choice>
   </define>
@@ -93,10 +93,10 @@
       <ref name="block_name"/>
     </element>
   </define>
-  <!-- Interactive block handling -->
-  <define name="Interactive">
+  <!-- Function block handling -->
+  <define name="Function">
     <a:documentation/>
-    <element name="Interactive">
+    <element name="Function">
       <ref name="block_label_or_name"/>
       <!-- htmx-like attributes -->
       <attribute name="function_id">

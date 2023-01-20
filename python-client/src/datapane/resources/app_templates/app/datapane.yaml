@@ -1,0 +1,21 @@
+# Datapane config - see https://docs.datapane.com/tutorials/deploying-an-app#configuration
+
+# App name (can include spaces, numbers, etc.)
+name: Covid Demo {{ name }}
+
+# App parameters
+parameters: [
+]
+
+## Additional files to include and exlcude (can use glob syntax)
+# include:
+# -
+# exclude:
+# -
+
+## Python packages required for the app
+#requirements:
+#  -
+
+# link to the source code, e.g. git repo
+# source_url:

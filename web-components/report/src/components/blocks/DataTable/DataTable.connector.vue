@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { defineAsyncComponent, ref } from "vue";
-import { DatasetResponse, ExportType } from "../../../data-model/blocks";
+import {
+    BlockFigureProps,
+    DatasetResponse,
+    ExportType,
+} from "../../../data-model/blocks";
 import { useRootStore } from "../../../data-model/root-store";
 import { storeToRefs } from "pinia";
+import BlockWrapper from "../../layout/BlockWrapper.vue";
 const DataTableBlock = defineAsyncComponent(() => import("./DataTable.vue"));
 
 const p = defineProps<{
@@ -13,6 +18,8 @@ const p = defineProps<{
     getCsvText: () => Promise<string>;
     downloadLocal: (type: ExportType) => Promise<void>;
     downloadRemote: (type: ExportType) => Promise<void>;
+    figure: BlockFigureProps;
+    singleBlockEmbed?: boolean;
 }>();
 
 const rootStore = useRootStore();
@@ -51,16 +58,18 @@ const handleLoadFull = async () => {
 </script>
 
 <template>
-    <DataTableBlock
-        :singleBlockEmbed="!!singleBlockEmbed"
-        :data="dsData"
-        :cells="p.cells"
-        :schema="dsSchema"
-        :previewMode="previewMode"
-        :getCsvText="p.getCsvText"
-        :downloadLocal="p.downloadLocal"
-        :downloadRemote="p.downloadRemote"
-        :refId="p.refId"
-        @load-full="handleLoadFull"
-    />
+    <block-wrapper :figure="p.figure" :single-block-embed="singleBlockEmbed">
+        <data-table-block
+            :singleBlockEmbed="!!singleBlockEmbed"
+            :data="dsData"
+            :cells="p.cells"
+            :schema="dsSchema"
+            :previewMode="previewMode"
+            :getCsvText="p.getCsvText"
+            :downloadLocal="p.downloadLocal"
+            :downloadRemote="p.downloadRemote"
+            :refId="p.refId"
+            @load-full="handleLoadFull"
+        />
+    </block-wrapper>
 </template>

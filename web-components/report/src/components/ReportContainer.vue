@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ReportComponent from "./ReportComponent.vue";
+import LoadingSpinner from "./LoadingSpinner.vue";
 import { AppData, ReportProps } from "../data-model/types";
 import { computed, onMounted, ref } from "vue";
 import { trackLocalReportView } from "../../../shared/dp-track";
@@ -73,20 +74,15 @@ const htmlHeader = computed(() => {
           });
 });
 
-const htmlHeaderRef = (node: any) => {
-    /**
-     * Set report theme on HTML header node load
-     */
-    if (document.body.contains(node)) {
-        setTheme(p.isLightProse);
-    }
-};
+onMounted(() => {
+    setTheme(p.isLightProse);
+});
 
 const { dpAppRunner } = window;
 </script>
 
 <template>
-    <Teleport to="#header-target">
+    <Teleport to="#header-target" v-if="dpAppRunner && isView(report)">
         <button @click="setReport" class="dp-btn dp-btn-sm dp-btn-primary">
             <div class="flex align-items justify-between">
                 <div>Reset</div>
@@ -96,20 +92,21 @@ const { dpAppRunner } = window;
             </div>
         </button>
     </Teleport>
-    <div :class="{ 'mt-14': dpAppRunner }">
-        <div
-            v-if="!singleBlockEmbed"
-            id="html-header"
-            :ref="htmlHeaderRef"
-            v-html="htmlHeader"
-        />
+    <div :class="{ 'mt-16': dpAppRunner, 'mt-8': !dpAppRunner }">
+        <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
         <report-component
-            v-if="isView(report)"
+            v-if="isView(report) && !error"
             :is-org="p.isOrg"
             :mode="p.mode"
             :report="report"
             :key="report.refId"
         />
+        <div
+            v-else-if="!isView(report) && !error"
+            class="flex items-center justify-center h-screen w-full -mt-12"
+        >
+            <loading-spinner :large="true" />
+        </div>
         <div v-if="error" class="bg-red-100 p-4 mt-4">{{ error }}</div>
     </div>
 </template>

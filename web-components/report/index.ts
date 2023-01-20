@@ -9,6 +9,9 @@ import "highlight.js/styles/stackoverflow-light.css";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/eclipse.css";
 
+// Async load `tailwind.css` so that it can be split into own file by rollup
+import("./tailwind");
+
 customElements.define("x-table-block", defineCustomElement(TableBlock));
 
 const parseElementProps = (elId: string): any => {

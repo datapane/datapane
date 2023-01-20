@@ -9,8 +9,7 @@ from typing import Any, Dict
 
 import dacite
 
-from .dp_types import JDict, JList, SSDict
-from .utils import log
+from datapane.common import JDict, JList, SSDict, log
 
 
 # TODO - move

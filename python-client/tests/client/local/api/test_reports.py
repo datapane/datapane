@@ -11,10 +11,10 @@ from lxml import etree
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
-import datapane.blocks.interactive
+import datapane.blocks.function
 from datapane.client.api.builtins import gen_df, gen_plot
 from datapane.client.api.report.blocks import BaseElement, BuilderState
-from datapane.client.exceptions import DPError
+from datapane.client.exceptions import DPClientError
 from datapane.common.report import load_doc, validate_report_doc
 
 ################################################################################
@@ -191,7 +191,7 @@ def test_gen_report_nested_mixed():
 
 def test_gen_report_primitives(datadir: Path):
     # check we don't allow arbitary python primitives - must be pickled directly via dp.Attachment
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         _ = dp.App([1, 2, 3])
 
     report = dp.App(
@@ -206,20 +206,20 @@ def test_gen_report_primitives(datadir: Path):
 
 def test_gen_failing_reports():
     # nested pages
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         r = dp.App(dp.Page(dp.Page(md_block)))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         r = dp.App(dp.Group(dp.Page(md_block)))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # page/pages with 0 objects
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         r = dp.App(dp.Page(blocks=[]))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # select with 1 object
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         r = dp.App(dp.Page(dp.Select(blocks=[md_block])))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
@@ -229,7 +229,7 @@ def test_gen_failing_reports():
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
     # empty df
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         r = dp.App(dp.DataTable(pd.DataFrame()))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
@@ -238,7 +238,7 @@ def test_gen_failing_reports():
         r = dp.App(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
         dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
 
-    with pytest.raises(DPError):
+    with pytest.raises(DPClientError):
         dp.App(dp.Text("a", name="3-invalid-name"))
 
 

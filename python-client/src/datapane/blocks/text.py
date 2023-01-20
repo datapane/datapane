@@ -96,17 +96,8 @@ class Text(EmbeddedTextBlock):
         return Group(blocks=blocks)
 
 
-class Divider(EmbeddedTextBlock):
-    """
-    Divider blocks add a horizontal line to your report, normally used to break up report contents
-    # TODO - turn into a component function, doesn't need to be a block type
-    """
-
-    _tag = "Text"
-
-    def __init__(self):
-        # `---` is processed as a horizontal divider by the FE markdown renderer
-        super().__init__(content="---")
+def Divider() -> Text:
+    return Text("---")
 
 
 class Code(EmbeddedTextBlock):
@@ -188,7 +179,7 @@ class Embed(EmbeddedTextBlock):
         result = get_embed_url(url, width=width, height=height)
 
         # if "html" not in result:
-        #     raise DPError(f"Can't embed result from provider for URL '{url}'")
+        #     raise DPClientError(f"Can't embed result from provider for URL '{url}'")
         super().__init__(
             content=result.html, name=name, label=label, url=url, title=result.title, provider_name=result.provider
         )

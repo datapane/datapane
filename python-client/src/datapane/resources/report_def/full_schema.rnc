@@ -50,7 +50,7 @@ block_label_or_name = block_name?, block_label?
 #  block_label_or_name, Block+
 #}
 
-Block = LayoutBlock | DataBlock | Interactive | Empty
+Block = LayoutBlock | DataBlock | Function | Empty
 
 # Used to describe a Placeholder element we can patch - like empty div in HTML
 Empty = element Empty {
@@ -59,8 +59,8 @@ Empty = element Empty {
 
 
 ################################################################################
-# Interactive block handling
-Interactive = element Interactive {
+# Function block handling
+Function = element Function {
   block_label_or_name,
 
   # htmx-like attributes

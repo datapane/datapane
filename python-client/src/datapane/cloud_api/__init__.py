@@ -40,4 +40,4 @@ from .app import App, AppFormatting, AppWidth, FontChoice, PageLayout, TextAlign
 from .common import Resource
 from .dp_object import DPObjectRef
 from .file import File
-from .user import hello_world, login, logout, ping, template
+from .user import hello_world, login, logout, ping, signup, template

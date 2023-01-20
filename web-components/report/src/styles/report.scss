@@ -41,3 +41,21 @@
 .multiselect__tag {
     margin-top: 1px;
 }
+
+input[name="parameter_files"]::file-selector-button {
+    background: var(--dp-accent-color) !important;
+    color: var(--dp-accent-text) !important;
+    @apply rounded-md;
+}
+
+/* DataTable */
+
+revo-grid {
+    background-color: white;
+}
+
+/* Formkit */
+
+.formkit-form {
+    width: 100% !important;
+}

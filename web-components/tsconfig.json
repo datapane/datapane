@@ -21,10 +21,7 @@
         "report/**/*.vue",
         "base/**/*.ts",
         "base/**/*.d.ts",
-        "base/**/*.vue",
-        "params-component/**/*.ts",
-        "params-component/**/*.d.ts",
-        "params-component/**/*.vue"
+        "base/**/*.vue"
     ],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

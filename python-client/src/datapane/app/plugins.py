@@ -10,7 +10,7 @@ Canister is a simple plugin for bottle, providing:
 - CORS for cross-domain REST APIs
 
 Changes Canister -> DPBottle
-Removeed
+Removed
 - Logging
 - Global auth (both Basic and JWT)
   - instead a hardcoded "anonymous" user

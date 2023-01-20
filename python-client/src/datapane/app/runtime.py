@@ -7,6 +7,7 @@ import random
 import secrets
 import sys
 import typing as t
+from copy import copy
 from functools import wraps
 from pathlib import Path
 
@@ -16,34 +17,19 @@ from pydantic import ValidationError
 
 from datapane.blocks import Controls, Swap
 from datapane.client import log
-from datapane.processors import AppTransformations, ConvertXML, OptimiseAST, Pipeline, ViewState
+from datapane.processors import AppTransformations, ConvertXML, Pipeline, PreProcessView, ViewState
 from datapane.processors.file_store import GzipTmpFileEntry
 from datapane.view import View
 
 if t.TYPE_CHECKING:
     from .json_rpc import RPC_JSON
 
-
-########################################################################
-# View processors
-# NOTEs
-# 3 functions
-# - global
-# - app wrapped - manual and auto wrapped (when placed in Controls)
-# - app unwrapped - unwrapped functions are called directly - these are just normal python functions
-# - need to make View an element type so can place in tree
-# - add dp.Dynamic temporarily
-# - wrapped functions take params, along with unpacking helpers in the wrapper
-# - do we support params / props and normal python function syntax?
-#   - 2 ways complex? only at controls site?
-
-
 # global function cache
-f_cache: LRU[t.Tuple[str, bytes], t.Dict] = LRU(max_size=128)
+f_cache: LRU[t.Tuple[str, bytes], ViewState] = LRU(max_size=128)
 
 
 @dc.dataclass
-class InteractiveRef:
+class FunctionRef:
     f: t.Callable
     controls: Controls
     f_id: str
@@ -74,7 +60,7 @@ class InteractiveRef:
         log.debug(f"Registered {self.f} ({self.cache=}, {self.state=})")
 
 
-FEntries = t.Dict[str, InteractiveRef]
+FEntries = t.Dict[str, FunctionRef]
 
 
 @dc.dataclass
@@ -82,7 +68,7 @@ class GlobalState:
     """Stored within the lifetime of an App and passed through to handlers"""
 
     app_dir: Path
-    main: InteractiveRef
+    main: FunctionRef
 
 
 @dc.dataclass
@@ -101,7 +87,7 @@ class SessionState:
     def __post_init__(self):
         self.session_id = secrets.token_urlsafe(18)
 
-    def add_entry(self, app_entry: InteractiveRef) -> None:
+    def add_entry(self, app_entry: FunctionRef) -> None:
         """Add the entry to the known entries for the state"""
         self.entries[app_entry.f_id] = app_entry
 
@@ -120,87 +106,95 @@ def get_session_state() -> SessionState:
     return t.cast(SessionState, bt.request.session)
 
 
-def apply_ref(g_s: GlobalState, s_s: SessionState, ref: InteractiveRef, params: t.Dict) -> t.Dict:
-    """Run the referenced app function with the given parameters and return the result
+def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.Dict) -> t.Dict:
+    """
+    Run the referenced app function with the given parameters and return the result
     suitable for encoding in an RPC response
     """
     from .json_rpc import RPCException
 
-    # do we have this in the cache??
-    if ref.cache:
-        _key = (ref.f_id, pickle.dumps(params))
-        _val = f_cache.get(_key)
-        _hit_ratio = (f_cache.hit_count / (f_cache.soft_miss_count + f_cache.hit_count)) * 100
-        log.debug(f"Cache info - {f_cache.soft_miss_count} misses, {f_cache.hit_count} hits ({_hit_ratio:.2f}%)")
+    def check_cache() -> t.Optional[t.Dict]:
+        # do we have this in the cache??
+        if ref.cache:
+            _key = (ref.f_id, pickle.dumps(params))
+            _val: t.Optional[ViewState] = f_cache.get(_key)
+            _hit_ratio = (f_cache.hit_count / (f_cache.soft_miss_count + f_cache.hit_count)) * 100
+            log.debug(f"Cache info - {f_cache.soft_miss_count} misses, {f_cache.hit_count} hits ({_hit_ratio:.2f}%)")
 
-        if _val:
-            log.debug("Got cache hit for request")
-            return _val
+            if _val:
+                log.debug("Got cache hit for request")
+                return build_rpc_res(_val)
+        return None
 
-    # validate the params
+    def store_cache(vs: ViewState) -> None:
+        if ref.cache:
+            _key = (ref.f_id, pickle.dumps(params))
+            f_cache[_key] = vs
 
-    # handle files
+    def gen_args():
+        try:
+            ParamsModel = ref.controls._to_pydantic()
+            params_model = ParamsModel(**params)
+            in_params: dict = params_model.dict()
 
-    try:
-        ParamsModel = ref.controls._to_pydantic()
-        params_model = ParamsModel(**params)
-    except ValidationError as e:
-        # TODO - fix json-rpc id handling here
-        raise RPCException(-32602, "Invalid Parameters", data=e.errors()) from e
+        except ValidationError as e:
+            # TODO - fix json-rpc id handling here
+            raise RPCException(-32602, "Invalid Parameters", data=e.errors()) from e
 
-    # function arg handling / binding
-    f_sig = inspect.signature(ref.f, follow_wrapped=True)
-    in_params: t.Dict = params_model.dict()
+        # function arg handling / binding
+        f_sig = inspect.signature(ref.f, follow_wrapped=True)
 
-    # unpack params
-    kwargs = {}
-    for k in list(in_params.keys()):
-        if k in f_sig.parameters:
-            kwargs[k] = in_params.pop(k)
+        # unpack params
+        kwargs = {}
+        for k in list(in_params.keys()):
+            if k in f_sig.parameters:
+                kwargs[k] = in_params.pop(k)
 
-    # add optional state param
-    if ref.state:  # "state" in f_sig.parameters:
-        kwargs["state"] = s_s.user_state
+        # add optional state param
+        if ref.state:  # "state" in f_sig.parameters:
+            kwargs["state"] = s_s.user_state
 
-    f_args = f_sig.bind(params=in_params, **kwargs)
-    f_args.apply_defaults()
+        f_args = f_sig.bind(params=in_params, **kwargs)
+        f_args.apply_defaults()
+        return f_args
 
-    # call the function
+    def build_view(res) -> ViewState:
+        # Build a view for serving, using the view_ast as a base state and storing assets in dest
+        # TODO - use ref.swap to validate return type
+        view: View
+        if isinstance(res, View):
+            view = copy(res)
+        elif isinstance(res, list):
+            view = View(*res)
+        else:
+            view = View(res)
+
+        assets_dir = g_s.app_dir / "assets"
+
+        # write the app html and assets
+        vs = ViewState(view=view, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
+        return Pipeline(vs).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state
+
+    def build_rpc_res(vs: ViewState) -> dict:
+        # we need to reapply the viewstate for the specific user session
+        s_s.apply_view_state(vs)
+        return dict(is_fragment=ref.f_id != "app.main", view_xml=vs.view_xml, assets=vs.store.as_dict())
+
+    ############################################################################
+    # Core logic
+    if rpc_res := check_cache():
+        return rpc_res
+
+    # call the function with the processed input parameters
+    f_args = gen_args()
     res = ref.f(*f_args.args, **f_args.kwargs)
-
-    # TODO - just construct a new View
-    # TODO - use ref.swap to validate return type
-    view: View
-    if isinstance(res, View):
-        view = res
-    elif isinstance(res, list):
-        view = View(*res)
-    else:
-        view = View(res)
-
     # build the view response
-    vs = build_view(g_s, s_s, view)
-    s_s.apply_view_state(vs)
+    vs = build_view(res)
+    # construct the RPC return
+    rpc_res = build_rpc_res(vs)
+    store_cache(vs)
 
-    # return result
-    res = dict(is_fragment=ref.f_id != "app.main", view_xml=vs.view_xml, assets=vs.store.as_dict())
-
-    if ref.cache:
-        _key = (ref.f_id, pickle.dumps(params))
-        f_cache[_key] = res
-
-    return res
-
-
-def build_view(g_s: GlobalState, s_s: SessionState, view: View) -> ViewState:
-    """
-    Build a view for serving, using the view_ast as a base state and storing assets in dest
-    """
-    assets_dir = g_s.app_dir / "assets"
-
-    # write the app html and assets
-    vs = ViewState(view=view, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
-    return Pipeline(vs).pipe(OptimiseAST()).pipe(AppTransformations()).pipe(ConvertXML()).state
+    return rpc_res
 
 
 def dp_function(name: str, cache: bool = False, state: bool = False):

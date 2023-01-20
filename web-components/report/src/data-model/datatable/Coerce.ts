@@ -43,7 +43,7 @@ export class Coerce {
     }
 
     private composeFloatField(field: any) {
-        this.coerceRow = R.compose((row) => {
+        this.coerceRow = R.compose((row: any) => {
             const val = row[field.name];
             if (val) {
                 row[field.name] = parseFloat(val);
@@ -67,7 +67,7 @@ export class Coerce {
             // Therefore we do not need to check the 'field.type.unit' property
             // against 'TimeUnit', we can simply always pass the value to
             // 'new Date()'...
-            this.coerceRow = R.compose((row) => {
+            this.coerceRow = R.compose((row: any) => {
                 const val = row[field.name];
                 if (val) {
                     row[field.name] = new Date(val).toISOString();
