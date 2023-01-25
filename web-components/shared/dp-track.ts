@@ -22,17 +22,10 @@ const KPIS_ENDPOINT = urljoin(
 const LOCK_NAME = "ph_datapane_store";
 const mutex = new FastMutex();
 
-const identifyUser = async (posthog: any, userId: string) => {
-    try {
-        posthog.identify(userId);
-    } catch (e) {
-        console.error("An analytics error occurred", e);
-    }
-};
-
 export const setupPostHog = async (
     apiKey: string,
-    userId?: string
+    userId?: string,
+    groupId?: string
 ): Promise<void> => {
     try {
         await mutex.lock(LOCK_NAME);
@@ -41,7 +34,8 @@ export const setupPostHog = async (
             loaded: async (posthog: any) => {
                 /* We need to do this to use elsewhere in more dynamic ways, outside the scope of this file */
                 window.posthog = posthog;
-                userId && (await identifyUser(posthog, userId));
+                userId && posthog.identify(userId);
+                groupId && posthog.group("company", groupId);
                 await mutex.release(LOCK_NAME);
             },
         });
