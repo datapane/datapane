@@ -148,5 +148,6 @@ def capture_event(name: str) -> Callable[[F], F]:
 def finish_queue():
     """Block main thread until analytics queue is clear"""
     global _consumer
-    _consumer.join_queue()
-    del _consumer
+    if _consumer is not None:
+        _consumer.join_queue()
+    _consumer = None
