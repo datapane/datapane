@@ -40,6 +40,7 @@ feel free to drop by our Discord server or forum, found on our [community page][
 ### Do you have questions about the source code?
 
 - Feel free to drop by to [chat][chat].
+- Ask a question on our [forum](https://forum.datapane.com/).
 
 ### Do you want to contribute to the Datapane community?
 
