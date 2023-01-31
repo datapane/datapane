@@ -73,7 +73,7 @@ But what if we want to send a link to our report or embed it instead?
 
 Datapane Cloud is free! Share reports privately, or embed them into platforms like Salesforce and Medium.
 
-To sign up go to https://datapane.com/accounts/signup/ and then login by doing the following
+To sign up go to https://cloud.datapane.com/accounts/signup/ and then login by doing the following
 """
     ),
     dp.Select(
@@ -102,7 +102,7 @@ There's so much more we can do with Datapane!
 - [Read the documentation](https://docs.datapane.com)
 - [Explore our community spaces](https://datapane.com/community)
 - [We're open-source – browse the Datapane repo](https://github.com/datapane/datapane)
-- [Sign up for a Datapane Cloud account](https://datapane.com/accounts/signup/)
+- [Sign up for a Datapane Cloud account](https://cloud.datapane.com/accounts/signup/)
 """
     ),
 )
