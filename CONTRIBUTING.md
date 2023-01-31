@@ -33,9 +33,9 @@ feel free to drop by our Discord server or forum, found on our [community page][
 
 - That's great - it's always good to hear feedback and new ideas!
 
-- Check to see if it's been discussed already in our [forum][forum]
+- Check to see if it's been discussed already in our [feature requests][feature requests]
 
-- Open up a new Thread in the [forum][forum], we can start chatting about your needs!
+- Open up a new thread in our [feature requests][feature requests], we can start chatting about your needs!
 
 ### Do you have questions about the source code?
 
@@ -53,4 +53,4 @@ Datapane Team
 
 [community-page]: https://datapane.com/community
 [chat]: https://chat.datapane.com/
-[forum]: https://datapane.nolt.io/
+[feature requests]: https://datapane.nolt.io/
