@@ -163,6 +163,12 @@ Leave us some feedback, ask questions and request features.
 
 ### 📮 [Give feedback](https://datapane.nolt.io)
 
+## Forums
+
+Need technical help? Ask our experts on the forums.
+
+### 📮 [Ask a question](https://forum.datapane.com/)
+
 # Hosting Apps
 
 In addition to saving apps locally or hosting them yourself, you can host and share your apps using [Datapane Cloud](https://datapane.com/cloud).

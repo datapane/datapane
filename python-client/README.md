@@ -163,6 +163,12 @@ Leave us some feedback, ask questions and request features.
 
 ### 📮 [Give feedback](https://datapane.nolt.io)
 
+## Forums
+
+Need technical help? Ask our experts on the forums.
+
+### 📮 [Ask a question](https://forum.datapane.com/)
+
 # Hosting Apps
 
 In addition to saving apps locally or hosting them yourself, you can host and share your apps using [Datapane Cloud](https://datapane.com/cloud).
@@ -193,6 +199,7 @@ Here a few samples of the top apps created by the Datapane community.
 - [Join Discord](https://chat.datapane.com)
 - [Sign up for a free account](https://datapane.com/accounts/signup)
 - [Read the documentation](https://docs.datapane.com)
+- [Ask a question](https://forum.datapane.com/)
 
 ## Analytics
 
