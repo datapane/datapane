@@ -173,7 +173,7 @@ Need technical help? Ask our experts on the forums.
 
 In addition to saving apps locally or hosting them yourself, you can host and share your apps using [Datapane Cloud](https://datapane.com/cloud).
 
-To get your API key, [create a free account](https://cloud.datapane.com/accounts/signup/).
+To get your API key, [create a free account](https://datapane.com/accounts/signup/).
 
 Next, in your Python notebook or script, change the `save` function to `upload`:
 
@@ -197,8 +197,9 @@ Here a few samples of the top apps created by the Datapane community.
 # Next Steps
 
 - [Join Discord](https://chat.datapane.com)
-- [Sign up for a free account](https://cloud.datapane.com/accounts/signup/)
+- [Sign up for a free account](https://datapane.com/accounts/signup)
 - [Read the documentation](https://docs.datapane.com)
+- [Ask a question](https://forum.datapane.com/)
 
 ## Analytics
 
