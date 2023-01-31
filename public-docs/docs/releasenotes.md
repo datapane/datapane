@@ -21,7 +21,7 @@ Datapane Cloud is the best way to host and share your apps, dashboards, and apps
 
 With this release, Datapane Cloud users can now securely share reports with their team or clients by creating private Workspaces and Projects.
 
-[Create a free Workspace](https://datapane.com/accounts/signup){ .md-button }
+[Create a free Workspace](https://cloud.datapane.com/accounts/signup/){ .md-button }
 
 ### :octicons-repo-template-24: Templates and Components Catalogs
 
