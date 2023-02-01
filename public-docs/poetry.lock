@@ -601,7 +601,7 @@ six = "*"
 
 [[package]]
 name = "datapane"
-version = "0.15.5"
+version = "0.15.6"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
@@ -622,7 +622,7 @@ datacommons-pandas = "^0.0.3"
 dominate = "^2.4.0"
 dulwich = "^0.20.0"
 furl = "^2.0.0"
-glom = ">=20.11.0,<23.0.0"
+glom = ">=20.11.0,<24.0.0"
 importlib_resources = ">=3.0.0,<6.0.0"
 ipynbname = "^2021.3.2"
 Jinja2 = "^3.0.0"
@@ -631,7 +631,7 @@ lxml = "^4.0.0"
 micawber = ">=0.5.0"
 munch = "^2.3.0"
 nbconvert = ">=6.1.0,<7.0.0"
-packaging = ">=20.0.0,<22.0.0"
+packaging = ">=21.0.0,<24.0.0"
 pandas = "^1.1.0"
 posthog = ">=1.4.0, <3.0.0"
 pyarrow = ">=6.0.0,<11.0.0"
@@ -2774,6 +2774,7 @@ optional = false
 python-versions = "*"
 files = [
     {file = "pytrends-4.8.0-py2-none-any.whl", hash = "sha256:31a76cf560a23a9eb691a9a83a3306bbe555ed1665122a5756e789829f56a0ef"},
+    {file = "pytrends-4.8.0-py3-none-any.whl", hash = "sha256:376bcb745a3dff61e2bc2e39b2f419a153bcd9b0c4f869d0345e41e27b784260"},
     {file = "pytrends-4.8.0.tar.gz", hash = "sha256:04b7b33eb6dfc120aa89cb4640688a8b633337276b6ddcea44ff0c7f6b6243d2"},
 ]
 
