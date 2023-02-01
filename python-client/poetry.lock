@@ -219,14 +219,14 @@ files = [
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.11.1"
+version = "4.11.2"
 description = "Screen-scraping library"
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
-    {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},
-    {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
+    {file = "beautifulsoup4-4.11.2-py3-none-any.whl", hash = "sha256:0e79446b10b3ecb499c1556f7e228a53e64a2bfcebd455f370d8927cb5b59e39"},
+    {file = "beautifulsoup4-4.11.2.tar.gz", hash = "sha256:bc4bdda6717de5a2987436fb8d72f45dc90dd856bdfd512a1314ce90349a0106"},
 ]
 
 [package.dependencies]
@@ -1145,24 +1145,24 @@ files = [
 
 [[package]]
 name = "ipykernel"
-version = "6.21.0"
+version = "6.20.2"
 description = "IPython Kernel for Jupyter"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipykernel-6.21.0-py3-none-any.whl", hash = "sha256:a9aaefb0cd6f44e3dcaeaafb9222862ae73831f71afd77f465fc83d6199d1888"},
-    {file = "ipykernel-6.21.0.tar.gz", hash = "sha256:719eac0f1d86706589ee0910d6f785fd4c1ef123ab8e3466b8961c37991d0ef2"},
+    {file = "ipykernel-6.20.2-py3-none-any.whl", hash = "sha256:5d0675d5f48bf6a95fd517d7b70bcb3b2c5631b2069949b5c2d6e1d7477fb5a0"},
+    {file = "ipykernel-6.20.2.tar.gz", hash = "sha256:1893c5b847033cd7a58f6843b04a9349ffb1031bc6588401cadc9adb58da428e"},
 ]
 
 [package.dependencies]
 appnope = {version = "*", markers = "platform_system == \"Darwin\""}
 comm = ">=0.1.1"
-debugpy = ">=1.6.5"
+debugpy = ">=1.0"
 ipython = ">=7.23.1"
 jupyter-client = ">=6.1.12"
-jupyter-core = ">=4.12,<5.0.0 || >=5.1.0"
 matplotlib-inline = ">=0.1"
+nest-asyncio = "*"
 packaging = "*"
 psutil = "*"
 pyzmq = ">=17"
@@ -1443,14 +1443,14 @@ test = ["click", "coverage", "pre-commit", "pytest (>=7.0)", "pytest-asyncio (>=
 
 [[package]]
 name = "jupyter-server"
-version = "2.1.0"
+version = "2.2.0"
 description = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyter_server-2.1.0-py3-none-any.whl", hash = "sha256:90cd6f2bd0581ddd9b2dbe82026a0f4c228a1d95c86e22460efbfdfc931fcf56"},
-    {file = "jupyter_server-2.1.0.tar.gz", hash = "sha256:efaae5e4f0d5f22c7f2f2dc848635036ee74a2df02abed52d30d9d95121ad382"},
+    {file = "jupyter_server-2.2.0-py3-none-any.whl", hash = "sha256:9c79b7227a7e3974856265908da40715ab49b7014ac39478d80b07e164b5a70e"},
+    {file = "jupyter_server-2.2.0.tar.gz", hash = "sha256:f901efcb4adce2370c64dc5942be587bd181119644660a1eb123435c3cd01f95"},
 ]
 
 [package.dependencies]
@@ -2177,7 +2177,7 @@ test = ["pep440", "pre-commit", "pytest", "testpath"]
 name = "nest-asyncio"
 version = "1.5.6"
 description = "Patch asyncio to allow nested event loops"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.5"
 files = [
@@ -2605,14 +2605,14 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "posthog"
-version = "2.2.0"
+version = "2.3.0"
 description = "Integrate PostHog into any python application."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "posthog-2.2.0-py2.py3-none-any.whl", hash = "sha256:cf3561a23d6770991f0b890fbe09e20c488e54efe65f9202ffd4e37dd6a90f8a"},
-    {file = "posthog-2.2.0.tar.gz", hash = "sha256:1f450a20f7bed217874ded234f6ffc24ae73da37a16aa5bf76335249b34a9f60"},
+    {file = "posthog-2.3.0-py2.py3-none-any.whl", hash = "sha256:d4e2dcbfbea876409725470437acb32ca96cd7696c144bb19993ce6ad561f504"},
+    {file = "posthog-2.3.0.tar.gz", hash = "sha256:906ce912caa7f307ec8d32a88283203e96da6e4fd86e65ba7503994c5c484ac9"},
 ]
 
 [package.dependencies]
