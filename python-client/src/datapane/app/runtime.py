@@ -233,10 +233,12 @@ def hello_rpc(g_s: GlobalState, s_s: SessionState, name: str) -> RPC_JSON:
 def reset(g_s: GlobalState, s_s: SessionState) -> RPC_JSON:
     from .plugins import COOKIE_NAME
 
+    log.info(f"Resetting session for {s_s.session_id=}")
+
     # remove the user session
+    del s_s
     # remove the cookie
     bt.response.delete_cookie(COOKIE_NAME)
-    log.info(f"Resetting session for {s_s.session_id=}")
     return None
 
 
