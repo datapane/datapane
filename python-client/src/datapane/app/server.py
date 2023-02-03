@@ -14,6 +14,7 @@ import sys
 import tempfile
 import threading
 import typing as t
+from contextlib import suppress
 from pathlib import Path
 
 import bottle as bt
@@ -110,6 +111,7 @@ def serve(
     host: str = "127.0.0.1",
     debug: bool = False,
     ui: str = None,
+    public: bool = False,
 ) -> None:
     """
     Main app serve entrypoint.
@@ -158,7 +160,7 @@ def serve(
         if ui not in CONTROLLER_UIS:
             raise ValueError(f"UI choice '{ui}' is not a known option. Choose from: {', '.join(CONTROLLER_UIS.keys())}")
         ui_cls = CONTROLLER_UIS[ui]
-    controller = ServerController(server, cleanup=app_cleanup, ui_cls=ui_cls)
+    controller = ServerController(server, cleanups=[app_cleanup], ui_cls=ui_cls, public=public)
     controller.go()
 
 
@@ -326,19 +328,46 @@ class ControllerUI:
 
 
 class ServerController:
-    def __init__(self, server: CherootServer, *, cleanup: t.Callable, ui_cls: t.Type[ControllerUI]) -> None:
+    def __init__(
+        self, server: CherootServer, *, cleanups: list[t.Callable] = None, ui_cls: t.Type[ControllerUI], public: bool
+    ) -> None:
         self.server: CherootServer = server
-        self.cleanup = cleanup
+        self.cleanups: list[t.Callable] = cleanups or []
         self.thread: threading.Thread = None
         self.ui: ControllerUI = ui_cls(self)
+        self.public = public
 
     def go(self):
         self.server.acquire_port()
         self.ui.display()
+
+        if self.public:
+            self.start_ngrok()
+
         if self.ui.server_needs_background_thread:
             self.run_server_in_thread()
         else:
             self.run_server()
+
+    def start_ngrok(self):
+        from pyngrok import ngrok
+
+        current_config = {}
+        config_path = ngrok.conf.get_default().config_path or ngrok.conf.DEFAULT_NGROK_CONFIG_PATH
+
+        if config_path:
+            with suppress(FileNotFoundError):
+                current_config = ngrok.installer.get_ngrok_config(config_path, use_cache=False)
+
+        if current_config.get("authtoken", None):
+            ngrok_auth_token = current_config.get("authtoken")
+        else:
+            ngrok_auth_token = input("Enter ngrok auth token (see https://ngrok.com): ")
+
+        ngrok.set_auth_token(ngrok_auth_token)
+        http_tunnel = ngrok.connect(self.server.port, bind_tls=True)
+        self.ui.show_message(f"Public URL: {http_tunnel.public_url}\n")
+        self.cleanups.append(ngrok.kill)
 
     def run_server(self):
         try:
@@ -346,7 +375,7 @@ class ServerController:
         except KeyboardInterrupt:
             pass
         finally:
-            self.cleanup()
+            self.do_cleanups()
 
     def run_server_in_thread(self):
         assert self.thread is None
@@ -354,15 +383,19 @@ class ServerController:
         thread.start()
         self.thread = thread
         # To cover the case of non-clean shutdown:
-        atexit.register(self.cleanup)
+        atexit.register(self.do_cleanups)
 
     def stop_background_server(self):
         # This is only used for threaded mode
         self.server.stop()
         if self.thread is not None:
             self.thread.join()
-        self.cleanup()
-        atexit.unregister(self.cleanup)
+        self.do_cleanups()
+        atexit.unregister(self.do_cleanups)
+
+    def do_cleanups(self):
+        for cleanup in self.cleanups:
+            cleanup()
 
     @property
     def server_url(self) -> str:
@@ -395,8 +428,10 @@ class FallbackNotebookControllerUI(ControllerUI):
         )
 
     def show_message(self, value: str):
-        # we don't have a proper updatable display, but it's better to print somewhere than nowhere
-        print(value, file=sys.stdout, end="")
+        # Autolink URLs by treating as Markdown
+        from IPython.display import Markdown, display
+
+        display(Markdown(value))
 
 
 if ipywidgets is not None:

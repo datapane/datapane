@@ -97,6 +97,7 @@ cheroot = "^9.0.0"
 base64io = "^1.0.3"
 multimethod = "^1.9"
 typing-extensions = "^4.4.0"
+pyngrok = "^5.2.1"
 
 [tool.poetry.extras]
 plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi", "nbconvert"]

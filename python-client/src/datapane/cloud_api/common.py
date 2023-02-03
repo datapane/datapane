@@ -30,8 +30,8 @@ from typing_extensions import Self
 from datapane import __version__
 from datapane.client import config as c
 from datapane.client import log
-from datapane.client.exceptions import IncompatibleVersionError, ReportTooLargeError, UnsupportedResourceError
 from datapane.client.commands import failure_msg
+from datapane.client.exceptions import IncompatibleVersionError, ReportTooLargeError, UnsupportedResourceError
 from datapane.client.utils import TEST_ENV
 from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
 
