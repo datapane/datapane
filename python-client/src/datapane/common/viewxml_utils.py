@@ -40,7 +40,7 @@ def validate_report_doc(
     except DocumentInvalid:
         if not quiet:
             xml_str = xml_str if xml_str else etree.tounicode(xml_doc, pretty_print=True)
-            log.error(f"Error validating report document:\n\n{xml_str}")
+            log.error(f"Error validating report document:\n\n{xml_str}\n{rng_validator.error_log}\n")
         raise
 
 
