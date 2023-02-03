@@ -12,14 +12,14 @@ if not (sys.platform == "linux" and sys.version_info.minor >= 7):
 import typing as t
 
 import datapane as dp
-from datapane.client.api.common import DPTmpFile
-from datapane.client.api.runtime import _report
-from datapane.client.apps import DatapaneCfg, build_bundle
+from datapane.cloud_api.common import DPTmpFile
+from datapane.cloud_api.obsolete.teams import LegacyApp
 from datapane.common import SDict, SSDict
-from datapane.common.config import RunnerConfig
-from datapane.runner import __main__ as m
-from datapane.runner.exec_script import exec_mod
-from datapane.runner.typedefs import RunResult
+from datapane.legacy_apps import DatapaneCfg, build_bundle
+from datapane.legacy_runner import __main__ as m
+from datapane.legacy_runner.config import RunnerConfig
+from datapane.legacy_runner.exec_script import exec_mod
+from datapane.legacy_runner.typedefs import RunResult
 
 # disabled for now - may re-enable when we support local
 # running/rendering with our runner calling into user code
@@ -53,7 +53,7 @@ def test_exec(datadir: Path, monkeypatch, capsys):
     assert out == "x is 4\nin foo\nmy_df\n5\n"
 
 
-class MockApp(dp.LegacyApp):
+class MockApp(LegacyApp):
     """Use custom mock class to disable constructor but keep other methods"""
 
     script = ""
@@ -80,7 +80,7 @@ def mock_report_upload(self, **kwargs):
     """Mock creating a report object"""
     report = mock.Mock()
     report.id = "ABC"
-    _report.append(report)
+    # _report.append(report)  # TODO fix?
     return mock.DEFAULT
 
 
@@ -94,7 +94,7 @@ def mock_do_download_file(fn: str, *args):
     return Path(fn)
 
 
-@mock.patch("datapane.client.api.LegacyApp", new=MockApp)
+@mock.patch("datapane.cloud_api.obsolete.teams", new=MockApp)
 @mock.patch("datapane.client.api.common.do_download_file", side_effect=mock_do_download_file)
 def _runner(
     params: SDict, env: SSDict, script: Path, ddf, sdist: Path = Path("."), app_schema: t.List[SDict] = []

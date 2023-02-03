@@ -12,7 +12,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
 from pandas.io.formats.style import Styler
 
-from datapane.client.api.files import save
+from datapane.cloud_api.obsolete.files import save
 
 data = pd.DataFrame({"x": np.random.randn(20), "y": np.random.randn(20)})
 

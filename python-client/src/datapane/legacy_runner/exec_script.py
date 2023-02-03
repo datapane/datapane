@@ -16,6 +16,7 @@ from types import FrameType
 from typing import List, Optional
 
 import datapane.client.api as api
+from datapane.cloud_api.obsolete.teams import LegacyApp
 from datapane.common import SDict, SSDict, log
 
 from .exceptions import CodeError, CodeRaisedError, CodeSyntaxError
@@ -27,7 +28,7 @@ ENVIRON_CONFIG = {
 RUN_NAME = "__datapane__"  # <datapane> ??
 
 
-def run(app: api.LegacyApp, user_config: SDict, env: SSDict) -> SDict:
+def run(app: LegacyApp, user_config: SDict, env: SSDict) -> SDict:
     """Run a datapane python script/module"""
     api._reset_runtime(params=user_config)
     # use the app id for unique, isolated dir per app
@@ -125,7 +126,7 @@ def run_commands(cmds: List[str]) -> None:
             importlib.invalidate_caches()  # ensure new packages are detected
 
 
-def setup_script(s: api.LegacyApp, env_dir: Path):
+def setup_script(s: LegacyApp, env_dir: Path):
     """Setup the script - unpack & install deps"""
     # TODO - add local cache check here
     if env_dir.exists():

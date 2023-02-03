@@ -1,7 +1,7 @@
 import pytest
 from packaging.version import Version
 
-from datapane.common import config as c
+from datapane.client import config as c
 from datapane.common import versioning as v
 
 

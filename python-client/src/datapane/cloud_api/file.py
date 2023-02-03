@@ -92,7 +92,7 @@ class File(DPObjectRef):
             An instance of the created `File` object
         """
         # import here as a very slow module due to nested imports
-        from .files import save
+        from .obsolete.files import save
 
         fn = save(data)
         return cls.post_with_files(file=fn.file, **kwargs)

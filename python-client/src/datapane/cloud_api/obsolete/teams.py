@@ -15,12 +15,11 @@ from pathlib import Path
 from typing import Optional
 
 from datapane import __version__
-from datapane.client.apps import DatapaneCfg
+from datapane.cloud_api.common import DPTmpFile, do_download_file
+from datapane.cloud_api.dp_object import DPObjectRef
 from datapane.common import NPath, SDict, SList, SSDict
 from datapane.common.utils import dict_drop_empty
-
-from .common import DPTmpFile, do_download_file
-from .dp_object import DPObjectRef
+from datapane.legacy_apps import DatapaneCfg
 
 if t.TYPE_CHECKING:
     pass

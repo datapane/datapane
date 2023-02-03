@@ -7,15 +7,16 @@ import pandas as pd
 import pytest
 from dominate.tags import h2
 from glom import glom
-from lxml import etree
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
 import datapane.blocks.function
-from datapane.client.api.builtins import gen_df, gen_plot
-from datapane.client.api.report.blocks import BaseElement, BuilderState
+from datapane.blocks import BaseElement
+from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
-from datapane.common.report import load_doc, validate_report_doc
+from datapane.common.viewxml_utils import load_doc, validate_report_doc
+from datapane.processors import ConvertXML, Pipeline, ViewState
+from datapane.processors.file_store import DummyFileEntry
 
 ################################################################################
 # Helpers
@@ -25,8 +26,9 @@ str_md_block = "Simple string Markdown"
 
 
 def element_to_str(e: BaseElement) -> str:
-    s = e._to_xml(BuilderState())
-    return etree.tounicode(s.elements[0], pretty_print=True)
+    return (
+        Pipeline(ViewState(view=e, file_entry_klass=DummyFileEntry)).pipe(ConvertXML(pretty_print=True)).state.view_xml
+    )
 
 
 def num_blocks(report_str: str) -> int:
@@ -60,7 +62,7 @@ def gen_report_simple() -> dp.App:
     )
 
 
-def gen_legacy_report_simple() -> dp.Report:
+def gen_legacy_report_simple() -> dp.App:
     return dp.Report(
         blocks=[
             md_block_id,

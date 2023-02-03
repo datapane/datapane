@@ -10,9 +10,9 @@ import typing as t
 from collections import deque
 from pathlib import Path
 
-from datapane.client.apps import DATAPANE_YAML, DatapaneCfg
 from datapane.client.utils import ON_DATAPANE
 from datapane.common import NPath, SDict, log
+from datapane.legacy_apps import DATAPANE_YAML, DatapaneCfg
 
 if t.TYPE_CHECKING:
     from .report.app import App

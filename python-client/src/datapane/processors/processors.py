@@ -86,12 +86,16 @@ class ConvertXML(BaseProcessor):
     local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
     local_post_transform = etree.XSLT(local_post_xslt)
 
+    def __init__(self, *, pretty_print: bool = False) -> None:
+        self.pretty_print: bool = pretty_print
+        super().__init__()
+
     def __call__(self, _) -> str:
         initial_doc = self.convert_xml()
         transformed_doc = self.post_transforms(initial_doc)
 
         # convert to string
-        view_xml_str: str = etree.tounicode(transformed_doc)
+        view_xml_str: str = etree.tounicode(transformed_doc, pretty_print=self.pretty_print)
         # s1 = dc.replace(s, view_xml=view_xml_str)
         self.s.view_xml = view_xml_str
 

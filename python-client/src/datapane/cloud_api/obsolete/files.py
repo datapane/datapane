@@ -22,12 +22,12 @@ from pandas.io.formats.style import Styler
 
 from datapane.client import log
 from datapane.client.exceptions import DPClientError
+from datapane.cloud_api.common import DPTmpFile
 
 from ... import Attachment, DataTable, Plot, Table
+from ...blocks import DataBlock
 from ...blocks.text import Text
-from .common import DPTmpFile
 from .files_optional import Axes, BFigure, BLayout, Figure, Map, PFigure, Visualisation
-from .report.blocks import DataBlock
 
 if TYPE_CHECKING:
     from bokeh.model import Model
