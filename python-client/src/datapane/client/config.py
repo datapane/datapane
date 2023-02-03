@@ -161,7 +161,7 @@ class Config:
         if self.version in (1, 2, 3):
             # If token exists check still valid and can login, use to get server props
             if self.token and self.token != DEFAULT_TOKEN:
-                from .api.user import ping
+                from ..cloud_api.user import ping
 
                 with suppress(Exception):
                     # get the email for v4 of spec

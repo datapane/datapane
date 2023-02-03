@@ -1,23 +1,7 @@
 import pytest
 from packaging.version import Version
 
-from datapane.client import config as c
 from datapane.common import versioning as v
-
-
-def test_encode_decode():
-    """Test we can encode/decode a config element"""
-    u_config = c.RunnerConfig(app_id="ZBAmDk1", config=dict(a=3))
-
-    # test raw
-    e = c.encode(u_config, compressed=False)
-    d = c.decode(e, compressed=False)
-    assert d == u_config
-
-    # test compressed
-    e_c = c.encode(u_config, compressed=True)
-    d_c = c.decode(e_c, compressed=True)
-    assert d_c == u_config
 
 
 def test_version():

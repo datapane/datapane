@@ -17,7 +17,7 @@ from datapane.cloud_api.obsolete.teams import LegacyApp
 from datapane.common import SDict, SSDict
 from datapane.legacy_apps import DatapaneCfg, build_bundle
 from datapane.legacy_runner import __main__ as m
-from datapane.legacy_runner.config import RunnerConfig
+from datapane.legacy_runner.config import RunnerConfig, decode, encode
 from datapane.legacy_runner.exec_script import exec_mod
 from datapane.legacy_runner.typedefs import RunResult
 
@@ -95,7 +95,7 @@ def mock_do_download_file(fn: str, *args):
 
 
 @mock.patch("datapane.cloud_api.obsolete.teams", new=MockApp)
-@mock.patch("datapane.client.api.common.do_download_file", side_effect=mock_do_download_file)
+@mock.patch("datapane.cloud_api.common.do_download_file", side_effect=mock_do_download_file)
 def _runner(
     params: SDict, env: SSDict, script: Path, ddf, sdist: Path = Path("."), app_schema: t.List[SDict] = []
 ) -> RunResult:
@@ -115,7 +115,7 @@ def _runner(
 
 # TODO - fix exception handling stacktraces
 @mock.patch("datapane.runner.exec_script.setup_script", autospec=True)
-@mock.patch("datapane.client.api.App.upload", autospec=True, side_effect=mock_report_upload)
+@mock.patch("datapane.cloud_api.App.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
     """Test running an isolated code snippet with params
     NOTE - we can simplify by calling exec_script.run directly, doesn't test as much of API however
@@ -151,7 +151,7 @@ def test_run_single_app(rc, isc, datadir: Path, monkeypatch, capfd):
     f("WORLD")
 
 
-@mock.patch("datapane.client.api.App.upload", autospec=True, side_effect=mock_report_upload)
+@mock.patch("datapane.cloud_api.App.upload", autospec=True, side_effect=mock_report_upload)
 def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     monkeypatch.chdir(datadir)
     # monkeypatch.setenv("DATAPANE_ON_DATAPANE", "true")
@@ -185,3 +185,18 @@ def test_run_bundle(rc, datadir: Path, monkeypatch, capsys):
     assert "WORLD" in out
     assert dp.Result.get() == "hello , world!"
     assert res.report_id is None
+
+
+def test_encode_decode():
+    """Test we can encode/decode a config element"""
+    u_config = RunnerConfig(app_id="ZBAmDk1", config=dict(a=3))
+
+    # test raw
+    e = encode(u_config, compressed=False)
+    d = decode(e, compressed=False)
+    assert d == u_config
+
+    # test compressed
+    e_c = encode(u_config, compressed=True)
+    d_c = decode(e_c, compressed=True)
+    assert d_c == u_config

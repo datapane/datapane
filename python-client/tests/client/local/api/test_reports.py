@@ -118,7 +118,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
     divider_block = dp.Divider()
-    empty_block = datapane.blocks.interactive.Empty(name="empty-block")
+    empty_block = datapane.blocks.function.Empty(name="empty-block")
 
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")

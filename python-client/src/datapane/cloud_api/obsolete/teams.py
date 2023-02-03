@@ -124,7 +124,7 @@ class LegacyApp(DPObjectRef):
         # NOTE - use __call__??
         # TODO - move exec_script here?
         # TODO - call should handle param defaults
-        from datapane.client.api.common import do_download_file
+        from datapane.cloud_api.common import do_download_file
         from datapane.runner.exec_script import run
 
         with ExitStack() as stack:

@@ -60,7 +60,7 @@ def write_config(raw_config, config_path: Path | None = None):
 def mock_config_defaults():
     """Mock calculated defaults so we can assert against them"""
     with mock.patch("uuid.uuid4", autospec=True) as uuid4, mock.patch(
-        "datapane.client.api.user.ping", autospec=True
+        "datapane.cloud_api.user.ping", autospec=True
     ) as ping:
         uuid4.return_value = mock.Mock(hex=Expected.session_id)
         ping.return_value = Expected.email

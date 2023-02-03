@@ -12,7 +12,7 @@ from matplotlib.collections import EventCollection
 import datapane as dp
 import datapane.blocks.asset
 import datapane.blocks.text
-from datapane.client.api.builtins import gen_df, gen_plot
+from datapane.builtins import gen_df, gen_plot
 
 lis = [1, 2, 3]
 
@@ -37,7 +37,9 @@ fig.add_trace(go.Bar(x=[0, 1, 2, 3, 4, 5], y=[1, 0.5, 0.7, -1.2, 0.3, 0.4]))
 plotly_asset = datapane.blocks.asset.Plot(data=fig)
 
 # Markdown
-md_block = datapane.blocks.inline_text.Text(text=f"# Test markdown block with env var: {os.environ['ENV_VAR']} \n Test **content**")
+md_block = datapane.blocks.inline_text.Text(
+    text=f"# Test markdown block with env var: {os.environ['ENV_VAR']} \n Test **content**"
+)
 
 # Downloadable file
 file_asset = datapane.blocks.asset.Attachment(data=lis)
@@ -59,8 +61,8 @@ xdata1 = xdata[0, :]
 xdata2 = xdata[1, :]
 xdata1.sort()
 xdata2.sort()
-ydata1 = xdata1 ** 2
-ydata2 = 1 - xdata2 ** 3
+ydata1 = xdata1**2
+ydata2 = 1 - xdata2**3
 mpl_fig = plt.figure(figsize=(15, 15))
 ax = mpl_fig.add_subplot(1, 1, 1)
 ax.plot(xdata1, ydata1, color="tab:blue")
