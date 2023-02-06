@@ -11,46 +11,58 @@ import abc
 import base64
 import io
 import json
+import math
 import tempfile
 import typing as t
 from datetime import date, datetime, time
 from pathlib import Path
-from types import EllipsisType
 
 import pydantic as pyd
 from lxml.builder import ElementMaker
 from lxml.etree import _Element as Element
 
+from datapane.client.exceptions import DPClientError
 from datapane.common import SDict, SList
 from datapane.common.viewxml_utils import mk_attribs
 
 E = ElementMaker()
 X = t.TypeVar("X")
-Field = t.Tuple[t.Type, t.Union[t.Any, EllipsisType]]
+Field = t.Tuple[t.Type, t.Any]
 ValidatorF = t.Callable[[X], X]
+
+Numeric = t.Union[float, int]
 
 
 class Parameter(abc.ABC, t.Generic[X]):
-    _T: X
+    _T: type[X]
     _tag: str
     cacheable: bool = True
 
-    def __init__(self, name: str, label: t.Optional[str], default: t.Union[X, EllipsisType]):
-        # NOTE - in pydantic, `...` is used to denote a required value
+    def __init__(self, name: str, label: t.Optional[str], initial: t.Optional[X], *, allow_empty: bool = False):
+        if not name:
+            raise DPClientError(f"A non empty name must be provided, got '{name}'")
+        if label == "":
+            raise DPClientError("label must be a non-empty string or None")
         self.name = name
         self.label = label
-        self.default = default
+        self.initial = initial
 
-        # NOTE - currently we use default as initial and set required based on default also
-        required = self.default is ...
-        initial = self._proc_initial(self.default) if self.default is not ... else None
-        self.attribs: SDict = dict(name=self.name, label=self.label, required=required, initial=initial)
+        initial = self._proc_initial(self.initial) if self.initial is not None else None
+        self.attribs: SDict = dict(name=self.name, label=self.label, required=not allow_empty, initial=initial)
+
+    def _check_instance(self):
+        """
+        Perform basic checks that the Parameter was constructed correctly.
+        """
+        # This method throws a fairly clear error if user passes bad strings,
+        # which we want to catch as soon as possible.
+        self._to_xml()
 
     def _proc_initial(self, x: X) -> t.Any:
         return x
 
     def _as_field(self) -> Field:
-        return (self._T, self.default)
+        return (self._T, self.initial)
 
     def _validator(self) -> ValidatorF:
         # return identity
@@ -68,24 +80,46 @@ class Switch(Parameter[bool]):
     _T = bool
     _tag = "Switch"
 
-    def __init__(self, name: str, label: t.Optional[str] = None, default: bool = ...):
-        super().__init__(name, label, default)
+    def __init__(
+        self,
+        name: str,
+        label: t.Optional[str] = None,
+        *,
+        initial: bool = False,
+    ):
+        super().__init__(name, label, initial)
+        self._check_instance()
 
 
 class TextBox(Parameter[str]):
     _T = str
     _tag = "TextBox"
 
-    def __init__(self, name: str, label: t.Optional[str] = None, default: str = ...):
-        super().__init__(name, label, default)
+    def __init__(
+        self,
+        name: str,
+        label: t.Optional[str] = None,
+        *,
+        initial: str = "",
+        allow_empty: bool = False,
+    ):
+        super().__init__(name, label, initial, allow_empty=allow_empty)
+        self._check_instance()
 
 
 class NumberBox(Parameter[float]):
     _T = float
     _tag = "NumberBox"
 
-    def __init__(self, name: str, label: t.Optional[str] = None, default: float = ...):
-        super().__init__(name, label, default)
+    def __init__(
+        self,
+        name: str,
+        label: t.Optional[str] = None,
+        *,
+        initial: float,
+    ):
+        super().__init__(name, label, initial)
+        self._check_instance()
 
 
 class Range(Parameter):
@@ -96,18 +130,22 @@ class Range(Parameter):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: int = ...,
-        min: t.Optional[int] = None,
-        max: t.Optional[int] = None,
-        step: t.Optional[int] = None,
+        *,
+        initial: Numeric,
+        min: Numeric,
+        max: Numeric,
+        step: t.Optional[Numeric] = None,
     ):
-        super().__init__(name, label, default)
-        self.min = min
-        self.max = max
-        self.step = step
+        super().__init__(name, label, self._T(initial))
+        if any(isinstance(v, float) and (math.isinf(v) or math.isnan(v)) for v in (min, max, step)):
+            raise DPClientError("min/max/step must not be `inf` or `nan`")
+        self.min = self._T(min)
+        self.max = self._T(max)
+        self.step = None if step is None else self._T(step)
+        self._check_instance()
 
     def _as_field(self) -> Field:
-        return (pyd.confloat(ge=self.min, le=self.max), self.default)
+        return (pyd.confloat(ge=self.min, le=self.max), self.initial)
 
     def _to_xml(self) -> Element:
         attribs = mk_attribs(**self.attribs, min=self.min, max=self.max, step=self.step)
@@ -124,14 +162,20 @@ class Choice(Parameter[str]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: str = ...,
-        options: SList = None,
+        *,
+        options: SList,
+        initial: t.Optional[str] = None,
     ):
         # valid params
-        assert options
-        assert (default in options) if (default is not ...) else True
-        super().__init__(name, label, default)
+        if not options:
+            raise DPClientError("At least one option must be provided")
+        if initial is not None and initial not in options:
+            raise DPClientError(f"Initial value `{initial}` must be present in the options")
+        if any(opt == "" for opt in options):
+            raise DPClientError("All options must be non-empty strings")
+        super().__init__(name, label, initial)
         self.options = options
+        self._check_instance()
 
     def _validator(self) -> ValidatorF[str]:
         def f(x: str):
@@ -146,7 +190,7 @@ class Choice(Parameter[str]):
 
 
 class MultiChoice(Parameter[SList]):
-    """Choose nultiple elements from a set"""
+    """Choose multiple elements from a set"""
 
     _T = SList
     _tag = "MultiChoice"
@@ -155,14 +199,22 @@ class MultiChoice(Parameter[SList]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: SList = ...,
-        options: SList = None,
+        *,
+        initial: SList = [],
+        options: SList,
+        allow_empty: bool = False,
     ):
         # valid params
-        assert options
-        assert (self._check(default, options)) if (default is not ...) else True
-        super().__init__(name, label, default)
+        initial = initial or []
+        if not options:
+            raise DPClientError("At least one option must be provided")
+        if any(d not in options for d in initial):
+            raise DPClientError(f"All items in default value `{initial}` must be present in the options")
+        if any(opt == "" for opt in options):
+            raise DPClientError("All options must be non-empty strings")
+        super().__init__(name, label, initial, allow_empty=allow_empty)
         self.options = options
+        self._check_instance()
 
     def _check(self, xs: SList, ys: SList):
         return set(xs).issubset(ys)
@@ -192,9 +244,12 @@ class Tags(Parameter[SList]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: SList = ...,
+        *,
+        initial: SList = [],
+        allow_empty: bool = False,
     ):
-        super().__init__(name, label, default)
+        super().__init__(name, label, initial or [], allow_empty=allow_empty)
+        self._check_instance()
 
     def _proc_initial(self, x: X) -> t.Any:
         return json.dumps(x)
@@ -208,9 +263,11 @@ class Date(Parameter[date]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: date = ...,
+        *,
+        initial: t.Optional[date] = None,
     ):
-        super().__init__(name, label, default)
+        super().__init__(name, label, initial)
+        self._check_instance()
 
     def _proc_initial(self, x: date) -> t.Any:
         return x.isoformat()
@@ -224,9 +281,11 @@ class Time(Parameter[time]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: time = ...,
+        *,
+        initial: t.Optional[time] = None,
     ):
-        super().__init__(name, label, default)
+        super().__init__(name, label, initial)
+        self._check_instance()
 
     def _proc_initial(self, x: time) -> t.Any:
         return x.isoformat()
@@ -240,9 +299,11 @@ class DateTime(Parameter[datetime]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: datetime = ...,
+        *,
+        initial: t.Optional[datetime] = None,
     ):
-        super().__init__(name, label, default)
+        super().__init__(name, label, initial)
+        self._check_instance()
 
     def _proc_initial(self, x: datetime) -> t.Any:
         return x.isoformat()
@@ -278,10 +339,12 @@ class File(Parameter[B64Path]):
         self,
         name: str,
         label: t.Optional[str] = None,
-        default: t.Optional[B64Path] = ...,
+        initial: t.Optional[B64Path] = None,
+        allow_empty: bool = False,
     ):
         # Set default to None to mark an optional File
-        super().__init__(name, label, default)
+        super().__init__(name, label, initial, allow_empty=allow_empty)
+        self._check_instance()
 
     def _validator(self) -> ValidatorF:
         # bit hacky, but create a Path object from the internal B64Path object

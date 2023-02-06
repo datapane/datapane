@@ -88,7 +88,7 @@ Param = PTextBox | PNumberBox | PRange | PSwitch | PChoice | PMultiChoice | PTag
 paramAttributes =
   attribute name { xsd:string { minLength = "1" } },
   attribute label { xsd:string { minLength = "1" } }?,
-  attribute initial { xsd:string { minLength = "1" } }?,
+  attribute initial { xsd:string }?,
   attribute required { xsd:boolean }
 
 PTextBox = element TextBox {
@@ -101,9 +101,9 @@ PNumberBox = element NumberBox {
 
 PRange = element Range {
   paramAttributes,
-  attribute min { xsd:integer },
-  attribute max { xsd:integer },
-  attribute step { xsd:integer }?
+  attribute min { xsd:double },
+  attribute max { xsd:double },
+  attribute step { xsd:double }?
 }
 
 PSwitch = element Switch {

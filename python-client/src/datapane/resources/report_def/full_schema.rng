@@ -190,9 +190,7 @@
     </optional>
     <optional>
       <attribute name="initial">
-        <data type="string">
-          <param name="minLength">1</param>
-        </data>
+        <data type="string"/>
       </attribute>
     </optional>
     <attribute name="required">
@@ -213,14 +211,14 @@
     <element name="Range">
       <ref name="paramAttributes"/>
       <attribute name="min">
-        <data type="integer"/>
+        <data type="double"/>
       </attribute>
       <attribute name="max">
-        <data type="integer"/>
+        <data type="double"/>
       </attribute>
       <optional>
         <attribute name="step">
-          <data type="integer"/>
+          <data type="double"/>
         </attribute>
       </optional>
     </element>

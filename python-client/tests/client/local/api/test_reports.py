@@ -16,7 +16,8 @@ from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
 from datapane.common.viewxml_utils import load_doc, validate_report_doc
 from datapane.processors import ConvertXML, Pipeline, PreProcessView, ViewState
-from datapane.processors.file_store import B64FileEntry, DummyFileEntry
+from datapane.processors.file_store import B64FileEntry
+from datapane.processors.types import mk_null_pipe
 
 ################################################################################
 # Helpers
@@ -26,9 +27,7 @@ str_md_block = "Simple string Markdown"
 
 
 def element_to_str(e: BaseElement) -> str:
-    return (
-        Pipeline(ViewState(view=e, file_entry_klass=DummyFileEntry)).pipe(ConvertXML(pretty_print=True)).state.view_xml
-    )
+    return mk_null_pipe(e).pipe(ConvertXML(pretty_print=True)).state.view_xml
 
 
 def num_blocks(report_str: str) -> int:
