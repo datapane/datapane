@@ -97,7 +97,7 @@ class XMLBuilder(ViewVisitor):
             name = gen_name()
             e = E.Group(
                 E.Function(c_e, **{**b._attributes, "target": name}),
-                E.Group(E.Empty(name=name), columns="1"),
+                E.Group(E.Empty(name=gen_name()), name=name, columns="1"),
                 columns=cols,
             )
         else:
