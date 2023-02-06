@@ -46,7 +46,7 @@ tasks:
   publish:dev:
     desc: "Publish dev build to the CDN"
     vars:
-      CDN_BUCKET: 'gs://datapane-static-hosting-prod/python-client-dev'
+      CDN_BUCKET: 'gs://datapane-static-hosting-prod/python-client/dev'
     cmds:
       - |
         gsutil -h 'Cache-Control: no-cache, no-store, no-transform, max-age=0' \
