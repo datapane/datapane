@@ -92,21 +92,19 @@ const { dpAppRunner } = window;
             </div>
         </button>
     </Teleport>
-    <div :class="{ 'mt-16': dpAppRunner, 'mt-8': !dpAppRunner }">
-        <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
-        <report-component
-            v-if="isView(report) && !error"
-            :is-org="p.isOrg"
-            :mode="p.mode"
-            :report="report"
-            :key="report.refId"
-        />
-        <div
-            v-else-if="!isView(report) && !error"
-            class="flex items-center justify-center h-screen w-full -mt-12"
-        >
-            <loading-spinner :large="true" />
-        </div>
-        <div v-if="error" class="bg-red-100 p-4 mt-4">{{ error }}</div>
+    <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
+    <report-component
+        v-if="isView(report) && !error"
+        :is-org="p.isOrg"
+        :mode="p.mode"
+        :report="report"
+        :key="report.refId"
+    />
+    <div
+        v-else-if="!isView(report) && !error"
+        class="flex items-center justify-center h-screen w-full -mt-12"
+    >
+        <loading-spinner :large="true" />
     </div>
+    <div v-if="error" class="bg-red-100 p-4 mt-4">{{ error }}</div>
 </template>

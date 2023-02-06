@@ -5,7 +5,13 @@
   </head>
   <body>
     % include("navbar.html")
-    <main class="{{ report_width_class }} w-full mx-auto">
+    <main class="{{ report_width_class }} w-full mx-auto\\
+% if app_runner:
+  mt-16\\
+% else:
+  mt-8\\
+% end
+">
       <div id="report" class="w-full pb-12"></div>
     </main>
   </body>
