@@ -67,13 +67,16 @@ const readGcsTextOrJsonFile = <T = string | object | null>(
 
 export class Block {
     public refId = uuid4();
-    public id?: string;
+    public componentProps: any;
+    public component: any;
+
     public static captionType: CaptionType = "Figure";
+
     public caption?: string;
     public label?: string;
     public count?: number;
-    public componentProps: any;
-    public component: any;
+    public id?: string;
+    public name?: string;
 
     public constructor(
         elem: Elem,

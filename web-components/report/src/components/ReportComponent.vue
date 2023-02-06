@@ -68,7 +68,7 @@ const handlePageChange = (newPageNumber: number) =>
                 <div class="sm:flex block">
                     <div
                         v-if="pages.length > 1 && layout === 'side'"
-                        class="hidden sm:block w-1/6 bg-gray-100 px-4"
+                        class="hidden sm:block flex-none w-1/6 bg-gray-100 px-4"
                     >
                         <v-pages
                             :labels="pageLabels"
@@ -76,8 +76,8 @@ const handlePageChange = (newPageNumber: number) =>
                             @page-change="handlePageChange"
                         />
                     </div>
-                    <div class="flex-1 flex flex-col">
-                        <div class="flex-grow px-4">
+                    <div class="flex-1 flex flex-col min-w-0">
+                        <div class="grow px-4">
                             <component
                                 :is="child.component"
                                 v-for="child in currentPage"

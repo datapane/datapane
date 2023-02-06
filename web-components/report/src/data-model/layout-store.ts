@@ -3,8 +3,8 @@ import {
     Block,
     Group,
     isLayoutBlock,
-    isSelect,
     PageLayout,
+    Select,
 } from "./blocks/index";
 import { v4 as uuid4 } from "uuid";
 import { computed, reactive, ref } from "vue";
@@ -106,7 +106,7 @@ export const useViewStore = (
         const _layout = ref(initialLayout);
 
         const hasPages = computed(
-            () => children.length === 1 && isSelect(children[0]),
+            () => children.length === 1 && children[0] instanceof Select,
         );
 
         const layout = computed(

@@ -8,15 +8,31 @@ import VFunction from "../../components/controls/Function.connector.vue";
 import { ControlsField } from "./interactive";
 import * as b from "./index";
 import { SwapType } from "../types";
+import { EmptyObject } from "../root-store";
 
-export abstract class LayoutBlock<T extends Block = Block> extends Block {
+export abstract class ParentBlock<T extends Block = Block> extends Block {
+    /**
+     * A non-atomic block that has children
+     */
     public children: T[];
-    public store: any;
 
     public constructor(elem: any, figure: BlockFigure) {
         super(elem, figure);
         const { children } = elem.attributes;
         this.children = children;
+    }
+}
+
+export abstract class LayoutBlock<
+    T extends Block = Block,
+> extends ParentBlock<T> {
+    /**
+     * A non-atomic block which uses children to control layout, e.g. in columns, selects, pages
+     */
+    public store: any;
+
+    public constructor(elem: any, figure: BlockFigure) {
+        super(elem, figure);
         this.store = useLayoutStore(this.children)();
         this.componentProps = { ...this.componentProps, store: this.store };
     }
@@ -121,7 +137,9 @@ export class Toggle extends LayoutBlock {
     }
 }
 
-export class FunctionBlock extends LayoutBlock<ControlsField> {
+export class FunctionBlock extends ParentBlock<ControlsField> {
+    public store: any;
+
     public component = markRaw(VFunction);
     public name = "Function";
 
@@ -137,6 +155,7 @@ export class FunctionBlock extends LayoutBlock<ControlsField> {
             trigger,
             timer,
         } = elem.attributes;
+
         this.store = useControlStore(this.children, target, swap)();
 
         this.componentProps = {
@@ -159,28 +178,41 @@ export class View extends LayoutBlock {
     public constructor(elem: any, figure: BlockFigure) {
         super(elem, figure);
         const { layout, fragment } = elem.attributes;
+
         this.store = JSON.parse(fragment)
             ? undefined
             : useViewStore(this.children, layout)();
+
         this.componentProps = { ...this.componentProps, store: this.store };
     }
 }
 
-export const isView = (obj: any): obj is View => obj.name === "View";
+/* Block/element type guards and checks */
 
-export const isGroup = (obj: any): obj is Group => obj.name === "Group";
+export const isFunctionElem = (elem: Block | b.Elem): boolean =>
+    elem.name === "Function";
 
-export const isSelect = (obj: any): obj is Select => obj.name === "Select";
+export const isGroupElem = (elem: Block | b.Elem): boolean =>
+    elem.name === "Group";
 
-export const isToggle = (obj: any): obj is Toggle => obj.name === "Toggle";
+export const isSelectElem = (elem: Block | b.Elem): boolean =>
+    elem.name === "Select";
 
-export const isFunction = (obj: any): obj is FunctionBlock =>
-    obj.name === "Function";
+export const isToggleElem = (elem: Block | b.Elem): boolean =>
+    elem.name === "Toggle";
 
-export const isLayoutBlock = (obj: any): obj is LayoutBlock =>
-    isView(obj) ||
-    isSelect(obj) ||
-    isToggle(obj) ||
-    isView(obj) ||
-    isGroup(obj) ||
-    isFunction(obj);
+export const isViewElem = (elem: Block | b.Elem | EmptyObject): boolean =>
+    elem.name === "View";
+
+export const isParentElem = (elem: Block | b.Elem): boolean =>
+    isSelectElem(elem) ||
+    isToggleElem(elem) ||
+    isViewElem(elem) ||
+    isGroupElem(elem) ||
+    isFunctionElem(elem);
+
+export const isLayoutBlock = (block: Block): block is LayoutBlock =>
+    block instanceof LayoutBlock;
+
+export const isView = (block: Block | EmptyObject): block is View =>
+    block instanceof View;

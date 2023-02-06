@@ -6,6 +6,7 @@ import * as b from "./blocks/index";
 import * as maps from "./test-maps";
 import { AppData, AppMetaData, SwapType } from "./types";
 import he from "he";
+import { isParentElem } from "./blocks/index";
 
 export type EmptyObject = Record<string, never>;
 
@@ -217,19 +218,19 @@ export const useRootStore = defineStore("root", () => {
             elem.attributes = {};
         }
 
-        if (b.isFunction(elem)) {
+        if (b.isFunctionElem(elem)) {
             // Skip inner `Controls` block.
             // Can assert not-null as layout block JSON always contains `elements`
             const controlBlock = elem.elements![0];
             elem.elements = controlBlock.elements;
             elem.attributes.subtitle = controlBlock.attributes?.label;
-        } else if (b.isView(elem) && isFragment) {
+        } else if (b.isViewElem(elem) && isFragment) {
             elem.name = "Group";
             elem.attributes.columns = "1";
         }
 
-        if (b.isLayoutBlock(elem)) {
-            // Recursively deserialize children if `LayoutBlock`
+        if (isParentElem(elem)) {
+            // Recursively deserialize children if present
             elem.attributes.children = elem.elements
                 ? elem.elements.map((e) => deserialize(e))
                 : [];
@@ -248,7 +249,7 @@ export const useRootStore = defineStore("root", () => {
          * Generates new `View` fragment by hitting the app server with params and function ID,
          * and updates the app at the given `target`
          */
-        if (!b.isView(report.value)) {
+        if (!(report.value instanceof b.View)) {
             throw (
                 "Report object not yet initialized: " +
                 JSON.stringify(report.value)
@@ -267,10 +268,10 @@ export const useRootStore = defineStore("root", () => {
         let didUpdate = false;
 
         while (stack.length && !didUpdate) {
-            const block = stack.pop();
+            // We can assert `LayoutBlock` (not `undefined`) as the stack is only popped while non-empty
+            const block = stack.pop() as b.LayoutBlock;
 
-            if (!block || !b.isLayoutBlock(block)) continue;
-
+            // If the target block is in `block.children` then update the `children` accordingly and return `true`
             didUpdate = block.update(target, group, method);
 
             stack.push(...block.children.filter(b.isLayoutBlock));
