@@ -49,7 +49,7 @@ tasks:
       CDN_BUCKET: 'gs://datapane-static-hosting-prod/python-client-dev'
     cmds:
       - |
-        gsutil -h 'Cache-Control: no-cache' \
+        gsutil -h 'Cache-Control: no-cache, no-store, no-transform, max-age=0' \
           cp dist/datapane-"$(poetry version -s)"-py3-none-any.whl \
              '{{.CDN_BUCKET}}/datapane--py3-none-any.whl'
     preconditions:
