@@ -136,11 +136,11 @@ class BaseExportHTML(BaseProcessor, ABC):
         cls.template = SimpleTemplate(name=cls.template_name, lookup=[str(cls.template_dir)])
 
     def get_cdn(self) -> str:
-        from datapane import __rev__, __version__
+        from datapane import __is_dev_build__, __version__
 
         if cdn_base := os.getenv("DATAPANE_CDN_BASE"):
             return cdn_base
-        elif __rev__ == "local":
+        elif __is_dev_build__:
             return "https://datapane-cdn.com/dev"
         else:
             return f"https://datapane-cdn.com/v{__version__}"

@@ -4,10 +4,15 @@ import sys
 from pathlib import Path
 
 try:
-    from ._version import __rev__
+    from . import _version
 except ImportError:
     # NOTE - could use subprocess to get from git?
     __rev__ = "local"
+    __is_dev_build__ = True
+else:
+    __rev__ = _version.__rev__
+    __is_dev_build__ = getattr(_version, "__is_dev_build__", False)
+    del _version
 
 __version__ = "0.15.6"
 
