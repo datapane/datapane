@@ -112,7 +112,7 @@ class Function(BaseElement):
         self,
         function: t.Callable[..., View],
         target: t.Union[BlockId, TargetMode],
-        controls: Controls,
+        controls: t.Union[Controls, t.Iterable[Parameter]],
         name: BlockId = None,
         label: t.Optional[str] = None,
         swap: Swap = Swap.REPLACE,
@@ -122,7 +122,7 @@ class Function(BaseElement):
         submit_label: str = "Go",
         timer: int = 30,
     ):
-        self.controls = controls
+        self.controls = controls if isinstance(controls, Controls) else Controls(*controls)
         self.function = function
         self.cache = cache
         self.target = target
