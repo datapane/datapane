@@ -18,10 +18,13 @@ const p = defineProps<{
     error?: string;
 }>();
 
+// Disable function runs for local reports
+const functionRunDisabled = window.dpLocal && !window.dpAppRunner;
+
 const scheduleInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 onMounted(() => {
-    if (p.trigger === TriggerType.SCHEDULE && p.timer) {
+    if (p.trigger === TriggerType.SCHEDULE && p.timer && !functionRunDisabled) {
         scheduleInterval.value = setInterval(p.update, p.timer * 1000);
     }
 });
@@ -71,15 +74,23 @@ onUnmounted(() => {
                     v-if="p.trigger === TriggerType.SUBMIT"
                 >
                     <div
-                        v-if="p.loading"
                         class="flex items-center justify-start bg-gray-200 p-2 rounded-md shadow"
+                        v-if="p.loading || functionRunDisabled"
                     >
-                        <loading-spinner />
-                        <div class="pl-1">Running function...</div>
+                        <template v-if="p.loading">
+                            <loading-spinner />
+                            <div class="pl-1">Running function...</div>
+                        </template>
+                        <template v-else-if="functionRunDisabled">
+                            <i class="fa fa-info-circle" />
+                            <div class="pl-1">
+                                Function running is disabled for static reports
+                            </div>
+                        </template>
                     </div>
                     <button
                         type="submit"
-                        :disabled="p.loading || !valid"
+                        :disabled="p.loading || !valid || functionRunDisabled"
                         :class="[
                             'ml-auto inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50',
                         ]"
