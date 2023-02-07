@@ -17,7 +17,7 @@ done when making significant changes to server.py
 
   - It should print:
 
-      Bottle v0.13-dev server starting up (using CherootServer)...
+      ...
       App running on http://127.0.0.1:8080/
       Hit Ctrl-C to quit.
 
@@ -29,6 +29,14 @@ done when making significant changes to server.py
 * run `python simple.py` in two terminals:
 
   - the second instance should open on port 8081
+
+* run `PORT=8082 python simple.py` in a terminal:
+
+  - It should print:
+
+    ...
+    App running on http://0.0.0.0:8082/
+    ...
 
 * copy the simple.py script into a Jupyter notebook cell and press Ctrl-Enter
 

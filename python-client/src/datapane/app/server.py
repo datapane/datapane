@@ -107,10 +107,11 @@ def serve_file(global_state: GlobalState, filename: str):
 
 def serve(
     entry: t.Union[View, t.Callable[[], View]],
+    *,
     port: t.Optional[int] = None,
-    host: str = "127.0.0.1",
+    host: t.Optional[str] = None,
     debug: bool = False,
-    ui: str = None,
+    ui: t.Optional[str] = None,
     public: bool = False,
 ) -> None:
     """
@@ -151,6 +152,18 @@ def serve(
 
     if debug is not None:
         bt._debug(debug)
+
+    if port is None:
+        if _port := os.environ.get("PORT"):
+            port = int(_port)
+
+            # when the port is provided from the environment, it likely means
+            # we're running in a hosted environment.
+            # Bind to all interfaces so the proxy can route to us.
+            if host is None:
+                host = "0.0.0.0"
+    if host is None:
+        host = "127.0.0.1"
 
     server = CherootServer(app, host=host, port=port, preferred_port=8080, quiet=False)
     ui_cls: t.Type[ControllerUI]
