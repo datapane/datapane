@@ -615,7 +615,7 @@ def dockerfile(python: str, installer: str, file_to_exec: str, output: io.TextIO
     _installer = hosting_utils.SupportedInstallers[installer]
 
     if Path(output.name).exists() and output.name != "<stdout>":
-        click.confirm(f"output file 'output' exists. Overwrite?", default=False, abort=True)
+        click.confirm(f"output file '{output.name}' exists. Overwrite?", default=False, abort=True)
 
     contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, file_to_exec=file_to_exec)
     output.write(contents)
