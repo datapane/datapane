@@ -1,12 +1,6 @@
 # flake8: noqa:F811
 import dataclasses as dc
 import io
-
-pass
-
-pass
-
-pass
 import tarfile
 import time
 import typing as t
@@ -619,6 +613,9 @@ def generate():
 def dockerfile(python: str, installer: str, file_to_exec: str, output: io.TextIOWrapper):
     """Generate a dockerfile to help with hosting Apps"""
     _installer = hosting_utils.SupportedInstallers[installer]
+
+    if Path(output.name).exists() and output.name != "<stdout>":
+        click.confirm(f"output file 'output' exists. Overwrite?", default=False, abort=True)
 
     contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, file_to_exec=file_to_exec)
     output.write(contents)
