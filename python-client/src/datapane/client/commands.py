@@ -1,5 +1,12 @@
 # flake8: noqa:F811
 import dataclasses as dc
+import io
+
+pass
+
+pass
+
+pass
 import tarfile
 import time
 import typing as t
@@ -19,6 +26,7 @@ from tabulate import tabulate
 from datapane import __rev__, __version__
 from datapane import cloud_api as api
 from datapane import legacy_apps as apps
+from datapane.app import hosting_utils
 from datapane.client import log
 from datapane.client.utils import _setup_dp_logging
 from datapane.common import SDict, dict_drop_empty
@@ -569,3 +577,48 @@ def failure_msg(msg: str, do_exit: bool = False):
             ctx.exit(2)
         else:
             exit(2)
+
+
+#############################################################################
+
+# Utilities for helping self-hosting apps
+
+
+@app.group()
+def hosting():
+    """Commands to help with hosting"""
+
+
+@hosting.group()
+def generate():
+    """Commands to generate misc files"""
+
+
+@generate.command()
+@click.option(
+    "--python",
+    default=hosting_utils.DEFAULT_PYTHON_VERSION,
+    show_default=True,
+)
+@click.option(
+    "--installer",
+    default=hosting_utils.DEFAULT_INSTALLER,
+    show_default=True,
+    type=click.Choice(hosting_utils.SupportedInstallers.as_list(), case_sensitive=False),
+)
+@click.option(
+    "--file-to-exec",
+    prompt="What file will need running",
+    default=(lambda: next(hosting_utils.python_files(), None)),
+    type=click.Path(exists=False, dir_okay=False),
+    help="The file you'd like to run (contains dp.serve(...))",
+)
+@click.option(
+    "--output", "-o", default="Dockerfile", show_default=True, type=click.File(mode="w", lazy=True, atomic=True)
+)
+def dockerfile(python: str, installer: str, file_to_exec: str, output: io.TextIOWrapper):
+    """Generate a dockerfile to help with hosting Apps"""
+    _installer = hosting_utils.SupportedInstallers[installer]
+
+    contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, file_to_exec=file_to_exec)
+    output.write(contents)
