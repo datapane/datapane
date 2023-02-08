@@ -64,11 +64,12 @@ from .blocks import (
     Trigger,
     wrap_block,
 )
-from .cloud_api import App, AppFormatting, AppWidth
+from .cloud_api import App as CloudApp
+from .cloud_api import AppFormatting, AppWidth
 from .cloud_api import File as CloudFile
 from .cloud_api import FontChoice, TextAlignment, hello_world, login, logout, ping, signup
 from .processors import build, save_report, stringify_report, upload
-from .view import View
+from .view import App, View
 
 # Other useful re-exports
 from . import builtins  # isort:skip  otherwise circular import issue
@@ -81,6 +82,7 @@ __all__ = [
     "AppWidth",
     "DPClientError",
     "CloudFile",
+    "CloudApp",
     "FontChoice",
     "TextAlignment",
     "builtins",

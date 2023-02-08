@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 
 from lxml import etree
 
@@ -10,6 +11,8 @@ from datapane.blocks.layout import ContainerBlock
 
 if t.TYPE_CHECKING:
     from typing_extensions import Self
+
+    from datapane.cloud_api.app import AppFormatting
 
 
 class View(ContainerBlock):
@@ -60,3 +63,95 @@ class View(ContainerBlock):
         from .visitors import PrettyPrinter
 
         self.accept(PrettyPrinter())
+
+
+class App(View):
+    """
+    App documents collate plots, text, tables, and files into an interactive document that
+    can be analysed and shared by users in their browser
+    """
+
+    # Backwards compatible interfaces/wrappers
+
+    def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
+        if "layout" in kwargs:
+            raise ValueError(
+                "App(layout=...) is no longer supported, please use `dp.Group(columns=...)` for horizontal layouts"
+            )
+        warnings.warn(
+            "Instead of dp.App(), please see our newer API dp.View(). "
+            + "Instead of App.upload(), App.save_report() etc., you can use dp.upload(view), dp.save_report(view)",
+            DeprecationWarning,
+        )
+        super().__init__(*arg_blocks, blocks=blocks, **kwargs)
+
+    def upload(
+        self,
+        name: str,
+        description: str = "",
+        source_url: str = "",
+        publicly_visible: t.Optional[bool] = None,
+        tags: t.Optional[t.List[str]] = None,
+        project: t.Optional[str] = None,
+        open: bool = False,
+        formatting: t.Optional[AppFormatting] = None,
+        overwrite: bool = False,
+        **kwargs,
+    ) -> None:
+        from ..processors import upload
+
+        upload(
+            view=self,
+            name=name,
+            description=description,
+            source_url=source_url,
+            publicly_visible=publicly_visible,
+            tags=tags,
+            project=project,
+            open=open,
+            formatting=formatting,
+            overwrite=overwrite,
+            **kwargs,
+        )
+
+    def save(
+        self,
+        path: str,
+        open: bool = False,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+        cdn_base: t.Optional[str] = None,
+    ) -> None:
+        from ..processors import save_report
+
+        if standalone:
+            raise ValueError("save(standalone=True) is no longer supported, sorry!")
+        if author is not None:
+            raise ValueError('save(author="...") is no longer supported, sorry!')
+        if cdn_base is not None:
+            raise ValueError('save(cdn_base="...") is no longer supported, sorry!')
+        save_report(view=self, path=path, open=open, name=name, formatting=formatting)
+
+    def stringify(
+        self,
+        standalone: bool = False,
+        name: t.Optional[str] = None,
+        author: t.Optional[str] = None,
+        formatting: t.Optional[AppFormatting] = None,
+        cdn_base: t.Optional[str] = None,
+        template_name: str = "template.html",
+    ) -> str:
+        from ..processors import stringify_report
+
+        if standalone:
+            raise ValueError("save(standalone=True) is no longer supported, sorry!")
+        if author is not None:
+            raise ValueError('save(author="...") is no longer supported, sorry!')
+        if cdn_base is not None:
+            raise ValueError('save(cdn_base="...") is no longer supported, sorry!')
+        if template_name != "template.html":
+            raise ValueError('save(template_name="...") is no longer supported, sorry!')
+
+        return stringify_report(view=self, name=name, formatting=formatting)

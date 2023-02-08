@@ -71,11 +71,9 @@ class AppFormatting:
 }}"""
 
 
-# NOTE - this is essentially a DPCloud App - we should split the App object and the DPObjectRef parts here...
 class App(DPObjectRef):
     """
-    App documents collate plots, text, tables, and files into an interactive document that
-    can be analysed and shared by users in their Browser
+    An App that has been uploaded to datapane.com
     """
 
     # NOTE - uploading handled via the DPCloudUploader processor

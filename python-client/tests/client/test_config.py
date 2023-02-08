@@ -293,7 +293,7 @@ def test_new_config__additional_event(posthog, monkeypatch, tmp_path):
     from tests.client.local.api.test_reports import gen_report_simple
 
     report = gen_report_simple()
-    report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
+    report.save(path="test_out.html", name="My Wicked Report")
 
     analytics._consumer.join_queue()
     assert posthog.capture.call_count == 2

@@ -15,8 +15,8 @@ from datapane.blocks import BaseElement
 from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
 from datapane.common.viewxml_utils import load_doc, validate_report_doc
-from datapane.processors import ConvertXML, Pipeline, ViewState
-from datapane.processors.file_store import DummyFileEntry
+from datapane.processors import ConvertXML, Pipeline, PreProcessView, ViewState
+from datapane.processors.file_store import B64FileEntry, DummyFileEntry
 
 ################################################################################
 # Helpers
@@ -32,23 +32,27 @@ def element_to_str(e: BaseElement) -> str:
 
 
 def num_blocks(report_str: str) -> int:
-    x = "count(/Report/Pages//*)"
+    x = "count(/View//*)"
     return int(load_doc(report_str).xpath(x))
 
 
-def assert_report(
-    report: dp.App, expected_attachments: int = None, expected_num_blocks: int = None
+def _app_to_xml_and_files(app: dp.App) -> ViewState:
+    s = ViewState(view=app, file_entry_klass=B64FileEntry)
+    return Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).state
+
+
+def assert_app(
+    view: dp.App, expected_attachments: int = None, expected_num_blocks: int = None
 ) -> t.Tuple[str, t.List[Path]]:
-    report_str, attachments = dp.Processor(report)._gen_report(
-        embedded=False, served=False, title="TITLE", description="DESCRIPTION"
-    )
-    # print(report_str)
+    state = _app_to_xml_and_files(view)
+    view_xml = state.view_xml
+    attachments = state.store.file_list
     if expected_attachments:
         assert len(attachments) == expected_attachments
     if expected_num_blocks:
-        assert num_blocks(report_str) == expected_num_blocks
-    assert validate_report_doc(xml_str=report_str)
-    return (report_str, attachments)
+        assert num_blocks(view_xml) == expected_num_blocks
+    assert validate_report_doc(xml_str=view_xml)
+    return (view_xml, attachments)
 
 
 ################################################################################
@@ -160,18 +164,18 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 def test_gen_report_single():
     # report with single block
     report = dp.App("test block")
-    assert_report(report, 0)
-    assert len(report.pages[0].blocks) == 1
-    assert isinstance(report.pages[0].blocks[0], dp.Text)
+    assert_app(report, 0)
+    assert len(report.blocks) == 1
+    assert isinstance(report.blocks[0], dp.Text)
 
 
 def test_gen_report_simple():
     report = gen_report_simple()
-    assert_report(report, 0)
+    assert_app(report, 0)
     # TODO - replace accessors here with glom / boltons / toolz
-    assert len(report.pages[0].blocks) == 2
-    assert isinstance(report.pages[0].blocks[1], dp.Text)
-    assert report.pages[0].blocks[0].name == "test-id-1"
+    assert len(report.blocks) == 2
+    assert isinstance(report.blocks[1], dp.Text)
+    assert report.blocks[0].name == "test-id-1"
 
 
 def test_gen_report_nested_mixed():
@@ -183,12 +187,12 @@ def test_gen_report_nested_mixed():
         "Simple string Markdown #2",
     )
 
-    assert_report(report, 0)
-    assert len(glom(report, "pages.0.blocks")) == 2
-    assert isinstance(glom(report, "pages.0.blocks.0"), dp.Group)
-    assert isinstance(report.pages[0].blocks[0], dp.Group)
-    assert isinstance(report.pages[0].blocks[1], dp.Text)
-    assert glom(report, "pages.0.blocks.0.blocks.0.name") == "test-id-1"
+    assert_app(report, 0)
+    assert len(glom(report, "blocks")) == 2
+    assert isinstance(glom(report, "blocks.0"), dp.Group)
+    assert isinstance(report.blocks[0], dp.Group)
+    assert isinstance(report.blocks[1], dp.Text)
+    assert glom(report, "blocks.0.blocks.0.name") == "test-id-1"
 
 
 def test_gen_report_primitives(datadir: Path):
@@ -202,43 +206,43 @@ def test_gen_report_primitives(datadir: Path):
         gen_plot(),  # Plot
         datadir / "datapane-logo.png",  # Attachment
     )
-    assert_report(report, 3)
-    assert glom(report, ("pages.0.blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
+    assert_app(report, 3)
+    assert glom(report, ("blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
 
 
 def test_gen_failing_reports():
     # nested pages
     with pytest.raises(DPClientError):
         r = dp.App(dp.Page(dp.Page(md_block)))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
     with pytest.raises(DPClientError):
         r = dp.App(dp.Group(dp.Page(md_block)))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     # page/pages with 0 objects
     with pytest.raises(DPClientError):
         r = dp.App(dp.Page(blocks=[]))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     # select with 1 object
     with pytest.raises(DPClientError):
         r = dp.App(dp.Page(dp.Select(blocks=[md_block])))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     # empty text block
     with pytest.raises(AssertionError):
         r = dp.App(dp.Text(" "))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     # empty df
     with pytest.raises(DPClientError):
         r = dp.App(dp.DataTable(pd.DataFrame()))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     # invalid names
     with pytest.raises(DocumentInvalid):
         r = dp.App(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
-        dp.Processor(r)._gen_report(embedded=False, served=False, title="TITLE", description="DESCRIPTION")
+        _app_to_xml_and_files(r)
 
     with pytest.raises(DPClientError):
         dp.App(dp.Text("a", name="3-invalid-name"))
@@ -267,30 +271,30 @@ def test_gen_report_nested_blocks():
     )
 
     # No additional wrapper block
-    assert len(report.pages[0].blocks) == 3
-    assert isinstance(report.pages[0].blocks[0], dp.Group)
-    assert isinstance(report.pages[0].blocks[1], dp.Select)
-    assert isinstance(report.pages[0].blocks[2], dp.Toggle)
-    assert isinstance(report.pages[0].blocks[1].blocks[1], dp.Text)
-    assert glom(report, ("pages.0.blocks", ["_attributes.label"])) == [
+    assert len(report.blocks) == 3
+    assert isinstance(report.blocks[0], dp.Group)
+    assert isinstance(report.blocks[1], dp.Select)
+    assert isinstance(report.blocks[2], dp.Toggle)
+    assert isinstance(report.blocks[1].blocks[1], dp.Text)
+    assert glom(report, ("blocks", ["_attributes.label"])) == [
         "test-group-label",
         "test-select-label",
         "test-toggle-label",
     ]
-    assert glom(report, "pages.0.blocks.0.blocks.0.name") == "test-id-1"
-    assert glom(report, "pages.0.blocks.1.blocks.0._attributes.label") == "test-block-label"
-    assert_report(report, 0)
+    assert glom(report, "blocks.0.blocks.0.name") == "test-id-1"
+    assert glom(report, "blocks.1.blocks.0._attributes.label") == "test-block-label"
+    assert_app(report, 0)
 
 
 def test_gen_report_complex_no_files():
     report = gen_report_complex_no_files()
-    assert_report(report, 0)
-    assert len(report.pages) == 3
+    assert_app(report, 0)
+    assert len(report.blocks) == 3
 
 
 def test_gen_report_with_files(datadir: Path):
     report = gen_report_complex_with_files(datadir)
-    assert_report(report, 5, 23)
+    assert_app(report, 5, 24)
 
 
 ################################################################################
@@ -299,7 +303,7 @@ def test_gen_report_with_files(datadir: Path):
 def test_local_report_simple(datadir: Path, monkeypatch):  # noqa: ANN
     monkeypatch.chdir(datadir)
     report = gen_report_simple()
-    report.save(path="test_out.html", name="My Wicked Report", author="Datapane Team")
+    report.save(path="test_out.html", name="My Wicked Report")
 
 
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
