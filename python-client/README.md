@@ -213,7 +213,7 @@ $ mkdir -p ~/.config/datapane && touch ~/.config/datapane/no_analytics
 ### macOS
 
 ```bash
-$ mkdir -p ~/Library/Application\ Data/datapane && touch ~/Library/Application\ Data/no_analytics
+$ mkdir -p ~/Library/Application\ Support/datapane && touch ~/Library/Application\ Support/datapane/no_analytics
 ```
 
 ### Windows (PowerShell)
