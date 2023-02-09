@@ -17,7 +17,7 @@ module.exports = {
             postcss: {
                 plugins: [
                     tailwindcss({
-                        config: "./report.tailwind.config.js",
+                        config: "./local-report.tailwind.config.js",
                     }),
                 ],
             },
