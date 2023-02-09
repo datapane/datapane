@@ -24,7 +24,7 @@
     window.dpAuthorId = "{{author_id}}";
   % end
   // construct the View
-  const appData = { data: { result: { view_xml: "{{report_doc}}", assets: {{!assets}} } }};
+  const appData = { data: { result: { view_xml: `{{report_doc}}`, assets: {{!assets}} } }};
   const htmlHeader = `<style type="text/css">{{ !css_header }}</style>`;
   window.reportProps = { htmlHeader, appData, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW" };
 </script>

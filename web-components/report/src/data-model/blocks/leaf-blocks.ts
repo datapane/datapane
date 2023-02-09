@@ -185,6 +185,42 @@ export class BigNumberBlock extends Block {
     }
 }
 
+export class EmbedBlock extends Block {
+    public component = markRaw(VEmbedBlock);
+
+    private _isIFrame?: boolean;
+    private html: string;
+
+    public constructor(elem: Elem, figure: BlockFigure) {
+        super(elem, figure);
+        this.html = getInnerText(elem);
+        this.componentProps = {
+            ...this.componentProps,
+            html: this.html,
+            isIframe: this.isIFrame,
+        };
+    }
+
+    public get isIFrame(): boolean {
+        /**
+         * Returns `true` if the embed HTML is an iframe element
+         */
+        if (typeof this._isIFrame === "undefined") {
+            const doc: Document = new DOMParser().parseFromString(
+                this.html,
+                "text/html",
+            );
+            const root: HTMLBodyElement | null =
+                doc.documentElement.querySelector("body");
+            this._isIFrame =
+                !!root &&
+                root.childElementCount === 1 &&
+                root.children[0].tagName.toLowerCase() === "iframe";
+        }
+        return this._isIFrame;
+    }
+}
+
 /* Asset blocks */
 
 export abstract class AssetBlock extends Block {
@@ -236,42 +272,6 @@ export class FoliumBlock extends AssetBlock {
 export class PlotapiBlock extends AssetBlock {
     public component = markRaw(VPlotapiBlock);
     public static captionType: CaptionType = "Plot";
-}
-
-export class EmbedBlock extends AssetBlock {
-    public component = markRaw(VEmbedBlock);
-
-    private _isIFrame?: boolean;
-    private html: string;
-
-    public constructor(elem: Elem, figure: BlockFigure) {
-        super(elem, figure);
-        this.html = getInnerText(elem);
-        this.componentProps = {
-            ...this.componentProps,
-            html: this.html,
-            isIframe: this.isIFrame,
-        };
-    }
-
-    public get isIFrame(): boolean {
-        /**
-         * Returns `true` if the embed HTML is an iframe element
-         */
-        if (typeof this._isIFrame === "undefined") {
-            const doc: Document = new DOMParser().parseFromString(
-                this.html,
-                "text/html",
-            );
-            const root: HTMLBodyElement | null =
-                doc.documentElement.querySelector("body");
-            this._isIFrame =
-                !!root &&
-                root.childElementCount === 1 &&
-                root.children[0].tagName.toLowerCase() === "iframe";
-        }
-        return this._isIFrame;
-    }
 }
 
 export class FileBlock extends AssetBlock {

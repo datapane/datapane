@@ -171,7 +171,8 @@ class BaseExportHTML(BaseProcessor, ABC):
             view_xml = ""
 
         html = self.template.render(
-            report_doc=view_xml,
+            # Escape JS multi-line strings
+            report_doc=view_xml.replace("`", "\\`"),
             assets=assets,
             report_width_class=report_width_classes.get(formatting.width),
             report_name=name,
