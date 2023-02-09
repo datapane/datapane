@@ -579,11 +579,6 @@ def failure_msg(msg: str, do_exit: bool = False):
 
 
 @app.group()
-def hosting():
-    """Commands to help with hosting"""
-
-
-@hosting.group()
 def generate():
     """Commands to generate misc files"""
 

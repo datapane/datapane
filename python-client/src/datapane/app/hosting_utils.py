@@ -54,7 +54,7 @@ RUN \
 def generate_dockerfile(
     python_version: str = DEFAULT_PYTHON_VERSION,
     installer: SupportedInstallers = DEFAULT_INSTALLER,
-    file_to_exec: t.Union[str, None] = None,
+    file_to_exec: t.Optional[str] = None,
 ):
     # TODO: better error handling
     assert _is_valid_python_version(python_version), "The python version you specified is not supported"
