@@ -214,7 +214,33 @@ class DPBottlePlugin:
             req.session = session
 
             # call the route dispatcher
-            result = callback(*args, **kwargs)
+            try:
+                result = callback(*args, **kwargs)
+            except OSError as e:
+                # Catch OSError, as `socket` will raise OSError or TimeoutError depending on
+                # where it is.
+                #
+                # occurs when 2 conditions are met:
+                #   - the client has sent part of the body, but took too long to finish
+                #   - we are currently trying to read the body
+                #
+                # This can be replicated using 'gnutls-cli' or 'telnet' to:
+                # 1. connect to the server
+                # 2. send a POST request with headers and the **start** of the body
+                # 3. wait for the server to timeout the connection (~10 seconds from connection)
+                #
+                # In these cases, we don't need to provide a response
+
+                # TimeoutError could happen in the handler.
+                # Do a sanity check to make sure it's actually a socket error
+                try:
+                    _ = req.body
+                except OSError:
+                    # we were right, bail out
+                    log.warning("dropping timed-out request")
+                    return
+                else:
+                    raise e from e
 
             # update the session, if needed
             if _session_hash != hash(session):

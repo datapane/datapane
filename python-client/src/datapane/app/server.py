@@ -18,7 +18,8 @@ from contextlib import suppress
 from pathlib import Path
 
 import bottle as bt
-import cheroot.ssl
+import cheroot.server
+import cheroot.ssl.builtin
 import cheroot.wsgi
 import importlib_resources as ir
 
@@ -233,6 +234,22 @@ def _choose_ui_class() -> t.Type[ControllerUI]:
 # Communicates with ServerController.
 
 
+class CherootHTTPRequest(cheroot.server.HTTPRequest):
+    def ensure_headers_sent(self, *args, **kwargs):
+        try:
+            super().ensure_headers_sent(*args, **kwargs)
+        except OSError:
+            # We're at a low enough level to know that OSError means the socket
+            # closed, likely from a timeout.
+            # bail out silently, to let Cheroot handle response cleanup correctly.
+            # This also keeps the messy traceback from showing.
+            pass
+
+
+class CherootHTTPConnection(cheroot.server.HTTPConnection):
+    RequestHandlerClass = CherootHTTPRequest
+
+
 class CherootServer:
     quiet = False
 
@@ -268,6 +285,7 @@ class CherootServer:
         keyfile = options.pop("keyfile", None)
         chainfile = options.pop("chainfile", None)
         server = cheroot.wsgi.Server(**options)
+        server.ConnectionClass = CherootHTTPConnection
         if certfile and keyfile:
             server.ssl_adapter = cheroot.ssl.builtin.BuiltinSSLAdapter(certfile, keyfile, chainfile)
         server.prepare()  # This will raise an error on failure to bind port
