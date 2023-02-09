@@ -73,7 +73,9 @@ _NO_ANALYTICS: bool = is_analytics_disabled()
 def user_properties() -> Dict:
     """User properties to be added on `identify`, and amended on `capture`"""
     from datapane import __version__
-    from datapane.ipython.environment import environment
+    from datapane.ipython.environment import get_environment
+
+    environment = get_environment()
 
     return dict(
         os=platform.system(),

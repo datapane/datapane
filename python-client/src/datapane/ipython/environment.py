@@ -254,7 +254,3 @@ class PapermillEnvironment(IPythonZMQEnvironment):
     @cached_property
     def support_rich_display(self) -> bool:  # type: ignore[override]
         return get_ipython_user_ns().get("DP_NOTEBOOK_RUNNER", False)
-
-
-# TODO: remove
-environment = get_environment()

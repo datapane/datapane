@@ -10,7 +10,7 @@ from datapane.client.analytics import capture_event
 from datapane.client.exceptions import DPClientError
 from datapane.client.utils import display_msg
 
-from .environment import environment
+from .environment import get_environment
 from .exceptions import BlocksNotFoundException, NotebookParityException
 
 if typing.TYPE_CHECKING:
@@ -84,13 +84,11 @@ def cells_to_blocks(
 
     ..note:: IPython output caching must be enabled for this function to work. It is enabled by default.
     """
-
+    environment = get_environment()
     if not environment.is_notebook_environment:
         raise DPClientError("This function can only be used in a notebook environment")
 
-    from IPython import get_ipython
-
-    ip = get_ipython()
+    ip = environment.get_ipython()
     user_ns = ip.user_ns
     ipython_output_cache = user_ns["_oh"]
     ipython_input_cache = user_ns["_ih"]

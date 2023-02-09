@@ -86,11 +86,11 @@ class BaseElement(ABC):
         """Display the block as a side effect within a Jupyter notebook"""
         from IPython.display import HTML, display
 
-        from datapane.ipython.environment import environment
+        from datapane.ipython.environment import get_environment
         from datapane.processors.api import stringify_report
         from datapane.view import View
 
-        if environment.support_rich_display:
+        if get_environment().support_rich_display:
             html_str = stringify_report(View(self))
             display(HTML(html_str))
         else:

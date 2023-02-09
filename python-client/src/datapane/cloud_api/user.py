@@ -34,7 +34,7 @@ from datapane.client import display_msg
 from datapane.client.commands import failure_msg, success_msg
 from datapane.client.utils import open_in_browser
 from datapane.common import URL, pushd
-from datapane.ipython.environment import environment
+from datapane.ipython.environment import get_environment
 
 from .common import _process_res
 
@@ -270,7 +270,7 @@ def token_connect(server: str, action: str = "login") -> t.Optional[str]:
         login_token = create_token(s)
         url = (
             furl(path="/accounts/api-login-token-accept", origin=server)
-            .add({"login_token": login_token, "action": action, "jupyter": environment.is_notebook_environment})
+            .add({"login_token": login_token, "action": action, "jupyter": get_environment().is_notebook_environment})
             .url
         )
 
