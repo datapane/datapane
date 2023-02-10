@@ -18,12 +18,15 @@ export type ReportProps = {
     assetStore: any;
 };
 
+export type AppDataResult = {
+    view_xml: string;
+    assets: any;
+};
+
 export type AppData = {
     data: {
-        result: {
-            view_xml: string;
-            assets: any;
-        };
+        result?: AppDataResult;
+        error?: { message: string; code: number };
     };
 };
 

@@ -23,10 +23,15 @@
     window.dpReportId = "{{report_id}}";
     window.dpAuthorId = "{{author_id}}";
   % end
-  // construct the View
-  const appData = { data: { result: { view_xml: `{{report_doc}}`, assets: {{!assets}} } }};
+
+  /* construct the view */
   const htmlHeader = `<style type="text/css">{{ !css_header }}</style>`;
-  window.reportProps = { htmlHeader, appData, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW" };
+  window.reportProps = { htmlHeader, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW" };
+
+  if (!window.dpAppRunner) {
+      // pass app data via props if in local (static) mode, otherwise this data is fetched from the server
+      window.reportProps["appData"] = { data: { result: { view_xml: `{{report_doc}}`, assets: {{!assets}} } }};
+  }
 </script>
 <script type="module">
   import { mountReport } from "{{ cdn_base }}/report/index.es.js";

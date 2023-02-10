@@ -58,7 +58,7 @@ const useActions = (initialChildren: Block[]) => {
         const targetChild = children[idx];
 
         if (!isLayoutBlock(targetChild)) {
-            throw "Can't perform inner replace on non layout block";
+            throw new Error("Can't perform inner replace on non layout block");
         }
 
         this.$patch(() => {

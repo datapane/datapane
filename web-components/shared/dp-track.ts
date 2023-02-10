@@ -75,7 +75,7 @@ export const getDeviceId = async (): Promise<string> => {
     const device = localStorage.getItem(LOCK_NAME);
 
     if (!device) {
-        throw "Couldn't access device ID";
+        throw new Error("Couldn't access device ID");
     }
 
     return JSON.parse(device).distinct_id;

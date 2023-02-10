@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ReportComponent from "./ReportComponent.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import ErrorCallout from "./ErrorCallout.vue";
 import { AppData, ReportProps } from "../data-model/types";
 import { computed, onMounted, ref } from "vue";
 import { trackLocalReportView } from "../../../shared/dp-track";
@@ -9,13 +10,14 @@ import { storeToRefs } from "pinia";
 import { isView } from "../data-model/blocks";
 import sanitizeHtml from "sanitize-html";
 import { setTheme } from "../theme";
+import { parseError } from "../shared/shared";
 
 const p = defineProps<{
     isOrg: ReportProps["isOrg"];
     isLightProse: ReportProps["isLightProse"];
     mode: ReportProps["mode"];
     htmlHeader: ReportProps["htmlHeader"];
-    appData: AppData;
+    appData?: AppData;
 }>();
 
 const rootStore = useRootStore();
@@ -23,15 +25,18 @@ const error = ref<string | undefined>();
 
 const setReport = async () => {
     try {
-        await rootStore.setReport(p.appData, {
-            isLightProse: p.isLightProse,
-            mode: p.mode,
-            isOrg: p.isOrg,
-            // TODO - webUrl
-            webUrl: "",
-        });
+        await rootStore.setReport(
+            {
+                isLightProse: p.isLightProse,
+                mode: p.mode,
+                isOrg: p.isOrg,
+                // TODO - webUrl
+                webUrl: "",
+            },
+            p.appData,
+        );
     } catch (e) {
-        error.value = "Something went wrong while fetching the app";
+        error.value = parseError(e);
         console.error(e);
     }
 };
@@ -106,5 +111,5 @@ const { dpAppRunner } = window;
     >
         <loading-spinner :large="true" />
     </div>
-    <div v-if="error" class="bg-red-100 p-4 mt-4">{{ error }}</div>
+    <error-callout v-if="error" :error="error" />
 </template>

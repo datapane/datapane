@@ -17,7 +17,7 @@ customElements.define("x-table-block", defineCustomElement(TableBlock));
 const parseElementProps = (elId: string): any => {
     const propsEl = document.getElementById(elId);
     if (!propsEl || !propsEl.textContent) {
-        throw "Couldn't find props JSON element";
+        throw new Error("Couldn't find props JSON element");
     }
     return JSON.parse(propsEl.textContent);
 };

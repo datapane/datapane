@@ -76,7 +76,7 @@ export abstract class LayoutBlock<
                 } else if (method === SwapType.INNER) {
                     this.store.inner(idx, group);
                 } else {
-                    throw `Method ${method} not recognised`;
+                    throw new Error(`Method ${method} not recognised`);
                 }
                 return true;
             }

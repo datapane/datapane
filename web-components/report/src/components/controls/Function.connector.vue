@@ -10,6 +10,7 @@ import BlockWrapper from "../layout/BlockWrapper.vue";
 import { TriggerType } from "../../data-model/types";
 import { BlockFigureProps } from "../../data-model/blocks";
 import FunctionBlock from "./Function.vue";
+import { parseError } from "../../shared/shared";
 
 const p = defineProps<{
     store: any;
@@ -36,12 +37,8 @@ const update = async () => {
         error.value = undefined;
         loading.value = true;
         await p.store.update(p.functionId);
-    } catch (e: any) {
-        if (e.name === "TargetNotFoundError") {
-            error.value = e.message;
-        } else {
-            error.value = "Something went wrong while updating the app";
-        }
+    } catch (e) {
+        error.value = parseError(e);
         console.error(e);
     } finally {
         loading.value = false;

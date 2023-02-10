@@ -23,7 +23,7 @@ const file2b64 = (file: File): Promise<string | null> =>
         reader.readAsDataURL(file);
         reader.onload = () => {
             if (typeof reader.result !== "string") {
-                throw `File type not string (${reader.result})`;
+                throw new Error(`File type not string (${reader.result})`);
             }
             const [, b64String] = reader.result.split("base64,");
             resolve(b64String);

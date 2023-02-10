@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import { TriggerType } from "../../data-model/types";
 import { ControlsField } from "../../data-model/blocks";
 import LoadingSpinner from "../LoadingSpinner.vue";
+import ErrorCallout from "../ErrorCallout.vue";
 
 const p = defineProps<{
     onChange: (v: { name: string; value: any }) => void;
@@ -98,7 +99,7 @@ onUnmounted(() => {
                         {{ p.prompt }}
                     </button>
                 </div>
-                <div v-if="error" class="bg-red-100 p-4 mt-4">{{ error }}</div>
+                <error-callout v-if="error" :error="error" />
             </form-kit>
         </div>
     </div>

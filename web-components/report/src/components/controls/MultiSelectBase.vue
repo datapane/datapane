@@ -19,7 +19,7 @@ onMounted(() => {
     if (hiddenRef.value) {
         p.context.node.input(p.context.tags.join(","));
     } else {
-        throw "Tags field not properly initialized";
+        throw new Error("Tags field not properly initialized");
     }
 });
 

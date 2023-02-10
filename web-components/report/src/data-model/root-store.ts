@@ -4,18 +4,11 @@ import convert from "xml-js";
 import { reactive, ref } from "vue";
 import * as b from "./blocks/index";
 import * as maps from "./test-maps";
-import { AppData, AppMetaData, SwapType } from "./types";
+import { AppData, AppDataResult, AppMetaData, SwapType } from "./types";
 import he from "he";
 import { isParentElem } from "./blocks/index";
 
 export type EmptyObject = Record<string, never>;
-
-export class TargetNotFoundError extends Error {
-    constructor(targetId: string) {
-        super(`Target block with ID '${targetId}' not found`);
-        this.name = "TargetNotFoundError";
-    }
-}
 
 const mkBlockMap = (
     isLightProse: boolean,
@@ -161,7 +154,7 @@ export const useRootStore = defineStore("root", () => {
             const figure = { caption, count, captionType: class_.captionType };
             return new class_(elem, figure, opts);
         } else {
-            throw `Couldn't deserialize from JSON ${elem}`;
+            throw new Error(`Couldn't deserialize from JSON ${elem}`);
         }
     };
 
@@ -179,23 +172,14 @@ export const useRootStore = defineStore("root", () => {
             { headers: { "Content-Type": "application/json" } },
         );
 
-    const setReport = async (localAppData: AppData, meta: AppMetaData) => {
+    const setReport = async (meta: AppMetaData, localAppData?: AppData) => {
         /**
          * Set report object either from given app data or
          * by fetching from the app server
          */
-        let appData: AppData;
-        if (localAppData.data.result.view_xml) {
-            // Decode HTML entities for locally saved reports
-            localAppData.data.result.view_xml = he.decode(
-                localAppData.data.result.view_xml,
-            );
-            appData = localAppData;
-        } else {
-            appData = await fetchReport();
-        }
+        const appData = localAppData ?? (await fetchReport());
 
-        const { view_xml, assets } = appData.data.result;
+        const { view_xml, assets } = parseAppData(appData, !!localAppData);
 
         blockMap.push(
             ...mkBlockMap(meta.isLightProse, meta.webUrl, meta.isOrg),
@@ -206,11 +190,36 @@ export const useRootStore = defineStore("root", () => {
         // Using `reactive` / Object.assign on `report` only preserved JSON-serialisable properties (i.e. no methods)
         report.value = xmlToView(view_xml);
 
-        // Can cast to `View` as we just assigned the response to `Report`
+        // Can cast to `View` as we just assigned the response to `report.value`
         singleBlockEmbed.value = isSingleBlockEmbed(
             report.value as b.View,
             meta.mode,
         );
+    };
+
+    const parseAppData = (
+        appData: AppData,
+        isLocal?: boolean,
+    ): AppDataResult => {
+        /**
+         * Return XML and assets from `appData`, decoding the XML if needed.
+         */
+        if (!appData.data.result) {
+            // Throw JSON-RPC error if available
+            const { error } = appData.data;
+            throw new Error(
+                error ? `${error.message} (${error.code})` : "Unknown error",
+            );
+        }
+
+        if (isLocal) {
+            // Decode HTML entities for locally saved reports
+            appData.data.result.view_xml = he.decode(
+                appData.data.result.view_xml,
+            );
+        }
+
+        return appData.data.result;
     };
 
     const deserialize = (elem: b.Elem, isFragment = false): b.Block => {
@@ -250,14 +259,12 @@ export const useRootStore = defineStore("root", () => {
          * and updates the app at the given `target`
          */
         if (!(report.value instanceof b.View)) {
-            throw (
-                "Report object not yet initialized: " +
-                JSON.stringify(report.value)
-            );
+            throw new Error("App not yet initialized");
         }
 
         const r = await fetchReport({ functionId, params });
-        const { view_xml, assets } = r.data.result;
+
+        const { view_xml, assets } = parseAppData(r);
 
         // Update asset store
         Object.assign(assetMap, assets);
@@ -278,7 +285,7 @@ export const useRootStore = defineStore("root", () => {
         }
 
         if (!didUpdate) {
-            throw new TargetNotFoundError(target);
+            throw new Error(`Target block with ID '${target}' not found`);
         }
     };
 
