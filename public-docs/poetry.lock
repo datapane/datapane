@@ -649,7 +649,7 @@ six = "*"
 
 [[package]]
 name = "datapane"
-version = "0.15.6"
+version = "0.15.7"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
@@ -686,6 +686,7 @@ pandas = "^1.1.0"
 posthog = ">=1.4.0, <3.0.0"
 pyarrow = ">=6.0.0,<11.0.0"
 pydantic = "^1.6.0"
+pyngrok = "^5.2.1"
 PyYAML = ">=5.4.0,<7.0.0"
 requests = "^2.19.0"
 requests-toolbelt = ">=0.9.1, <0.11.0"
@@ -2800,6 +2801,20 @@ files = [
 
 [package.dependencies]
 markdown = ">=3.2"
+
+[[package]]
+name = "pyngrok"
+version = "5.2.1"
+description = "A Python wrapper for ngrok."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pyngrok-5.2.1.tar.gz", hash = "sha256:770b386782f382490e1934b92d99ff314f192abef49f83d6a1c7b3b03871793e"},
+]
+
+[package.dependencies]
+PyYAML = "*"
 
 [[package]]
 name = "pyparsing"
