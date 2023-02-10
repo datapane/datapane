@@ -25,6 +25,7 @@ import importlib_resources as ir
 
 from datapane.blocks import Controls
 from datapane.client import log
+from datapane.client.analytics import capture
 from datapane.common.dp_types import SECS_1_HOUR, SIZE_1_MB
 from datapane.common.utils import guess_type
 from datapane.ipython.environment import get_environment
@@ -74,6 +75,7 @@ def create_bottle_app(debug: bool) -> bt.Bottle:
         return html
 
     if debug:
+        # enable serving the web-components assets directly from py app server
         root_dir: Path = t.cast(Path, ir.files("datapane"))
         web_dist_dir = root_dir.parent.parent.parent / "web-components" / "dist"
 
@@ -145,6 +147,7 @@ def serve(
     # start the server
     app.config.update({})
     app.install(DPBottlePlugin(g_s))
+    capture("App Server Started")
 
     def app_cleanup():
         shutil.rmtree(app_dir, ignore_errors=True)

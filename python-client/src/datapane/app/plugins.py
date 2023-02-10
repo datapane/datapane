@@ -30,6 +30,7 @@ from functools import wraps
 import bottle as bt
 
 from datapane.client import log
+from datapane.client.analytics import capture
 from datapane.common.dp_types import SECS_1_HOUR, SECS_1_WEEK
 
 from .runtime import GlobalState, SessionState
@@ -201,6 +202,7 @@ class DPBottlePlugin:
                     httponly=True,
                     samesite="lax",
                 )
+                capture("App Session Created")
                 log.info(f"Session created: {s_id}")
 
             # thread name = <ip>-<session_id[0:6]>

@@ -6,6 +6,7 @@ import bottle as bt
 from pydantic import BaseModel, ValidationError, conint, constr, validator
 
 from datapane.client import log
+from datapane.client.analytics import capture
 
 from .runtime import GlobalState, apply_ref, get_session_state, global_rpc_functions
 
@@ -79,6 +80,7 @@ def _dispatch(g_s: GlobalState) -> t.Optional[t.Dict]:
     """JSON-RPC dispatcher"""
 
     s_s = get_session_state()
+    capture("App Function Called")
     # NOTE - we don't handle RPC Parse error here, bottle will return 400 instead if invalid json
     json_req_obj: t.Dict = bt.request.json
     _id: t.Optional[int] = None
