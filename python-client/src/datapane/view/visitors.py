@@ -13,8 +13,6 @@ from datapane import blocks as bk
 from datapane.blocks import BaseElement, Function
 from datapane.blocks.layout import ContainerBlock
 
-pass
-
 from .view import View
 
 if t.TYPE_CHECKING:

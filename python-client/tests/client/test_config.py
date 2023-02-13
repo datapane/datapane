@@ -290,10 +290,10 @@ def test_new_config__additional_event(posthog, monkeypatch, tmp_path):
     test_new_config__login_event(posthog)
 
     monkeypatch.chdir(tmp_path)
-    from tests.client.local.api.test_reports import gen_report_simple
+    from tests.client.views.test_views import gen_view_simple
 
-    report = gen_report_simple()
-    report.save(path="test_out.html", name="My Wicked Report")
+    view = gen_view_simple()
+    dp.save_report(view, path="test_out.html", name="My Test Report")
 
     analytics._consumer.join_queue()
     assert posthog.capture.call_count == 2

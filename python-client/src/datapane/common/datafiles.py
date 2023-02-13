@@ -8,7 +8,7 @@ import pyarrow as pa
 from pandas.errors import ParserError
 from pyarrow import RecordBatchFileWriter
 
-from .df_processor import process_df, str_to_arrow_str
+from .df_processor import obj_to_str, process_df, str_to_arrow_str
 from .dp_types import ARROW_EXT, ARROW_MIMETYPE, MIME, log
 from .utils import guess_encoding
 
@@ -51,6 +51,8 @@ class ArrowFormat(DFFormatter):
     @staticmethod
     def load_file(fn: PathOrFile) -> pd.DataFrame:
         df = pa.ipc.open_file(fn).read_pandas()
+        # NOTE - need to convert categories from object to string https://github.com/apache/arrow/issues/33070
+        obj_to_str(df)
         str_to_arrow_str(df)
         return df
 

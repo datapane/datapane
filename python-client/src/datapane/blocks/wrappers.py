@@ -23,9 +23,11 @@ def convert_to_block(x: object) -> DataBlock:
     )
 
 
-@multimethod
-def convert_to_block(x: t.Any) -> DataBlock:
-    return b.Attachment(x)
+# NOTE - this is currently disabled to avoid confusing users when they
+# try to embed any Python object, instead they must use dp.Attachment
+# @multimethod
+# def convert_to_block(x: t.Any) -> DataBlock:
+#     return b.Attachment(x)
 
 
 @multimethod

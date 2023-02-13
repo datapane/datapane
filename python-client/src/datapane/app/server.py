@@ -75,6 +75,7 @@ def create_bottle_app(debug: bool) -> bt.Bottle:
         html = ExportBaseHTMLOnly(debug).generate_chrome()
         return html
 
+    bt.debug(debug)
     if debug:
         # enable serving the web-components assets directly from py app server
         root_dir: Path = t.cast(Path, ir.files("datapane"))

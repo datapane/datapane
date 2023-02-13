@@ -1,6 +1,7 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
 import sys
+import typing as t
 from pathlib import Path
 
 try:
@@ -155,10 +156,11 @@ if get_dp_mode() == DPMode.LIBRARY and not IN_PYTEST:
     init()
 
 
-def load_params_from_command_line() -> None:
+def load_params_from_command_line() -> t.Dict:
     """Call this from your own scripts to read any CLI parameters into the global Params object"""
-    # from .client.utils import parse_command_line
-    #
-    # config = parse_command_line()
+    from .client.utils import log, parse_command_line
+
+    config = parse_command_line()
+    log.debug(config)
     # Params.replace(config)
-    pass
+    return config

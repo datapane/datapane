@@ -19,16 +19,16 @@ def setup(file: Path, test_org: bool):
     print("Building test reports / apps")
 
     # demo reports
-    style_report = dp.builtins.build_demo_report()
-    style_report.upload(name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
+    style_report_v = dp.builtins.demo()
+    style_report_app = dp.upload(style_report_v, name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
 
-    dp_objs = {"styleReportURL": style_report.web_url}
+    dp_objs = {"styleReportURL": style_report_app.web_url}
 
     # add a basic file
     if test_org:
         # file
         obj = {"foo": "bar"}
-        obj_file = dp.File.upload_obj(data=pickle.dumps(obj), name=gen_name())
+        obj_file = dp.CloudFile.upload_obj(data=pickle.dumps(obj), name=gen_name())
         # record obj urls
         dp_objs.update({"fileURL": obj_file.web_url})
 
@@ -44,10 +44,10 @@ def teardown(file: Path, test_org: bool):
 
     # delete the objects, ignoring errors
     with suppress(Exception):
-        dp.App.by_id(dp_objs["styleReportURL"]).delete()
+        dp.CloudApp.by_id(dp_objs["styleReportURL"]).delete()
     if test_org:
         with suppress(Exception):
-            dp.File.by_id(dp_objs["fileURL"]).delete()
+            dp.CloudFile.by_id(dp_objs["fileURL"]).delete()
 
 
 if __name__ == "__main__":

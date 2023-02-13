@@ -42,7 +42,7 @@ class FunctionRef:
     def __post_init__(self):
         # validate the function
         f_sig = inspect.signature(self.f)
-        self.state = "state" in f_sig.parameters
+        self.state = "session" in f_sig.parameters
 
         if "params" not in f_sig.parameters:
             # TODO - support optional params if all controls exists in the
@@ -51,11 +51,11 @@ class FunctionRef:
 
         if self.state or not self.controls.is_cacheable:
             if self.cache:
-                log.warning(f"Disabling cache hint for {self.f}")
+                log.debug(f"Disabling cache hint for {self.f}")
             self.cache = False
 
         if self.cache:
-            log.warning(f"Enabling experimental cache support for {self.f}")
+            log.debug(f"Enabling experimental cache support for {self.f}")
 
         log.debug(f"Registered {self.f} ({self.cache=}, {self.state=})")
 
@@ -152,7 +152,7 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
 
         # add optional state param
         if ref.state:  # "state" in f_sig.parameters:
-            kwargs["state"] = s_s.user_state
+            kwargs["session"] = s_s.user_state
 
         f_args = f_sig.bind(params=in_params, **kwargs)
         f_args.apply_defaults()

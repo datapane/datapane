@@ -32,4 +32,4 @@ from .dp_types import (
 )
 from .ops_utils import pushd, timestamp
 from .utils import dict_drop_empty, guess_type, utf_read_text
-from .viewxml_utils import ViewXML, load_doc, validate_report_doc
+from .viewxml_utils import ViewXML, load_doc, validate_view_doc

@@ -94,7 +94,7 @@ def test_parameter_parsing_for_library():
     test_command = [
         sys.executable,
         "-c",
-        "import datapane; datapane.load_params_from_command_line(); print(datapane.Params)",
+        "import datapane; x = datapane.load_params_from_command_line(); print(x)",
         "--parameter",
         "my_param=123",
     ]

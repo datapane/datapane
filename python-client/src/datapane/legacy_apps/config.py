@@ -1,14 +1,11 @@
 """Support for handling datapane app config"""
 import dataclasses as dc
-import json
 import os
 import re
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
 import dacite
-import importlib_resources as ir
-import jsonschema
 import stringcase
 import yaml
 from typing_extensions import Self
@@ -89,9 +86,9 @@ class DatapaneCfg:
         #         "Config and Script directory must be in same directory"
 
         # validate config
-        if self.parameters:
-            config_schema = json.loads(ir.read_text("datapane.resources", "app_parameter_def.schema.json"))
-            jsonschema.validate(self.parameters, config_schema)
+        # if self.parameters:
+        #     config_schema = json.loads(ir.read_text("datapane.resources", "app_parameter_def.schema.json"))
+        #     jsonschema.validate(self.parameters, config_schema)
 
     @classmethod
     def create_initial(cls, config_file: Path = None, script: Path = None, **kw) -> Self:

@@ -16,10 +16,14 @@ from types import FrameType
 from typing import List, Optional
 
 import datapane.client.api as api
-from datapane.cloud_api.obsolete.teams import LegacyApp
 from datapane.common import SDict, SSDict, log
 
 from .exceptions import CodeError, CodeRaisedError, CodeSyntaxError
+
+if t.TYPE_CHECKING:
+    # for BC reasons
+    LegacyApp = t.Any
+
 
 ENVIRON_CONFIG = {
     "banned_builtins": {"compile", "exec", "eval"},

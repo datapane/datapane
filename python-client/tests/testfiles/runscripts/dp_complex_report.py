@@ -45,7 +45,7 @@ md_block = datapane.blocks.inline_text.Text(
 file_asset = datapane.blocks.asset.Attachment(data=lis)
 
 # In-line image
-img_asset = datapane.blocks.asset.Media(file=Path("./datapane-logo.png"))
+img_asset = datapane.blocks.asset.Media(file=Path("./datapane-icon-192x192.png"))
 
 # Vega
 vega_asset = datapane.blocks.asset.Plot(data=gen_plot())

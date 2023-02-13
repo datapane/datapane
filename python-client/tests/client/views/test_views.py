@@ -14,8 +14,8 @@ import datapane.blocks.function
 from datapane.blocks import BaseElement
 from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
-from datapane.common.viewxml_utils import load_doc, validate_report_doc
-from datapane.processors import ConvertXML, Pipeline, PreProcessView, ViewState
+from datapane.common.viewxml_utils import load_doc, validate_view_doc
+from datapane.processors import AppTransformations, ConvertXML, Pipeline, PreProcessView, ViewState
 from datapane.processors.file_store import B64FileEntry
 from datapane.processors.types import mk_null_pipe
 
@@ -27,37 +27,39 @@ str_md_block = "Simple string Markdown"
 
 
 def element_to_str(e: BaseElement) -> str:
-    return mk_null_pipe(e).pipe(ConvertXML(pretty_print=True)).state.view_xml
+    # NOTE - this validates as well
+    return mk_null_pipe(dp.View(e)).pipe(ConvertXML(pretty_print=True)).state.view_xml
 
 
-def num_blocks(report_str: str) -> int:
+def num_blocks(view_str: str) -> int:
     x = "count(/View//*)"
-    return int(load_doc(report_str).xpath(x))
+    return int(load_doc(view_str).xpath(x))
 
 
-def _app_to_xml_and_files(app: dp.App) -> ViewState:
-    s = ViewState(view=app, file_entry_klass=B64FileEntry)
-    return Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).state
+def _view_to_xml_and_files(app_or_view: t.Union[dp.View, dp.App]) -> ViewState:
+    """Create a viewstate resulting from converting the View to XML & in-mem B64 files"""
+    s = ViewState(view=app_or_view, file_entry_klass=B64FileEntry)
+    return Pipeline(s).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state
 
 
-def assert_app(
-    view: dp.App, expected_attachments: int = None, expected_num_blocks: int = None
+def assert_view(
+    view: t.Union[dp.App, dp.View], expected_attachments: int = None, expected_num_blocks: int = None
 ) -> t.Tuple[str, t.List[Path]]:
-    state = _app_to_xml_and_files(view)
+    state = _view_to_xml_and_files(view)
     view_xml = state.view_xml
     attachments = state.store.file_list
     if expected_attachments:
         assert len(attachments) == expected_attachments
     if expected_num_blocks:
         assert num_blocks(view_xml) == expected_num_blocks
-    assert validate_report_doc(xml_str=view_xml)
+    assert validate_view_doc(xml_str=view_xml)
     return (view_xml, attachments)
 
 
 ################################################################################
 # Generators
-def gen_report_simple() -> dp.App:
-    return dp.App(
+def gen_view_simple() -> dp.View:
+    return dp.View(
         blocks=[
             md_block_id,
             str_md_block,
@@ -65,22 +67,13 @@ def gen_report_simple() -> dp.App:
     )
 
 
-def gen_legacy_report_simple() -> dp.App:
-    return dp.Report(
-        blocks=[
-            md_block_id,
-            str_md_block,
-        ]
-    )
-
-
-def gen_report_complex_no_files() -> dp.App:
-    """Generate a complex layout report with simple elements"""
+def gen_view_complex_no_files() -> dp.View:
+    """Generate a complex layout view with simple elements"""
     select = dp.Select(blocks=[md_block, md_block], type=dp.SelectType.TABS)
     group = dp.Group(md_block, md_block, columns=2)
     toggle = dp.Toggle(md_block, md_block)
 
-    return dp.App(
+    return dp.View(
         dp.Page(
             blocks=[
                 dp.Group(md_block, md_block, columns=2),
@@ -105,7 +98,7 @@ def gen_report_complex_no_files() -> dp.App:
     )
 
 
-def gen_report_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.App:
+def gen_view_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.View:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -126,7 +119,7 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
     list_asset = dp.Attachment(data=lis, filename="List Asset")
-    img_asset = dp.Media(file=datadir / "datapane-logo.png")
+    img_asset = dp.Media(file=datadir / "datapane-icon-192x192.png")
 
     # tables
     table_asset = dp.Table(data=small_df, caption="Test Basic Table")
@@ -136,9 +129,9 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
     )
 
     if single_file:
-        return dp.App(dp.Group(blocks=[md_block, dt_asset]))
+        return dp.View(dp.Group(blocks=[md_block, dt_asset]))
     else:
-        return dp.App(
+        return dp.View(
             dp.Page(
                 dp.Select(
                     md_block, html_block, html_block_1, code_block, formula_block, embed_block, type=dp.SelectType.TABS
@@ -159,26 +152,26 @@ def gen_report_complex_with_files(datadir: Path, single_file: bool = False, loca
 
 
 ################################################################################
-# PyReport Tests
-def test_gen_report_single():
-    # report with single block
-    report = dp.App("test block")
-    assert_app(report, 0)
-    assert len(report.blocks) == 1
-    assert isinstance(report.blocks[0], dp.Text)
+# View Tests
+def test_gen_view_single():
+    # view with single block
+    view = dp.View("test block")
+    assert_view(view, 0)
+    assert len(view.blocks) == 1
+    assert isinstance(view.blocks[0], dp.Text)
 
 
-def test_gen_report_simple():
-    report = gen_report_simple()
-    assert_app(report, 0)
+def test_gen_view_simple():
+    view = gen_view_simple()
+    assert_view(view, 0)
     # TODO - replace accessors here with glom / boltons / toolz
-    assert len(report.blocks) == 2
-    assert isinstance(report.blocks[1], dp.Text)
-    assert report.blocks[0].name == "test-id-1"
+    assert len(view.blocks) == 2
+    assert isinstance(view.blocks[1], dp.Text)
+    assert view.blocks[0].name == "test-id-1"
 
 
-def test_gen_report_nested_mixed():
-    report = dp.App(
+def test_gen_view_nested_mixed():
+    view = dp.View(
         dp.Group(
             md_block_id,
             str_md_block,
@@ -186,70 +179,71 @@ def test_gen_report_nested_mixed():
         "Simple string Markdown #2",
     )
 
-    assert_app(report, 0)
-    assert len(glom(report, "blocks")) == 2
-    assert isinstance(glom(report, "blocks.0"), dp.Group)
-    assert isinstance(report.blocks[0], dp.Group)
-    assert isinstance(report.blocks[1], dp.Text)
-    assert glom(report, "blocks.0.blocks.0.name") == "test-id-1"
+    assert_view(view, 0)
+    assert len(glom(view, "blocks")) == 2
+    assert isinstance(glom(view, "blocks.0"), dp.Group)
+    assert isinstance(view.blocks[0], dp.Group)
+    assert isinstance(view.blocks[1], dp.Text)
+    assert glom(view, "blocks.0.blocks.0.name") == "test-id-1"
 
 
-def test_gen_report_primitives(datadir: Path):
+def test_gen_view_primitives(datadir: Path):
     # check we don't allow arbitary python primitives - must be pickled directly via dp.Attachment
     with pytest.raises(DPClientError):
-        _ = dp.App([1, 2, 3])
+        _ = dp.View([1, 2, 3]).get_dom()
 
-    report = dp.App(
+    view = dp.View(
         "Simple string Markdown #2",  # Markdown
         gen_df(),  # Table
         gen_plot(),  # Plot
-        datadir / "datapane-logo.png",  # Attachment
+        datadir / "datapane-icon-192x192.png",  # Attachment
     )
-    assert_app(report, 3)
-    assert glom(report, ("blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
+    assert_view(view, 3)
+    assert glom(view, ("blocks", ["_tag"])) == ["Text", "Table", "Plot", "Attachment"]
 
 
-def test_gen_failing_reports():
+def test_gen_failing_views():
     # nested pages
     with pytest.raises(DPClientError):
-        r = dp.App(dp.Page(dp.Page(md_block)))
-        _app_to_xml_and_files(r)
-    with pytest.raises(DPClientError):
-        r = dp.App(dp.Group(dp.Page(md_block)))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.Page(dp.Page(md_block)))
+        _view_to_xml_and_files(v)
+    # we only transform top-level pages
+    with pytest.raises(DocumentInvalid):
+        v = dp.View(dp.Group(dp.Page(md_block)))
+        _view_to_xml_and_files(v)
 
     # page/pages with 0 objects
     with pytest.raises(DPClientError):
-        r = dp.App(dp.Page(blocks=[]))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.Page(blocks=[]))
+        _view_to_xml_and_files(v)
 
     # select with 1 object
     with pytest.raises(DPClientError):
-        r = dp.App(dp.Page(dp.Select(blocks=[md_block])))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.Page(dp.Select(blocks=[md_block])))
+        _view_to_xml_and_files(v)
 
     # empty text block
     with pytest.raises(AssertionError):
-        r = dp.App(dp.Text(" "))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.Text(" "))
+        _view_to_xml_and_files(v)
 
     # empty df
     with pytest.raises(DPClientError):
-        r = dp.App(dp.DataTable(pd.DataFrame()))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.DataTable(pd.DataFrame()))
+        _view_to_xml_and_files(v)
 
     # invalid names
     with pytest.raises(DocumentInvalid):
-        r = dp.App(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
-        _app_to_xml_and_files(r)
+        v = dp.View(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
+        _view_to_xml_and_files(v)
 
     with pytest.raises(DPClientError):
-        dp.App(dp.Text("a", name="3-invalid-name"))
+        dp.View(dp.Text("a", name="3-invalid-name"))
 
 
-def test_gen_report_nested_blocks():
+def test_gen_view_nested_blocks():
     s = "# Test markdown block <hello/> \n Test **content**"
-    report = dp.App(
+    view = dp.View(
         blocks=[
             dp.Group(dp.Text(s, name="test-id-1"), "Simple string Markdown", label="test-group-label"),
             dp.Select(
@@ -270,43 +264,43 @@ def test_gen_report_nested_blocks():
     )
 
     # No additional wrapper block
-    assert len(report.blocks) == 3
-    assert isinstance(report.blocks[0], dp.Group)
-    assert isinstance(report.blocks[1], dp.Select)
-    assert isinstance(report.blocks[2], dp.Toggle)
-    assert isinstance(report.blocks[1].blocks[1], dp.Text)
-    assert glom(report, ("blocks", ["_attributes.label"])) == [
+    assert len(view.blocks) == 3
+    assert isinstance(view.blocks[0], dp.Group)
+    assert isinstance(view.blocks[1], dp.Select)
+    assert isinstance(view.blocks[2], dp.Toggle)
+    assert isinstance(view.blocks[1].blocks[1], dp.Text)
+    assert glom(view, ("blocks", ["_attributes.label"])) == [
         "test-group-label",
         "test-select-label",
         "test-toggle-label",
     ]
-    assert glom(report, "blocks.0.blocks.0.name") == "test-id-1"
-    assert glom(report, "blocks.1.blocks.0._attributes.label") == "test-block-label"
-    assert_app(report, 0)
+    assert glom(view, "blocks.0.blocks.0.name") == "test-id-1"
+    assert glom(view, "blocks.1.blocks.0._attributes.label") == "test-block-label"
+    assert_view(view, 0)
 
 
-def test_gen_report_complex_no_files():
-    report = gen_report_complex_no_files()
-    assert_app(report, 0)
-    assert len(report.blocks) == 3
+def test_gen_view_complex_no_files():
+    view = gen_view_complex_no_files()
+    assert_view(view, 0)
+    assert len(view.blocks) == 3
 
 
-def test_gen_report_with_files(datadir: Path):
-    report = gen_report_complex_with_files(datadir)
-    assert_app(report, 5, 24)
+def test_gen_view_with_files(datadir: Path):
+    view = gen_view_complex_with_files(datadir)
+    assert_view(view, 5, 24)
 
 
 ################################################################################
 # Local saving
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
-def test_local_report_simple(datadir: Path, monkeypatch):  # noqa: ANN
+def test_save_report_simple(datadir: Path, monkeypatch):  # noqa: ANN
     monkeypatch.chdir(datadir)
-    report = gen_report_simple()
-    report.save(path="test_out.html", name="My Wicked Report")
+    view = gen_view_simple()
+    dp.save_report(view, path="test_out.html", name="My Test Report")
 
 
 @pytest.mark.skipif("CI" in os.environ, reason="Currently depends on building fe-components first")
-def test_local_report_with_files(datadir: Path, monkeypatch):  # noqa: ANN
+def test_save_report_with_files(datadir: Path, monkeypatch):  # noqa: ANN
     monkeypatch.chdir(datadir)
-    report = gen_report_complex_with_files(datadir, local_report=True)
-    report.save(path="test_out.html", name="Even better report")
+    view = gen_view_complex_with_files(datadir, local_report=True)
+    dp.save_report(view, path="test_out.html", name="Even better report")

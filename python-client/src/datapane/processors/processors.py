@@ -22,8 +22,8 @@ from datapane.client.analytics import _NO_ANALYTICS, capture
 from datapane.client.exceptions import InvalidReportError
 from datapane.client.utils import display_msg, log, open_in_browser
 from datapane.cloud_api import AppFormatting, AppWidth
-from datapane.common import HTML, NPath, timestamp, validate_report_doc
-from datapane.common.viewxml_utils import local_report_def
+from datapane.common import HTML, NPath, timestamp, validate_view_doc
+from datapane.common.viewxml_utils import local_view_resources
 from datapane.view import CollectFunctions, PreProcess, XMLBuilder
 
 from .file_store import FileEntry
@@ -79,7 +79,7 @@ class AppTransformations(BaseProcessor):
 class ConvertXML(BaseProcessor):
     """Convert the View AST into an XML fragment"""
 
-    local_post_xslt = etree.parse(str(local_report_def / "local_post_process.xslt"))
+    local_post_xslt = etree.parse(str(local_view_resources / "local_post_process.xslt"))
     local_post_transform = etree.XSLT(local_post_xslt)
 
     def __init__(self, *, pretty_print: bool = False) -> None:
@@ -116,7 +116,7 @@ class ConvertXML(BaseProcessor):
         # TODO - custom lxml-based transforms go here...
 
         # validate post all transformations
-        validate_report_doc(xml_doc=processed_view_doc)
+        validate_view_doc(xml_doc=processed_view_doc)
         return processed_view_doc
 
 

@@ -1,10 +1,17 @@
-# flake8: noqa:F401 isort:skip_file
-# fmt:off
-# inject get_ipython mock for magic functions
-from unittest.mock import Mock
-get_ipython = Mock()
 #!/usr/bin/env python
 # coding: utf-8
+
+# In[ ]:
+
+
+# inject get_ipython mock for magic functions
+try:
+    get_ipython
+except NameError:
+    from unittest.mock import Mock
+    get_ipython = Mock()
+    del Mock
+
 
 # In[89]:
 
@@ -23,4 +30,5 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
+print(np, KMeans, PCA, scale)
 print(df)

@@ -69,7 +69,7 @@ def test_to_df_numpy_scaler():
 
 
 def test_to_df_numpy_bool():
-    assert_scalar_works(np.bool(True))
+    assert_scalar_works(bool(True))
 
 
 def test_to_df_datetime():

@@ -1,4 +1,4 @@
 name: DP Complex Report
 script: dp_complex_report.py
 include:
-  - datapane-logo.png
+  - datapane-icon-192x192.png

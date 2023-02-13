@@ -5,3 +5,5 @@
 /src/datapane/resources/local_report/vue.*.js
 /src/datapane/resources/local_report/report
 /src/datapane/resources/local_report/report/**
+
+.hypothesis/

@@ -9,8 +9,8 @@ from micawber import ProviderException, bootstrap_basic, bootstrap_noembed, cach
 
 from .dp_types import HTML, DPError, SSDict, log
 
-local_report_def = ir.files("datapane.resources.report_def")
-rng_validator = etree.RelaxNG(file=str(local_report_def / "full_schema.rng"))
+local_view_resources = ir.files("datapane.resources.view_resources")
+rng_validator = etree.RelaxNG(file=str(local_view_resources / "full_schema.rng"))
 
 dp_namespace: str = "https://datapane.com/schemas/report/1/"
 ViewXML = str
@@ -26,7 +26,7 @@ def is_valid_id(id: str) -> bool:
     return re.fullmatch(r"^[a-zA-Z_][\w.-]*$", id) is not None
 
 
-def validate_report_doc(
+def validate_view_doc(
     xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, quiet: bool = False
 ) -> bool:
     """Validate the model against the schema, throws an etree.DocumentInvalid if not"""

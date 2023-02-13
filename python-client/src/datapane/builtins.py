@@ -12,32 +12,16 @@ import pandas as pd
 
 from datapane import View
 from datapane import blocks as b
-from datapane.cloud_api import App
 from datapane.common import NPath
 
 __all__ = [
     "add_code",
-    "add_header",
-    "add_footer",
-    "build_md_report",
-    "build_demo_report",
+    "build_md_view",
+    "demo",
     "gen_df",
     "gen_table_df",
     "gen_plot",
 ]
-
-#
-# def _map_page_blocks(page: b.Page, f: t.Callable[[b.BlockList], b.BlockList]) -> b.Page:
-#     page.blocks = f(page.blocks)
-#     return page
-#
-#
-# def _map_report_pages(r: App, f: t.Callable[[b.Page], b.Page], all_pages: bool = True) -> App:
-#     def g(i: int, page: b.Page) -> b.Page:
-#         return f(page) if all_pages or i == 0 else page
-#
-#     r.pages = [g(*x) for x in enumerate(r.pages)]
-#     return r
 
 
 def add_code(block: b.BlockOrPrimitive, code: str, language: str = "python") -> b.Select:
@@ -58,11 +42,11 @@ def add_code(block: b.BlockOrPrimitive, code: str, language: str = "python") -> 
     return b.Select(w_block, b.Code(code, language, label="Code"), type=b.SelectType.TABS)
 
 
-def build_md_report(
+def build_md_view(
     text_or_file: t.Union[str, NPath],
     *args: b.BlockOrPrimitive,
     **kwargs: b.BlockOrPrimitive,
-) -> App:
+) -> View:
     """
     An easy way to build a complete report from a single top-level markdown text / file template.
     Any additional context can be passed in and will be inserted into the Markdown template.
@@ -85,45 +69,7 @@ def build_md_report(
         b_text = b.Text(text=t.cast(str, text_or_file))
 
     group = b_text.format(*args, **kwargs)
-    return App(View(group))
-
-
-def add_header(report: App, header: b.BlockOrPrimitive, all_pages: bool = True) -> App:
-    """
-    Add a header to the report, returning a modified version of the same report
-
-    Args:
-        report: The report to add the header to
-        header: The header block - this can be any dp Block, e.g a File, Plot, Logo, or anything
-        all_pages: Apply the header to all pages or just the first page only
-
-    Returns:
-        A modified report with the header applied
-    """
-    return None
-    # report = deepcopy(report)
-    # return _map_report_pages(
-    #     report, lambda p: _map_page_blocks(p, lambda blocks: [b.Group(blocks=[header] + p.blocks)]), all_pages=all_pages
-    # )
-
-
-def add_footer(report: App, footer: b.BlockOrPrimitive, all_pages: bool = True) -> App:
-    """
-    Add a footer to the report, returning a modified version of the same report
-
-    Args:
-        report: The report to add the header to
-        footer: The footer block - this can be any dp Block, e.g a File, Plot, Logo, or anything
-        all_pages: Apply the header to all pages or just the first page only
-
-    Returns:
-        A modified report with the footer applied
-    """
-    return None
-    # report = deepcopy(report)
-    # return _map_report_pages(
-    #     report, lambda p: _map_page_blocks(p, lambda blocks: [b.Group(blocks=p.blocks + [footer])]), all_pages=all_pages
-    # )
+    return View(group)
 
 
 def gen_df(dim: int = 4) -> pd.DataFrame:
@@ -144,13 +90,12 @@ def gen_plot() -> alt.Chart:
     return alt.Chart(gen_df()).mark_line().encode(x="x", y="y")
 
 
-def build_demo_report() -> View:
+def demo() -> View:
     """
-    Generate a sample demo report
+    Generate a sample demo view
 
     Returns:
-        A datapane App object for saving or uploading
-
+        A datapane View object for saving or uploading
     """
 
     import altair as alt  # noqa
@@ -195,7 +140,7 @@ def build_demo_report() -> View:
         return folium.Map(location=[45.372, -121.6972], zoom_start=12, tiles="Stamen Terrain")
 
     df1 = gen_table_df(10)
-    styler1 = df1.style.apply(_color_large_vals, axis=1).hide_index()
+    styler1 = df1.style.apply(_color_large_vals, axis=1).hide(axis="index")
 
     def _vega_sine():
         x = np.arange(100)
@@ -252,7 +197,7 @@ Additionally layout blocks provide the ability nest blocks to create groups of c
 
 
     """
-    logo = ir.files("datapane.resources.app_templates") / "datapane-logo.png"
+    logo = ir.files("datapane.resources") / "datapane-icon-192x192.png"
     other = b.Group(
         b.Media(file=str(logo)),
         b.BigNumber(heading="Datapane Blocks", value=11, prev_value=6, is_upward_change=True),

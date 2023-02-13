@@ -98,6 +98,9 @@ class Page(ContainerBlock):
         self.title = title
         super().__init__(*arg_blocks, blocks=blocks, label=title, name=name)
 
+        if any(isinstance(b, Page) for b in self.blocks):
+            raise DPClientError("Nested pages not supported, please use Selects and Groups")
+
 
 class Select(ContainerBlock):
     """
