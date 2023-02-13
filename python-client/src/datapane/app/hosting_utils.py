@@ -32,11 +32,12 @@ ARG PYTHON_VERSION='%(python_version)s'
 FROM python:${PYTHON_VERSION}
 WORKDIR /app/
 
+%(install_deps_block)s
+
 # load your files into the image
 # To exclude files, setup a .dockerignore
-COPY ./ /app/
+COPY ./ .
 
-%(install_deps_block)s
 %(notebook_convert_block)s
 
 # execute your app (what to run on the server)
@@ -46,11 +47,15 @@ CMD exec python %(app_file)s
 
 _pip_install_block = r"""
 # Install the App dependencies
+# Note: If your requirements.txt file depends on other files,
+#       you should change to 'COPY ./ .'.
+# If you don't have a requirements.txt file:
+#  - remove the below lines
+#  - let us know your usecase, so we can improve Datapane!
+COPY ./requirements.txt .
 RUN \
-  if test -f 'requirements.txt'; then \
-    echo "Installing dependencies from requirements.txt..." ;\
-    pip install --no-cache-dir -r requirements.txt ;\
-  fi
+  echo "Installing dependencies from requirements.txt..." \
+  && pip install --no-cache-dir -r requirements.txt
 """.strip()
 
 _notebook_convert_block = r"""
@@ -58,8 +63,8 @@ _notebook_convert_block = r"""
 #       Convert the notebook using standard jupyter tools.
 # If you face issues, please let us know!
 RUN \
-  echo "Generating %(output_path)s from your notebook %(notebook_path)s..." ;\
-  jupyter nbconvert --to python %(notebook_path)s
+  echo "Generating %(output_path)s from your notebook %(notebook_path)s..." \
+  && jupyter nbconvert --to python %(notebook_path)s
 """
 
 
