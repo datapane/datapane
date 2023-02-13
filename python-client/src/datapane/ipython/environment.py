@@ -5,7 +5,7 @@ import json
 import os
 import sys
 import typing as t
-from functools import cache, cached_property
+from functools import cached_property
 from pathlib import Path
 
 from datapane.client import log
@@ -19,12 +19,16 @@ if t.TYPE_CHECKING:
 __all__ = ("get_environment",)
 
 
-@cache
+_env = None
+
+
 def get_environment() -> PythonEnvironment:
     """Returns the current IPython environment"""
-    env = _get_environment()
-    log.info("Detected IPython environment: %s", env.name)
-    return env
+    global _env
+    if _env is None:
+        _env = _get_environment()
+        log.info("Detected IPython environment: %s", _env.name)
+    return _env
 
 
 def _get_ipython() -> t.Optional[InteractiveShell]:
