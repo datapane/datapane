@@ -596,21 +596,21 @@ def generate():
     type=click.Choice(hosting_utils.SupportedInstallers.as_list(), case_sensitive=False),
 )
 @click.option(
-    "--file-to-exec",
-    prompt="What file will need running",
+    "--app-file",
+    prompt="What file contains your App?",
     default=(lambda: next(hosting_utils.python_files(), None)),
     type=click.Path(exists=False, dir_okay=False),
-    help="The file you'd like to run (contains dp.serve(...))",
+    help="The App file you'd like to run (contains dp.serve(...))",
 )
 @click.option(
     "--output", "-o", default="Dockerfile", show_default=True, type=click.File(mode="w", lazy=True, atomic=True)
 )
-def dockerfile(python: str, installer: str, file_to_exec: str, output: io.TextIOWrapper):
+def dockerfile(python: str, installer: str, app_file: t.Union[str, Path, None], output: io.TextIOWrapper):
     """Generate a dockerfile to help with hosting Apps"""
     _installer = hosting_utils.SupportedInstallers[installer]
 
     if Path(output.name).exists() and output.name != "<stdout>":
         click.confirm(f"output file '{output.name}' exists. Overwrite?", default=False, abort=True)
 
-    contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, file_to_exec=file_to_exec)
+    contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, app_file=app_file)
     output.write(contents)
