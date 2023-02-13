@@ -44,7 +44,6 @@ COPY ./ .
 CMD exec python %(app_file)s
 """.lstrip()
 
-
 _pip_install_block = r"""
 # Install the App dependencies
 # Note: If your requirements.txt file depends on other files,
@@ -62,6 +61,14 @@ _notebook_convert_block = r"""
 # Note: Datapane currently expects a python file to execute.
 #       Convert the notebook using standard jupyter tools.
 # If you face issues, please let us know!
+RUN \
+  # ensure nbconvert is available to us \
+  command -v jupyter-nbconvert >/dev/null 2>&1 \
+  || { \
+    echo >&2 "nbconvert not found. Please add it as a dependency" \
+    && exit 1 \
+  ;}
+
 RUN \
   echo "Generating %(output_path)s from your notebook %(notebook_path)s..." \
   && jupyter nbconvert --to python %(notebook_path)s
