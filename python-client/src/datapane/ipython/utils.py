@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import typing
 from contextlib import suppress
+from pathlib import Path
 
 from datapane.client.analytics import capture_event
 from datapane.client.exceptions import DPClientError
@@ -145,3 +146,34 @@ The following cells have not been executed and saved: {', '.join(map(str, dirty_
     display_msg("Notebook converted to blocks.")
 
     return blocks
+
+
+_ipython_mock_header = """
+# inject get_ipython mock for magic functions
+try:
+    get_ipython
+except NameError:
+    from unittest.mock import Mock
+    get_ipython = Mock()
+    del Mock
+""".strip()
+
+
+def extract_py_notebook(in_file: typing.Union[Path, typing.IO]) -> str:
+    """Extract the python code from a given notebook"""
+    import nbconvert
+    import nbformat
+
+    notebook: nbformat.NotebookNode = nbformat.read(in_file, as_version=nbformat.NO_CONVERT)
+    nb_version = notebook.get("nbformat", 4)
+    new_code_cell = nbformat.versions[nb_version].new_code_cell
+
+    # Magics generate references to get_ipython in the output.
+    # Mock it so the script runs without reference errors.
+    notebook["cells"].insert(0, new_code_cell(_ipython_mock_header))
+
+    conv = nbconvert.PythonExporter()
+    body, _ = conv.from_notebook_node(notebook)
+    body = body.rstrip() + "\n"  # Conversion oddity normalized
+
+    return body

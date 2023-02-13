@@ -5,16 +5,16 @@ import os
 import re
 from pathlib import Path
 from typing import ClassVar, List, Optional
-from typing_extensions import Self
 
 import dacite
 import importlib_resources as ir
 import jsonschema
 import stringcase
 import yaml
+from typing_extensions import Self
 
-from datapane.client.exceptions import DPClientError, MissingCloudPackagesError
 from datapane.client import log
+from datapane.client.exceptions import DPClientError
 from datapane.common import SDict, utf_read_text
 
 # script paths
@@ -154,38 +154,6 @@ class DatapaneCfg:
 
 
 def extract_py_notebook(in_file: Path) -> str:
-    """Extract the python code from a given notebook"""
-    try:
-        import nbconvert
-        import nbformat
-        from traitlets.config import Config as TConfig
-    except ImportError:
-        raise MissingCloudPackagesError()
+    from datapane.ipython.utils import extract_py_notebook
 
-    # we use config for importing
-    c = TConfig()
-    # c.PythonExporter.preprocessors = []
-    # load the notebook
-    notebook: nbformat.NotebookNode = nbformat.read(str(in_file), as_version=nbformat.NO_CONVERT)
-    # TODO - any preprocessing here
-    # convert it
-    conv = nbconvert.PythonExporter(config=c)
-    (body, resources) = conv.from_notebook_node(notebook)
-    body = body.rstrip() + "\n"  # Conversion oddity normalized
-    # (body, resources) = conv.from_filename(str(in_file))
-    # write the notebook
-    # writer = nbconvert.writers.FilesWriter()
-    # writer.write(body, resources, "output_notebook")
-
-    # TODO - use nbconvert jinja support once v6 supports custom templates properly
-    # postprocess body
-    # we need to mock get_ipython as nbconvert doesn't comment it out
-    header = """# flake8: noqa:F401 isort:skip_file
-# fmt:off
-# inject get_ipython mock for magic functions
-from unittest.mock import Mock
-get_ipython = Mock()
-"""
-
-    script = header + body
-    return script
+    return extract_py_notebook(in_file)

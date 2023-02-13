@@ -609,8 +609,51 @@ def dockerfile(python: str, installer: str, app_file: t.Union[str, Path, None], 
     """Generate a dockerfile to help with hosting Apps"""
     _installer = hosting_utils.SupportedInstallers[installer]
 
-    if Path(output.name).exists() and output.name != "<stdout>":
+    if Path(output.name).exists() and output.name != "-":
         click.confirm(f"output file '{output.name}' exists. Overwrite?", default=False, abort=True)
 
     contents = hosting_utils.generate_dockerfile(python_version=python, installer=_installer, app_file=app_file)
     output.write(contents)
+
+
+@generate.command()
+@click.option(
+    "--nb",
+    "--app-file",
+    "nb_path",
+    prompt="What notebook would you like to convert?",
+    default=(lambda: next(hosting_utils.python_files(extensions=[".ipynb"]), None)),
+    type=click.Path(exists=True, readable=True, dir_okay=False, resolve_path=True),
+)
+@click.option(
+    "-o",
+    "--out",
+    "output",
+    type=click.File(mode="w", lazy=True, atomic=True),
+)
+def script_from_nb(nb_path: t.Union[str, Path], output: t.Union[t.IO, None]):
+    """Generate a script from a Jupyter Notebook
+
+    Uses nbconvert to extract as a python script, with modifications
+    to provide a more seamless experience.
+
+    Outputs are not preserved.
+    """
+    from datapane.ipython.utils import extract_py_notebook
+
+    nb_path = Path(nb_path)
+    cwd = Path.cwd()
+    if output is None:
+        output_path = cwd / nb_path.with_suffix(".py").name
+        output = click.open_file(str(output_path), mode="w", atomic=True)
+
+    with click.open_file(str(nb_path), mode="r") as nb_file:
+        py_contents = extract_py_notebook(nb_file)
+
+    if output.name != "-":
+        click.echo(f"Writing to file: {click.format_filename(output.name, shorten=True)}")
+        if Path(output.name).exists():
+            click.confirm("File exists. Overwrite?", default=False, abort=True)
+
+    with output as f:
+        f.write(py_contents)

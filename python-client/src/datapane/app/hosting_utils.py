@@ -59,19 +59,11 @@ RUN \
 
 _notebook_convert_block = r"""
 # Note: Datapane currently expects a python file to execute.
-#       Convert the notebook using standard jupyter tools.
+#       This converts your notebook to a python file.
 # If you face issues, please let us know!
 RUN \
-  # ensure nbconvert is available to us \
-  command -v jupyter-nbconvert >/dev/null 2>&1 \
-  || { \
-    echo >&2 "nbconvert not found. Please add it as a dependency" \
-    && exit 1 \
-  ;}
-
-RUN \
   echo "Generating %(output_path)s from your notebook %(notebook_path)s..." \
-  && jupyter nbconvert --to python %(notebook_path)s
+  && datapane app generate script-from-nb --nb %(notebook_path)s --out %(output_path)s
 """
 
 
@@ -111,7 +103,7 @@ def generate_dockerfile(
     )
 
 
-def python_files(cwd: t.Union[str, pathlib.Path] = ".", /, extensions=(".py", ".ipynb")):
+def python_files(cwd: t.Union[str, pathlib.Path] = ".", /, extensions: t.Sequence[str] = (".py", ".ipynb")):
     cwd = pathlib.Path(cwd) if isinstance(cwd, str) else cwd
 
     # iterdir() doesn't define an order.
