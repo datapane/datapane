@@ -15,6 +15,7 @@ import tempfile
 import threading
 import typing as t
 from contextlib import suppress
+from getpass import getpass
 from pathlib import Path
 
 import bottle as bt
@@ -373,10 +374,10 @@ class ServerController:
 
     def go(self):
         self.server.acquire_port()
-        self.ui.display()
-
         if self.public:
             self.start_ngrok()
+
+        self.ui.display()
 
         if self.ui.server_needs_background_thread:
             self.run_server_in_thread()
@@ -396,7 +397,7 @@ class ServerController:
         if current_config.get("authtoken", None):
             ngrok_auth_token = current_config.get("authtoken")
         else:
-            ngrok_auth_token = input("Enter ngrok auth token (see https://ngrok.com): ")
+            ngrok_auth_token = getpass("Enter ngrok auth token (see https://ngrok.com): ")
 
         ngrok.set_auth_token(ngrok_auth_token)
         http_tunnel = ngrok.connect(self.server.port, bind_tls=True)
