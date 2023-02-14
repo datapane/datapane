@@ -133,9 +133,12 @@ class XMLBuilder(ViewVisitor):
 
         # check if we already have stored this asset to the store
         # TODO - do we just persist the asset store across the session??
-        if b._prev_entry and type(b._prev_entry) == self.store.fw_klass:
-            self.store.add_file(b._prev_entry)
-            return b._prev_entry
+        if b._prev_entry:
+            if type(b._prev_entry) == self.store.fw_klass:
+                self.store.add_file(b._prev_entry)
+                return b._prev_entry
+            else:
+                b._prev_entry = None
 
         if b.data is not None:
             # fe = files.add_to_store(self.data, s.store)

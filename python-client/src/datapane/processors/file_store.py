@@ -66,7 +66,7 @@ class NullWriter(io.BytesIO):
 
 
 class DummyFileEntry(FileEntry):
-    """File emtry that discards all data - for internal use"""
+    """File entry that discards all data - for internal use"""
 
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)

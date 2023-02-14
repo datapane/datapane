@@ -183,11 +183,11 @@ def upload(
     kwargs = dict_drop_empty(kwargs)
 
     s = ViewState(view=view, file_entry_klass=GzipTmpFileEntry)
-    s1: ViewState = Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).pipe(PreUploadProcessor()).state
+    (view_xml, file_list) = Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).pipe(PreUploadProcessor()).result
 
     # attach the view and upload as an App
-    files: FileAttachmentList = dict(attachments=s1.store.file_list)
-    app = App.post_with_files(files, overwrite=overwrite, document=s1.view_xml, **kwargs)
+    files: FileAttachmentList = dict(attachments=file_list)
+    app = App.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
 
     if open:
         open_in_browser(app.web_url)

@@ -6,6 +6,7 @@ import os
 import typing as t
 from abc import ABC
 from copy import copy
+from itertools import count
 from os import path as osp
 from pathlib import Path
 from uuid import uuid4
@@ -25,6 +26,7 @@ from datapane.common import HTML, NPath, timestamp, validate_report_doc
 from datapane.common.viewxml_utils import local_report_def
 from datapane.view import CollectFunctions, PreProcess, XMLBuilder
 
+from .file_store import FileEntry
 from .types import BaseProcessor
 
 if t.TYPE_CHECKING:
@@ -34,7 +36,7 @@ if t.TYPE_CHECKING:
 class PreProcessView(BaseProcessor):
     """Optimisations to improve the layout of the view using the Block-API"""
 
-    def __call__(self, _) -> None:
+    def __call__(self, _: t.Any) -> None:
         # AST checks
         if len(self.s.view.blocks) == 0:
             raise InvalidReportError("Empty view - must contain at least one block")
@@ -66,17 +68,11 @@ class PreProcessView(BaseProcessor):
 class AppTransformations(BaseProcessor):
     """Transform an app prior to running"""
 
-    def __call__(self, _) -> None:
+    def __call__(self, _: t.Any) -> None:
         ci = CollectFunctions()
         self.s.view.accept(ci)
         # s1 = dc.replace(s, entries=ci.entries)
         self.s.entries = ci.entries
-        return None
-
-
-class PreUploadProcessor(BaseProcessor):
-    def __call__(self, _) -> t.Any:
-        """TODO - pre-upload pass of the AST, can handle inlining file attributes from AssetStore"""
         return None
 
 
@@ -90,7 +86,7 @@ class ConvertXML(BaseProcessor):
         self.pretty_print: bool = pretty_print
         super().__init__()
 
-    def __call__(self, _) -> str:
+    def __call__(self, _: t.Any) -> ElementT:
         initial_doc = self.convert_xml()
         transformed_doc = self.post_transforms(initial_doc)
 
@@ -102,7 +98,8 @@ class ConvertXML(BaseProcessor):
         if log.isEnabledFor(logging.DEBUG):
             log.debug(etree.tounicode(transformed_doc, pretty_print=True))
 
-        return view_xml_str
+        # return the doc for further processing (xml str stored in state)
+        return transformed_doc
 
     def convert_xml(self) -> ElementT:
         # create initial state
@@ -121,6 +118,35 @@ class ConvertXML(BaseProcessor):
         # validate post all transformations
         validate_report_doc(xml_doc=processed_view_doc)
         return processed_view_doc
+
+
+class PreUploadProcessor(BaseProcessor):
+    def __call__(self, doc: ElementT) -> t.Tuple[str, t.List[t.BinaryIO]]:
+        """
+        pre-upload pass of the XML doc so can be uploaded to DPCloud
+        modifies the document based on the FileStore
+        """
+
+        # check no functions exist in the uploaded app
+        if any(isinstance(block, b.Function) for block in self.s.view):
+            raise InvalidReportError(
+                "Functions can't currently be uploaded, please use dp.serve to serve your app locally"
+            )
+
+        # NOTE - this currently relies on all assets existing linearly in document order
+        # in the asset store - if we move to a cas we will need to update the algorithm here
+        # replace ref -> attachment in view
+        # all blocks with a ref
+        refs: t.List[ElementT] = doc.xpath("/View//*[@src][starts-with(@src, 'ref://')]")
+        for (idx, ref, f_entry) in zip(count(0), refs, self.s.store.files):
+            ref: ElementT
+            f_entry: FileEntry
+            _hash: str = ref.get("src").split("://")[1]
+            ref.set("src", f"attachment://{idx}")
+            assert _hash == f_entry.hash  # sanity check
+
+        self.s.view_xml = etree.tounicode(doc)
+        return (self.s.view_xml, self.s.store.file_list)
 
 
 ###############################################################################
@@ -209,7 +235,7 @@ class ExportBaseHTMLOnly(BaseExportHTML):
     def get_cdn(self) -> str:
         return "/web-static" if self.debug else super().get_cdn()
 
-    def __call__(self, _) -> None:
+    def __call__(self, _: t.Any) -> None:
         return None
 
 
@@ -228,7 +254,7 @@ class ExportHTMLInlineAssets(BaseExportHTML):
         self.name = name
         self.formatting = formatting
 
-    def __call__(self, _) -> str:
+    def __call__(self, _: t.Any) -> str:
         html, report_id = self._write_html_template(name=self.name, formatting=self.formatting)
 
         Path(self.path).write_text(html, encoding="utf-8")
@@ -286,7 +312,7 @@ class ExportHTMLStringInlineAssets(BaseExportHTML):
         self.name = name
         self.formatting = formatting
 
-    def __call__(self, _) -> HTML:
+    def __call__(self, _: t.Any) -> HTML:
         html, report_id = self._write_html_template(name=self.name, formatting=self.formatting)
 
         return HTML(html)

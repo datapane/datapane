@@ -28,17 +28,21 @@ class ViewState:
         self.store = FileStore(fw_klass=file_entry_klass, assets_dir=dir_path)
 
 
-class BaseProcessor:
+P_IN = t.TypeVar("P_IN")
+P_OUT = t.TypeVar("P_OUT")
+
+
+class BaseProcessor(t.Generic[P_IN, P_OUT]):
     """Processor class that handles pipeline operations"""
 
     s: ViewState
 
-    def __call__(self, _: t.Any) -> t.Any:
+    def __call__(self, x: P_IN) -> P_OUT:
         raise NotImplementedError("Implement in subclass")
 
 
 # TODO - type this properly
-class Pipeline:
+class Pipeline(t.Generic[P_IN]):
     """
     A simple, programmable, eagerly-evaluated, pipeline specialised on ViewAST transformations
     similar to f :: State s => s ViewState x -> s ViewState y
@@ -46,13 +50,13 @@ class Pipeline:
 
     # NOTE - toolz has an untyped function for this
 
-    def __init__(self, s: ViewState, x: t.Any = None):
+    def __init__(self, s: ViewState, x: P_IN = None):
         self._state = s
         self._x = x
 
-    def pipe(self, p: BaseProcessor) -> Pipeline:
+    def pipe(self, p: BaseProcessor[P_IN, P_OUT]) -> Pipeline[P_OUT]:
         p.s = self._state
-        y = p(self._x)  # need to call as positional args
+        y = p.__call__(self._x)  # need to call as positional args
         self._state = p.s
         return Pipeline(self._state, y)
 
@@ -61,10 +65,10 @@ class Pipeline:
         return self._state
 
     @property
-    def result(self) -> t.Any:
+    def result(self) -> P_IN:
         return self._x
 
 
-def mk_null_pipe(view: View) -> Pipeline:
+def mk_null_pipe(view: View) -> Pipeline[None]:
     s = ViewState(view, file_entry_klass=DummyFileEntry)
     return Pipeline(s)
