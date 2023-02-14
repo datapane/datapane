@@ -5,6 +5,7 @@ set -euo pipefail
 # We build against the datpane source, so reference the assets in /dev
 # which are continously relased
 export DATAPANE_CDN_BASE="${DATAPANE_CDN_BASE:-https://datapane-cdn.com/dev}"
+export PYTHONWARNINGS="ignore"
 
 echo "Building against CDN: ${DATAPANE_CDN_BASE}"
 
