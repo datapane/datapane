@@ -4,6 +4,8 @@ import { TriggerType } from "../../data-model/types";
 import { ControlsField } from "../../data-model/blocks";
 import LoadingSpinner from "../LoadingSpinner.vue";
 import ErrorCallout from "../ErrorCallout.vue";
+import { getNode } from "@formkit/core";
+import { v4 as uuid4 } from "uuid";
 
 const p = defineProps<{
     onChange: (v: { name: string; value: any }) => void;
@@ -23,10 +25,18 @@ const p = defineProps<{
 const functionRunDisabled = window.dpLocal && !window.dpAppRunner;
 
 const scheduleInterval = ref<ReturnType<typeof setInterval> | null>(null);
+const formId = uuid4();
+
+const updateIfValid = () => {
+    const node = getNode(formId);
+    if (node?.context?.state.valid) {
+        p.update();
+    }
+};
 
 onMounted(() => {
     if (p.trigger === TriggerType.SCHEDULE && p.timer && !functionRunDisabled) {
-        scheduleInterval.value = setInterval(p.update, p.timer * 1000);
+        scheduleInterval.value = setInterval(updateIfValid, p.timer * 1000);
     }
 });
 
@@ -43,6 +53,7 @@ onUnmounted(() => {
             <form-kit
                 type="form"
                 :actions="false"
+                :id="formId"
                 #default="{ state: { valid } }"
                 @submit="update"
             >

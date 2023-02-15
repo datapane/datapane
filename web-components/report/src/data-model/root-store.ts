@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { defineStore } from "pinia";
 import convert from "xml-js";
 import { reactive, ref } from "vue";
@@ -7,6 +7,13 @@ import * as maps from "./test-maps";
 import { AppData, AppDataResult, AppMetaData, SwapType } from "./types";
 import he from "he";
 import { isParentElem } from "./blocks/index";
+import axiosRetry from "axios-retry";
+
+axiosRetry(axios, {
+    retries: 3,
+    retryCondition: (e: AxiosError) => e.response?.status === 502,
+    retryDelay: () => 1000,
+});
 
 export type EmptyObject = Record<string, never>;
 

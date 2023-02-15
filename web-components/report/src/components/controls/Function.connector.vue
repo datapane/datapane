@@ -5,7 +5,7 @@
  * but this would remove re-rendering on `store.children` change.
  */
 import { storeToRefs } from "pinia";
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref } from "vue";
 import BlockWrapper from "../layout/BlockWrapper.vue";
 import { TriggerType } from "../../data-model/types";
 import { BlockFigureProps } from "../../data-model/blocks";
@@ -26,7 +26,6 @@ const p = defineProps<{
 const { children } = storeToRefs(p.store);
 const error = ref<string | undefined>();
 const loading = ref<boolean>(false);
-const scheduleInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const onChange = (v: any) => {
     p.store.setField(v.name, v.value);
@@ -44,18 +43,6 @@ const update = async () => {
         loading.value = false;
     }
 };
-
-onMounted(() => {
-    if (p.trigger === TriggerType.SCHEDULE && p.timer) {
-        scheduleInterval.value = setInterval(update, p.timer * 1000);
-    }
-});
-
-onUnmounted(() => {
-    if (scheduleInterval.value) {
-        clearInterval(scheduleInterval.value);
-    }
-});
 </script>
 
 <template>
@@ -68,6 +55,7 @@ onUnmounted(() => {
             :subtitle="p.subtitle"
             :label="p.label"
             :trigger="p.trigger"
+            :timer="p.timer"
             :prompt="p.prompt"
             :error="error"
             :loading="loading"

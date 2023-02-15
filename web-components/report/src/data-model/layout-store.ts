@@ -126,13 +126,35 @@ export const useControlStore = (
         const children = reactive(initialChildren);
         const parameters = reactive(initialParams);
         const rootStore = useRootStore();
+        const inFlight = ref(false);
 
         const setField = (k: string, v: any) => {
             parameters[k] = cleanParam(v);
         };
 
-        const update = async (functionId: string) =>
-            await rootStore.update(target, method, parameters, functionId);
+        const update = async (functionId: string) => {
+            /**
+             * Call the root-store update method with current parameter and function,
+             * locking subsequent requests from the same function block until the request is done.
+             */
+            if (!inFlight.value) {
+                inFlight.value = true;
+                try {
+                    await rootStore.update(
+                        target,
+                        method,
+                        parameters,
+                        functionId,
+                    );
+                } finally {
+                    inFlight.value = false;
+                }
+            } else {
+                console.warn(
+                    "[Datapane] Scheduled run dropped as the current run is still in progress",
+                );
+            }
+        };
 
         return { children, setField, update };
     });
