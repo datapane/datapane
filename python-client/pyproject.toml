@@ -141,6 +141,10 @@ namespace = "datapane._vendor"
 drop = [
     "bin/",
 ]
+[tool.vendoring.typing-stubs]
+# The generated .pyi files break autocomplete on PyCharm; drop them.
+bottle = []
+munch = []
 
 # FOR PEP-517/518
 [build-system]
