@@ -18,12 +18,12 @@ from contextlib import suppress
 from getpass import getpass
 from pathlib import Path
 
-import bottle as bt
 import cheroot.server
 import cheroot.ssl.builtin
 import cheroot.wsgi
 import importlib_resources as ir
 
+import datapane._vendor.bottle as bt
 from datapane.blocks import Controls
 from datapane.client import log
 from datapane.client.analytics import capture

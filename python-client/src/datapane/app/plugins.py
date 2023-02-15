@@ -27,8 +27,7 @@ import typing as t
 from collections import UserDict
 from functools import wraps
 
-import bottle as bt
-
+import datapane._vendor.bottle as bt
 from datapane.client import log
 from datapane.client.analytics import capture
 from datapane.common.dp_types import SECS_1_HOUR, SECS_1_WEEK

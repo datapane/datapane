@@ -11,11 +11,11 @@ from pathlib import Path
 from uuid import uuid4
 
 import importlib_resources as ir
-from bottle import SimpleTemplate
 from lxml import etree
 from lxml.etree import _Element as ElementT
 
 from datapane import blocks as b
+from datapane._vendor.bottle import SimpleTemplate
 from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture
 from datapane.client.exceptions import InvalidReportError

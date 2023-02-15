@@ -21,13 +21,13 @@ from urllib import parse as up
 import click
 import requests
 from furl import furl
-from munch import Munch, munchify
 from packaging.version import Version
 from requests import Response
 from requests_toolbelt import MultipartEncoder, MultipartEncoderMonitor
 from typing_extensions import Self
 
 from datapane import __version__
+from datapane._vendor.munch import Munch, munchify
 from datapane.client import config as c
 from datapane.client import log
 from datapane.client.commands import failure_msg

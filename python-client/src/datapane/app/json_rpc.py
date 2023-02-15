@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import typing as t
 
-import bottle as bt
 from pydantic import BaseModel, ValidationError, conint, constr, validator
 
+import datapane._vendor.bottle as bt
 from datapane.client import log
 from datapane.client.analytics import capture
 

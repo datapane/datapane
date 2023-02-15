@@ -79,7 +79,6 @@ importlib_resources = ">=3.0.0,<6.0.0"
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
-munch = { git = "https://github.com/Infinidat/munch.git", rev = "28c1256e76c00f42aa9315015283f0bba8819c4c" }
 packaging = ">=21.0.0,<24.0.0"
 posthog = ">=1.4.0, <3.0.0"
 pydantic = "^1.6.0"
@@ -91,8 +90,6 @@ tabulate = ">=0.8.9, < 0.10.0"
 toolz = ">=0.11.0,<0.13.0"
 validators = ">=0.18.0,<0.21.0"
 ipynbname = "^2021.3.2"
-# Using `master` for bottle as is highly stable and has newer fixes for eventual 0.13 release
-bottle = { git = "https://github.com/bottlepy/bottle.git", branch = "master" }
 cheroot = "^9.0.0"
 base64io = "^1.0.3"
 multimethod = "^1.9"
@@ -125,12 +122,25 @@ dp-runner = "datapane.runner.__main__:main"
 [tool.poetry.group.dev.dependencies]
 hypothesis = {extras = ["cli"], version = "^6.67.1"}
 
+# pinned, as this library is more targetted for use by pip
+vendoring = "1.2.0"
+
 [tool.black]
 # The same config should be duplicated in other pyproject.toml files so that
 # black always finds it.
 line-length = 120
 target-version = ['py37']
 include = '\.pyi?$'
+
+[tool.vendoring]
+destination = "src/datapane/_vendor/"
+requirements = "vendor.txt"
+namespace = "datapane._vendor"
+
+[tool.vendoring.transformations]
+drop = [
+    "bin/",
+]
 
 # FOR PEP-517/518
 [build-system]

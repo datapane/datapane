@@ -11,10 +11,10 @@ from copy import copy
 from functools import wraps
 from pathlib import Path
 
-import bottle as bt
 from boltons.cacheutils import LRU
 from pydantic import ValidationError
 
+import datapane._vendor.bottle as bt
 from datapane.blocks import Controls, Swap
 from datapane.client import log
 from datapane.processors import AppTransformations, ConvertXML, Pipeline, PreProcessView, ViewState

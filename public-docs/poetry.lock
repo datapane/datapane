@@ -274,22 +274,6 @@ files = [
 ]
 
 [[package]]
-name = "bottle"
-version = "0.13.dev0"
-description = "Fast and simple WSGI-framework for small web-applications."
-category = "main"
-optional = false
-python-versions = "*"
-files = []
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/bottlepy/bottle.git"
-reference = "master"
-resolved_reference = "99341ff3791b2e7e705d7373e71937e9018eb081"
-
-[[package]]
 name = "branca"
 version = "0.6.0"
 description = "Generate complex HTML+JS pages with Python"
@@ -661,7 +645,6 @@ develop = true
 altair = "^4.0.0"
 base64io = "^1.0.3"
 boltons = ">=20.0.0,<22.0.0"
-bottle = {git = "https://github.com/bottlepy/bottle.git", branch = "master"}
 chardet = ">=4.0.0,<6.0.0"
 cheroot = "^9.0.0"
 click = ">=7.1.0, <9.0.0"
@@ -680,7 +663,6 @@ jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
 multimethod = "^1.9"
-munch = {git = "https://github.com/Infinidat/munch.git", rev = "28c1256e76c00f42aa9315015283f0bba8819c4c"}
 packaging = ">=21.0.0,<24.0.0"
 pandas = "^1.1.0"
 posthog = ">=1.4.0, <3.0.0"
@@ -2002,29 +1984,6 @@ files = [
     {file = "multimethod-1.9.1-py3-none-any.whl", hash = "sha256:52f8f1f2b9d5a4c7adfdcc114dbeeebe3245a4420801e8807e26522a79fb6bc2"},
     {file = "multimethod-1.9.1.tar.gz", hash = "sha256:1589bf52ca294667fd15527ea830127c763f5bfc38562e3642591ffd0fd9d56f"},
 ]
-
-[[package]]
-name = "munch"
-version = "2.5.1.dev23"
-description = "A dot-accessible dictionary (a la JavaScript objects)"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-files = []
-develop = false
-
-[package.dependencies]
-six = "*"
-
-[package.extras]
-testing = ["astroid (>=2.0)", "coverage", "pylint (>=2.3.1,<2.4.0)", "pytest"]
-yaml = ["PyYAML (>=5.1.0)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/Infinidat/munch.git"
-reference = "28c1256e76c00f42aa9315015283f0bba8819c4c"
-resolved_reference = "28c1256e76c00f42aa9315015283f0bba8819c4c"
 
 [[package]]
 name = "nbclassic"

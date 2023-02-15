@@ -339,22 +339,6 @@ files = [
 ]
 
 [[package]]
-name = "bottle"
-version = "0.13.dev0"
-description = "Fast and simple WSGI-framework for small web-applications."
-category = "main"
-optional = false
-python-versions = "*"
-files = []
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/bottlepy/bottle.git"
-reference = "master"
-resolved_reference = "99341ff3791b2e7e705d7373e71937e9018eb081"
-
-[[package]]
 name = "branca"
 version = "0.6.0"
 description = "Generate complex HTML+JS pages with Python"
@@ -819,6 +803,7 @@ files = [
     {file = "debugpy-1.6.6-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9b5d1b13d7c7bf5d7cf700e33c0b8ddb7baf030fcf502f76fc061ddd9405d16c"},
     {file = "debugpy-1.6.6-cp38-cp38-win32.whl", hash = "sha256:70ab53918fd907a3ade01909b3ed783287ede362c80c75f41e79596d5ccacd32"},
     {file = "debugpy-1.6.6-cp38-cp38-win_amd64.whl", hash = "sha256:c05349890804d846eca32ce0623ab66c06f8800db881af7a876dc073ac1c2225"},
+    {file = "debugpy-1.6.6-cp39-cp39-macosx_11_0_x86_64.whl", hash = "sha256:11a0f3a106f69901e4a9a5683ce943a7a5605696024134b522aa1bfda25b5fec"},
     {file = "debugpy-1.6.6-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a771739902b1ae22a120dbbb6bd91b2cae6696c0e318b5007c5348519a4211c6"},
     {file = "debugpy-1.6.6-cp39-cp39-win32.whl", hash = "sha256:549ae0cb2d34fc09d1675f9b01942499751d174381b6082279cf19cdb3c47cbe"},
     {file = "debugpy-1.6.6-cp39-cp39-win_amd64.whl", hash = "sha256:de4a045fbf388e120bb6ec66501458d3134f4729faed26ff95de52a754abddb1"},
@@ -2089,29 +2074,6 @@ files = [
     {file = "multimethod-1.9.1-py3-none-any.whl", hash = "sha256:52f8f1f2b9d5a4c7adfdcc114dbeeebe3245a4420801e8807e26522a79fb6bc2"},
     {file = "multimethod-1.9.1.tar.gz", hash = "sha256:1589bf52ca294667fd15527ea830127c763f5bfc38562e3642591ffd0fd9d56f"},
 ]
-
-[[package]]
-name = "munch"
-version = "2.5.1.dev23"
-description = "A dot-accessible dictionary (a la JavaScript objects)"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-files = []
-develop = false
-
-[package.dependencies]
-six = "*"
-
-[package.extras]
-testing = ["astroid (>=2.0)", "coverage", "pylint (>=2.3.1,<2.4.0)", "pytest"]
-yaml = ["PyYAML (>=5.1.0)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/Infinidat/munch.git"
-reference = "28c1256e76c00f42aa9315015283f0bba8819c4c"
-resolved_reference = "28c1256e76c00f42aa9315015283f0bba8819c4c"
 
 [[package]]
 name = "mypy"
@@ -3585,6 +3547,18 @@ doc = ["sphinx", "sphinx_rtd_theme"]
 test = ["flake8", "isort", "pytest"]
 
 [[package]]
+name = "toml"
+version = "0.10.2"
+description = "Python Library for Tom's Obvious, Minimal Language"
+category = "dev"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+files = [
+    {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
+    {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
+]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -3797,6 +3771,30 @@ files = [
 pandas = "*"
 
 [[package]]
+name = "vendoring"
+version = "1.2.0"
+description = "A command line tool, to simplify vendoring pure Python dependencies."
+category = "dev"
+optional = false
+python-versions = "~= 3.8"
+files = [
+    {file = "vendoring-1.2.0-py2.py3-none-any.whl", hash = "sha256:35b5fca683264e69e851a7580bb6a6f9848af024ffc8382ed5491bcfa55750c6"},
+    {file = "vendoring-1.2.0.tar.gz", hash = "sha256:6340a84bf542222c96f22ebc3cb87e4d86932dc04bc8d446e38285594702c00e"},
+]
+
+[package.dependencies]
+click = "*"
+jsonschema = "*"
+packaging = "*"
+requests = "*"
+rich = "*"
+toml = "*"
+
+[package.extras]
+doc = ["sphinx"]
+test = ["pytest", "pytest-cov", "pytest-mock"]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -3872,4 +3870,4 @@ plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi", "nbconvert"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0, < 3.12.0"
-content-hash = "448617bc3e9ac9727c03562a82ec5224a6ed8d6aae1ae035af195821aab4c552"
+content-hash = "9c5c85bc6037c990bb2927b2eeb688b064f0be013d49921000a22bc50f553d9f"

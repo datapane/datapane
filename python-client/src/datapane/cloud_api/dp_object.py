@@ -15,9 +15,9 @@ from typing import Optional, Type, cast
 from urllib import parse as up
 
 import validators as v
-from munch import Munch
 from requests import HTTPError
 
+from datapane._vendor.munch import Munch
 from datapane.client import DPClientError, log
 from datapane.common import JSON, URL, SDict
 

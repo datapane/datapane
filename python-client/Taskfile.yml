@@ -70,3 +70,9 @@ tasks:
         msg: >-
           Poetry needs installing on your system: ->
           https://python-poetry.org/docs/master/#installing-with-the-official-installer
+
+  vendor-update:
+    desc: "Update vendored dependencies"
+    cmds:
+      - |
+        poetry run vendoring sync

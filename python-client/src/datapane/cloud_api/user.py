@@ -25,9 +25,9 @@ import importlib_resources as ir
 import requests
 from dulwich import client, errors, porcelain
 from furl import furl
-from munch import Munch
 
 from datapane import __version__
+from datapane._vendor.munch import Munch
 from datapane.client import DPClientError, capture, capture_event
 from datapane.client import config as c
 from datapane.client import display_msg
