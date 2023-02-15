@@ -5,6 +5,7 @@ import typing as t
 import importlib_resources as ir
 from lxml import etree
 from lxml.etree import DocumentInvalid
+from lxml.etree import _Element as ElementT
 from micawber import ProviderException, bootstrap_basic, bootstrap_noembed, cache
 
 from .dp_types import HTML, DPError, SSDict, log
@@ -16,7 +17,7 @@ dp_namespace: str = "https://datapane.com/schemas/report/1/"
 ViewXML = str
 
 
-def load_doc(x: str) -> etree._Element:
+def load_doc(x: str) -> ElementT:
     parser = etree.XMLParser(strip_cdata=False, recover=True, remove_blank_text=True, remove_comments=True)
     return etree.fromstring(x, parser=parser)
 
@@ -27,7 +28,7 @@ def is_valid_id(id: str) -> bool:
 
 
 def validate_view_doc(
-    xml_str: t.Optional[str] = None, xml_doc: t.Optional[etree.Element] = None, quiet: bool = False
+    xml_str: t.Optional[str] = None, xml_doc: t.Optional[ElementT] = None, quiet: bool = False
 ) -> bool:
     """Validate the model against the schema, throws an etree.DocumentInvalid if not"""
     assert xml_str or (xml_doc is not None)

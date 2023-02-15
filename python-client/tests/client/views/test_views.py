@@ -44,7 +44,7 @@ def _view_to_xml_and_files(app_or_view: t.Union[dp.View, dp.App]) -> ViewState:
 
 def assert_view(
     view: t.Union[dp.App, dp.View], expected_attachments: int = None, expected_num_blocks: int = None
-) -> t.Tuple[str, t.List[Path]]:
+) -> t.Tuple[str, t.List[t.BinaryIO]]:
     state = _view_to_xml_and_files(view)
     view_xml = state.view_xml
     attachments = state.store.file_list
@@ -98,7 +98,9 @@ def gen_view_complex_no_files() -> dp.View:
     )
 
 
-def gen_view_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.View:
+def gen_view_complex_with_files(
+    datadir: Path, single_file: bool = False, local_report: bool = False, include_fun: bool = False
+) -> dp.View:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -128,6 +130,14 @@ def gen_view_complex_with_files(datadir: Path, single_file: bool = False, local_
         table_asset if local_report else dp.DataTable(df=big_df, name="big-table-block", caption="Test DataTable")
     )
 
+    fun = dp.Function(
+        lambda params: dp.View("Hellow"),
+        target="x",
+        controls=dp.Controls(
+            dp.TextBox("name", initial="xyz"), dp.Choice("lang", label="Language", options=["py", "rb"], initial="py")
+        ),
+    )
+
     if single_file:
         return dp.View(dp.Group(blocks=[md_block, dt_asset]))
     else:
@@ -147,6 +157,7 @@ def gen_view_complex_with_files(datadir: Path, single_file: bool = False, local_
                 img_asset,
                 table_asset,
                 dt_asset,
+                fun if include_fun else dp.Empty("empty"),
             ),
         )
 
@@ -163,7 +174,7 @@ def test_gen_view_single():
 
 def test_gen_view_simple():
     view = gen_view_simple()
-    assert_view(view, 0)
+    assert_view(view, 0, 2)
     # TODO - replace accessors here with glom / boltons / toolz
     assert len(view.blocks) == 2
     assert isinstance(view.blocks[1], dp.Text)
@@ -179,7 +190,7 @@ def test_gen_view_nested_mixed():
         "Simple string Markdown #2",
     )
 
-    assert_view(view, 0)
+    assert_view(view, 0, 4)
     assert len(glom(view, "blocks")) == 2
     assert isinstance(glom(view, "blocks.0"), dp.Group)
     assert isinstance(view.blocks[0], dp.Group)
@@ -287,7 +298,12 @@ def test_gen_view_complex_no_files():
 
 def test_gen_view_with_files(datadir: Path):
     view = gen_view_complex_with_files(datadir)
-    assert_view(view, 5, 24)
+    assert_view(view, 5, 25)
+
+
+def test_gen_view_with_function(datadir: Path):
+    view = gen_view_complex_with_files(datadir, include_fun=True)
+    assert_view(view, 5, 28)
 
 
 ################################################################################

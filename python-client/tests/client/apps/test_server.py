@@ -8,7 +8,7 @@ done when making significant changes to server.py
 
 * Clear out `/tmp/dp-*` (temporary directories created for serving apps)
 
-* Create an exampl app in `simple.py`
+* Create an example app in `simple.py`
 
     import datapane as dp
     dp.serve(dp.View(dp.Text("Some text")))

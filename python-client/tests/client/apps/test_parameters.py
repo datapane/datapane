@@ -97,6 +97,7 @@ def _test_param_class_with_args(param_class: type, args: tuple, kwargs: dict):
 PARAMETER_CLASSES = [
     dp.Switch,
     dp.TextBox,
+    dp.NumberBox,
     dp.Range,
     dp.Choice,
     dp.MultiChoice,

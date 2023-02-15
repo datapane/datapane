@@ -4,6 +4,7 @@ import typing as t
 import warnings
 
 from lxml import etree
+from lxml.etree import _Element as ElementT
 
 from datapane.blocks import Group
 from datapane.blocks.base import BlockOrPrimitive
@@ -48,7 +49,7 @@ class View(ContainerBlock):
         app_template.validate()
         return cls(blocks=app_template.blocks)
 
-    def get_dom(self) -> str:
+    def get_dom(self) -> ElementT:
         """Return the Document structure for the View"""
         # internal debugging method
         from datapane.processors.file_store import DummyFileEntry, FileStore
@@ -57,7 +58,11 @@ class View(ContainerBlock):
 
         builder = XMLBuilder(FileStore(DummyFileEntry))
         v = self.accept(builder)
-        return etree.tounicode(v.elements[0], pretty_print=True)
+        return v.elements[0]
+
+    def get_dom_str(self) -> str:
+        dom = self.get_dom()
+        return etree.tounicode(dom, pretty_print=True)
 
     def pprint(self) -> None:
         from .visitors import PrettyPrinter

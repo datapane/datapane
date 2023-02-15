@@ -108,24 +108,9 @@ def serve_file(global_state: GlobalState, filename: str):
 
 
 # See tests/client/test_server.py for important info on testing this code.
-
-
-def serve(
-    entry: t.Union[View, t.Callable[[], View]],
-    *,
-    port: t.Optional[int] = None,
-    host: t.Optional[str] = None,
-    debug: bool = False,
-    ui: t.Optional[str] = None,
-    public: bool = False,
-    embed_mode: bool = False,
-) -> None:
-    """
-    Main app serve entrypoint.
-
-    Pass `port` to run on a specific port, otherwise one will be chosen automatically.
-
-    """
+def build_app(
+    entry: t.Union[View, t.Callable[[], View]], *, debug: bool = False, embed_mode: bool = False
+) -> t.Tuple[bt.Bottle, t.Callable]:
     # setup GlobalState
     f_cache.clear()
     # set up the initial env
@@ -150,15 +135,37 @@ def serve(
     # start the server
     app.config.update({})
     app.install(DPBottlePlugin(g_s, embed_mode))
-    capture("App Server Started")
 
     def app_cleanup():
         shutil.rmtree(app_dir, ignore_errors=True)
+        f_cache.clear()
         app.close()
         log.info("Shutting down server")
 
     if debug is not None:
         bt._debug(debug)
+
+    return app, app_cleanup
+
+
+def serve(
+    entry: t.Union[View, t.Callable[[], View]],
+    *,
+    port: t.Optional[int] = None,
+    host: t.Optional[str] = None,
+    debug: bool = False,
+    ui: t.Optional[str] = None,
+    public: bool = False,
+    embed_mode: bool = False,
+) -> None:
+    """
+    Main app serve entrypoint.
+
+    Pass `port` to run on a specific port, otherwise one will be chosen automatically.
+
+    """
+    app, app_cleanup = build_app(entry, debug=debug, embed_mode=embed_mode)
+    capture("App Server Started")
 
     if port is None:
         if _port := os.environ.get("PORT"):
