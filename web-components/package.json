@@ -2,6 +2,10 @@
     "name": "datapane-next",
     "private": true,
     "version": "0.0.0",
+    "engines": {
+        "node": ">=16.13.0 <17",
+        "npm": ">=8.1 <9"
+    },
     "scripts": {
         "build:alpine-stores": "NODE_ENV=production vite build --config alpine-stores/vite.config.ts",
         "build:base": "NODE_ENV=production vite build --config base/vite.config.ts",
