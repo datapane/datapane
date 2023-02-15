@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import HPages from "./layout/HPages.vue";
-import VPages from "./layout/VPages.vue";
-import PrevNext from "./layout/PrevNext.vue";
-import MobilePages from "./layout/MobilePages.vue";
+import NavBar from "./layout/NavBar.vue";
 import { computed, ComputedRef } from "vue";
 import { ReportProps } from "../data-model/types";
 import { storeToRefs } from "pinia";
@@ -12,14 +9,17 @@ import { Block, View } from "../data-model/blocks";
 // see https://github.com/vuejs/core/issues/4294
 const p = defineProps<{
     isOrg: ReportProps["isOrg"];
+    reportWidthClass: ReportProps["reportWidthClass"];
     mode: ReportProps["mode"];
     htmlHeader?: ReportProps["htmlHeader"];
+    isServedApp: ReportProps["isServedApp"];
+    resetApp: () => void;
     report: View;
 }>();
 
 // Set up deserialised report object
 
-const { children, tabNumber, hasPages, layout } = storeToRefs(p.report.store);
+const { children, tabNumber, hasPages } = storeToRefs(p.report.store);
 
 const pages: ComputedRef<Block[]> = computed(() =>
     hasPages.value ? children.value[0].children : [],
@@ -39,17 +39,19 @@ const handlePageChange = (newPageNumber: number) =>
 
 <template>
     <template v-if="p.report">
-        <div
-            v-if="pages.length > 1 && layout === 'top'"
-            class="hidden sm:block w-full mb-6"
+        <nav-bar
+            :reset-app="p.resetApp"
+            :is-served-app="p.isServedApp"
+            :labels="pageLabels"
+            :page-number="tabNumber"
+            :report-width-class="p.reportWidthClass"
+            @page-change="handlePageChange"
+        />
+        <main
+            class="w-full bg-dp-background mx-auto"
+            :class="p.reportWidthClass"
+            data-cy="report-component"
         >
-            <h-pages
-                :labels="pageLabels"
-                :page-number="tabNumber"
-                @page-change="handlePageChange"
-            />
-        </div>
-        <div class="w-full bg-dp-background" data-cy="report-component">
             <div
                 :class="[
                     'flex flex-col justify-end bg-dp-background',
@@ -58,24 +60,7 @@ const handlePageChange = (newPageNumber: number) =>
                     },
                 ]"
             >
-                <div class="sm:hidden p-2" v-if="pages.length > 1">
-                    <mobile-pages
-                        :labels="pageLabels"
-                        :page-number="tabNumber"
-                        @page-change="handlePageChange"
-                    />
-                </div>
                 <div class="sm:flex block">
-                    <div
-                        v-if="pages.length > 1 && layout === 'side'"
-                        class="hidden sm:block flex-none w-1/6 bg-gray-100 px-4"
-                    >
-                        <v-pages
-                            :labels="pageLabels"
-                            :page-number="tabNumber"
-                            @page-change="handlePageChange"
-                        />
-                    </div>
                     <div class="flex-1 flex flex-col min-w-0">
                         <div class="grow px-4">
                             <component
@@ -85,15 +70,9 @@ const handlePageChange = (newPageNumber: number) =>
                                 v-bind="child.componentProps"
                             />
                         </div>
-                        <prev-next
-                            v-if="pages.length > 1"
-                            :page-number="tabNumber"
-                            :num-pages="pageLabels.length"
-                            @page-change="handlePageChange"
-                        />
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </template>
 </template>

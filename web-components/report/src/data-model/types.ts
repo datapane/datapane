@@ -12,10 +12,12 @@ export type IReport = {
 export type ReportProps = {
     isOrg: boolean;
     isLightProse: boolean;
+    isServedApp: boolean;
     mode: "VIEW" | "EMBED";
     htmlHeader: string;
     report: IReport;
     assetStore: any;
+    reportWidthClass: "max-w-3xl" | "max-w-screen-xl" | "max-w-full";
 };
 
 export type AppDataResult = {

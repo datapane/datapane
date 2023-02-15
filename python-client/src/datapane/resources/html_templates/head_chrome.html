@@ -26,7 +26,7 @@
 
   /* construct the view */
   const htmlHeader = `<style type="text/css">{{ !css_header }}</style>`;
-  window.reportProps = { htmlHeader, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW" };
+  window.reportProps = { htmlHeader, isLightProse: {{is_light_prose}}, isOrg: false, mode: "VIEW", reportWidthClass: "{{ report_width_class }}" };
 
   if (!window.dpAppRunner) {
       // pass app data via props if in local (static) mode, otherwise this data is fetched from the server

@@ -19,6 +19,7 @@
         "@bokeh/bokehjs": "~2.4.2",
         "@formkit/themes": "^1.0.0-beta.14",
         "@formkit/vue": "^1.0.0-beta.14",
+        "@heroicons/vue": "^2.0.15",
         "@highlightjs/vue-plugin": "^2.1.0",
         "@popperjs/core": "^2.11.2",
         "@revolist/revogrid": "3.0.98",

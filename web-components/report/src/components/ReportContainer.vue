@@ -15,6 +15,7 @@ import { parseError } from "../shared/shared";
 const p = defineProps<{
     isOrg: ReportProps["isOrg"];
     isLightProse: ReportProps["isLightProse"];
+    reportWidthClass: ReportProps["reportWidthClass"];
     mode: ReportProps["mode"];
     htmlHeader: ReportProps["htmlHeader"];
     appData?: AppData;
@@ -87,19 +88,12 @@ const { dpAppRunner } = window;
 </script>
 
 <template>
-    <Teleport to="#header-target" v-if="dpAppRunner && isView(report)">
-        <button @click="setReport" class="dp-btn dp-btn-sm dp-btn-primary">
-            <div class="flex align-items justify-between">
-                <div>Reset</div>
-                <div class="ml-1.5">
-                    <i class="fa fa-refresh" aria-hidden="true"></i>
-                </div>
-            </div>
-        </button>
-    </Teleport>
     <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
     <report-component
         v-if="isView(report) && !error"
+        :reset-app="setReport"
+        :is-served-app="dpAppRunner"
+        :report-width-class="p.reportWidthClass"
         :is-org="p.isOrg"
         :mode="p.mode"
         :report="report"
