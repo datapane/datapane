@@ -2,7 +2,7 @@
 import ReportComponent from "./ReportComponent.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import ErrorCallout from "./ErrorCallout.vue";
-import { AppData, ReportProps } from "../data-model/types";
+import { AppData, AppMetaData, ReportProps } from "../data-model/types";
 import { computed, onMounted, ref } from "vue";
 import { trackLocalReportView } from "../../../shared/dp-track";
 import { useRootStore } from "../data-model/root-store";
@@ -18,6 +18,7 @@ const p = defineProps<{
     reportWidthClass: ReportProps["reportWidthClass"];
     mode: ReportProps["mode"];
     htmlHeader: ReportProps["htmlHeader"];
+    webUrl?: AppMetaData["webUrl"];
     appData?: AppData;
 }>();
 
@@ -31,8 +32,7 @@ const setReport = async () => {
                 isLightProse: p.isLightProse,
                 mode: p.mode,
                 isOrg: p.isOrg,
-                // TODO - webUrl
-                webUrl: "",
+                webUrl: p.webUrl,
             },
             p.appData,
         );

@@ -471,7 +471,13 @@
   <!-- These are dervived from the attached asset file and not set by the user -->
   <define name="staticAssetAttributes">
     <a:documentation/>
-    <!-- attribute cas_ref { xsd:string { pattern = "[0-9a-f]{64}" } } ?, -->
+    <optional>
+      <attribute name="cas_ref">
+        <data type="string">
+          <param name="pattern">[0-9a-f]{64}</param>
+        </data>
+      </attribute>
+    </optional>
     <attribute name="type">
       <data type="string">
         <param name="pattern">\w+/[\w.+\-]+</param>

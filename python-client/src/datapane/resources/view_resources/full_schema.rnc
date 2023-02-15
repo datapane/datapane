@@ -229,7 +229,7 @@ BigNumber = element BigNumber {
 
 # These are dervived from the attached asset file and not set by the user
 staticAssetAttributes =
-  # attribute cas_ref { xsd:string { pattern = "[0-9a-f]{64}" } } ?,
+  attribute cas_ref { xsd:string { pattern = "[0-9a-f]{64}" } } ?,
   attribute type { xsd:string { pattern = '\w+/[\w.+\-]+' } },
   # attribute size { xsd:positiveInteger },
   # attribute hash { xsd:string { pattern = "[0-9a-f]{10}" } },
