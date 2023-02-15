@@ -134,7 +134,7 @@ class DPObjectRef:
     ) -> U:
         # TODO - move into UploadedFileMixin ?
         if file:
-            with file.open("b") as f:
+            with file.open("rb") as f:
                 # wrap up a single file into a FileList
                 files: FileAttachmentList = dict(uploaded_file=[f])
                 res = Resource(cls.endpoint).post_files(files=files, overwrite=overwrite, **data)
