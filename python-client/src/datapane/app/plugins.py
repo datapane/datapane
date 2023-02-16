@@ -185,7 +185,7 @@ class DPBottlePlugin:
                 session = t.cast(SessionState, prev_session)
                 s_id = t.cast(str, prev_s_id)
                 log.info(f"Existing session found for {s_id=}")
-            else:
+            elif req.path == "/":
                 # new session
                 session = SessionState(user="anonymous")
                 session.add_entry(self.g_s.main)
@@ -206,6 +206,10 @@ class DPBottlePlugin:
                 )
                 capture("App Session Created")
                 log.info(f"Session created: {s_id}")
+            else:
+                # no valid previous session and calling a route other than "/"
+                res.headers["Datapane-Error"] = "unknown-session"
+                raise bt.HTTPError(400, "Unknown session", **res.headers)
 
             # thread name = <ip>-<session_id[0:6]>
             threading.current_thread().name = f"{req.remote_addr}-{s_id[0:6]}"
