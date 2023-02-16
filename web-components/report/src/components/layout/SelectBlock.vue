@@ -5,7 +5,7 @@ import MultiSelect from "vue-multiselect";
 import "vue-multiselect/dist/dist/vue-multiselect.esm.css";
 import { storeToRefs } from "pinia";
 
-const p = defineProps<{ type: string; store: any }>();
+const p = defineProps<{ type?: string; store: any }>();
 
 const { children, tabNumber } = storeToRefs(p.store);
 

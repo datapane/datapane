@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import Folium from "./Folium.vue";
 import { BlockFigureProps } from "../../data-model/blocks";
+import BlockWrapper from "../layout/BlockWrapper.vue";
 
 const p = defineProps<{
     fetchAssetData: any;
