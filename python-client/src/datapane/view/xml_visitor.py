@@ -90,7 +90,7 @@ class XMLBuilder(ViewVisitor):
         # TODO - move to PreProcess processor
         if b.target == TargetMode.SELF:
             name = gen_name()
-            e = E.Interactive(c_e, **{**b._attributes, "target": name, "name": name})
+            e = E.Function(c_e, **{**b._attributes, "target": name, "name": name})
         elif b.target in (TargetMode.BELOW, TargetMode.SIDE):
             # desugar to create a Group(Interactive, Result)
             cols = "1" if b.target == TargetMode.BELOW else "2"
