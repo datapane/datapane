@@ -134,9 +134,11 @@ class DPBottlePlugin:
     session_secret: str
     cors: t.Optional[str]
     g_s: GlobalState
+    embed_mode: bool
 
-    def __init__(self, g_s: GlobalState):
+    def __init__(self, g_s: GlobalState, embed_mode: bool):
         self.g_s = g_s
+        self.embed_mode = embed_mode
 
     def setup(self, app: bt.Bottle):
         # if 'canister' not in app.config:
@@ -191,15 +193,16 @@ class DPBottlePlugin:
                 s_id = session.session_id
                 self.sessions.set(s_id, session)
                 # NOTE - do we want a timelimit on cookie, or just tie to browser session?
+                # if embed_mode is True (default: False), we disable samesite cookies so sessions work in iframes
                 res.set_cookie(
                     COOKIE_NAME,
                     s_id,
                     secret=self.session_secret,
                     path="/",
                     maxage=SECS_1_WEEK,
-                    secure=False,
+                    secure=self.embed_mode,
                     httponly=True,
-                    samesite="lax",
+                    samesite="none" if self.embed_mode else "lax",
                 )
                 capture("App Session Created")
                 log.info(f"Session created: {s_id}")

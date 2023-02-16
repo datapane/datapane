@@ -118,6 +118,7 @@ def serve(
     debug: bool = False,
     ui: t.Optional[str] = None,
     public: bool = False,
+    embed_mode: bool = False,
 ) -> None:
     """
     Main app serve entrypoint.
@@ -148,7 +149,7 @@ def serve(
 
     # start the server
     app.config.update({})
-    app.install(DPBottlePlugin(g_s))
+    app.install(DPBottlePlugin(g_s, embed_mode))
     capture("App Server Started")
 
     def app_cleanup():
