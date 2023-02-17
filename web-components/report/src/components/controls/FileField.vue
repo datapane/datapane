@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, ref } from "vue";
+import { CloudArrowUpIcon } from "@heroicons/vue/24/outline";
 
 const emit = defineEmits(["change"]);
 
@@ -12,6 +13,8 @@ const p = defineProps<{
 const validation: ComputedRef = computed(() =>
     p.required ? [["+required"]] : [],
 );
+
+const hasFile = ref(false);
 
 const file2b64 = (file: File): Promise<string | null> =>
     /**
@@ -41,22 +44,46 @@ const setupListeners = (node: any) => {
                 name: p.name,
                 value: await file2b64(node._value[0].file),
             });
+
+            hasFile.value = true;
         } else {
             emit("change", { name: p.name, value: undefined });
+
+            hasFile.value = false;
         }
     });
 };
+
+const id = `file_${p.name}`;
 </script>
 
 <template>
     <form-kit
         type="file"
+        :id="id"
         :label="label || name"
         name="parameter_files"
         :validation="validation"
+        file-item-icon="fileDoc"
+        file-remove-icon="trash"
+        no-files-icon="fileDoc"
         validation-visibility="live"
         form="params-form"
         data-cy="file-field"
         @node="setupListeners"
-    />
+    >
+        <template #noFiles>
+            <label
+                class="flex w-full h-full items-center space-x-4 text-gray-500 hover:text-gray-700 formkit-no-files px-4 pt-3 pb-4 cursor-pointer"
+                v-if="!hasFile"
+                :for="id"
+            >
+                <cloud-arrow-up-icon class="w-6 h-6" />
+                <div class="flex flex-col">
+                    <span class="font-semibold text-sm">Upload a file</span
+                    ><span class="text-xs">Up to 25mb supported.</span>
+                </div>
+            </label>
+        </template>
+    </form-kit>
 </template>

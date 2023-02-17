@@ -59,12 +59,18 @@ export const formkitConfig = {
             checkbox: boxClassification,
             email: textClassification,
             file: {
-                label: "block mb-1 font-bold text-sm",
-                inner: "max-w-md cursor-pointer",
-                input: "text-gray-600 text-sm mb-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600",
-                noFiles: "block text-gray-800 text-sm mb-1",
-                fileItem: "block flex text-gray-800 text-sm mb-1",
-                fileRemove: "ml-auto text-blue-500 text-sm",
+                label: "block mb-1 font-bold text-sm ",
+                fileItem:
+                    "flex items-center text-gray-800 mb-1 last:mb-0 text-sm px-4 pt-3 pb-4",
+                fileItemIcon: "w-4 mr-2 shrink-0",
+                fileList:
+                    "shrink grow peer px-3 py-2 formkit-multiple:data-[has-multiple='true']:mb-6",
+                fileName: "break-all grow text-ellipsis",
+                fileRemove:
+                    "flex items-center z-[2] ml-auto  hover:text-red-500 pl-2 peer-data-[has-multiple=true]:text-sm peer-data-[has-multiple=true]:text-blue-500 peer-data-[has-multiple=true]:ml-3 peer-data-[has-multiple=true]:mb-2 formkit-multiple:bottom-[0.15em] formkit-multiple:pl-0 formkit-multiple:ml-0 formkit-multiple:left-[1em] formkit-multiple:formkit-prefix-icon:left-[3.75em]",
+                fileRemoveIcon: "block text-base w-3 relative z-[2] mr-2",
+                inner: "mt-1 flex relative justify-center rounded-md border-2 border-dashed border-gray-300 ",
+                input: "hidden",
             },
             month: textClassification,
             number: textClassification,
