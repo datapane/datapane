@@ -78,7 +78,11 @@ const mkBlockMap = (
         {
             class_: b.TemporalField,
             test: maps.jsonIsTimeField,
-            opts: { timeFormat: "HH:mm:ss", type: "time" },
+            opts: {
+                timeFormat: "HH:mm:ss",
+                type: "time",
+                parseFormat: "HH:mm:ss",
+            },
         },
         { class_: b.Group, test: maps.jsonIsGroup },
         { class_: b.View, test: maps.jsonIsView },

@@ -99,11 +99,14 @@ export class TemporalField extends ControlsField {
     public constructor(elem: Elem, figure: BlockFigure, opts?: any) {
         super(elem, figure);
         const { initial } = elem.attributes;
-        const { timeFormat, type } = opts;
+        const { timeFormat, type, parseFormat } = opts;
         this.componentProps = {
             ...this.componentProps,
-            // `moment(undefined)` resolves to current date
-            initial: moment(initial).format(timeFormat),
+            // initial may be undefined -> moment() gives us current datetime
+            // parseFormat may be undefined -> moment does automatic datetime parsing
+            initial: (initial ? moment(initial, parseFormat) : moment()).format(
+                timeFormat,
+            ),
             type,
         };
     }
