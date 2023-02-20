@@ -142,7 +142,16 @@ def parameter_class_with_valid_args(draw, classes=st.sampled_from(PARAMETER_CLAS
 
 
 @given(parameter_class_with_valid_args())
-@settings(max_examples=1000)
+@settings(
+    # max_examples: We have lots of different controls we are testing over, and
+    # want to explore more of the space for each one.
+    max_examples=1000,
+    # It appears we must have some delayed imports that make some calls to
+    # Control constructors much slower than others. So if this test is run in
+    # isolation, or for some orderings, hypothesis reports a deadline error. So
+    # we remove it.
+    deadline=None,
+)
 @example((dp.Switch, (), {"name": "\x1f"}))
 @example((dp.Range, (), {"name": "x", "initial": 0, "min": 0, "max": -math.nan}))
 def test_fuzz_all_parameters(parameter_class_and_args):
