@@ -53,7 +53,8 @@ const dropdownMenuLinks = [
 <template>
     <nav
         :class="[
-            'bg-white relative z-50',
+            // z-40 to be below modals and side bars on datapane.com
+            'bg-white relative z-40',
             { 'shadow sticky top-0': labels.length > 0 },
         ]"
     >
