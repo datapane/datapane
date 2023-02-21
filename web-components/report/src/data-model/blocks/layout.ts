@@ -4,7 +4,7 @@ import VGroup from "../../components/layout/Group.vue";
 import VSelect from "../../components/layout/SelectBlock.vue";
 import VToggle from "../../components/layout/Toggle.vue";
 import { Block, BlockFigure } from "./leaf-blocks";
-import VFunction from "../../components/controls/Function.connector.vue";
+import VCompute from "../../components/controls/Compute.connector.vue";
 import { ControlsField } from "./interactive";
 import * as b from "./index";
 import { SwapType } from "../types";
@@ -141,11 +141,11 @@ export class Toggle extends LayoutBlock {
     }
 }
 
-export class FunctionBlock extends ParentBlock<ControlsField> {
+export class ComputeBlock extends ParentBlock<ControlsField> {
     public store: any;
 
-    public component = markRaw(VFunction);
-    public name = "Function";
+    public component = markRaw(VCompute);
+    public name = "Compute";
 
     public constructor(elem: any, figure: BlockFigure) {
         super(elem, figure);
@@ -193,8 +193,8 @@ export class View extends LayoutBlock {
 
 /* Block/element type guards and checks */
 
-export const isFunctionElem = (elem: Block | b.Elem): boolean =>
-    elem.name === "Function";
+export const isComputeElem = (elem: Block | b.Elem): boolean =>
+    elem.name === "Compute";
 
 export const isGroupElem = (elem: Block | b.Elem): boolean =>
     elem.name === "Group";
@@ -213,7 +213,7 @@ export const isParentElem = (elem: Block | b.Elem): boolean =>
     isToggleElem(elem) ||
     isViewElem(elem) ||
     isGroupElem(elem) ||
-    isFunctionElem(elem);
+    isComputeElem(elem);
 
 export const isLayoutBlock = (block: Block): block is LayoutBlock =>
     block instanceof LayoutBlock;

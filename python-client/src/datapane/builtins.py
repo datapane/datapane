@@ -10,7 +10,7 @@ import importlib_resources as ir
 import numpy as np
 import pandas as pd
 
-from datapane import View
+from datapane import Blocks
 from datapane import blocks as b
 from datapane.common import NPath
 
@@ -46,7 +46,7 @@ def build_md_view(
     text_or_file: t.Union[str, NPath],
     *args: b.BlockOrPrimitive,
     **kwargs: b.BlockOrPrimitive,
-) -> View:
+) -> Blocks:
     """
     An easy way to build a complete report from a single top-level markdown text / file template.
     Any additional context can be passed in and will be inserted into the Markdown template.
@@ -69,7 +69,7 @@ def build_md_view(
         b_text = b.Text(text=t.cast(str, text_or_file))
 
     group = b_text.format(*args, **kwargs)
-    return View(group)
+    return Blocks(group)
 
 
 def gen_df(dim: int = 4) -> pd.DataFrame:
@@ -90,7 +90,7 @@ def gen_plot() -> alt.Chart:
     return alt.Chart(gen_df()).mark_line().encode(x="x", y="y")
 
 
-def demo() -> View:
+def demo() -> Blocks:
     """
     Generate a sample demo view
 
@@ -357,4 +357,4 @@ dp.Attachment(data=[1,2,3])
 
     page_3 = b.Text(adv_blocks, label="Blocks").format(plots=plots, tables=tables, text=text, embed=embed, media=media)
 
-    return View(b.Select(page_1, page_2, page_3))
+    return Blocks(b.Select(page_1, page_2, page_3))

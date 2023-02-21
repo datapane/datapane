@@ -10,8 +10,7 @@ from glom import glom
 from lxml.etree import DocumentInvalid
 
 import datapane as dp
-import datapane.blocks.function
-from datapane.blocks import BaseElement
+from datapane.blocks import BaseBlock
 from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
 from datapane.common.viewxml_utils import load_doc, validate_view_doc
@@ -26,9 +25,9 @@ md_block = dp.Text(text="# Test markdown block <hello/> \n Test **content**")
 str_md_block = "Simple string Markdown"
 
 
-def element_to_str(e: BaseElement) -> str:
+def element_to_str(e: BaseBlock) -> str:
     # NOTE - this validates as well
-    return mk_null_pipe(dp.View(e)).pipe(ConvertXML(pretty_print=True)).state.view_xml
+    return mk_null_pipe(dp.Blocks(e)).pipe(ConvertXML(pretty_print=True)).state.view_xml
 
 
 def num_blocks(view_str: str) -> int:
@@ -36,14 +35,14 @@ def num_blocks(view_str: str) -> int:
     return int(load_doc(view_str).xpath(x))
 
 
-def _view_to_xml_and_files(app_or_view: t.Union[dp.View, dp.App]) -> ViewState:
+def _view_to_xml_and_files(app_or_view: t.Union[dp.Blocks, dp.App]) -> ViewState:
     """Create a viewstate resulting from converting the View to XML & in-mem B64 files"""
-    s = ViewState(view=app_or_view, file_entry_klass=B64FileEntry)
+    s = ViewState(blocks=app_or_view, file_entry_klass=B64FileEntry)
     return Pipeline(s).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state
 
 
 def assert_view(
-    view: t.Union[dp.App, dp.View], expected_attachments: int = None, expected_num_blocks: int = None
+    view: t.Union[dp.App, dp.Blocks], expected_attachments: int = None, expected_num_blocks: int = None
 ) -> t.Tuple[str, t.List[t.BinaryIO]]:
     state = _view_to_xml_and_files(view)
     view_xml = state.view_xml
@@ -58,8 +57,8 @@ def assert_view(
 
 ################################################################################
 # Generators
-def gen_view_simple() -> dp.View:
-    return dp.View(
+def gen_view_simple() -> dp.Blocks:
+    return dp.Blocks(
         blocks=[
             md_block_id,
             str_md_block,
@@ -67,13 +66,13 @@ def gen_view_simple() -> dp.View:
     )
 
 
-def gen_view_complex_no_files() -> dp.View:
+def gen_view_complex_no_files() -> dp.Blocks:
     """Generate a complex layout view with simple elements"""
     select = dp.Select(blocks=[md_block, md_block], type=dp.SelectType.TABS)
     group = dp.Group(md_block, md_block, columns=2)
     toggle = dp.Toggle(md_block, md_block)
 
-    return dp.View(
+    return dp.Blocks(
         dp.Page(
             blocks=[
                 dp.Group(md_block, md_block, columns=2),
@@ -100,7 +99,7 @@ def gen_view_complex_no_files() -> dp.View:
 
 def gen_view_complex_with_files(
     datadir: Path, single_file: bool = False, local_report: bool = False, include_fun: bool = False
-) -> dp.View:
+) -> dp.Blocks:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -116,7 +115,7 @@ def gen_view_complex_with_files(
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
     divider_block = dp.Divider()
-    empty_block = datapane.blocks.function.Empty(name="empty-block")
+    empty_block = dp.Empty(name="empty-block")
 
     # assets
     plot_asset = dp.Plot(data=gen_plot(), caption="Plot Asset")
@@ -130,8 +129,8 @@ def gen_view_complex_with_files(
         table_asset if local_report else dp.DataTable(df=big_df, name="big-table-block", caption="Test DataTable")
     )
 
-    fun = dp.Function(
-        lambda params: dp.View("Hellow"),
+    fun = dp.Compute(
+        lambda params: dp.Blocks("Hellow"),
         target="x",
         controls=dp.Controls(
             dp.TextBox("name", initial="xyz"), dp.Choice("lang", label="Language", options=["py", "rb"], initial="py")
@@ -139,9 +138,9 @@ def gen_view_complex_with_files(
     )
 
     if single_file:
-        return dp.View(dp.Group(blocks=[md_block, dt_asset]))
+        return dp.Blocks(dp.Group(blocks=[md_block, dt_asset]))
     else:
-        return dp.View(
+        return dp.Blocks(
             dp.Page(
                 dp.Select(
                     md_block, html_block, html_block_1, code_block, formula_block, embed_block, type=dp.SelectType.TABS
@@ -166,7 +165,7 @@ def gen_view_complex_with_files(
 # View Tests
 def test_gen_view_single():
     # view with single block
-    view = dp.View("test block")
+    view = dp.Blocks("test block")
     assert_view(view, 0)
     assert len(view.blocks) == 1
     assert isinstance(view.blocks[0], dp.Text)
@@ -182,7 +181,7 @@ def test_gen_view_simple():
 
 
 def test_gen_view_nested_mixed():
-    view = dp.View(
+    view = dp.Blocks(
         dp.Group(
             md_block_id,
             str_md_block,
@@ -201,9 +200,9 @@ def test_gen_view_nested_mixed():
 def test_gen_view_primitives(datadir: Path):
     # check we don't allow arbitary python primitives - must be pickled directly via dp.Attachment
     with pytest.raises(DPClientError):
-        _ = dp.View([1, 2, 3]).get_dom()
+        _ = dp.Blocks([1, 2, 3]).get_dom()
 
-    view = dp.View(
+    view = dp.Blocks(
         "Simple string Markdown #2",  # Markdown
         gen_df(),  # Table
         gen_plot(),  # Plot
@@ -216,45 +215,45 @@ def test_gen_view_primitives(datadir: Path):
 def test_gen_failing_views():
     # nested pages
     with pytest.raises(DPClientError):
-        v = dp.View(dp.Page(dp.Page(md_block)))
+        v = dp.Blocks(dp.Page(dp.Page(md_block)))
         _view_to_xml_and_files(v)
     # we only transform top-level pages
     with pytest.raises(DocumentInvalid):
-        v = dp.View(dp.Group(dp.Page(md_block)))
+        v = dp.Blocks(dp.Group(dp.Page(md_block)))
         _view_to_xml_and_files(v)
 
     # page/pages with 0 objects
     with pytest.raises(DPClientError):
-        v = dp.View(dp.Page(blocks=[]))
+        v = dp.Blocks(dp.Page(blocks=[]))
         _view_to_xml_and_files(v)
 
     # select with 1 object
     with pytest.raises(DPClientError):
-        v = dp.View(dp.Page(dp.Select(blocks=[md_block])))
+        v = dp.Blocks(dp.Page(dp.Select(blocks=[md_block])))
         _view_to_xml_and_files(v)
 
     # empty text block
     with pytest.raises(AssertionError):
-        v = dp.View(dp.Text(" "))
+        v = dp.Blocks(dp.Text(" "))
         _view_to_xml_and_files(v)
 
     # empty df
     with pytest.raises(DPClientError):
-        v = dp.View(dp.DataTable(pd.DataFrame()))
+        v = dp.Blocks(dp.DataTable(pd.DataFrame()))
         _view_to_xml_and_files(v)
 
     # invalid names
     with pytest.raises(DocumentInvalid):
-        v = dp.View(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
+        v = dp.Blocks(dp.Text("a", name="my-name"), dp.Text("a", name="my-name"))
         _view_to_xml_and_files(v)
 
     with pytest.raises(DPClientError):
-        dp.View(dp.Text("a", name="3-invalid-name"))
+        dp.Blocks(dp.Text("a", name="3-invalid-name"))
 
 
 def test_gen_view_nested_blocks():
     s = "# Test markdown block <hello/> \n Test **content**"
-    view = dp.View(
+    view = dp.Blocks(
         blocks=[
             dp.Group(dp.Text(s, name="test-id-1"), "Simple string Markdown", label="test-group-label"),
             dp.Select(

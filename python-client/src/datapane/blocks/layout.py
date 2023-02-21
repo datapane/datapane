@@ -10,8 +10,8 @@ from glom import glom
 from datapane.client import DPClientError
 from datapane.common.dp_types import StrEnum
 
-from .base import BaseElement, BlockId, BlockList, BlockOrPrimitive, wrap_block
-from .function import Empty, gen_name
+from .base import BaseBlock, BlockId, BlockList, BlockOrPrimitive, wrap_block
+from .compute import Empty, gen_name
 
 if t.TYPE_CHECKING:
     from typing_extensions import Self
@@ -32,7 +32,7 @@ class VAlign(StrEnum):
     BOTTOM = "bottom"
 
 
-class ContainerBlock(BaseElement):
+class ContainerBlock(BaseBlock):
     """
     Abstract Block that supports nested/contained blocks
      - represents a subtree in the document

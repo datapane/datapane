@@ -47,7 +47,7 @@ def parameter_produces_valid_xml_in_view(param: Parameter) -> bool:
     def f(params):
         return None
 
-    view = dp.View(dp.Function(f, target="x", controls=controls), dp.Text("text", name="x"))
+    view = dp.Blocks(dp.Compute(f, target="x", controls=controls), dp.Text("text", name="x"))
 
     # ConvertXML raises a validation error if the XML doesn't match the schema, which is what we want:
     state = mk_null_pipe(view).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state

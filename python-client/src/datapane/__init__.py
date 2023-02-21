@@ -28,23 +28,25 @@ from .client import (  # isort:skip  otherwise circular import issue
     set_dp_mode,
 )  # isort:skip  otherwise circular import issue
 
-from .app.server import serve
+from .app.server import serve_app
 from .blocks import (
     HTML,
     Attachment,
     BigNumber,
     Choice,
     Code,
+    Compute,
     Controls,
     DataTable,
     Date,
     DateTime,
     Divider,
+    Dynamic,
     Embed,
     Empty,
     File,
+    Form,
     Formula,
-    Function,
     Group,
     Media,
     MultiChoice,
@@ -67,12 +69,13 @@ from .blocks import (
     VAlign,
     wrap_block,
 )
-from .cloud_api import App as CloudApp
 from .cloud_api import AppFormatting, AppWidth
 from .cloud_api import File as CloudFile
-from .cloud_api import FontChoice, TextAlignment, hello_world, login, logout, ping, signup
-from .processors import build, save_report, stringify_report, upload
-from .view import App, View
+from .cloud_api import FontChoice
+from .cloud_api import Report as CloudApp
+from .cloud_api import TextAlignment, hello_world, login, logout, ping, signup
+from .processors import build_report, save_report, stringify_report, upload_report
+from .view import App, Blocks
 
 # Other useful re-exports
 from . import builtins  # isort:skip  otherwise circular import issue
@@ -114,13 +117,15 @@ __all__ = [
     "Text",
     "Toggle",
     "Controls",
-    "Function",
     "VAlign",
-    "View",
-    "upload",
+    "Compute",
+    "Form",
+    "Dynamic",
+    "Blocks",
+    "upload_report",
     "save_report",
-    "serve",
-    "build",
+    "serve_app",
+    "build_report",
     "stringify_report",
     "X",
     "Range",

@@ -13,9 +13,9 @@ import datapane.blocks as b
 from datapane.client.utils import display_msg
 from datapane.ipython.exceptions import BlocksNotFoundException
 
-BlockFilterF = t.Callable[[b.BaseElement], bool]
-BlockTypes = t.Union[t.Tuple[t.Type[b.BaseElement], ...], t.Type]
-BaseElementList = t.List[b.BaseElement]
+BlockFilterF = t.Callable[[b.BaseBlock], bool]
+BlockTypes = t.Union[t.Tuple[t.Type[b.BaseBlock], ...], t.Type]
+BaseElementList = t.List[b.BaseBlock]
 
 _registry: t.Dict[str, t.Type[IPythonTemplate]] = {}
 
@@ -36,7 +36,7 @@ def partition_blocks_by_predicates(
 
 
 def partition_blocks_by_types(
-    blocks: BaseElementList, partition_types: t.List[t.Type[b.BaseElement]]
+    blocks: BaseElementList, partition_types: t.List[t.Type[b.BaseBlock]]
 ) -> t.List[BaseElementList]:
     """Partition blocks by types"""
 
@@ -179,7 +179,7 @@ class AssetCodeListTemplate(IPythonTemplate, template_name="asset_code_list"):
     def transform(self) -> None:
         blocks = self.blocks
         pages: t.List[b.LayoutBlock] = []
-        last_block: t.Optional[b.BaseElement] = None
+        last_block: t.Optional[b.BaseBlock] = None
 
         for block in blocks:
             # If the block is not a Code or Text block, add it to a new page
@@ -206,7 +206,7 @@ class DescriptivePagesTemplate(IPythonTemplate, template_name="descriptive_pages
         blocks = self.blocks
         pages: t.List[b.LayoutBlock] = []
         page_blocks: BaseElementList = []
-        last_block: t.Optional[b.BaseElement] = None
+        last_block: t.Optional[b.BaseBlock] = None
         page_title: str = "Page 1"
 
         for block in blocks:

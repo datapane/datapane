@@ -25,6 +25,7 @@ import threading
 import time
 import typing as t
 from collections import UserDict
+from contextlib import suppress
 from functools import wraps
 
 import datapane._vendor.bottle as bt
@@ -113,7 +114,7 @@ class SessionCache(t.Generic[V]):
         return s_id
 
     def delete(self, s_id: str) -> None:
-        with self._lock:
+        with self._lock, suppress(KeyError):
             del self._cache[s_id]
 
     def clear(self) -> None:
@@ -163,6 +164,28 @@ class DPBottlePlugin:
         if self.cors in ("", "false"):
             self.cors = None
 
+    def _create_session(self, res: bt.LocalResponse) -> SessionState:
+        """Create a new session and return in the response"""
+        session = SessionState(user="anonymous")
+        session.add_entry(self.g_s.main)
+
+        s_id = session.s_id
+        self.sessions.set(s_id, session)
+        # NOTE - do we want a timelimit on cookie, or just tie to browser session?
+        # if embed_mode is True (default: False), we disable samesite cookies so sessions work in iframes
+        res.set_cookie(
+            COOKIE_NAME,
+            s_id,
+            secret=self.session_secret,
+            path="/",
+            maxage=SECS_1_WEEK,
+            secure=self.embed_mode,
+            httponly=True,
+            samesite="none" if self.embed_mode else "lax",
+        )
+        log.info(f"Session created: {s_id}")
+        return session
+
     def apply(self, callback: t.Callable, route: bt.Route):
         @wraps(callback)
         def wrapper(*args, **kwargs):
@@ -181,38 +204,29 @@ class DPBottlePlugin:
             prev_s_id: t.Optional[str] = req.get_cookie(COOKIE_NAME, secret=self.session_secret)
             prev_session = self.sessions.get(prev_s_id)
 
-            if prev_session is not None:
+            if route.rule == "/control/reset/" and route.method == "POST":
+                # reset the session
+                log.info(f"Resetting session for {prev_s_id=}")
+                # remove the user session, if exists, and create a new one
+                if prev_session is not None:
+                    self.sessions.delete(prev_s_id)
+                _ = self._create_session(res)
+                res.status = 204
+                return None
+            elif prev_session is not None:
                 session = t.cast(SessionState, prev_session)
                 s_id = t.cast(str, prev_s_id)
                 log.info(f"Existing session found for {s_id=}")
-            elif req.path == "/":
-                # new session
-                session = SessionState(user="anonymous")
-                session.add_entry(self.g_s.main)
-
-                s_id = session.session_id
-                self.sessions.set(s_id, session)
-                # NOTE - do we want a timelimit on cookie, or just tie to browser session?
-                # if embed_mode is True (default: False), we disable samesite cookies so sessions work in iframes
-                res.set_cookie(
-                    COOKIE_NAME,
-                    s_id,
-                    secret=self.session_secret,
-                    path="/",
-                    maxage=SECS_1_WEEK,
-                    secure=self.embed_mode,
-                    httponly=True,
-                    samesite="none" if self.embed_mode else "lax",
-                )
+            elif route.rule == "/":  # and no prev session
+                session = self._create_session(res)
                 capture("App Session Created")
-                log.info(f"Session created: {s_id}")
             else:
                 # no valid previous session and calling a route other than "/"
                 res.headers["Datapane-Error"] = "unknown-session"
                 raise bt.HTTPError(400, "Unknown session", **res.headers)
 
             # thread name = <ip>-<session_id[0:6]>
-            threading.current_thread().name = f"{req.remote_addr}-{s_id[0:6]}"
+            threading.current_thread().name = f"{req.remote_addr}-{session.s_id[0:6]}"
 
             # NOTE - user handling was here...
             # session.session.user = user = "anonymous"
@@ -252,7 +266,7 @@ class DPBottlePlugin:
 
             # update the session, if needed
             if _session_hash != hash(session):
-                self.sessions.set(s_id, session)
+                self.sessions.set(session.s_id, session)
 
             # Cors handling
             if self.cors:
@@ -271,3 +285,4 @@ class DPBottlePlugin:
     def close(self):
         log.debug("Closing DPBottle Plugin")
         self.sessions.clear()
+        self.g_s.clear()

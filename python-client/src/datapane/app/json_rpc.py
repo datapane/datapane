@@ -8,7 +8,7 @@ import datapane._vendor.bottle as bt
 from datapane.client import log
 from datapane.client.analytics import capture
 
-from .runtime import GlobalState, apply_ref, get_session_state, global_rpc_functions
+from .runtime import GlobalState, apply_ref, get_session_state
 
 RPC_JSON = t.Union[str, int, float, bool, None, t.Mapping[str, t.Any], t.List[t.Any]]
 JListDict = t.Union[t.List[t.Any], t.Dict[str, t.Any]]
@@ -67,17 +67,17 @@ class RPCException(Exception):
 
 ##################################################################
 # RPC Dispatcher
-def dispatch(g_s: GlobalState) -> t.Dict:
+def app_rpc_call(g_s: GlobalState) -> t.Dict:
     try:
-        return _dispatch(g_s)
+        return _app_rpc_call(g_s)
     except RPCException as e:
         # convert to a JSON-RPC error msg
         log.exception(e)
         return e.as_rpc().dict()
 
 
-def _dispatch(g_s: GlobalState) -> t.Optional[t.Dict]:
-    """JSON-RPC dispatcher"""
+def _app_rpc_call(g_s: GlobalState) -> t.Optional[t.Dict]:
+    """JSON-RPC app-level dispatcher"""
 
     s_s = get_session_state()
     capture("App Function Called")
@@ -96,11 +96,8 @@ def _dispatch(g_s: GlobalState) -> t.Optional[t.Dict]:
 
     # process args
     if isinstance(json_req.params, list):
-        args = json_req.params.copy()
-        kwargs = dict()
-    else:  # isinstance(params, dict):
-        kwargs = json_req.params.copy()
-        args = tuple()
+        raise ValueError("Positional params not supported")
+    kwargs = json_req.params.copy()
 
     # dispatch method call
     if json_req.is_method_call:
@@ -108,11 +105,7 @@ def _dispatch(g_s: GlobalState) -> t.Optional[t.Dict]:
             log.info(f"Attempting to dispatch to {json_req.method}")
             f_name = json_req.method
 
-            if f_name.startswith("dp.") and f_name in global_rpc_functions:
-                # global functions are called directly
-                f = global_rpc_functions[json_req.method]
-                res = f(g_s, s_s, *args, **kwargs)
-            elif f_name.startswith("app.") and f_name in s_s.entries:
+            if f_name.startswith("app.") and f_name in s_s.entries:
                 # app function
                 # move into helper?
                 ref = s_s.entries[json_req.method]

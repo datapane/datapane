@@ -10,13 +10,13 @@ from lxml.builder import ElementMaker
 from multimethod import DispatchError, multimethod
 
 from datapane import DPClientError
-from datapane.blocks import BaseElement
+from datapane.blocks import BaseBlock
 from datapane.blocks.asset import AssetBlock
-from datapane.blocks.function import Function, TargetMode, gen_name
+from datapane.blocks.compute import Compute, TargetMode, gen_name
 from datapane.blocks.layout import ContainerBlock
 from datapane.blocks.text import EmbeddedTextBlock
-from datapane.common.viewxml_utils import mk_attribs
-from datapane.view.view import View
+from datapane.common.viewxml_utils import ElementT, mk_attribs
+from datapane.view.view_blocks import Blocks
 from datapane.view.visitors import ViewVisitor
 
 if t.TYPE_CHECKING:
@@ -33,48 +33,66 @@ class XMLBuilder(ViewVisitor):
 
     store: FileStore
     # element: t.Optional[etree.Element] = None  # Empty Group Element?
-    elements: t.List[etree.Element] = dc.field(default_factory=list)
+    elements: t.List[ElementT] = dc.field(default_factory=list)
+
+    def get_root(self, fragment: bool = False) -> ElementT:
+        """Return the top-level ViewXML"""
+        # create the top-level
+
+        # get the top-level root
+        _top_group: ElementT = self.elements.pop()
+        assert _top_group.tag == "Group"
+        assert not self.elements
+
+        # create top-level structure
+        return E.View(
+            # E.Internal(),
+            *_top_group.getchildren(),
+            **mk_attribs(version="1", fragment=fragment),
+        )
 
     @property
     def store_count(self) -> int:
         return len(self.store.files)
 
-    def add_element(self, _: BaseElement, e: etree.Element) -> XMLBuilder:
+    def add_element(self, _: BaseBlock, e: etree.Element) -> XMLBuilder:
         """Add an element to the list of nodes at the current XML tree location"""
         self.elements.append(e)
         return self
 
     # xml convertors
     @multimethod
-    def visit(self, b: BaseElement) -> XMLBuilder:
+    def visit(self, b: BaseBlock) -> XMLBuilder:
         """Base implementation - just created an empty tag including all the initial attributes"""
         _E = getattr(E, b._tag)
         return self.add_element(b, _E(**b._attributes))
 
-    @multimethod
-    def visit(self, b: ContainerBlock) -> XMLBuilder:
-        cur_elemnts = self.elements
+    def _visit_subnodes(self, b: ContainerBlock) -> t.List[ElementT]:
+        cur_elements = self.elements
         self.elements = []
         b.traverse(self)  # visit subnodes
-        # reduce(lambda _s, block: block.accept(_s), b.blocks, self)
+        res = self.elements
+        self.elements = cur_elements
+        return res
+
+    @multimethod
+    def visit(self, b: ContainerBlock) -> XMLBuilder:
+        sub_elements = self._visit_subnodes(b)
         # build the element
         _E = getattr(E, b._tag)
-        element = _E(*self.elements, **b._attributes)
-        self.elements = cur_elemnts
+        element = _E(*sub_elements, **b._attributes)
         return self.add_element(b, element)
 
     @multimethod
-    def visit(self, b: View) -> XMLBuilder:
-        b.traverse(self)  # visit subnodes
+    def visit(self, b: Blocks) -> XMLBuilder:
+        sub_elements = self._visit_subnodes(b)
 
-        # create top-level structure
-        view_doc = E.View(
-            # E.Internal(),
-            *self.elements,
-            **mk_attribs(version="1", fragment=b.fragment),
+        # Blocks are converted to Group internally
+        element = E.Group(
+            *sub_elements,
+            columns="1",
         )
-        self.elements = [view_doc]
-        return self
+        return self.add_element(b, element)
 
     @multimethod
     def visit(self, b: EmbeddedTextBlock) -> XMLBuilder:
@@ -83,26 +101,25 @@ class XMLBuilder(ViewVisitor):
         return self.add_element(b, _E(etree.CDATA(b.content), **b._attributes))
 
     @multimethod
-    def visit(self, b: Function) -> XMLBuilder:
+    def visit(self, b: Compute) -> XMLBuilder:
         c_e = b.controls._to_xml()
 
-        # Special Target handling - this occurs at the lower IR level for now,
-        # TODO - move to PreProcess processor
+        # Target handling - this occurs during XML gen for now, could move to Preprocess
         if b.target == TargetMode.SELF:
             name = gen_name()
-            e = E.Function(c_e, **{**b._attributes, "target": name, "name": name})
+            e = E.Compute(c_e, **{**b._attributes, "target": name, "name": name})
         elif b.target in (TargetMode.BELOW, TargetMode.SIDE):
             # desugar to create a Group(Interactive, Result)
             cols = "1" if b.target == TargetMode.BELOW else "2"
             name = gen_name()
             e = E.Group(
-                E.Function(c_e, **{**b._attributes, "target": name}),
+                E.Compute(c_e, **{**b._attributes, "target": name}),
                 E.Group(E.Empty(name=gen_name()), name=name, columns="1"),
                 columns=cols,
             )
         else:
             # use default target
-            e = E.Function(c_e, **b._attributes)
+            e = E.Compute(c_e, **b._attributes)
 
         return self.add_element(b, e)
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 import atexit
 import inspect
 import os
-import shutil
 import sys
 import tempfile
 import threading
@@ -31,27 +30,23 @@ from datapane.common.dp_types import SECS_1_HOUR, SIZE_1_MB
 from datapane.common.utils import guess_type
 from datapane.ipython.environment import get_environment
 from datapane.processors.processors import ExportBaseHTMLOnly
-from datapane.view import View
+from datapane.view import Blocks
 
 try:
     import ipywidgets
 except ImportError:
     ipywidgets = None
 
-from .json_rpc import dispatch
+from .json_rpc import app_rpc_call
 from .plugins import DPBottlePlugin
-from .runtime import FunctionRef, GlobalState, f_cache, get_session_state
-
-########################################################################
-# App Server
-# TODO
-#  - caching
+from .runtime import FunctionRef, GlobalState, get_session_state
 
 # globally set the max request size to 100 MB
 bt.BaseRequest.MEMFILE_MAX = int(os.getenv("MAX_REQUEST_BODY", 100 * SIZE_1_MB))
 
 
 def create_bottle_app(debug: bool) -> bt.Bottle:
+    # Create the app and all nested routes
     app: bt.Bottle = bt.Bottle()
     # Update app config
     app.config.update(
@@ -108,12 +103,10 @@ def serve_file(global_state: GlobalState, filename: str):
 
 
 # See tests/client/test_server.py for important info on testing this code.
-def build_app(
-    entry: t.Union[View, t.Callable[[], View]], *, debug: bool = False, embed_mode: bool = False
-) -> t.Tuple[bt.Bottle, t.Callable]:
+def _build_app(
+    entry: t.Union[Blocks, t.Callable[[], Blocks]], *, debug: bool = False, embed_mode: bool = False
+) -> bt.Bottle:
     # setup GlobalState
-    f_cache.clear()
-    # set up the initial env
     app_dir = Path(tempfile.mkdtemp(prefix="dp-"))
     assets_dir = app_dir / "assets"
     assets_dir.mkdir(parents=True)
@@ -128,28 +121,24 @@ def build_app(
     main_entry = FunctionRef(f=entry_f, controls=Controls.empty(), f_id="app.main", cache=cache)
     g_s = GlobalState(app_dir, main_entry)
 
+    # create app and add routes
     app = create_bottle_app(debug)
-    app.route("/dispatch/", ["POST"], lambda: dispatch(g_s))
+    app.route("/app-rpc-call/", ["POST"], lambda: app_rpc_call(g_s))
     app.route("/assets/<filename>", ["GET"], lambda filename: serve_file(g_s, filename))
+    app.route("/control/reset/", ["POST"], lambda: None)
 
     # start the server
     app.config.update({})
     app.install(DPBottlePlugin(g_s, embed_mode))
 
-    def app_cleanup():
-        shutil.rmtree(app_dir, ignore_errors=True)
-        f_cache.clear()
-        app.close()
-        log.info("Shutting down server")
-
     if debug is not None:
         bt._debug(debug)
 
-    return app, app_cleanup
+    return app
 
 
-def serve(
-    entry: t.Union[View, t.Callable[[], View]],
+def serve_app(
+    entry: t.Union[Blocks, t.Callable[[], Blocks]],
     *,
     port: t.Optional[int] = None,
     host: t.Optional[str] = None,
@@ -164,7 +153,7 @@ def serve(
     Pass `port` to run on a specific port, otherwise one will be chosen automatically.
 
     """
-    app, app_cleanup = build_app(entry, debug=debug, embed_mode=embed_mode)
+    app = _build_app(entry, debug=debug, embed_mode=embed_mode)
     capture("App Server Started")
 
     if port is None:
@@ -187,7 +176,7 @@ def serve(
         if ui not in CONTROLLER_UIS:
             raise ValueError(f"UI choice '{ui}' is not a known option. Choose from: {', '.join(CONTROLLER_UIS.keys())}")
         ui_cls = CONTROLLER_UIS[ui]
-    controller = ServerController(server, cleanups=[app_cleanup], ui_cls=ui_cls, public=public)
+    controller = ServerController(server, cleanups=[app.close], ui_cls=ui_cls, public=public)
     controller.go()
 
 

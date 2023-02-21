@@ -1,17 +1,17 @@
-import Function from "../../components/controls/Function.vue";
+import Compute from "../../components/controls/Compute.vue";
 import * as b from "../../data-model/blocks/index";
 import { makeTemplate } from "../utils";
 
 export default {
-    title: "Controls/Function",
-    component: Function,
+    title: "Controls/Compute",
+    component: Compute,
 };
 
-export const Primary = makeTemplate(Function);
+export const Primary = makeTemplate(Compute);
 
 Primary.args = {
-    label: "Function block",
-    subtitle: "Function subtitle",
+    label: "Compute block",
+    subtitle: "Compute subtitle",
     update: () => null,
     onChange: () => null,
     prompt: "Custom prompt",

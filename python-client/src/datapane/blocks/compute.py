@@ -6,16 +6,16 @@ import typing as t
 from pydantic import BaseConfig, BaseModel, create_model, validator
 from typing_extensions import Self
 
+from datapane.client import DPClientError
 from datapane.common.dp_types import StrEnum
 from datapane.common.viewxml_utils import mk_attribs
 
-from .base import BaseElement, BlockId
+from .base import BaseBlock, BlockId
 from .parameters import E, Parameter
 
 if t.TYPE_CHECKING:
-    from lxml.etree import _Element as Element
-
-    from datapane.view import View
+    from datapane.common.viewxml_utils import ElementT
+    from datapane.view import Blocks
 
 
 def gen_name() -> str:
@@ -23,7 +23,7 @@ def gen_name() -> str:
     return f"id-{secrets.token_urlsafe(8)}"
 
 
-class Empty(BaseElement):
+class Empty(BaseBlock):
     """
     An empty block that can be patched later
 
@@ -75,7 +75,7 @@ class Controls:
         DummyModel = create_model("DummyModel", **fields, __config__=DummyModelConfig, __validators__=validators)
         return DummyModel
 
-    def _to_xml(self) -> Element:
+    def _to_xml(self) -> ElementT:
         attribs = mk_attribs(label=self.label)
         return E.Controls(*[p._to_xml() for p in self.params], **attribs)
 
@@ -83,6 +83,10 @@ class Controls:
     def is_cacheable(self) -> bool:
         """Can the controls be cached"""
         return all(p.cacheable for p in self.params)
+
+    @property
+    def param_names(self) -> t.Set[str]:
+        return {p.name for p in self.params}
 
 
 class Swap(StrEnum):
@@ -95,24 +99,34 @@ class Swap(StrEnum):
 class Trigger(StrEnum):
     SUBMIT = "submit"
     SCHEDULE = "schedule"  # every 30s
+    VISIBLE = "visible"
+    LOAD = "load"
+    MOUNT = "mount"
 
 
 class TargetMode(StrEnum):
     SELF = "self"
     BELOW = "below"
     SIDE = "side"
+    # TODO - 'parent' - find the nearest group ancestor and replace there
+    # PARENT = "parent"
 
 
-class Function(BaseElement):
-    """Function blocks allow for dynamic views based on running functions"""
+TargetT = t.Union[BlockId, TargetMode, BaseBlock]
+ControlsT = t.Union[Controls, t.Iterable[Parameter], None]
+FunctionT = t.Callable[..., "Blocks"]
 
-    _tag = "Function"
+
+class Compute(BaseBlock):
+    """Compute blocks allow for dynamic views based on running python functions that return blocks"""
+
+    _tag = "Compute"
 
     def __init__(
         self,
-        function: t.Callable[..., View],
-        target: t.Union[BlockId, TargetMode],
-        controls: t.Union[Controls, t.Iterable[Parameter], None] = None,
+        function: FunctionT,
+        target: TargetT,
+        controls: ControlsT = None,
         name: BlockId = None,
         label: t.Optional[str] = None,
         swap: Swap = Swap.REPLACE,
@@ -131,9 +145,14 @@ class Function(BaseElement):
 
         self.function = function
         self.cache = cache
-        self.target = target
+        if isinstance(target, BaseBlock):
+            if target.name is None:
+                raise DPClientError(f"Block {target} must have a name to be used as a target")
+            self.target = target.name
+        else:
+            self.target = str(target)
 
-        # NOTE - using id for the function_id means we can't persist sessions
+        # NOTE - using id for the function_id means we can't persist sessions across instances
         # prob ok for now
         self.function_id = f"app.{id(self)}"
 
@@ -149,6 +168,8 @@ class Function(BaseElement):
             opt_attribs.update(submit_label=submit_label)
         elif trigger == Trigger.SCHEDULE:
             opt_attribs.update(timer=timer)
+        elif trigger in (Trigger.LOAD, Trigger.VISIBLE):
+            trigger = Trigger.MOUNT
 
         # basic attributes
         super().__init__(
@@ -160,3 +181,53 @@ class Function(BaseElement):
             target=target,
             **opt_attribs,
         )
+
+
+# Compute Helpers
+def Form(
+    on_submit: FunctionT, controls: ControlsT = None, target: TargetT = TargetMode.BELOW, label: t.Optional[str] = None
+) -> Compute:
+    """
+    Create a form on the page that runs the provided function on submit.
+
+    Args:
+        on_submit: Function to run when the form is submitted
+        controls: Parameters for the Form
+        target (optional): Where the results from the function should be viewed
+        label (optional): Description for the Form
+
+    Returns: A Compute block representing the Form
+    """
+    return Compute(function=on_submit, controls=controls, target=target, label=label)
+
+
+def Dynamic(
+    on_load: t.Optional[FunctionT] = None,
+    on_timer: t.Optional[FunctionT] = None,
+    target: t.Optional[TargetT] = None,
+    seconds: int = 30,
+) -> Compute:
+    """
+    Create a dynamically updating block that runs the provided function to update the View.
+
+    Args:
+        on_load: Function to run when the App is loaded
+        on_timer: Function to run on a regular timer
+        target (optional): Where the results from the functino should be viewed
+        seconds (optional, default=30): Number of seconds between running the function specified by on_timer
+
+    Returns: A Compute block representing the Dynamic behaviour
+    """
+
+    if on_load and on_timer:
+        raise DPClientError("Can't use both on_load and on_timer simultaneously")
+    elif on_load:
+        f = on_load
+        target = target or TargetMode.SELF
+    elif on_timer:
+        f = on_timer
+        target = target or TargetMode.BELOW
+    else:
+        raise DPClientError("Must provide one of on_load or on_timer")
+
+    return Compute(function=f, target=target, timer=seconds)

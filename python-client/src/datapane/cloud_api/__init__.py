@@ -36,7 +36,7 @@ The core document APIs, these are found in `datapane.client.api.report`, includi
 
 """
 # flake8: noqa:F401
-from .app import App, AppFormatting, AppWidth, FontChoice, PageLayout, TextAlignment
+from .app import AppFormatting, AppWidth, FontChoice, PageLayout, Report, TextAlignment
 from .common import Resource
 from .dp_object import DPObjectRef
 from .file import File

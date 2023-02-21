@@ -13,7 +13,6 @@ from uuid import uuid4
 
 import importlib_resources as ir
 from lxml import etree
-from lxml.etree import _Element as ElementT
 
 from datapane import blocks as b
 from datapane._vendor.bottle import SimpleTemplate
@@ -23,7 +22,7 @@ from datapane.client.exceptions import InvalidReportError
 from datapane.client.utils import display_msg, log, open_in_browser
 from datapane.cloud_api import AppFormatting, AppWidth
 from datapane.common import HTML, NPath, timestamp, validate_view_doc
-from datapane.common.viewxml_utils import local_view_resources
+from datapane.common.viewxml_utils import ElementT, local_view_resources
 from datapane.view import CollectFunctions, PreProcess, XMLBuilder
 
 from .file_store import FileEntry
@@ -38,11 +37,11 @@ class PreProcessView(BaseProcessor):
 
     def __call__(self, _: t.Any) -> None:
         # AST checks
-        if len(self.s.view.blocks) == 0:
-            raise InvalidReportError("Empty view - must contain at least one block")
+        if len(self.s.blocks.blocks) == 0:
+            raise InvalidReportError("Empty blocks object - must contain at least one block")
 
         # convert Page -> Select + Group
-        v = copy(self.s.view)
+        v = copy(self.s.blocks)
         if all(isinstance(blk, b.Page) for blk in v.blocks):
             # convert to top-level Select
             p: b.Page  # noqa: F842
@@ -60,7 +59,7 @@ class PreProcessView(BaseProcessor):
         # v1 = copy(v)
 
         # update the processor state
-        self.s.view = v1
+        self.s.blocks = v1
 
         return None
 
@@ -70,7 +69,7 @@ class AppTransformations(BaseProcessor):
 
     def __call__(self, _: t.Any) -> None:
         ci = CollectFunctions()
-        self.s.view.accept(ci)
+        self.s.blocks.accept(ci)
         # s1 = dc.replace(s, entries=ci.entries)
         self.s.entries = ci.entries
         return None
@@ -82,8 +81,9 @@ class ConvertXML(BaseProcessor):
     local_post_xslt = etree.parse(str(local_view_resources / "local_post_process.xslt"))
     local_post_transform = etree.XSLT(local_post_xslt)
 
-    def __init__(self, *, pretty_print: bool = False) -> None:
+    def __init__(self, *, pretty_print: bool = False, fragment: bool = False) -> None:
         self.pretty_print: bool = pretty_print
+        self.fragment: bool = fragment
         super().__init__()
 
     def __call__(self, _: t.Any) -> ElementT:
@@ -104,12 +104,11 @@ class ConvertXML(BaseProcessor):
     def convert_xml(self) -> ElementT:
         # create initial state
         builder_state = XMLBuilder(store=self.s.store)
-        self.s.view.accept(builder_state)
-        return builder_state.elements[0]
+        self.s.blocks.accept(builder_state)
+        return builder_state.get_root(self.fragment)
 
     def post_transforms(self, view_doc: ElementT) -> ElementT:
         # TODO - post-xml transformations, essentially xslt / lxml-based DOM operations
-        #  e.g. s/View/Group/g
         # post_process via xslt
         processed_view_doc: ElementT = self.local_post_transform(view_doc)
 
@@ -128,7 +127,7 @@ class PreUploadProcessor(BaseProcessor):
         """
 
         # check no functions exist in the uploaded app
-        if any(isinstance(block, b.Function) for block in self.s.view):
+        if any(isinstance(block, b.Compute) for block in self.s.blocks):
             raise InvalidReportError(
                 "Functions can't currently be uploaded, please use dp.serve to serve your app locally"
             )

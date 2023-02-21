@@ -43,7 +43,7 @@ BlockId = str
 VV = t.TypeVar("VV", bound="ViewVisitor")
 
 
-class BaseElement(ABC):
+class BaseBlock(ABC):
     """Base Block class - subclassed by all Block types
 
     ..note:: The class is not used directly.
@@ -88,10 +88,10 @@ class BaseElement(ABC):
 
         from datapane.ipython.environment import get_environment
         from datapane.processors.api import stringify_report
-        from datapane.view import View
+        from datapane.view import Blocks
 
         if get_environment().support_rich_display:
-            html_str = stringify_report(View(self))
+            html_str = stringify_report(Blocks(self))
             display(HTML(html_str))
         else:
             display(self.__str__())
@@ -112,7 +112,7 @@ class BaseElement(ABC):
         return inst
 
 
-class DataBlock(BaseElement):
+class DataBlock(BaseBlock):
     """Abstract block that represents a leaf-node in the tree, e.g. a Plot or Table
 
     ..note:: This class is not used directly.
@@ -128,7 +128,7 @@ def wrap_block(b: BlockOrPrimitive) -> Block:
 
     # if isinstance(b, Page):
     #     raise DPClientError("Page objects can only be at the top-level")
-    if not isinstance(b, BaseElement):
+    if not isinstance(b, BaseBlock):
         # import here as a very slow module due to nested imports
         # from ..files import convert
 

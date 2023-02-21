@@ -50,7 +50,7 @@ block_label_or_name = block_name?, block_label?
 #  block_label_or_name, Block+
 #}
 
-Block = LayoutBlock | DataBlock | Function | Empty
+Block = LayoutBlock | DataBlock | Compute | Empty
 
 # Used to describe a Placeholder element we can patch - like empty div in HTML
 Empty = element Empty {
@@ -59,8 +59,8 @@ Empty = element Empty {
 
 
 ################################################################################
-# Function block handling
-Function = element Function {
+# Compute block handling
+Compute = element Compute {
   block_label_or_name,
 
   # htmx-like attributes
@@ -69,7 +69,7 @@ Function = element Function {
   attribute target { xsd:string { minLength = "1" } },
   # submit has hard-coded "Go" button
   # schedule is hard-coded to 30s for now
-  attribute trigger { string "submit" | string "schedule" },
+  attribute trigger { string "submit" | string "schedule" | string "visible" | string "load" | string "mount" },
   attribute swap { string "replace" | string "prepend" | string "append" | string "inner" },
   attribute submit_label { xsd:string { minLength = "1" maxLength = "32" } }?,
   attribute timer { xsd:positiveInteger }?,

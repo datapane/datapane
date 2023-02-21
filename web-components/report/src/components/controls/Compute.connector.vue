@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Use a connector here so we can separate the data model from the Vue component in testing.
- * Also possible to pass the individual store properties from the data model class via `Function.componentProps`,
+ * Also possible to pass the individual store properties from the data model class via `Compute.componentProps`,
  * but this would remove re-rendering on `store.children` change.
  */
 import { storeToRefs } from "pinia";
@@ -9,7 +9,7 @@ import { ref } from "vue";
 import BlockWrapper from "../layout/BlockWrapper.vue";
 import { TriggerType } from "../../data-model/types";
 import { BlockFigureProps } from "../../data-model/blocks";
-import FunctionBlock from "./Function.vue";
+import ComputeBlock from "./Compute.vue";
 import { parseError } from "../../shared/shared";
 
 const p = defineProps<{
@@ -47,7 +47,7 @@ const update = async () => {
 
 <template>
     <block-wrapper :figure="p.figure" :show-overflow="true">
-        <function-block
+        <compute-block
             :on-change="onChange"
             :update="update"
             :children="children"

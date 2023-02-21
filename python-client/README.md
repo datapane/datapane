@@ -97,7 +97,7 @@ fig = (
         color="species:N"
     )
 )
-view = dp.View(
+view = dp.Blocks(
     dp.Plot(fig),
     dp.DataTable(df)
 )
@@ -119,7 +119,7 @@ Add dropdowns, selects, grid, pages, and 10+ other blocks to enhance your apps.
 ```python
 import datapane as dp
 
-view = dp.View(
+view = dp.Blocks(
     dp.Formula("x^2 + y^2 = z^2"),
     dp.Group(
         dp.BigNumber(
@@ -175,10 +175,10 @@ To get your API key, [create a free account](https://cloud.datapane.com/accounts
 Next, in your Python notebook or script, change the `save` function to `upload`:
 
 ```python
-view = dp.View(
- ...
+view = dp.Blocks(
+    ...
 )
-dp.upload(view, name="Hello world")
+dp.upload_report(view, name="Hello world")
 ```
 
 # Demos and Examples

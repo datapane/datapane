@@ -15,10 +15,10 @@ from .environment import get_environment
 from .exceptions import BlocksNotFoundException, NotebookParityException
 
 if typing.TYPE_CHECKING:
-    from datapane.blocks import BaseElement
+    from datapane.blocks import BaseBlock
 
 
-def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optional[BaseElement]:
+def output_cell_to_block(cell: dict, ipython_output_cache: dict) -> typing.Optional[BaseBlock]:
     """Convert a IPython notebook output cell to a Datapane Block"""
     from datapane.blocks import wrap_block
 
@@ -74,7 +74,7 @@ def check_notebook_cache_parity(notebook_json: dict, ipython_input_cache: list) 
 @capture_event("IPython Cells to Blocks")
 def cells_to_blocks(
     opt_out: bool = True, show_code: bool = False, show_markdown: bool = True
-) -> typing.List[BaseElement]:
+) -> typing.List[BaseBlock]:
     """Convert IPython notebook cells to a list of Datapane Blocks
 
     Recognized cell tags:
@@ -122,13 +122,13 @@ The following cells have not been executed and saved: {', '.join(map(str, dirty_
             ):
                 from datapane.blocks.text import Text
 
-                markdown_block: BaseElement = Text("".join(cell["source"]))
+                markdown_block: BaseBlock = Text("".join(cell["source"]))
                 blocks.append(markdown_block)
             elif cell["cell_type"] == "code" and not cell.get("contains_ignored_functions", False):
                 if "dp-show-code" in tags or show_code:
                     from datapane.blocks.text import Code
 
-                    code_block: BaseElement = Code("".join(cell["source"]))
+                    code_block: BaseBlock = Code("".join(cell["source"]))
                     blocks.append(code_block)
 
                 output_block = output_cell_to_block(cell, ipython_output_cache)

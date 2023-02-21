@@ -25,7 +25,7 @@ const p = defineProps<{
 const rootStore = useRootStore();
 const error = ref<string | undefined>();
 
-const setReport = async () => {
+const setApp = async () => {
     try {
         await rootStore.setReport(
             {
@@ -42,7 +42,17 @@ const setReport = async () => {
     }
 };
 
-setReport();
+const resetApp = async () => {
+    try {
+        await rootStore.resetAppSession();
+    } catch (e) {
+        error.value = parseError(e);
+        console.error(e);
+    }
+    await setApp();
+};
+
+setApp();
 
 const storeProps = storeToRefs(rootStore);
 const { singleBlockEmbed, report } = storeProps;
@@ -91,7 +101,7 @@ const { dpAppRunner } = window;
     <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
     <report-component
         v-if="isView(report) && !error"
-        :reset-app="setReport"
+        :reset-app="resetApp"
         :is-served-app="dpAppRunner"
         :report-width-class="p.reportWidthClass"
         :is-org="p.isOrg"

@@ -10,10 +10,10 @@ from copy import copy
 from multimethod import multimethod
 
 from datapane import blocks as bk
-from datapane.blocks import BaseElement, Function
+from datapane.blocks import BaseBlock, Compute
 from datapane.blocks.layout import ContainerBlock
 
-from .view import View
+from .view_blocks import Blocks
 
 if t.TYPE_CHECKING:
     from datapane.app.runtime import FEntries
@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 @dc.dataclass
 class ViewVisitor(abc.ABC):
     @multimethod
-    def visit(self: VV, b: BaseElement) -> VV:
+    def visit(self: VV, b: BaseBlock) -> VV:
         return self
 
 
@@ -34,7 +34,7 @@ class PrettyPrinter(ViewVisitor):
     indent: int = 1
 
     @multimethod
-    def visit(self, b: BaseElement):
+    def visit(self, b: BaseBlock):
         print("|", "-" * self.indent, str(b), sep="")
 
     @multimethod
@@ -52,7 +52,7 @@ class CollectFunctions(ViewVisitor):
     entries: FEntries = dc.field(default_factory=dict)
 
     @multimethod
-    def visit(self, b: BaseElement):
+    def visit(self, b: BaseBlock):
         return self
 
     @multimethod
@@ -60,7 +60,7 @@ class CollectFunctions(ViewVisitor):
         b.traverse(self)
 
     @multimethod
-    def visit(self, b: Function):
+    def visit(self, b: Compute):
         # TODO - move this to common.types??
         from datapane.app.runtime import FunctionRef
 
@@ -85,12 +85,12 @@ class PreProcess(ViewVisitor):
     or the XML DOM via lxml.
     """
 
-    current_state: list[BaseElement] = dc.field(default_factory=list)
+    current_state: list[BaseBlock] = dc.field(default_factory=list)
     current_text: list[bk.Text] = dc.field(default_factory=list)
     in_collapsible_group: bool = False
 
     @multimethod
-    def visit(self, b: BaseElement):
+    def visit(self, b: BaseBlock):
         self.merge_text()
         self.current_state.append(copy(b))
 
@@ -107,7 +107,7 @@ class PreProcess(ViewVisitor):
         self.merge_text()
 
         with self.fresh_state(b):
-            self.in_collapsible_group = isinstance(b, View) or (isinstance(b, bk.Group) and b.columns == 1)
+            self.in_collapsible_group = isinstance(b, Blocks) or (isinstance(b, bk.Group) and b.columns == 1)
             _ = b.traverse(self)
             self.merge_text()
 
@@ -123,7 +123,7 @@ class PreProcess(ViewVisitor):
             self.current_text = []
 
     @property
-    def root(self) -> BaseElement:
+    def root(self) -> BaseBlock:
         return self.current_state[0]
 
     @contextmanager

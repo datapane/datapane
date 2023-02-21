@@ -58,7 +58,7 @@ export const jsonIsSelect = (json: any): boolean => json.name === "Select";
 
 export const jsonIsToggle = (json: any): boolean => json.name === "Toggle";
 
-export const jsonIsFunction = (json: any): boolean => json.name === "Function";
+export const jsonIsCompute = (json: any): boolean => json.name === "Compute";
 
 /* Asset blocks */
 

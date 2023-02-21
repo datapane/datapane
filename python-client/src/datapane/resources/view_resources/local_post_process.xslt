@@ -35,14 +35,13 @@
   -->
 
   <!-- find/replace nested Views -> Group -->
+  <!--
   <xsl:template match="/View//View">
     <Group valign="center" columns="1">
       <xsl:apply-templates/>
     </Group>
-
   </xsl:template>
-
-
+  -->
 
 
 </xsl:stylesheet>

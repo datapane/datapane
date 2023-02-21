@@ -71,9 +71,9 @@ class AppFormatting:
 }}"""
 
 
-class App(DPObjectRef):
+class Report(DPObjectRef):
     """
-    An App that has been uploaded to datapane.com
+    A Report that has been uploaded to datapane.com
     """
 
     # NOTE - uploading handled via the DPCloudUploader processor

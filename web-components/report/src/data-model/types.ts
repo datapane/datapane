@@ -49,6 +49,7 @@ export enum SwapType {
 export enum TriggerType {
     SUBMIT = "submit",
     SCHEDULE = "schedule",
+    MOUNT = "mount",
 }
 
 export enum VAlign {

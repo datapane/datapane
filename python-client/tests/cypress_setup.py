@@ -20,7 +20,7 @@ def setup(file: Path, test_org: bool):
 
     # demo reports
     style_report_v = dp.builtins.demo()
-    style_report_app = dp.upload(style_report_v, name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
+    style_report_app = dp.upload_report(style_report_v, name="CYPRESS-STYLE-REPORT", description="DESCRIPTION")
 
     dp_objs = {"styleReportURL": style_report_app.web_url}
 

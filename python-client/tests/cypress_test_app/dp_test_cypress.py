@@ -13,4 +13,4 @@ app = dp.App(
     datapane.blocks.inline_text.Text(file_param.read_text()),
 )
 
-dp.upload(app, name="params-test-report", overwrite=True)
+dp.upload_report(app, name="params-test-report", overwrite=True)

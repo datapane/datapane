@@ -14,9 +14,9 @@ from shutil import rmtree
 from datapane.client import DPClientError
 from datapane.client import config as c
 from datapane.client.utils import display_msg, open_in_browser
-from datapane.cloud_api.app import App, AppFormatting
+from datapane.cloud_api.app import AppFormatting, Report
 from datapane.common import NPath, dict_drop_empty
-from datapane.view import View
+from datapane.view import Blocks
 
 from .file_store import B64FileEntry, GzipTmpFileEntry
 from .processors import (
@@ -33,13 +33,13 @@ if t.TYPE_CHECKING:
     from datapane.cloud_api.common import FileAttachmentList
 
 
-__all__ = ["upload", "save_report", "build", "stringify_report"]
+__all__ = ["upload_report", "save_report", "build_report", "stringify_report"]
 
 
 ################################################################################
 # exported public API
-def build(
-    view: View,
+def build_report(
+    blocks: Blocks,
     name: str = "app",
     dest: t.Optional[NPath] = None,
     formatting: t.Optional[AppFormatting] = None,
@@ -50,7 +50,7 @@ def build(
     TODO(product) - unknown if we should keep this...
 
     Args:
-        view: The `View` object
+        blocks: The `Blocks` object
         name: The name of the app directory to be created
         dest: File path to store the app directory
         formatting: Sets the basic app styling
@@ -70,7 +70,7 @@ def build(
     assets_dir.mkdir(parents=True)
 
     # write the app html and assets
-    s = ViewState(view=view, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
+    s = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
     _: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -81,7 +81,7 @@ def build(
 
 
 def save_report(
-    view: View,
+    blocks: Blocks,
     path: str,
     open: bool = False,
     name: str = "Report",
@@ -89,14 +89,14 @@ def save_report(
 ) -> None:
     """Save the app document to a local HTML file
     Args:
-        view: The `View` object
+        blocks: The `Blocks` object
         path: File path to store the document
         open: Open in your browser after creating (default: False)
         name: Name of the document (optional: uses path if not provided)
         formatting: Sets the basic app styling
     """
 
-    s = ViewState(view=view, file_entry_klass=B64FileEntry)
+    s = ViewState(blocks=blocks, file_entry_klass=B64FileEntry)
     _: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -107,19 +107,19 @@ def save_report(
 
 
 def stringify_report(
-    view: View,
+    blocks: Blocks,
     name: t.Optional[str] = None,
     formatting: t.Optional[AppFormatting] = None,
 ) -> str:
     """Stringify the app document to a HTML string
 
     Args:
-        view: The `View` object
+        blocks: The `Blocks` object
         name: Name of the document (optional: uses path if not provided)
         formatting: Sets the basic app styling
     """
 
-    s = ViewState(view=view, file_entry_klass=B64FileEntry)
+    s = ViewState(blocks=blocks, file_entry_klass=B64FileEntry)
     report_html: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -131,8 +131,8 @@ def stringify_report(
     return report_html
 
 
-def upload(
-    view: View,
+def upload_report(
+    blocks: Blocks,
     name: str,
     description: str = "",
     source_url: str = "",
@@ -143,11 +143,11 @@ def upload(
     formatting: t.Optional[AppFormatting] = None,
     overwrite: bool = False,
     **kwargs,
-) -> App:
+) -> Report:
     """
-    Upload the app, including its attached assets, to the logged-in Datapane Server.
+    Upload as a report, including its attached assets, to the logged-in Datapane Server.
     Args:
-        view: The current View
+        blocks: The current `Blocks` object
         name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
         description: A high-level description for the document, this is displayed in searches and thumbnails
         source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
@@ -160,7 +160,7 @@ def upload(
     """
     # NOTE - this will become App deploy entrypoint also
 
-    display_msg("Uploading app and associated data - *please wait...*")
+    display_msg("Uploading report and associated data - *please wait...*")
 
     kwargs.update(
         name=name,
@@ -182,18 +182,18 @@ def upload(
     # current protocol is to strip all empty args and patch (via a post)
     kwargs = dict_drop_empty(kwargs)
 
-    s = ViewState(view=view, file_entry_klass=GzipTmpFileEntry)
+    s = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry)
     (view_xml, file_list) = Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).pipe(PreUploadProcessor()).result
 
     # attach the view and upload as an App
     files: FileAttachmentList = dict(attachments=file_list)
-    app = App.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
+    report = Report.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
 
     if open:
-        open_in_browser(app.web_url)
+        open_in_browser(report.web_url)
 
     display_msg(
-        "App successfully uploaded. View and share your app at {web_url:l}.",
-        web_url=app.web_url,
+        "Report successfully uploaded - view and share at {web_url:l}.",
+        web_url=report.web_url,
     )
-    return app
+    return report

@@ -5,10 +5,11 @@ import inspect
 import pickle
 import random
 import secrets
+import shutil
 import sys
 import typing as t
+import uuid
 from copy import copy
-from functools import wraps
 from pathlib import Path
 
 from boltons.cacheutils import LRU
@@ -19,13 +20,10 @@ from datapane.blocks import Controls, Swap
 from datapane.client import log
 from datapane.processors import AppTransformations, ConvertXML, Pipeline, PreProcessView, ViewState
 from datapane.processors.file_store import GzipTmpFileEntry
-from datapane.view import View
+from datapane.view import Blocks
 
 if t.TYPE_CHECKING:
-    from .json_rpc import RPC_JSON
-
-# global function cache
-f_cache: LRU[t.Tuple[str, bytes], ViewState] = LRU(max_size=128)
+    from datapane.common.dp_types import SDict
 
 
 @dc.dataclass
@@ -37,6 +35,7 @@ class FunctionRef:
     # other (decorator) params, ...
     cache: bool = False
     state: bool = dc.field(init=False)
+    needs_param: bool = dc.field(init=False)
     # reset: bool
 
     def __post_init__(self):
@@ -44,10 +43,16 @@ class FunctionRef:
         f_sig = inspect.signature(self.f)
         self.state = "session" in f_sig.parameters
 
-        if "params" not in f_sig.parameters:
-            # TODO - support optional params if all controls exists in the
-            #  function signature as args/kwargs?
-            raise ValueError(f"{self.f} needs a params argument")
+        if "params" in f_sig.parameters:
+            self.needs_param = True
+        else:
+            # check the function has explicit args for all controls
+            missing_params = self.controls.param_names - set(f_sig.parameters.keys())
+            self.needs_param = bool(missing_params)
+            if self.needs_param:
+                raise ValueError(
+                    f"{self.f} needs either a `params` argument or to handle additional parameters - {missing_params}"
+                )
 
         if self.state or not self.controls.is_cacheable:
             if self.cache:
@@ -69,13 +74,23 @@ class GlobalState:
 
     app_dir: Path
     main: FunctionRef
+    # todo - make threadsafe
+    state: SDict = dc.field(default_factory=dict)
+    server_id: str = dc.field(default_factory=lambda: uuid.uuid4().hex)
+    function_cache: LRU[t.Tuple[str, bytes], ViewState] = dc.field(default_factory=lambda: LRU(max_size=128))
+
+    def clear(self) -> None:
+        """Wipe global state - called on app.close"""
+        self.function_cache.clear()
+        self.state.clear()
+        shutil.rmtree(self.app_dir, ignore_errors=True)
 
 
 @dc.dataclass
 class SessionState:
     """Per-user / session state"""
 
-    session_id: str = dc.field(init=False)
+    s_id: str = dc.field(init=False)
     user: str = "anonymous"
     # dict of assets - TODO - type this
     assets: t.Dict = dc.field(default_factory=dict)
@@ -85,7 +100,7 @@ class SessionState:
     user_state: t.Dict[str, t.Any] = dc.field(default_factory=dict)
 
     def __post_init__(self):
-        self.session_id = secrets.token_urlsafe(18)
+        self.s_id = secrets.token_urlsafe(18)
 
     def add_entry(self, app_entry: FunctionRef) -> None:
         """Add the entry to the known entries for the state"""
@@ -106,6 +121,10 @@ def get_session_state() -> SessionState:
     return t.cast(SessionState, bt.request.session)
 
 
+def get_global_state() -> GlobalState:
+    return ...
+
+
 def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.Dict) -> t.Dict:
     """
     Run the referenced app function with the given parameters and return the result
@@ -117,6 +136,7 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
         # do we have this in the cache??
         if ref.cache:
             _key = (ref.f_id, pickle.dumps(params))
+            f_cache = g_s.function_cache
             _val: t.Optional[ViewState] = f_cache.get(_key)
             _hit_ratio = (f_cache.hit_count / (f_cache.soft_miss_count + f_cache.hit_count)) * 100
             log.debug(f"Cache info - {f_cache.soft_miss_count} misses, {f_cache.hit_count} hits ({_hit_ratio:.2f}%)")
@@ -129,9 +149,10 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
     def store_cache(vs: ViewState) -> None:
         if ref.cache:
             _key = (ref.f_id, pickle.dumps(params))
-            f_cache[_key] = vs
+            g_s.function_cache[_key] = vs
 
     def gen_args():
+        # "massage" the parameters to the function
         try:
             ParamsModel = ref.controls._to_pydantic()
             params_model = ParamsModel(**params)
@@ -150,35 +171,46 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
             if k in f_sig.parameters:
                 kwargs[k] = in_params.pop(k)
 
+        # add params if needed
+        if ref.needs_param:
+            kwargs["params"] = in_params
+        elif len(in_params) > 0:
+            log.warning(f"'params' not present in {ref.f} but additional parameters present - {in_params}, dropping")
+
         # add optional state param
         if ref.state:  # "state" in f_sig.parameters:
             kwargs["session"] = s_s.user_state
 
-        f_args = f_sig.bind(params=in_params, **kwargs)
+        f_args = f_sig.bind(**kwargs)
         f_args.apply_defaults()
         return f_args
+
+    is_fragment = ref.f_id != "app.main"
 
     def build_view(res) -> ViewState:
         # Build a view for serving, using the view_ast as a base state and storing assets in dest
         # TODO - use ref.swap to validate return type
-        view: View
-        if isinstance(res, View):
-            view = copy(res)
+        blocks: Blocks
+        if isinstance(res, Blocks):
+            blocks = copy(res)
         elif isinstance(res, list):
-            view = View(*res)
+            blocks = Blocks(*res)
         else:
-            view = View(res)
+            blocks = Blocks(res)
 
         assets_dir = g_s.app_dir / "assets"
 
         # write the app html and assets
-        vs = ViewState(view=view, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
-        return Pipeline(vs).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state
+        vs = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
+
+        return (
+            Pipeline(vs).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML(fragment=is_fragment)).state
+        )
 
     def build_rpc_res(vs: ViewState) -> dict:
         # we need to reapply the viewstate for the specific user session
         s_s.apply_view_state(vs)
-        return dict(is_fragment=ref.f_id != "app.main", view_xml=vs.view_xml, assets=vs.store.as_dict())
+        return dict(is_fragment=is_fragment, view_xml=vs.view_xml, assets=vs.store.as_dict())
 
     ############################################################################
     # Core logic
@@ -195,52 +227,3 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
     store_cache(vs)
 
     return rpc_res
-
-
-def dp_function(name: str, cache: bool = False, state: bool = False):
-    """Main function wrapper function
-    - unpacks params / args as needed, etc.
-    # NOTE - currently unused - will be a helper instead
-    """
-
-    def decorator(f: t.Callable):
-        @wraps(f)
-        def wrapper(s_s: SessionState, *args, **kwargs) -> View:
-            print(s_s, args, kwargs)
-            # TODO
-            #  - apply into `params` object?
-            #  - pass in user_state
-            #  - pydantic signature validation
-            res = f(*args, **kwargs)
-
-            if isinstance(res, View):
-                return res
-            elif isinstance(res, list):
-                return View(blocks=res)
-            else:
-                return View(blocks=[res])
-
-        return wrapper
-
-    return decorator
-
-
-# DP System Functions
-def hello_rpc(g_s: GlobalState, s_s: SessionState, name: str) -> RPC_JSON:
-    return [f"Hello {name}"]
-
-
-def reset(g_s: GlobalState, s_s: SessionState) -> RPC_JSON:
-    from .plugins import COOKIE_NAME
-
-    log.info(f"Resetting session for {s_s.session_id=}")
-
-    # remove the user session
-    del s_s
-    # remove the cookie
-    bt.response.delete_cookie(COOKIE_NAME)
-    return None
-
-
-# global registry, all functions prefixed with dp.
-global_rpc_functions: t.Dict[str, t.Callable[..., RPC_JSON]] = {"dp.hello_rpc": hello_rpc, "dp.reset": reset}

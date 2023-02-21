@@ -5,4 +5,4 @@ app = dp.App(
     datapane.blocks.inline_text.Text("__REPORT_RENDERED__"),
 )
 
-dp.upload(app, name="no-params-test-report", overwrite=True)
+dp.upload_report(app, name="no-params-test-report", overwrite=True)

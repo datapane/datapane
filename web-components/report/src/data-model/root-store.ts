@@ -56,7 +56,7 @@ const mkBlockMap = (
         { class_: b.FoliumBlock, test: maps.jsonIsIFrameHTML },
         { class_: b.PlotapiBlock, test: maps.jsonIsPlotapi },
         { class_: b.BigNumberBlock, test: maps.jsonIsBigNumber },
-        { class_: b.FunctionBlock, test: maps.jsonIsFunction },
+        { class_: b.ComputeBlock, test: maps.jsonIsCompute },
         { class_: b.InputField, test: maps.jsonIsInputField },
         { class_: b.RangeField, test: maps.jsonIsRangeField },
         { class_: b.TagsField, test: maps.jsonIsTagsField },
@@ -169,10 +169,10 @@ export const useRootStore = defineStore("root", () => {
     };
 
     const fetchReport = async (
-        { functionId, params } = { functionId: "app.main", params: undefined },
+        { functionId, params } = { functionId: "app.main", params: {} },
     ) =>
         await axios.post(
-            "/dispatch/",
+            "/app-rpc-call/",
             {
                 jsonrpc: "2.0",
                 id: 2,
@@ -181,6 +181,9 @@ export const useRootStore = defineStore("root", () => {
             },
             { headers: { "Content-Type": "application/json" } },
         );
+
+    const resetAppSession = async () =>
+        void (await axios.post("/control/reset/"));
 
     const setReport = async (meta: AppMetaData, localAppData?: AppData) => {
         /**
@@ -227,7 +230,7 @@ export const useRootStore = defineStore("root", () => {
             elem.attributes = {};
         }
 
-        if (b.isFunctionElem(elem)) {
+        if (b.isComputeElem(elem)) {
             // Skip inner `Controls` block.
             // Can assert not-null as layout block JSON always contains `elements`
             const controlBlock = elem.elements![0];
@@ -324,5 +327,6 @@ export const useRootStore = defineStore("root", () => {
         assetMap,
         singleBlockEmbed,
         setReport,
+        resetAppSession,
     };
 });

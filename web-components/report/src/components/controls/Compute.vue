@@ -27,6 +27,9 @@ const functionRunDisabled = window.dpLocal && !window.dpAppRunner;
 const scheduleInterval = ref<ReturnType<typeof setInterval> | null>(null);
 const formId = uuid4();
 
+// Don't show the block if it has no children and isn't triggered on submit
+const isVisible = p.trigger === TriggerType.SUBMIT || p.children.length;
+
 const updateIfValid = () => {
     const node = getNode(formId);
     if (node?.context?.state.valid) {
@@ -37,6 +40,8 @@ const updateIfValid = () => {
 onMounted(() => {
     if (p.trigger === TriggerType.SCHEDULE && p.timer && !functionRunDisabled) {
         scheduleInterval.value = setInterval(updateIfValid, p.timer * 1000);
+    } else if (p.trigger === TriggerType.MOUNT) {
+        p.update();
     }
 });
 
@@ -48,7 +53,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="w-full">
+    <div class="w-full" v-if="isVisible">
         <div class="border shadow-sm bg-gray-50 rounded-md w-full max-w-3xl">
             <form-kit
                 type="form"

@@ -83,7 +83,7 @@
     <choice>
       <ref name="LayoutBlock"/>
       <ref name="DataBlock"/>
-      <ref name="Function"/>
+      <ref name="Compute"/>
       <ref name="Empty"/>
     </choice>
   </define>
@@ -93,10 +93,10 @@
       <ref name="block_name"/>
     </element>
   </define>
-  <!-- Function block handling -->
-  <define name="Function">
+  <!-- Compute block handling -->
+  <define name="Compute">
     <a:documentation/>
-    <element name="Function">
+    <element name="Compute">
       <ref name="block_label_or_name"/>
       <!-- htmx-like attributes -->
       <attribute name="function_id">
@@ -119,6 +119,9 @@
         <choice>
           <value type="string" datatypeLibrary="">submit</value>
           <value type="string" datatypeLibrary="">schedule</value>
+          <value type="string" datatypeLibrary="">visible</value>
+          <value type="string" datatypeLibrary="">load</value>
+          <value type="string" datatypeLibrary="">mount</value>
         </choice>
       </attribute>
       <attribute name="swap">

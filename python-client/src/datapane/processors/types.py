@@ -5,7 +5,7 @@ import typing as t
 from pathlib import Path
 
 from datapane.common import ViewXML
-from datapane.view import View
+from datapane.view import Blocks
 
 from .file_store import DummyFileEntry, FileEntry, FileStore
 
@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 @dc.dataclass
 class ViewState:
     # maybe a FileHandler interface??
-    view: View
+    blocks: Blocks
     file_entry_klass: dc.InitVar[t.Type[FileEntry]]
     store: FileStore = dc.field(init=False)
     view_xml: ViewXML = ""
@@ -69,6 +69,6 @@ class Pipeline(t.Generic[P_IN]):
         return self._x
 
 
-def mk_null_pipe(view: View) -> Pipeline[None]:
-    s = ViewState(view, file_entry_klass=DummyFileEntry)
+def mk_null_pipe(blocks: Blocks) -> Pipeline[None]:
+    s = ViewState(blocks, file_entry_klass=DummyFileEntry)
     return Pipeline(s)

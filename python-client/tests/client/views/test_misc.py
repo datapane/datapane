@@ -42,5 +42,5 @@ Here's the dataset used...
     group = dp.Text(file=datadir / "report.md").format(table_asset, plot=plot_asset, select=select_asset)
     assert isinstance(group, dp.Group)
     assert glom(group, ("blocks", ["_tag"])) == ["Text", "Plot", "Text", "Select", "Text", "Table"]
-    assert "file-input" in dp.View(group).get_dom_str()
+    assert "file-input" in dp.Blocks(group).get_dom_str()
     assert "file-input" in glom(group, "blocks.0.content")

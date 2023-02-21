@@ -12,7 +12,7 @@ from tests.client.views import test_views as tv
 
 
 def f(params):
-    return dp.View("Hello")
+    return dp.Blocks("Hello")
 
 
 def mk_controls() -> dp.Controls:
@@ -31,21 +31,21 @@ def mk_controls() -> dp.Controls:
 
 
 def test_dp_function():
-    view = dp.View(dp.Function(f, target="x"))
+    view = dp.Blocks(dp.Compute(f, target="x"))
     tv.assert_view(view, 0, 2)  # inc empty Controls element
     root = view.get_dom()
     _controls: t.List[ElementT] = root.xpath("//Controls/*")
     assert len(_controls) == 0
-    assert glom(view, ("blocks", ["_tag"])) == ["Function"]
+    assert glom(view, ("blocks", ["_tag"])) == ["Compute"]
 
 
 def test_dp_function_controls():
     # all controls, test to xml, block length/name/ordering, etc.
 
-    view = dp.View(dp.Function(f, target="x", controls=mk_controls()))
+    view = dp.Blocks(dp.Compute(f, target="x", controls=mk_controls()))
     tv.assert_view(view, 0, 12)
     root = view.get_dom()
-    assert glom(view, ("blocks", ["_tag"])) == ["Function"]
+    assert glom(view, ("blocks", ["_tag"])) == ["Compute"]
 
     # test the controls
     control_names = [
