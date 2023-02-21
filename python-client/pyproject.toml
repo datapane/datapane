@@ -53,9 +53,6 @@ plotly = { version = "^5.0.0", optional = true }
 bokeh = { version = "^2.3.0", optional = true }
 folium = { version = ">=0.12.0, <0.15.0", optional = true }
 plotapi = { version = "^6.0.0", optional = true }
-nbconvert = { version = "^7.0.0", optional = true }
-
-# ipython = "^7.7.0" # needed for nbconvert?
 
 # cloud support
 flit-core = { version = "^3.1.0", optional = true }
@@ -79,6 +76,7 @@ importlib_resources = ">=3.0.0,<6.0.0"
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 micawber = ">=0.5.0"
+nbconvert = ">=5.6.1"
 packaging = ">=21.0.0,<24.0.0"
 posthog = ">=1.4.0, <3.0.0"
 pydantic = "^1.6.0"
