@@ -2,7 +2,7 @@
 
 description: Installing and setting up the Datapane library and API on your device
 
-Datapane's Python library and CLI can be installed using either `conda` or `pip` on macOS, Windows, or Linux. Datapane supports Python **3.6 - 3.10**.
+Datapane's Python library and CLI can be installed using either `conda` or `pip` on macOS, Windows, or Linux. Datapane supports Python **3.8 - 3.11**.
 
 !!! info
 
@@ -15,13 +15,13 @@ If you use `conda`, you can install it with:
 === "Bash"
 
     ``` bash
-    conda install -c conda-forge "datapane>=0.15.5"
+    conda install -c conda-forge "datapane>=0.16.0"
     ```
 
 === "Jupyter"
 
     ``` bash
-    !conda install -c conda-forge "datapane>=0.15.5"
+    !conda install -c conda-forge "datapane>=0.16.0"
     ```
 
 !!! warning

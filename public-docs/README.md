@@ -25,30 +25,11 @@ _hint:_ You can also use the same tool we use for Deploys for local serving afte
 wrangler pages dev --live-reload
 ```
 
-## Embedding apps and previews
-
-1. Save your app to the same directory as the notebook:
-
-    ```python
-    app.save(path="simple-app.html")
-    ```
-
-2. Use `dpdocsutils` to:
-
-    - embed the interactive app,
-
-    ```python
-    from dpdocsutils import previews
-    previews.embed_local_app('/tutorials/basics/simple-app.html', width="100%", height=400)
-    ```
-
-3. Mark the cell with the metadata tag `remove_input` so we only see the output.
-
 ## Hiding input and/or output
 
 Use metadata to show or hide input/output cells in notebooks.
 
--   `remove_input`, e.g. for cells containing preview code from `dpdocsutils`.
+-   `remove_input`,
 -   `remove_all_output`, e.g. for the cells outputting information after calling `.save()` or `.upload()`.
 -   `remove_cell`, e.g. when you want something executed without displaying input or output.
 

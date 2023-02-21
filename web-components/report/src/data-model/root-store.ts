@@ -5,7 +5,6 @@ import { reactive, ref } from "vue";
 import * as b from "./blocks/index";
 import * as maps from "./test-maps";
 import { AppData, AppDataResult, AppMetaData, SwapType } from "./types";
-import he from "he";
 import { isParentElem } from "./blocks/index";
 import axiosRetry from "axios-retry";
 
@@ -190,7 +189,7 @@ export const useRootStore = defineStore("root", () => {
          */
         const appData = localAppData ?? (await fetchReport());
 
-        const { view_xml, assets } = parseAppData(appData, !!localAppData);
+        const { view_xml, assets } = parseAppData(appData);
 
         blockMap.push(
             ...mkBlockMap(meta.isLightProse, meta.webUrl, meta.isOrg),
@@ -208,25 +207,15 @@ export const useRootStore = defineStore("root", () => {
         );
     };
 
-    const parseAppData = (
-        appData: AppData,
-        isLocal?: boolean,
-    ): AppDataResult => {
+    const parseAppData = (appData: AppData): AppDataResult => {
         /**
-         * Return XML and assets from `appData`, decoding the XML if needed.
+         * Return XML and assets from `appData`
          */
         if (!appData.data.result) {
             // Throw JSON-RPC error if available
             const { error } = appData.data;
             throw new Error(
                 error ? `${error.message} (${error.code})` : "Unknown error",
-            );
-        }
-
-        if (isLocal) {
-            // Decode HTML entities for locally saved reports
-            appData.data.result.view_xml = he.decode(
-                appData.data.result.view_xml,
             );
         }
 

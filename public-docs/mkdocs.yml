@@ -55,6 +55,29 @@ nav:
               - Attachments: "catalogs/blocks/attachment.ipynb"
               - Embeds: "catalogs/blocks/embed.ipynb"
               - Media: "catalogs/blocks/media.ipynb"
+      - 🎛️ Controls:
+        - Controls: "catalogs/controls/index.ipynb"
+        - Inputs:
+          - TextBox: "catalogs/controls/textbox.ipynb"
+          - Switch: "catalogs/controls/switch.ipynb"
+          - Range: "catalogs/controls/range.ipynb"
+          - Choice: "catalogs/controls/choice.ipynb"
+          - MultiChoice: "catalogs/controls/multichoice.ipynb"
+          - Tags: "catalogs/controls/tags.ipynb"
+          - Date: "catalogs/controls/date.ipynb"
+          - Time: "catalogs/controls/time.ipynb"
+          - DateTime: "catalogs/controls/datetime.ipynb"
+          - File: "catalogs/controls/file.ipynb"
+        - Targets:
+          - Block ID: "catalogs/controls/target/block-id.ipynb"
+          - Self: "catalogs/controls/target/self.ipynb"
+          - Side: "catalogs/controls/target/side.ipynb"
+          - Below: "catalogs/controls/target/below.ipynb"
+        - Swapping:
+          - Below: "catalogs/controls/swap/replace.ipynb"
+          - Inner: "catalogs/controls/swap/inner.ipynb"
+          - Prepend: "catalogs/controls/swap/prepend.ipynb"
+          - Append: "catalogs/controls/swap/append.ipynb"
       - 🗃 Components:
           - Components: "catalogs/components/index.ipynb"
           - Calendar heatmap: "catalogs/components/calendar-heatmap.ipynb"
@@ -111,6 +134,20 @@ plugins:
           - remove_single_output
         remove_input_tags:
           - remove_input
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_source: false
+            show_root_full_path: false
+            show_root_members_full_path: false
+            show_bases: false
+            merge_init_into_class: yes
+            heading_level: 2
+            docstring_style: google
   - search:
       lang: en
   - redirects:

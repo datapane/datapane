@@ -10,7 +10,6 @@ python = ">=3.10,<3.11.0"
 jupyterlab = "^3.4.3"
 mkdocs-material = "^8.3.7"
 mknotebooks = "^0.7.1"
-dpdocsutils = {path = "dpdocsutils", develop = true}
 altair = "^4.0.0"
 vega-datasets = ">=0.9.0,<1.0.0"
 matplotlib = "^3.0.0"
@@ -28,6 +27,7 @@ pytrends = "^4.8.0"
 nltk = "^3.7"
 datapane = {path = "../python-client", develop = true}
 mkdocs-redirects = "^1.2.0"
+mkdocstrings = {version = "^0.20.0", extras = ["python"]}
 
 
 [tool.poetry.dev-dependencies]

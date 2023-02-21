@@ -175,6 +175,20 @@ class BaseExportHTML(BaseProcessor, ABC):
         else:
             return f"https://datapane-cdn.com/v{__version__}"
 
+    def escape_json_htmlsafe(self, obj: t.Any) -> str:
+        """Escape JSON object for embedding in bottle templates."""
+
+        # Taken from Jinja2's |tojson pipe function
+        # (https://github.com/pallets/jinja/blob/b7cb6ee6675b12a027c5e7518f832b2926dfe293/src/jinja2/utils.py#L628)
+        # Use of markupsafe is removed, as we use bottle's SimpleTemplate.
+        return (
+            json.dumps(obj)
+            .replace("<", "\\u003c")
+            .replace(">", "\\u003e")
+            .replace("&", "\\u0026")
+            .replace("'", "\\u0027")
+        )
+
     def _write_html_template(
         self,
         name: str,
@@ -196,10 +210,10 @@ class BaseExportHTML(BaseProcessor, ABC):
             assets = {}
             view_xml = ""
 
+        app_data = dict(view_xml=view_xml, assets=assets)
         html = self.template.render(
             # Escape JS multi-line strings
-            report_doc=view_xml.replace("`", "\\`"),
-            assets=assets,
+            app_data=self.escape_json_htmlsafe(app_data),
             report_width_class=report_width_classes.get(formatting.width),
             report_name=name,
             report_date=timestamp(),

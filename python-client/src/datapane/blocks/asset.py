@@ -46,9 +46,12 @@ class AssetBlock(DataBlock):
 
 class Media(AssetBlock):
     """
-    Media blocks are used to attach a file to the report that can be viewed or streamed by report viewers
+    The Media block allows you to include images, GIFs, video and audio in your apps. If the file is in a supported format, it will be displayed inline in your app.
 
-    ..note:: Supported video, audio and image formats depends on the browser used to view the report. MP3, MP4, and all common image formats are generally supported by modern browsers
+    To include an image, you can use `dp.Media` and pass the path.
+
+    !!! note
+        Supported video, audio and image formats depends on the browser used to view the report. MP3, MP4, and all common image formats are generally supported by modern browsers
     """
 
     _tag = "Media"
@@ -73,11 +76,12 @@ class Media(AssetBlock):
 
 class Attachment(AssetBlock):
     """
-    Attachment blocks are used to attach a file to the report that can be downloaded by report viewers
+    If you want to include static files like PDFs or Excel docs in your app, use the `dp.Attachment` block.
 
-    Any type of file may be attached, for instance, images (png / jpg), PDFs, JSON data, Excel files, etc.
+    You can also pass in a Python object directly. Once you upload the app, your users will be able to explore and download these attachments.
 
-    ..tip:: To attach streamable / viewable video, audio or images, use the `dp.Media` block instead
+    !!! tip
+        To attach streamable / viewable video, audio or images, use the `dp.Media` block instead
     """
 
     _tag = "Attachment"
@@ -100,7 +104,9 @@ class Attachment(AssetBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
-        ..note:: either `data` or `file` must be provided
+        !!! note
+
+            Either `data` or `file` must be provided
         """
         if file:
             file = Path(file).expanduser()
@@ -113,8 +119,12 @@ class Attachment(AssetBlock):
 
 class Plot(AssetBlock):
     """
-    Plot blocks store a Python-based plot object, including ones created by Altair, Plotly, Matplotlib, Bokeh, Folium, and PlotAPI,
-    for interactive display in your report when viewed in the browser.
+    Datapane supports all major Python visualization libraries, allowing you to add interactive plots and visualizations to your app.
+
+    The `dp.Plot` block takes a plot object from one of the supported Python visualization libraries and renders it in your app.
+
+    !!! info
+        Datapane will automatically wrap your visualization or plot in a `dp.Plot` block if you pass it into your app directly.
     """
 
     _tag = "Plot"
@@ -142,8 +152,11 @@ class Plot(AssetBlock):
 
 class Table(AssetBlock):
     """
-    Table blocks store the contents of a dataframe as a HTML `table` whose style can be customised using
+    Table blocks store the contents of a DataFrame as a HTML `table` whose style can be customised using
     pandas' `Styler` API.
+
+    !!! tip
+        `Table` is the best option for displaying multidimensional DataFrames, as `DataTable` will flatten your data.
     """
 
     # NOTE - Tables are stored as HTML fragment files rather than inline within the Report document
@@ -169,12 +182,12 @@ class Table(AssetBlock):
 
 class DataTable(AssetBlock):
     """
-    DataTable blocks store a dataframe that can be viewed, sorted, filtered by users viewing your report, similar to a spreadsheet,
-    and can be downloaded by them as a CSV or Excel file.
+    The DataTable block takes a pandas DataFrame and renders an interactive, sortable, searchable table in your app, along with advanced analysis options such as exploring data through [SandDance](https://www.microsoft.com/en-us/research/project/sanddance/).
 
-    ..tip:: For smaller dataframes where you don't require sorting and filtering, also consider using the `Table` block
-    ..note:: The DataTable component has advanced analysis features that requires a server and is not supported when saving locally, please upload such reports to a Datapane Server or use dp.Table
+    It supports large datasets and viewers can also download the table from the website as a CSV or Excel file.
 
+    !!! tip
+        [`Table`](/catalogs/blocks/table) is the best option for displaying multidimensional DataFrames, as `DataTable` will flatten your data.
     """
 
     _tag = "DataTable"

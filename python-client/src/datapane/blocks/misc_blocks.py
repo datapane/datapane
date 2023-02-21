@@ -9,7 +9,11 @@ NumberValue = t.Union[str, int, float]
 
 class BigNumber(DataBlock):
     """
-    BigNumber blocks display a numerical value with a heading, alongside optional contextual information about the previous value.
+    A single number or change can often be the most important thing in an app.
+
+    The `BigNumber`block allows you to present KPIs, changes, and statistics in a friendly way to your viewers.
+
+    You can optionally set intent, and pass in numbers or text.
     """
 
     _tag = "BigNumber"

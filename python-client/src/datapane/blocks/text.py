@@ -30,11 +30,12 @@ class EmbeddedTextBlock(DataBlock):
 
 class Text(EmbeddedTextBlock):
     """
-    Markdown objects store Markdown text that can be displayed as formatted text when viewing your report.
+    You can add short or long-form Markdown content to your app with the `Text` block.
 
-    ..note:: This object is also available as `dp.Text`, and any strings provided directly to the Report/Group object are converted automatically to Markdown blocks
+    !!! info
+        Markdown is a lightweight markup language that allows you to include formatted text in your app, and can be access through `dp.Text`, or by passing in a string directly.&#x20;
 
-    ..tip:: You can also insert a dataframe in a Markdown block as a table by using `df.to_markdown()`, or use dp.Table or dp.DataTable for dedicated dataframe tables.
+        Check [here](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for more information on how to format your text with markdown.
     """
 
     _tag = "Text"
@@ -47,7 +48,8 @@ class Text(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
-        ..note:: File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Attachment
+        !!! note
+            File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Attachment
         """
         if text:
             text = text.strip()
@@ -66,7 +68,8 @@ class Text(EmbeddedTextBlock):
             *args: positional template context arguments
             **kwargs: keyword template context arguments
 
-        ..tip:: Either Python objects, e.g. dataframes, and plots, or Datapane blocks as context
+        !!! tip
+            Either Python objects, e.g. dataframes, and plots, or Datapane blocks as context
 
         Returns:
             A datapane Group object containing the list of text and embedded objects
@@ -102,7 +105,10 @@ def Divider() -> Text:
 
 class Code(EmbeddedTextBlock):
     """
-    Code objects store source code that can be displayed as formatted text when viewing your report.
+    The code block allows you to embed syntax highlighted source code into your app.
+
+    !!! note
+        This block currently supports Python and JavaScript.
     """
 
     _tag = "Code"
@@ -123,7 +129,10 @@ class Code(EmbeddedTextBlock):
 
 class HTML(EmbeddedTextBlock):
     """
-    HTML blocks can be used to embed an arbitrary HTML fragment in a report.
+    The HTML block allows you to add raw HTML to your app,  allowing for highly customized components, such as your company's brand, logo, and more.
+
+    !!! info
+        The HTML block is sandboxed and cannot execute JavaScript.
     """
 
     _tag = "HTML"
@@ -140,7 +149,10 @@ class HTML(EmbeddedTextBlock):
 
 class Formula(EmbeddedTextBlock):
     """
-    Formula blocks can be used to embed LaTeX in a report.
+    The formula block allows you easily to add [_LaTeX_](https://en.wikipedia.org/wiki/LaTeX)-formatted equations to your app, with an optional caption.
+
+    !!! tip
+        A brief intro into _LaTeX_ formulas can be found [here](https://en.wikibooks.org/wiki/LaTeX/Mathematics).
     """
 
     _tag = "Formula"
@@ -153,15 +165,20 @@ class Formula(EmbeddedTextBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
 
-            ..note:: LaTeX commonly uses special characters, hence prefix your formulas with `r` to make them
-            raw strings, e.g. r"\frac{1}{\sqrt{x^2 + 1}}"
+        !!! note
+            LaTeX commonly uses special characters, hence prefix your formulas with `r` to make them raw strings, e.g. `r"\frac{1}{\sqrt{x^2 + 1}}"`
+
+        Under the hood we use MathJAX to render the equations in the browser and not a full TeX engine. This means that some of your TeX input may not be rendered correctly on our system - read the MathJAX documentation for more info.
         """
         super().__init__(content=formula, caption=caption, name=name, label=label)
 
 
 class Embed(EmbeddedTextBlock):
     """
-    Embed blocks allow HTML from OEmbed providers (e.g. Youtube, Twitter, Vimeo) to be embedded in a report.
+    The Embed block lets you embed content from other platforms e.g. Youtube, Spotify.
+
+    !!! tip
+        If you're trying to embed an `iframe`, you can wrap it in an [`HTML`](/catalogs/blocks/html) block.
     """
 
     _tag = "Embed"

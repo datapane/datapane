@@ -68,11 +68,15 @@ class ContainerBlock(BaseElement):
 
 class Page(ContainerBlock):
     """
-    Page objects take a list of blocks which make up the Page.
-    This is included for backwards-compatability, and can be replaced by using Selects going forwards
+    Apps on Datapane can have multiple pages, which are presented to users as tabs at the top of your app. These can be used similarly to sheets in an Excel document.
 
-    ..note:: You can pass ordinary Blocks to a page, e.g. Plots or DataTables.
-      Additionally, if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
+    To add a page, use the `dp.Page` block at the top-level of your app, and give it a title with the `title` parameter.
+
+    !!! info
+        Pages cannot be nested, and can only exist at the root level of your `dp.App` object. If you're using pages, all other blocks must be contained inside a Page block.
+
+    !!! note
+        This is included for backwards-compatability, and can be replaced by using Selects going forwards.
     """
 
     # BC-only helper - converted into a Select + Group within the post-XML processor
@@ -92,8 +96,8 @@ class Page(ContainerBlock):
             title: The page title (optional)
             name: A unique id for the Page to aid querying (optional)
 
-        ..tip:: Page can be passed using either arg parameters or the `blocks` kwarg, e.g.
-          `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
+        !!! tip
+            Page can be passed using either arg parameters or the `blocks` kwarg, e.g. `dp.Page(group, select)` or `dp.Group(blocks=[group, select])`
         """
         self.title = title
         super().__init__(*arg_blocks, blocks=blocks, label=title, name=name)
@@ -109,8 +113,8 @@ class Select(ContainerBlock):
 
     The user can choose which nested object to view dynamically using either tabs or a dropdown.
 
-    ..note:: Select expects a list of Blocks, e.g. a Plot or Table, but also including Select or Groups themselves,
-      but if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
+    !!! note
+        Select expects a list of Blocks, e.g. a Plot or Table, but also including Select or Groups themselves, but if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
 
     """
 
@@ -132,8 +136,8 @@ class Select(ContainerBlock):
             name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
 
-        ..tip:: Select can be passed using either arg parameters or the `blocks` kwarg, e.g.
-          `dp.Select(table, plot, type=dp.SelectType.TABS)` or `dp.Select(blocks=[table, plot])`
+        !!! tip
+            Select can be passed using either arg parameters or the `blocks` kwarg, e.g. `dp.Select(table, plot, type=dp.SelectType.TABS)` or `dp.Select(blocks=[table, plot])`
         """
         _type = glom(type, "value", default=None)
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=_type)
@@ -143,13 +147,12 @@ class Select(ContainerBlock):
 
 class Group(ContainerBlock):
     """
-    Groups act as a container that holds a list of nested Blocks objects, such
-    as Tables, Plots, etc.. - they may even hold Group themselves recursively.
+    If you pass a list of blocks (such as `Plot` and `Table`) to an app, they are -- by default -- laid out in a single column with a row per block.
 
-    Group are used to provide a grouping for blocks can have layout options applied to them
+    If you would like to customize the rows and columns, Datapane provides a `Group` block which takes a list of blocks and a number of columns and lays them out in a grid.
 
-    ..note:: Group expects a list of Blocks, e.g. a Plot or Table, but also including Select or Groups themselves,
-      but if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
+    !!! tip
+        As `Group` blocks are blocks themselves, they are composable, and you can create more custom layers of nested blocks, for instance nesting 2 rows in the left column of a 2 column layout
     """
 
     _tag = "Group"
@@ -170,8 +173,8 @@ class Group(ContainerBlock):
             label: A label used when displaying the block (optional)
             columns: Display the contained blocks, e.g. Plots, using _n_ columns (default = 1), setting to 0 auto-wraps the columns
 
-        ..tip:: Group can be passed using either arg parameters or the `blocks` kwarg, e.g.
-          `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`
+        !!! note
+            Group can be passed using either arg parameters or the `blocks` kwarg, e.g. `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`.
         """
 
         # columns = columns or len(self.blocks)

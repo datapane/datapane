@@ -30,7 +30,7 @@
 
   if (!window.dpAppRunner) {
       // pass app data via props if in local (static) mode, otherwise this data is fetched from the server
-      window.reportProps["appData"] = { data: { result: { view_xml: `{{report_doc}}`, assets: {{!assets}} } }};
+      window.reportProps["appData"] = { data: { result: {{!app_data}} }};
   }
 </script>
 <script type="module">
