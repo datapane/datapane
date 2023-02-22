@@ -36,7 +36,7 @@
 
   <!-- find/replace nested Views -> Group -->
   <xsl:template match="/View//View">
-    <Group columns="1">
+    <Group valign="center" columns="1">
       <xsl:apply-templates/>
     </Group>
 

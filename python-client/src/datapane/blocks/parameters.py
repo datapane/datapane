@@ -239,8 +239,8 @@ class Tags(Parameter[SList]):
         allow_empty: bool = False,
     ):
         initial = initial or []
-        if any(x == "" for x in initial):
-            raise DPClientError("Empty initial tags not supported")
+        if any(x in ("", '"') for x in initial):
+            raise DPClientError("Empty initial tags or those consisting of a single quote not supported")
         super().__init__(name, label, initial, allow_empty=allow_empty)
         self._check_instance()
 

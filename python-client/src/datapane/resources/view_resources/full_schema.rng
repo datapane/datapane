@@ -251,11 +251,11 @@
           <data type="string"/>
         </attribute>
       </optional>
-      <!-- json list of strings -->
+      <!-- json list of strings, non empty -->
       <attribute name="options">
         <data type="string">
           <param name="minLength">2</param>
-          <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+          <param name="pattern">\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]</param>
         </data>
       </attribute>
     </element>
@@ -264,18 +264,18 @@
     <element name="MultiChoice">
       <ref name="paramAttributes"/>
       <optional>
-        <!-- json list of strings -->
+        <!-- json list of strings, non empty -->
         <attribute name="initial">
           <data type="string">
             <param name="minLength">2</param>
-            <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+            <param name="pattern">\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]</param>
           </data>
         </attribute>
       </optional>
       <attribute name="options">
         <data type="string">
           <param name="minLength">2</param>
-          <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+          <param name="pattern">\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]</param>
         </data>
       </attribute>
     </element>
@@ -284,11 +284,11 @@
     <element name="Tags">
       <ref name="paramAttributes"/>
       <optional>
-        <!-- json list of strings -->
+        <!-- json list of strings, non empty -->
         <attribute name="initial">
           <data type="string">
             <param name="minLength">2</param>
-            <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+            <param name="pattern">\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]</param>
           </data>
         </attribute>
       </optional>

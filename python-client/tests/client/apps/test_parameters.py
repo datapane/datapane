@@ -154,5 +154,8 @@ def parameter_class_with_valid_args(draw, classes=st.sampled_from(PARAMETER_CLAS
 )
 @example((dp.Switch, (), {"name": "\x1f"}))
 @example((dp.Range, (), {"name": "x", "initial": 0, "min": 0, "max": -math.nan}))
+@example((dp.Choice, (), {"name": "0", "label": None, "options": ['"'], "initial": None}))
+@example((dp.MultiChoice, (), {"name": "0", "label": None, "options": ['"'], "initial": ['"']}))
+@example((dp.MultiChoice, (), {"name": "0", "label": None, "options": ['"'], "initial": []}))
 def test_fuzz_all_parameters(parameter_class_and_args):
     return _test_param_class_with_args(*parameter_class_and_args)

@@ -116,21 +116,21 @@ PSwitch = element Switch {
 PChoice = element Choice {
   paramAttributes,
   attribute initial { xsd:string }?,
-  # json list of strings
-  attribute options { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }
+  # json list of strings, non empty
+  attribute options { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }
 }
 
 PMultiChoice = element MultiChoice {
   paramAttributes,
-  # json list of strings
-  attribute initial { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }?,
-  attribute options { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }
+  # json list of strings, non empty
+  attribute initial { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }?,
+  attribute options { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }
 }
 
 PTags = element Tags {
   paramAttributes,
-  # json list of strings
-  attribute initial { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }?
+  # json list of strings, non empty
+  attribute initial { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }?
 }
 
 PDate = element Date {
