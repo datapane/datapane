@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import enum
 import typing as t
 from collections import deque
 from functools import reduce
-
-from glom import glom
 
 from datapane.client import DPClientError
 from datapane.common.dp_types import StrEnum
@@ -21,7 +18,7 @@ if t.TYPE_CHECKING:
     from .base import VV
 
 
-class SelectType(enum.Enum):
+class SelectType(StrEnum):
     DROPDOWN = "dropdown"
     TABS = "tabs"
 
@@ -131,7 +128,7 @@ class Select(ContainerBlock):
         self,
         *arg_blocks: BlockOrPrimitive,
         blocks: t.List[BlockOrPrimitive] = None,
-        type: t.Optional[SelectType] = None,
+        type: SelectType = SelectType.TABS,
         name: BlockId = None,
         label: str = None,
     ):
@@ -139,15 +136,14 @@ class Select(ContainerBlock):
         Args:
             *arg_blocks: Page to add to report
             blocks: Allows providing the report blocks as a single list
-            type: An instance of SelectType that indicates if the select should use tabs or a dropdown
+            type: An instance of SelectType that indicates if the select should use tabs or a dropdown (default: Tabs)
             name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
 
         !!! tip
             Select can be passed using either arg parameters or the `blocks` kwarg, e.g. `dp.Select(table, plot, type=dp.SelectType.TABS)` or `dp.Select(blocks=[table, plot])`
         """
-        _type = glom(type, "value", default=None)
-        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=_type)
+        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=type)
         if len(self.blocks) < 2:
             raise DPClientError("Can't create Select with less than 2 objects")
 

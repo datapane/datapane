@@ -88,10 +88,7 @@ class XMLBuilder(ViewVisitor):
         sub_elements = self._visit_subnodes(b)
 
         # Blocks are converted to Group internally
-        element = E.Group(
-            *sub_elements,
-            columns="1",
-        )
+        element = E.Group(*sub_elements, columns="1", valign="top")
         return self.add_element(b, element)
 
     @multimethod
@@ -114,8 +111,9 @@ class XMLBuilder(ViewVisitor):
             name = gen_name()
             e = E.Group(
                 E.Compute(c_e, **{**b._attributes, "target": name}),
-                E.Group(E.Empty(name=gen_name()), name=name, columns="1"),
+                E.Group(E.Empty(name=gen_name()), name=name, columns="1", valign="top"),
                 columns=cols,
+                valign="top",
             )
         else:
             # use default target
