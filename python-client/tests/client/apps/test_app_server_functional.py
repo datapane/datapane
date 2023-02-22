@@ -241,7 +241,7 @@ def test_controls():
             textbox="2",
             numberbox=2.0,
             range=3.0,
-            choice="1",
+            choice="滚滚长江东逝水",
             multichoice=["2"],
             tags=["a", "b"],
             date=_datetime.date().isoformat(),

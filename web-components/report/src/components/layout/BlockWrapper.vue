@@ -18,7 +18,7 @@ const singleBlockEmbed = false;
 <template>
     <div
         :class="[
-            'w-full relative flex flex-col justify-center items-center',
+            'w-full relative flex flex-col justify-start items-center',
             { 'h-iframe': singleBlockEmbed },
             { 'py-3 px-1': !singleBlockEmbed },
             // TODO - why does overflow-x-auto create auto-y overflow in `Function` block?

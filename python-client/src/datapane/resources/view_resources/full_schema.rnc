@@ -88,52 +88,64 @@ Param = PTextBox | PNumberBox | PRange | PSwitch | PChoice | PMultiChoice | PTag
 paramAttributes =
   attribute name { xsd:string { minLength = "1" } },
   attribute label { xsd:string { minLength = "1" } }?,
-  attribute initial { xsd:string }?,
   attribute required { xsd:boolean }
 
 PTextBox = element TextBox {
-  paramAttributes
+  paramAttributes,
+  attribute initial { xsd:string }?
 }
 
 PNumberBox = element NumberBox {
-  paramAttributes
+  paramAttributes,
+  attribute initial { xsd:double }?
 }
 
 PRange = element Range {
   paramAttributes,
+  attribute initial { xsd:double }?,
   attribute min { xsd:double },
   attribute max { xsd:double },
   attribute step { xsd:double }?
 }
 
 PSwitch = element Switch {
+  attribute initial { xsd:boolean }?,
   paramAttributes
 }
 
 PChoice = element Choice {
   paramAttributes,
-  attribute choices { xsd:string }
+  attribute initial { xsd:string }?,
+  # json list of strings
+  attribute options { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }
 }
 
 PMultiChoice = element MultiChoice {
   paramAttributes,
-  attribute choices { xsd:string }
+  # json list of strings
+  attribute initial { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }?,
+  attribute options { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }
 }
 
 PTags = element Tags {
-  paramAttributes
+  paramAttributes,
+  # json list of strings
+  attribute initial { xsd:string { minLength = "2" pattern = """\["[^"]+"(,\s*"[^"]+")*\]""" } }?
 }
 
 PDate = element Date {
-  paramAttributes
+  paramAttributes,
+  attribute initial { xsd:date  }?
 }
 
 PTime = element Time {
-  paramAttributes
+  paramAttributes,
+  attribute initial { xsd:time  }?
 }
 
 PDateTime = element DateTime {
-  paramAttributes
+  paramAttributes,
+  attribute initial { xsd:dateTime  }?
 }
 
 PFile = element File {
@@ -156,6 +168,9 @@ Group = element Group {
 
   [ a:defaultValue = "1" ]
   attribute columns { xsd:nonNegativeInteger },
+  # widths is a json list of ints
+  attribute widths { xsd:string { minLength = "2" pattern = """\[\d+(,\s*\d+)*\]""" } }?,
+  attribute valign { string "top" | string "center" | string "bottom" },
 
   Block*
 }

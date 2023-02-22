@@ -1,6 +1,9 @@
 import dataclasses as dc
+import json
 import re
 import typing as t
+from collections.abc import Sized
+from numbers import Number
 
 import importlib_resources as ir
 from lxml import etree
@@ -45,6 +48,9 @@ def validate_view_doc(
         raise
 
 
+import math
+
+
 def conv_attrib(v: t.Any) -> t.Optional[str]:
     """
     Convert a value to a str for use as an ElementBuilder attribute
@@ -53,12 +59,25 @@ def conv_attrib(v: t.Any) -> t.Optional[str]:
     # TODO - use a proper serialisation framework here / lxml features
     if v is None:
         return v
-    v1 = str(v)
-    return v1.lower() if isinstance(v, bool) else v1
+    elif isinstance(v, Sized) and len(v) == 0:
+        return None
+    elif isinstance(v, str):
+        return v
+    elif isinstance(v, Number) and type(v) != bool:
+        if math.isinf(v) and v > 0:
+            return "INF"
+        elif math.isinf(v) and v < 0:
+            return "-INF"
+        elif math.isnan(v):
+            return "NaN"
+        else:
+            return str(v)
+    else:
+        return json.dumps(v)
 
 
 def mk_attribs(**attribs: t.Any) -> SSDict:
-    """convert attributes, dropping None values"""
+    """convert attributes, dropping None and empty values"""
     return {str(k): v1 for (k, v) in attribs.items() if (v1 := conv_attrib(v)) is not None}
 
 

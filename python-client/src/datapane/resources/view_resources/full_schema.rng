@@ -188,11 +188,6 @@
         </data>
       </attribute>
     </optional>
-    <optional>
-      <attribute name="initial">
-        <data type="string"/>
-      </attribute>
-    </optional>
     <attribute name="required">
       <data type="boolean"/>
     </attribute>
@@ -200,16 +195,31 @@
   <define name="PTextBox">
     <element name="TextBox">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="string"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PNumberBox">
     <element name="NumberBox">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="double"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PRange">
     <element name="Range">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="double"/>
+        </attribute>
+      </optional>
       <attribute name="min">
         <data type="double"/>
       </attribute>
@@ -225,43 +235,93 @@
   </define>
   <define name="PSwitch">
     <element name="Switch">
+      <optional>
+        <attribute name="initial">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
       <ref name="paramAttributes"/>
     </element>
   </define>
   <define name="PChoice">
     <element name="Choice">
       <ref name="paramAttributes"/>
-      <attribute name="choices">
-        <data type="string"/>
+      <optional>
+        <attribute name="initial">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <!-- json list of strings -->
+      <attribute name="options">
+        <data type="string">
+          <param name="minLength">2</param>
+          <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+        </data>
       </attribute>
     </element>
   </define>
   <define name="PMultiChoice">
     <element name="MultiChoice">
       <ref name="paramAttributes"/>
-      <attribute name="choices">
-        <data type="string"/>
+      <optional>
+        <!-- json list of strings -->
+        <attribute name="initial">
+          <data type="string">
+            <param name="minLength">2</param>
+            <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+          </data>
+        </attribute>
+      </optional>
+      <attribute name="options">
+        <data type="string">
+          <param name="minLength">2</param>
+          <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+        </data>
       </attribute>
     </element>
   </define>
   <define name="PTags">
     <element name="Tags">
       <ref name="paramAttributes"/>
+      <optional>
+        <!-- json list of strings -->
+        <attribute name="initial">
+          <data type="string">
+            <param name="minLength">2</param>
+            <param name="pattern">\["[^"]+"(,\s*"[^"]+")*\]</param>
+          </data>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PDate">
     <element name="Date">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="date"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PTime">
     <element name="Time">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="time"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PDateTime">
     <element name="DateTime">
       <ref name="paramAttributes"/>
+      <optional>
+        <attribute name="initial">
+          <data type="dateTime"/>
+        </attribute>
+      </optional>
     </element>
   </define>
   <define name="PFile">
@@ -303,6 +363,22 @@
       <ref name="block_label_or_name"/>
       <attribute name="columns" a:defaultValue="1">
         <data type="nonNegativeInteger"/>
+      </attribute>
+      <optional>
+        <!-- widths is a json list of ints -->
+        <attribute name="widths">
+          <data type="string">
+            <param name="minLength">2</param>
+            <param name="pattern">\[\d+(,\s*\d+)*\]</param>
+          </data>
+        </attribute>
+      </optional>
+      <attribute name="valign">
+        <choice>
+          <value type="string" datatypeLibrary="">top</value>
+          <value type="string" datatypeLibrary="">center</value>
+          <value type="string" datatypeLibrary="">bottom</value>
+        </choice>
       </attribute>
       <zeroOrMore>
         <ref name="Block"/>

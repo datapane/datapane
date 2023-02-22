@@ -50,3 +50,9 @@ export enum TriggerType {
     SUBMIT = "submit",
     SCHEDULE = "schedule",
 }
+
+export enum VAlign {
+    TOP = "top",
+    CENTER = "center",
+    BOTTOM = "bottom",
+}

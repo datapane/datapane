@@ -1,7 +1,7 @@
 """
 Basic View / XML level tests for the dp.Function block
 """
-
+import datetime
 import typing as t
 
 from glom import glom
@@ -21,10 +21,10 @@ def mk_controls() -> dp.Controls:
         dp.TextBox("textbox"),
         dp.NumberBox("numberbox", initial=10),
         dp.Range("range", initial=4, min=1, max=5),
-        dp.Choice("choice", options=["1", "2"]),
+        dp.Choice("choice", options=["滚滚长江东逝水", "2"]),
         dp.MultiChoice("multichoice", options=["1", "2"]),
         dp.Tags(name="tags"),
-        dp.Date("date"),
+        dp.Date("date", initial=datetime.date.today()),
         dp.DateTime("datetime"),
         dp.Time("time"),
     )

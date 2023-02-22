@@ -1,5 +1,6 @@
 declare global {
     interface Window {
+        isIPythonEmbed: boolean;
         dpLocal: boolean;
         reportProps?: any;
         posthog: any;

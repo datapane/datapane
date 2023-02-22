@@ -98,13 +98,17 @@ export abstract class LayoutBlock<
 
 export class Group extends LayoutBlock {
     public component = markRaw(VGroup);
-    public columns: number;
     public name = "Group";
 
     public constructor(elem: any, figure: BlockFigure) {
         super(elem, figure);
-        this.columns = +elem.attributes.columns;
-        this.componentProps = { ...this.componentProps, columns: this.columns };
+        const { columns, widths, valign } = elem.attributes;
+        this.componentProps = {
+            ...this.componentProps,
+            widths: widths ? JSON.parse(widths) : undefined,
+            columns: +columns,
+            valign,
+        };
     }
 }
 

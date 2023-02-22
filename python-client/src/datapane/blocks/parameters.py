@@ -10,7 +10,6 @@ from __future__ import annotations
 import abc
 import base64
 import io
-import json
 import math
 import tempfile
 import typing as t
@@ -47,8 +46,8 @@ class Parameter(abc.ABC, t.Generic[X]):
         self.label = label
         self.initial = initial
 
-        initial = self._proc_initial(self.initial) if self.initial is not None else None
-        self.attribs: SDict = dict(name=self.name, label=self.label, required=not allow_empty, initial=initial)
+        initial_attrib = self._proc_initial(self.initial) if self.initial is not None else None
+        self.attribs: SDict = dict(name=self.name, label=self.label, required=not allow_empty, initial=initial_attrib)
 
     def _check_instance(self):
         """
@@ -175,6 +174,7 @@ class Choice(Parameter[str]):
             raise DPClientError("All options must be non-empty strings")
         super().__init__(name, label, initial)
         self.options = options
+        self.attribs.update(options=options)
         self._check_instance()
 
     def _validator(self) -> ValidatorF[str]:
@@ -183,10 +183,6 @@ class Choice(Parameter[str]):
             return x
 
         return f
-
-    def _to_xml(self) -> Element:
-        attribs = mk_attribs(**self.attribs, choices=json.dumps(self.options))
-        return E.Choice(**attribs)
 
 
 class MultiChoice(Parameter[SList]):
@@ -214,6 +210,7 @@ class MultiChoice(Parameter[SList]):
             raise DPClientError("All options must be non-empty strings")
         super().__init__(name, label, initial, allow_empty=allow_empty)
         self.options = options
+        self.attribs.update(options=options)
         self._check_instance()
 
     def _check(self, xs: SList, ys: SList):
@@ -225,13 +222,6 @@ class MultiChoice(Parameter[SList]):
             return xs
 
         return f
-
-    def _proc_initial(self, x: X) -> t.Any:
-        return json.dumps(x)
-
-    def _to_xml(self) -> Element:
-        attribs = mk_attribs(**self.attribs, choices=json.dumps(self.options))
-        return E.MultiChoice(**attribs)
 
 
 class Tags(Parameter[SList]):
@@ -248,11 +238,11 @@ class Tags(Parameter[SList]):
         initial: SList = [],
         allow_empty: bool = False,
     ):
-        super().__init__(name, label, initial or [], allow_empty=allow_empty)
+        initial = initial or []
+        if any(x == "" for x in initial):
+            raise DPClientError("Empty initial tags not supported")
+        super().__init__(name, label, initial, allow_empty=allow_empty)
         self._check_instance()
-
-    def _proc_initial(self, x: X) -> t.Any:
-        return json.dumps(x)
 
 
 class Date(Parameter[date]):
@@ -353,3 +343,6 @@ class File(Parameter[B64Path]):
             return Path(x)
 
         return f
+
+    def _proc_initial(self, x: X) -> t.Any:
+        return None

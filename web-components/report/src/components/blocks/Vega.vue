@@ -67,7 +67,7 @@ onUnmounted(() => void vegaView.value?.finalize());
 <template>
     <div
         :class="[
-            'm-auto justify-center bg-white flex',
+            'justify-center bg-white flex',
             { 'w-full': p.responsive, 'h-iframe': singleBlockEmbed },
         ]"
     >

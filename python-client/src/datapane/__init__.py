@@ -64,6 +64,7 @@ from .blocks import (
     Time,
     Toggle,
     Trigger,
+    VAlign,
     wrap_block,
 )
 from .cloud_api import App as CloudApp
@@ -114,6 +115,7 @@ __all__ = [
     "Toggle",
     "Controls",
     "Function",
+    "VAlign",
     "View",
     "upload",
     "save_report",

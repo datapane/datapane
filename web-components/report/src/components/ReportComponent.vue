@@ -4,6 +4,7 @@ import { computed, ComputedRef } from "vue";
 import { ReportProps } from "../data-model/types";
 import { storeToRefs } from "pinia";
 import { Block, View } from "../data-model/blocks";
+import { useRootStore } from "../data-model/root-store";
 
 // Vue can't use a ts interface as props
 // see https://github.com/vuejs/core/issues/4294
@@ -17,7 +18,10 @@ const p = defineProps<{
     report: View;
 }>();
 
-// Set up deserialised report object
+const rootStore = useRootStore();
+const { singleBlockEmbed } = storeToRefs(rootStore);
+
+/* Set up deserialised report object */
 
 const { children, tabNumber, hasPages } = storeToRefs(p.report.store);
 
@@ -35,11 +39,15 @@ const currentPage: ComputedRef<Block[]> = computed(() =>
 
 const handlePageChange = (newPageNumber: number) =>
     p.report!.store.setTab(newPageNumber);
+
+const { isIPythonEmbed } = window;
+const isCloudEmbed = window.location.href.includes("/embed/");
 </script>
 
 <template>
     <template v-if="p.report">
         <nav-bar
+            v-if="!isIPythonEmbed && !singleBlockEmbed"
             :reset-app="p.resetApp"
             :is-served-app="p.isServedApp"
             :labels="pageLabels"
@@ -48,8 +56,14 @@ const handlePageChange = (newPageNumber: number) =>
             @page-change="handlePageChange"
         />
         <main
-            class="w-full bg-dp-background mx-auto"
-            :class="p.reportWidthClass"
+            :class="[
+                'w-full bg-dp-background mx-auto',
+                p.reportWidthClass,
+                {
+                    'h-iframe pb-16 overflow-auto':
+                        isCloudEmbed && !singleBlockEmbed,
+                },
+            ]"
             data-cy="report-component"
         >
             <div

@@ -8,6 +8,7 @@ from functools import reduce
 from glom import glom
 
 from datapane.client import DPClientError
+from datapane.common.dp_types import StrEnum
 
 from .base import BaseElement, BlockId, BlockList, BlockOrPrimitive, wrap_block
 from .function import Empty, gen_name
@@ -23,6 +24,12 @@ if t.TYPE_CHECKING:
 class SelectType(enum.Enum):
     DROPDOWN = "dropdown"
     TABS = "tabs"
+
+
+class VAlign(StrEnum):
+    TOP = "top"
+    CENTER = "center"
+    BOTTOM = "bottom"
 
 
 class ContainerBlock(BaseElement):
@@ -163,6 +170,8 @@ class Group(ContainerBlock):
         blocks: t.List[BlockOrPrimitive] = None,
         name: BlockId = None,
         label: t.Optional[str] = None,
+        widths: t.Optional[t.List[t.Union[int, float]]] = None,
+        valign: VAlign = VAlign.TOP,
         columns: int = 1,
     ):
         """
@@ -171,15 +180,22 @@ class Group(ContainerBlock):
             blocks: Allows providing the report blocks as a single list
             name: A unique id for the blocks to aid querying (optional)
             label: A label used when displaying the block (optional)
+            widths: A list of numbers representing the proportion of vertical space given to each column (optional)
+            valign: The vertical alignment of blocks in the Group (default = VAlign.TOP)
             columns: Display the contained blocks, e.g. Plots, using _n_ columns (default = 1), setting to 0 auto-wraps the columns
 
         !!! note
             Group can be passed using either arg parameters or the `blocks` kwarg, e.g. `dp.Group(plot, table, columns=2)` or `dp.Group(blocks=[plot, table], columns=2)`.
         """
 
+        if widths is not None and len(widths) != columns:
+            raise DPClientError("Group 'widths' list length does not match number of columns")
+
         # columns = columns or len(self.blocks)
         self.columns = columns
-        super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, columns=columns)
+        super().__init__(
+            *arg_blocks, blocks=blocks, name=name, label=label, columns=columns, widths=widths, valign=valign
+        )
 
 
 class Toggle(ContainerBlock):
