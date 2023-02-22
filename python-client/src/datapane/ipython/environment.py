@@ -129,7 +129,7 @@ class IPythonZMQEnvironment(IPythonTerminalEnvironment):
         user_ns = get_ipython_user_ns()
 
         # If it's an actual path, it'll always be absolute
-        if (path := user_ns.get("__file__", None)) and path.startswith("/"):
+        if (path := user_ns.get("__session__", None)) and path.startswith("/"):
             return Path(path)
 
         return super()._get_notebook_path()
