@@ -95,7 +95,7 @@ typing-extensions = "^4.4.0"
 pyngrok = "^5.2.1"
 
 [tool.poetry.extras]
-plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi", "nbconvert"]
+plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi"]
 cloud = ["flit-core"]
 
 [tool.poetry.group.dev.dependencies]
