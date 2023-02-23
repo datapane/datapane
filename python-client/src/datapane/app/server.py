@@ -7,7 +7,6 @@ Basic app server implementation, using,
 from __future__ import annotations
 
 import atexit
-import inspect
 import os
 import sys
 import tempfile
@@ -30,7 +29,7 @@ from datapane.common.dp_types import SECS_1_HOUR, SIZE_1_MB
 from datapane.common.utils import guess_type
 from datapane.ipython.environment import get_environment
 from datapane.processors.processors import ExportBaseHTMLOnly
-from datapane.view import Blocks
+from datapane.view import Blocks, BlocksT
 
 try:
     import ipywidgets
@@ -103,21 +102,15 @@ def serve_file(global_state: GlobalState, filename: str):
 
 
 # See tests/client/test_server.py for important info on testing this code.
-def _build_app(
-    entry: t.Union[Blocks, t.Callable[[], Blocks]], *, debug: bool = False, embed_mode: bool = False
-) -> bt.Bottle:
+def _build_app(entry: Blocks, *, debug: bool = False, embed_mode: bool = False) -> bt.Bottle:
     # setup GlobalState
     app_dir = Path(tempfile.mkdtemp(prefix="dp-"))
     assets_dir = app_dir / "assets"
     assets_dir.mkdir(parents=True)
 
     # hardcode the main app entry
-    if inspect.isfunction(entry):
-        entry_f = lambda params: entry()  # noqa: E731
-        cache = False
-    else:
-        entry_f = lambda params: entry  # noqa: E731
-        cache = True
+    entry_f = lambda params: entry  # noqa: E731
+    cache = True
     main_entry = FunctionRef(f=entry_f, controls=Controls.empty(), f_id="app.main", cache=cache)
     g_s = GlobalState(app_dir, main_entry)
 
@@ -138,7 +131,7 @@ def _build_app(
 
 
 def serve_app(
-    entry: t.Union[Blocks, t.Callable[[], Blocks]],
+    entry: BlocksT,
     *,
     port: t.Optional[int] = None,
     host: t.Optional[str] = None,
@@ -153,7 +146,11 @@ def serve_app(
     Pass `port` to run on a specific port, otherwise one will be chosen automatically.
 
     """
-    app = _build_app(entry, debug=debug, embed_mode=embed_mode)
+    wrapped_entry = Blocks.wrap_blocks(entry)
+    if not wrapped_entry.has_compute:
+        log.warning("Running serve_app on a static report - do you want to use save_report or upload_report instead?")
+
+    app = _build_app(wrapped_entry, debug=debug, embed_mode=embed_mode)
     capture("App Server Started")
 
     if port is None:

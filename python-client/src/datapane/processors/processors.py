@@ -127,9 +127,9 @@ class PreUploadProcessor(BaseProcessor):
         """
 
         # check no functions exist in the uploaded app
-        if any(isinstance(block, b.Compute) for block in self.s.blocks):
+        if self.s.blocks.has_compute:
             raise InvalidReportError(
-                "Functions can't currently be uploaded, please use dp.serve to serve your app locally"
+                "Reports with compute blocks can't currently be uploaded, please use dp.serve_app to serve as an app locally"
             )
 
         # NOTE - this currently relies on all assets existing linearly in document order

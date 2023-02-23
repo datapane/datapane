@@ -16,7 +16,7 @@ from datapane.client import config as c
 from datapane.client.utils import display_msg, open_in_browser
 from datapane.cloud_api.app import AppFormatting, Report
 from datapane.common import NPath, dict_drop_empty
-from datapane.view import Blocks
+from datapane.view import Blocks, BlocksT
 
 from .file_store import B64FileEntry, GzipTmpFileEntry
 from .processors import (
@@ -39,7 +39,7 @@ __all__ = ["upload_report", "save_report", "build_report", "stringify_report"]
 ################################################################################
 # exported public API
 def build_report(
-    blocks: Blocks,
+    blocks: BlocksT,
     name: str = "app",
     dest: t.Optional[NPath] = None,
     formatting: t.Optional[AppFormatting] = None,
@@ -50,7 +50,7 @@ def build_report(
     TODO(product) - unknown if we should keep this...
 
     Args:
-        blocks: The `Blocks` object
+        blocks: The `Blocks` object or a list of Blocks
         name: The name of the app directory to be created
         dest: File path to store the app directory
         formatting: Sets the basic app styling
@@ -70,7 +70,7 @@ def build_report(
     assets_dir.mkdir(parents=True)
 
     # write the app html and assets
-    s = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
+    s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
     _: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -81,7 +81,7 @@ def build_report(
 
 
 def save_report(
-    blocks: Blocks,
+    blocks: BlocksT,
     path: str,
     open: bool = False,
     name: str = "Report",
@@ -89,14 +89,14 @@ def save_report(
 ) -> None:
     """Save the app document to a local HTML file
     Args:
-        blocks: The `Blocks` object
+        blocks: The `Blocks` object or a list of Blocks
         path: File path to store the document
         open: Open in your browser after creating (default: False)
         name: Name of the document (optional: uses path if not provided)
         formatting: Sets the basic app styling
     """
 
-    s = ViewState(blocks=blocks, file_entry_klass=B64FileEntry)
+    s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=B64FileEntry)
     _: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -107,19 +107,19 @@ def save_report(
 
 
 def stringify_report(
-    blocks: Blocks,
+    blocks: BlocksT,
     name: t.Optional[str] = None,
     formatting: t.Optional[AppFormatting] = None,
 ) -> str:
     """Stringify the app document to a HTML string
 
     Args:
-        blocks: The `Blocks` object
+        blocks: The `Blocks` object or a list of Blocks
         name: Name of the document (optional: uses path if not provided)
         formatting: Sets the basic app styling
     """
 
-    s = ViewState(blocks=blocks, file_entry_klass=B64FileEntry)
+    s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=B64FileEntry)
     report_html: str = (
         Pipeline(s)
         .pipe(PreProcessView())
@@ -132,7 +132,7 @@ def stringify_report(
 
 
 def upload_report(
-    blocks: Blocks,
+    blocks: BlocksT,
     name: str,
     description: str = "",
     source_url: str = "",
@@ -147,7 +147,7 @@ def upload_report(
     """
     Upload as a report, including its attached assets, to the logged-in Datapane Server.
     Args:
-        blocks: The current `Blocks` object
+        blocks: The `Blocks` object or a list of Blocks
         name: The document name - can include spaces, caps, symbols, etc., e.g. "Profit & Loss 2020"
         description: A high-level description for the document, this is displayed in searches and thumbnails
         source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
@@ -182,7 +182,7 @@ def upload_report(
     # current protocol is to strip all empty args and patch (via a post)
     kwargs = dict_drop_empty(kwargs)
 
-    s = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry)
+    s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=GzipTmpFileEntry)
     (view_xml, file_list) = Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).pipe(PreUploadProcessor()).result
 
     # attach the view and upload as an App

@@ -9,7 +9,6 @@ import shutil
 import sys
 import typing as t
 import uuid
-from copy import copy
 from pathlib import Path
 
 from boltons.cacheutils import LRU
@@ -190,14 +189,7 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
     def build_view(res) -> ViewState:
         # Build a view for serving, using the view_ast as a base state and storing assets in dest
         # TODO - use ref.swap to validate return type
-        blocks: Blocks
-        if isinstance(res, Blocks):
-            blocks = copy(res)
-        elif isinstance(res, list):
-            blocks = Blocks(*res)
-        else:
-            blocks = Blocks(res)
-
+        blocks = Blocks.wrap_blocks(res)
         assets_dir = g_s.app_dir / "assets"
 
         # write the app html and assets

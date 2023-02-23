@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import typing as t
 import warnings
+from copy import copy
 
 from lxml import etree
 from lxml.etree import _Element as ElementT
 
-from datapane.blocks import Group
+from datapane.blocks import Compute, Group
 from datapane.blocks.base import BlockOrPrimitive
 from datapane.blocks.layout import ContainerBlock
 
@@ -71,6 +72,24 @@ class Blocks(ContainerBlock):
         from .visitors import PrettyPrinter
 
         self.accept(PrettyPrinter())
+
+    @classmethod
+    def wrap_blocks(cls, x: t.Union[Self, t.List[BlockOrPrimitive], BlockOrPrimitive]) -> Self:
+        blocks: Self
+        if isinstance(x, Blocks):
+            blocks = copy(x)
+        elif isinstance(x, list):
+            blocks = cls(*x)
+        else:
+            blocks = cls(x)
+        return blocks
+
+    @property
+    def has_compute(self):
+        return any(isinstance(block, Compute) for block in self.blocks)
+
+
+BlocksT = t.Union[Blocks, t.List[BlockOrPrimitive], t.Mapping[str, BlockOrPrimitive]]
 
 
 class App(Blocks):
