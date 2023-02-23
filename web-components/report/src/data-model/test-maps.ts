@@ -26,7 +26,7 @@ export const jsonIsEmpty = (json: any): boolean => json.name === "Empty";
 
 /* Control fields */
 
-export const jsonIsInputField = (json: any): boolean => json.name === "TextBox";
+export const jsonIsTextBox = (json: any): boolean => json.name === "TextBox";
 
 export const jsonIsRangeField = (json: any): boolean => json.name === "Range";
 

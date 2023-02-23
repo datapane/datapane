@@ -1,7 +1,7 @@
 import { Block, BlockFigure, Elem } from "./leaf-blocks";
 import { markRaw } from "vue";
 import VRangeField from "../../components/controls/RangeField.vue";
-import VInputField from "../../components/controls/InputField.vue";
+import VTextBox from "../../components/controls/TextBox.vue";
 import VTagsField from "../../components/controls/TagsField.vue";
 import VSwitchField from "../../components/controls/SwitchField.vue";
 import VMultiChoiceField from "../../components/controls/MultiChoiceField.vue";
@@ -49,8 +49,8 @@ export class RangeField extends ControlsField {
     }
 }
 
-export class InputField extends ControlsField {
-    public component = markRaw(VInputField);
+export class TextBox extends ControlsField {
+    public component = markRaw(VTextBox);
 
     public constructor(elem: Elem, figure: BlockFigure) {
         super(elem, figure);

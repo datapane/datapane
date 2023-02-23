@@ -38,7 +38,7 @@ Primary.args = {
             },
             {},
         ),
-        new b.InputField(
+        new b.TextBox(
             {
                 attributes: { name: "Input field" },
                 type: "element",
