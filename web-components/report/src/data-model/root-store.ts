@@ -18,8 +18,8 @@ export type EmptyObject = Record<string, never>;
 
 const mkBlockMap = (
     isLightProse: boolean,
-    webUrl: string,
     isOrg: boolean,
+    webUrl?: string,
 ): BlockTest[] => {
     /**
      * class_: The deserialized class that maps to a JSON `elem`
@@ -196,7 +196,7 @@ export const useRootStore = defineStore("root", () => {
         const { view_xml, assets } = parseAppData(appData);
 
         blockMap.push(
-            ...mkBlockMap(meta.isLightProse, meta.webUrl, meta.isOrg),
+            ...mkBlockMap(meta.isLightProse, meta.isOrg, meta.webUrl),
         );
 
         Object.assign(assetMap, assets);

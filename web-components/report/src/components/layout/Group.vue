@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useRootStore } from "../../data-model/root-store";
-import { computed } from "vue";
+import { computed, ComputedRef } from "vue";
 import { VAlign } from "../../data-model/types";
 
 const p = defineProps<{
@@ -15,7 +15,7 @@ const rootStore = useRootStore();
 const { singleBlockEmbed } = storeToRefs(rootStore);
 const { children } = storeToRefs(p.store);
 
-const alignItems = computed(() => {
+const alignItems: ComputedRef<string> = computed(() => {
     switch (p.valign) {
         case VAlign.TOP:
             return "start";
@@ -28,9 +28,9 @@ const alignItems = computed(() => {
     }
 });
 
-const gridTemplateColumns = computed(() => {
+const gridTemplateColumns: ComputedRef<string | undefined> = computed(() => {
     if (p.columns === 0) {
-        return {};
+        return;
     }
 
     return p.widths

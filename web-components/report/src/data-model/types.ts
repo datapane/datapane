@@ -36,7 +36,7 @@ export type AppMetaData = {
     isLightProse: ReportProps["isLightProse"];
     isOrg: ReportProps["isOrg"];
     mode: ReportProps["mode"];
-    webUrl: string;
+    webUrl?: string;
 };
 
 export enum SwapType {

@@ -2,6 +2,7 @@
 import { ReportProps } from "../../data-model/types";
 import { AdjustmentsHorizontalIcon } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/20/solid";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const p = defineProps<{
     labels: string[];
@@ -11,7 +12,6 @@ const p = defineProps<{
     resetApp: () => void;
 }>();
 const emit = defineEmits(["page-change"]);
-import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const showDropdown = ref(false);
 const showPagesDropdown = ref(false);
