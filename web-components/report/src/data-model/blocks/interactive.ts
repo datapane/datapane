@@ -52,11 +52,6 @@ export class RangeField extends ControlsField {
 
 export class TextBox extends ControlsField {
     public component = markRaw(VTextBox);
-
-    public constructor(elem: Elem, figure: BlockFigure) {
-        super(elem, figure);
-        this.componentProps = { ...this.componentProps, type: "text" };
-    }
 }
 
 export class NumberBox extends ControlsField {
@@ -68,7 +63,6 @@ export class NumberBox extends ControlsField {
         this.componentProps = {
             ...this.componentProps,
             initial: +initial,
-            type: "number",
         };
     }
 }

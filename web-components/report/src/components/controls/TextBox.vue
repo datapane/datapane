@@ -5,7 +5,6 @@ const emit = defineEmits(["change"]);
 
 const p = defineProps<{
     name: string;
-    type: "text" | "number";
     label?: string;
     initial?: string;
     required?: boolean;
