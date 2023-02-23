@@ -58,6 +58,7 @@ const mkBlockMap = (
         { class_: b.BigNumberBlock, test: maps.jsonIsBigNumber },
         { class_: b.ComputeBlock, test: maps.jsonIsCompute },
         { class_: b.TextBox, test: maps.jsonIsTextBox },
+        { class_: b.NumberBox, test: maps.jsonIsNumberBox },
         { class_: b.RangeField, test: maps.jsonIsRangeField },
         { class_: b.TagsField, test: maps.jsonIsTagsField },
         { class_: b.SwitchField, test: maps.jsonIsSwitchField },

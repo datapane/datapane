@@ -2,6 +2,7 @@ import { Block, BlockFigure, Elem } from "./leaf-blocks";
 import { markRaw } from "vue";
 import VRangeField from "../../components/controls/RangeField.vue";
 import VTextBox from "../../components/controls/TextBox.vue";
+import VNumberBox from "../../components/controls/NumberBox.vue";
 import VTagsField from "../../components/controls/TagsField.vue";
 import VSwitchField from "../../components/controls/SwitchField.vue";
 import VMultiChoiceField from "../../components/controls/MultiChoiceField.vue";
@@ -54,7 +55,21 @@ export class TextBox extends ControlsField {
 
     public constructor(elem: Elem, figure: BlockFigure) {
         super(elem, figure);
-        this.componentProps = { ...this.componentProps };
+        this.componentProps = { ...this.componentProps, type: "text" };
+    }
+}
+
+export class NumberBox extends ControlsField {
+    public component = markRaw(VNumberBox);
+
+    public constructor(elem: Elem, figure: BlockFigure) {
+        super(elem, figure);
+        const { initial } = elem.attributes;
+        this.componentProps = {
+            ...this.componentProps,
+            initial: +initial,
+            type: "number",
+        };
     }
 }
 

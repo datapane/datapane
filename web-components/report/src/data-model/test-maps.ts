@@ -28,6 +28,9 @@ export const jsonIsEmpty = (json: any): boolean => json.name === "Empty";
 
 export const jsonIsTextBox = (json: any): boolean => json.name === "TextBox";
 
+export const jsonIsNumberBox = (json: any): boolean =>
+    json.name === "NumberBox";
+
 export const jsonIsRangeField = (json: any): boolean => json.name === "Range";
 
 export const jsonIsSwitchField = (json: any): boolean => json.name === "Switch";
