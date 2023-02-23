@@ -109,11 +109,41 @@ PARAMETER_CLASSES = [
 ]
 
 
+class ParameterClasses:
+    all = PARAMETER_CLASSES
+    has_init = [dp.NumberBox, dp.Range, dp.Choice, dp.MultiChoice]
+    zero_init = list(set(all) - set(has_init))
+    with_init_kwargs = [(c, {}) for c in zero_init] + [
+        (dp.NumberBox, dict(initial=0)),
+        (dp.Range, dict(initial=0, min=0, max=1)),
+        (dp.Choice, dict(options=["a"])),
+        (dp.MultiChoice, dict(options=["b"])),
+    ]
+
+
+def test_ParameterClasses_complete():
+    assert ParameterClasses.all == PARAMETER_CLASSES
+    assert set(ParameterClasses.all) == set(ParameterClasses.has_init + ParameterClasses.zero_init)
+    assert set(ParameterClasses.all) == {cls for cls, _ in ParameterClasses.with_init_kwargs}
+
+
 def test_PARAMETER_CLASSES_complete():
     parameter_subclasses = all_subclasses(Parameter)
     for cls in parameter_subclasses:
         if hasattr(dp, cls.__name__):  # exported publicly
             assert cls in PARAMETER_CLASSES, f"{cls} should be in PARAMETER_CLASSES to ensure fuzz tests run against it"
+
+
+@pytest.mark.parametrize(
+    ("cls", "init_kwargs"),
+    ParameterClasses.with_init_kwargs,
+)
+def test_parameter_class_can_be_nameless(cls, init_kwargs):
+    assert "name" not in init_kwargs
+
+    parameter = cls(**init_kwargs)
+
+    assert parameter.name is None
 
 
 @st.composite
@@ -135,6 +165,11 @@ def parameter_class_with_valid_args(draw, classes=st.sampled_from(PARAMETER_CLAS
             kwarg_strategies[kw] = st.from_type(t)
         else:
             kwarg_strategies[kw] = st.deferred(lambda t=t: st.from_type(t))
+
+    # Nameless Parameters only have meaning when dealing with dp.Controls,
+    # so skip them for the purposes of fuzz testing.
+    if "name" in kwarg_strategies:
+        kwarg_strategies["name"] = st.text()
 
     args = tuple(draw(s) for s in arg_strategies)
     kwargs = {kw: draw(s) for kw, s in kwarg_strategies.items()}

@@ -36,9 +36,18 @@ class Parameter(abc.ABC, t.Generic[X]):
     _T: type[X]
     _tag: str
     cacheable: bool = True
+    name: t.Optional[str]
+    attribs: SDict
 
-    def __init__(self, name: str, label: t.Optional[str], initial: t.Optional[X], *, allow_empty: bool = False):
-        if not name:
+    def __init__(
+        self,
+        name: t.Optional[str] = None,
+        label: t.Optional[str] = None,
+        initial: t.Optional[X] = None,
+        *,
+        allow_empty: bool = False,
+    ):
+        if name == "":
             raise DPClientError(f"A non empty name must be provided, got '{name}'")
         if label == "":
             raise DPClientError("label must be a non-empty string or None")
@@ -47,7 +56,7 @@ class Parameter(abc.ABC, t.Generic[X]):
         self.initial = initial
 
         initial_attrib = self._proc_initial(self.initial) if self.initial is not None else None
-        self.attribs: SDict = dict(name=self.name, label=self.label, required=not allow_empty, initial=initial_attrib)
+        self.attribs = dict(name=self.name, label=self.label, required=not allow_empty, initial=initial_attrib)
 
     def _check_instance(self):
         """
@@ -55,7 +64,10 @@ class Parameter(abc.ABC, t.Generic[X]):
         """
         # This method throws a fairly clear error if user passes bad strings,
         # which we want to catch as soon as possible.
-        self._to_xml()
+
+        # `self.name` can be set by our parent (`dp.Controls`) for rendering.
+        # This makes `self.name is None` valid for the class instance, just not for the XML.
+        self._to_xml(name=self.name or "DEFERRED")
 
     def _proc_initial(self, x: X) -> t.Any:
         return x
@@ -67,12 +79,12 @@ class Parameter(abc.ABC, t.Generic[X]):
         # return identity
         return lambda x: x
 
-    def _to_xml(self) -> Element:
-        return getattr(E, self._tag)(**self._attribs)
+    def _to_xml(self, *, name: t.Optional[str] = None) -> Element:
+        return getattr(E, self._tag)(self.make_attribs(name=name))
 
-    @property
-    def _attribs(self) -> SDict:
-        return mk_attribs(**self.attribs)
+    def make_attribs(self, *, name: t.Optional[str] = None) -> SDict:
+        overlay = dict(name=name) if name is not None else {}
+        return mk_attribs(**{**self.attribs, **overlay})
 
 
 class Switch(Parameter[bool]):
@@ -81,7 +93,7 @@ class Switch(Parameter[bool]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: bool = False,
@@ -96,7 +108,7 @@ class TextBox(Parameter[str]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: str = "",
@@ -112,7 +124,7 @@ class NumberBox(Parameter[float]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: float,
@@ -127,7 +139,7 @@ class Range(Parameter):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: Numeric,
@@ -138,17 +150,13 @@ class Range(Parameter):
         super().__init__(name, label, self._T(initial))
         if any(isinstance(v, float) and (math.isinf(v) or math.isnan(v)) for v in (min, max, step)):
             raise DPClientError("min/max/step must not be `inf` or `nan`")
-        self.min = self._T(min)
-        self.max = self._T(max)
-        self.step = None if step is None else self._T(step)
+        self.min = self.attribs["min"] = self._T(min)
+        self.max = self.attribs["max"] = self._T(max)
+        self.step = self.attribs["step"] = None if step is None else self._T(step)
         self._check_instance()
 
     def _as_field(self) -> Field:
         return (pyd.confloat(ge=self.min, le=self.max), self.initial)
-
-    def _to_xml(self) -> Element:
-        attribs = mk_attribs(**self.attribs, min=self.min, max=self.max, step=self.step)
-        return E.Range(**attribs)
 
 
 class Choice(Parameter[str]):
@@ -159,7 +167,7 @@ class Choice(Parameter[str]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         options: SList,
@@ -193,7 +201,7 @@ class MultiChoice(Parameter[SList]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: SList = [],
@@ -232,7 +240,7 @@ class Tags(Parameter[SList]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: SList = [],
@@ -251,7 +259,7 @@ class Date(Parameter[date]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: t.Optional[date] = None,
@@ -269,7 +277,7 @@ class Time(Parameter[time]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: t.Optional[time] = None,
@@ -287,7 +295,7 @@ class DateTime(Parameter[datetime]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
         initial: t.Optional[datetime] = None,
@@ -327,7 +335,7 @@ class File(Parameter[B64Path]):
 
     def __init__(
         self,
-        name: str,
+        name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         initial: t.Optional[B64Path] = None,
         allow_empty: bool = False,

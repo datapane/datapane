@@ -49,9 +49,12 @@ class DummyModelConfig(BaseConfig):
 
 
 class Controls:
-    def __init__(self, *params: Parameter, label: t.Optional[str] = None):
+    label: t.Optional[str]
+    params: t.List[Parameter]
+
+    def __init__(self, *params: Parameter, label: t.Optional[str] = None, **kwarg_params: Parameter):
         self.label = label
-        self.params = list(params)
+        self.params = self._make_params(*params, **kwarg_params)
         self._check()
 
     @classmethod
@@ -62,6 +65,19 @@ class Controls:
         self.params.extend(other.params)
         self._check()
         return self
+
+    def _make_params(self, *args: Parameter, **kwargs: Parameter) -> t.List[Parameter]:
+        if args and kwargs:
+            raise ValueError("Cannot have Parameters passed as both args and kwargs")
+        if args:
+            if any(not p.name for p in args):
+                raise ValueError("Unnamed parameters cannot be passed as args")
+            return list(args)
+        params = []
+        for name, param in kwargs.items():
+            param.name = param.attribs["name"] = name
+            params.append(param)
+        return params
 
     def _check(self) -> None:
         # ensure all names are unique
@@ -113,7 +129,7 @@ class TargetMode(StrEnum):
 
 
 TargetT = t.Union[BlockId, TargetMode, BaseBlock]
-ControlsT = t.Union[Controls, t.Iterable[Parameter], None]
+ControlsT = t.Union[Controls, t.Iterable[Parameter], t.Mapping[str, Parameter], None]
 FunctionT = t.Callable[..., "Blocks"]
 
 
@@ -140,6 +156,8 @@ class Compute(BaseBlock):
             self.controls = Controls.empty()
         elif isinstance(controls, Controls):
             self.controls = controls
+        elif isinstance(controls, t.Mapping):
+            self.controls = Controls(**controls)
         else:  # iterable
             self.controls = Controls(*controls)
 

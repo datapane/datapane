@@ -17,7 +17,7 @@ from datapane.builtins import gen_df, gen_plot
 from datapane.common.dp_types import URL, SDict
 from datapane.common.viewxml_utils import ElementT
 
-from .test_function_views import mk_controls
+from .test_function_views import mk_controls  # noqa: Importing a fixture
 
 
 @dc.dataclass
@@ -246,16 +246,18 @@ def mk_str_dict(d: SDict) -> str:
     return json.dumps({k: str(v) for k, v in d.items()})
 
 
-def test_controls():
+def test_controls(mk_controls):  # noqa: F811
     """Test that control inputs can be passed into a function in a view and used sucessfully"""
-    controls = mk_controls()
+    controls: dp.Controls
 
     def f(params: t.Dict, switch: bool, textbox: str):
         assert ["switch", "textbox"] + list(params.keys()) == [p.name for p in controls.params]
         params1 = {**dict(switch=switch, textbox=textbox), **params}
         return dp.Blocks(mk_str_dict(params1))
 
-    view = dp.Blocks(dp.Compute(f, controls=controls, target="x"))
+    compute = dp.Compute(f, controls=mk_controls(), target="x")
+    controls = compute.controls
+    view = dp.Blocks(compute)
 
     with mk_app(view) as (app, dp_plugin):
         main_res = bootup_app(app, dp_plugin)
