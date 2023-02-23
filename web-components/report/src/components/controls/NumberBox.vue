@@ -10,10 +10,8 @@ const p = defineProps<{
     required?: boolean;
 }>();
 
-const onChange = (event: any) => {
-    const { value } = event.target;
-    emit("change", { name: p.name, value: +value });
-};
+const onChange = (value: number) =>
+    void emit("change", { name: p.name, value });
 
 const validation: ComputedRef = computed(() =>
     p.required ? [["+required"]] : [],
@@ -29,7 +27,7 @@ const validation: ComputedRef = computed(() =>
         :validation="validation"
         step="any"
         validation-visibility="live"
-        @keyup="onChange"
+        @input="onChange"
         data-cy="number-field"
         outer-class="flex-1"
     />
