@@ -76,10 +76,10 @@ export class MultiChoiceField extends ControlsField {
 
     public constructor(elem: Elem, figure: BlockFigure) {
         super(elem, figure);
-        const { initial, choices } = elem.attributes;
+        const { initial, options } = elem.attributes;
         this.componentProps = {
             ...this.componentProps,
-            choices: JSON.parse(choices),
+            options: JSON.parse(options),
             initial: initial ? parseJsonProp(initial) : [],
         };
     }
@@ -114,17 +114,17 @@ export class TemporalField extends ControlsField {
 
 export class SelectField extends ControlsField {
     public component = markRaw(VSelectField);
-    public choices: string[];
+    public options: string[];
 
     public constructor(elem: Elem, figure: BlockFigure) {
         super(elem, figure);
-        const { initial, choices } = elem.attributes;
-        this.choices = parseJsonProp(choices) as string[];
+        const { initial, options } = elem.attributes;
+        this.options = parseJsonProp(options) as string[];
 
         this.componentProps = {
             ...this.componentProps,
-            choices: this.choices,
-            initial: initial || this.choices[0],
+            options: this.options,
+            initial: initial || this.options[0],
         };
     }
 }

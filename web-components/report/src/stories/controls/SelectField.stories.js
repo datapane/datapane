@@ -10,6 +10,6 @@ export const Primary = makeTemplate(SelectField);
 
 Primary.args = {
     name: "Select field",
-    choices: ["foo", "bar", "boo", "far"],
+    options: ["foo", "bar", "boo", "far"],
     initial: "foo",
 };

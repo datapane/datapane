@@ -5,7 +5,7 @@ const emit = defineEmits(["change"]);
 
 const p = defineProps<{
     initial: string[];
-    choices: string[];
+    options: string[];
     label?: string;
     required?: boolean;
     name: string;
@@ -46,7 +46,7 @@ const setListeners = (node: any) => {
             :validation="validation"
             validation-visibility="live"
             :tags="p.initial"
-            :choices="choices"
+            :options="options"
             ref="el"
             @node="setListeners"
         />

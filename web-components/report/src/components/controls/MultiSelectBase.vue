@@ -5,7 +5,7 @@ import MultiSelect from "vue-multiselect";
 const p = defineProps<{ context: any }>();
 
 const value = ref(p.context.tags.map((name: string) => ({ name })));
-const options = ref(p.context.choices.map((name: string) => ({ name })));
+const options = ref(p.context.options.map((name: string) => ({ name })));
 
 // Formkit validation only works on uncontrolled inputs using `p.context._value`, and vue-multiselect
 // for Vue 3 seems to only support controlled input via `v-model`. So create a hidden input field

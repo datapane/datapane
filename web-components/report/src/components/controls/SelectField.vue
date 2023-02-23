@@ -3,7 +3,7 @@ const emit = defineEmits(["change"]);
 
 const p = defineProps<{
     name: string;
-    choices: string[];
+    options: string[];
     initial?: string;
     label?: string;
     required?: boolean;
@@ -20,7 +20,7 @@ const onChange = (value: string) => {
             type="select"
             :label="label || name"
             :name="name"
-            :options="choices"
+            :options="options"
             :value="initial"
             @input="onChange"
         />

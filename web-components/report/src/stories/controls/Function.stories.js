@@ -50,7 +50,7 @@ Primary.args = {
             {
                 attributes: {
                     name: "Multi select field",
-                    choices: JSON.stringify(["foo", "bar", "boo", "far"]),
+                    options: JSON.stringify(["foo", "bar", "boo", "far"]),
                     initial: JSON.stringify(["foo"]),
                 },
                 type: "element",
@@ -76,7 +76,7 @@ Primary.args = {
             {
                 attributes: {
                     name: "Select field",
-                    choices: JSON.stringify(["foo", "bar", "boo", "far"]),
+                    options: JSON.stringify(["foo", "bar", "boo", "far"]),
                     initial: "foo",
                 },
                 type: "element",
@@ -96,7 +96,7 @@ Primary.args = {
             {
                 attributes: {
                     name: "Tags field",
-                    choices: JSON.stringify(["foo", "bar", "boo", "far"]),
+                    options: JSON.stringify(["foo", "bar", "boo", "far"]),
                     initial: JSON.stringify(["foo"]),
                 },
                 type: "element",

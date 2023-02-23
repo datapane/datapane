@@ -11,6 +11,6 @@ export const Primary = makeTemplate(MultiChoiceField);
 Primary.args = {
     name: "Multi select field",
     label: "Multi select field",
-    choices: ["foo", "bar", "boo", "far"],
+    options: ["foo", "bar", "boo", "far"],
     initial: ["foo"],
 };

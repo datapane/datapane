@@ -36,7 +36,7 @@ const buttonClassification = {
 export const formkitConfig = {
     inputs: {
         multiSelectField: createInput(MultiSelectBase, {
-            props: ["tags", "choices", "multiSelectProps"],
+            props: ["tags", "options", "multiSelectProps"],
         }),
     },
     config: {

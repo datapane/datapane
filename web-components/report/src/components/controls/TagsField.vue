@@ -41,7 +41,7 @@ const setListeners = (node: any) => {
             :multiSelectProps="multiSelectProps"
             validation-visibility="live"
             :tags="p.initial"
-            :choices="p.initial"
+            :options="p.initial"
             ref="el"
             @node="setListeners"
         />
