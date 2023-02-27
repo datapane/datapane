@@ -75,7 +75,7 @@ from .cloud_api import FontChoice
 from .cloud_api import Report as CloudApp
 from .cloud_api import TextAlignment, hello_world, login, logout, ping, signup
 from .processors import build_report, save_report, stringify_report, upload_report
-from .view import App, Blocks
+from .view import App, Blocks, View
 
 # Other useful re-exports
 from . import builtins  # isort:skip  otherwise circular import issue
@@ -143,6 +143,7 @@ __all__ = [
     "Trigger",
     "TargetMode",
     "Page",
+    "View",
 ]
 
 

@@ -118,7 +118,7 @@ class Select(ContainerBlock):
     The user can choose which nested object to view dynamically using either tabs or a dropdown.
 
     !!! note
-        Select expects a list of Blocks, e.g. a Plot or Table, but also including Select or Groups themselves, but if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
+        Select expects a list of Blocks, e.g. a Plot or Table, but also includes Select or Groups themselves, but if a Python object is passed, e.g. a Dataframe, Datapane will attempt to convert it automatically.
 
     """
 
@@ -196,7 +196,7 @@ class Group(ContainerBlock):
 
 class Toggle(ContainerBlock):
     """
-    Toggles act as a container that holds a list of nested Block objects, whose visbility can be toggled on or off by the report viewer
+    Toggles act as a container that holds a list of nested Block objects, whose visibility can be toggled on or off by the report viewer
     """
 
     _tag = "Toggle"

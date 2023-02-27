@@ -152,6 +152,20 @@ class Compute(BaseBlock):
         submit_label: str = "Go",
         timer: int = 30,
     ):
+        """
+        Create a compute block that runs the provided function.
+
+        Args:
+            function: Function to run
+            target: Where the results from the function should be viewed
+            controls: Parameters for the Form
+            swap: The mechanism to replace the referenced block
+            trigger: How the function is called
+            cache: Hint that the function output may be cached
+
+
+        Returns: A Compute block representing the Dynamic behaviour
+        """
         if controls is None:
             self.controls = Controls.empty()
         elif isinstance(controls, Controls):
@@ -203,7 +217,12 @@ class Compute(BaseBlock):
 
 # Compute Helpers
 def Form(
-    on_submit: FunctionT, controls: ControlsT = None, target: TargetT = TargetMode.BELOW, label: t.Optional[str] = None
+    on_submit: FunctionT,
+    controls: ControlsT = None,
+    target: TargetT = TargetMode.BELOW,
+    label: t.Optional[str] = None,
+    submit_label: str = "Go",
+    cache: bool = False,
 ) -> Compute:
     """
     Create a form on the page that runs the provided function on submit.
@@ -213,10 +232,14 @@ def Form(
         controls: Parameters for the Form
         target (optional): Where the results from the function should be viewed
         label (optional): Description for the Form
+        submit_label: Label for the submit button
+        cache: Hint that the on_submit function may be cached
 
     Returns: A Compute block representing the Form
     """
-    return Compute(function=on_submit, controls=controls, target=target, label=label)
+    return Compute(
+        function=on_submit, controls=controls, target=target, label=label, submit_label=submit_label, cache=cache
+    )
 
 
 def Dynamic(
@@ -231,7 +254,7 @@ def Dynamic(
     Args:
         on_load: Function to run when the App is loaded
         on_timer: Function to run on a regular timer
-        target (optional): Where the results from the functino should be viewed
+        target (optional): Where the results from the function should be viewed
         seconds (optional, default=30): Number of seconds between running the function specified by on_timer
 
     Returns: A Compute block representing the Dynamic behaviour

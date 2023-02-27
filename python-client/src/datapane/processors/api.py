@@ -46,8 +46,9 @@ def build_report(
     overwrite: bool = False,
 ) -> None:
     """Build an (static) app with a directory structure, which can be served by a local http server
-    NOTE - this outputs compressed assets into the dir as well, may be an issue if self-hosting...
-    TODO(product) - unknown if we should keep this...
+
+    !!! note
+        This outputs compressed assets into the dir as well, may be an issue if self-hosting...
 
     Args:
         blocks: The `Blocks` object or a list of Blocks
@@ -56,6 +57,7 @@ def build_report(
         formatting: Sets the basic app styling
         overwrite: Replace existing app with the same name and destination if already exists (default: False)
     """
+    # TODO(product) - unknown if we should keep this...
 
     # build the dest dir
     app_dir: Path = Path(dest or os.getcwd()) / name

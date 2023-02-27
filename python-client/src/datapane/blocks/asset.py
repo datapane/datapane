@@ -51,7 +51,7 @@ class Media(AssetBlock):
     To include an image, you can use `dp.Media` and pass the path.
 
     !!! note
-        Supported video, audio and image formats depends on the browser used to view the report. MP3, MP4, and all common image formats are generally supported by modern browsers
+        Supported video, audio and image formats depend on the browser used to view the report. MP3, MP4, and all common image formats are generally supported by modern browsers
     """
 
     _tag = "Media"
@@ -187,7 +187,7 @@ class DataTable(AssetBlock):
     It supports large datasets and viewers can also download the table from the website as a CSV or Excel file.
 
     !!! tip
-        [`Table`](/catalogs/blocks/table) is the best option for displaying multidimensional DataFrames, as `DataTable` will flatten your data.
+        `Table` is the best option for displaying multidimensional DataFrames, as `DataTable` will flatten your data.
     """
 
     _tag = "DataTable"

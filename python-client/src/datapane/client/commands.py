@@ -600,7 +600,7 @@ def generate():
     prompt="What file contains your App?",
     default=(lambda: next(hosting_utils.python_files(), None)),
     type=click.Path(exists=False, dir_okay=False),
-    help="The App file you'd like to run (contains dp.serve(...))",
+    help="The App file you'd like to run (contains dp.serve_app(...))",
 )
 @click.option(
     "--output", "-o", default="Dockerfile", show_default=True, type=click.File(mode="w", lazy=True, atomic=True)

@@ -1,0 +1,159 @@
+@media screen and (max-width: 76.1875em) {
+    .md-nav--primary .md-nav__title[for="__drawer"] {
+        --tw-gradient-to: #09091a;
+        --tw-gradient-from: #131329;
+        --tw-gradient-stops: var(--tw-gradient-from),
+            var(--tw-gradient-to, rgb(19 19 41 / 0));
+        background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+    }
+}
+
+md-nav__title {
+    display: none;
+}
+
+.md-header {
+    --tw-gradient-to: #581c87;
+    --tw-gradient-from: #312e81;
+    --tw-gradient-stops: var(--tw-gradient-from),
+        var(--tw-gradient-to, rgb(19 19 41 / 0));
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.md-header__topic {
+    font-weight: 600;
+}
+* {
+    --md-footer-bg-color: #312e81;
+}
+[data-md-color-scheme="default"] {
+    --md-primary-fg-color: #312e81;
+    --md-accent-fg-color: #581c87;
+    --md-default-fg-color--light: #312e81;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #7571f1;
+    --md-accent-fg-color: #805df7;
+    --md-default-bg-color: #1f2937;
+    --md-default-fg-color--light: #fff;
+}
+
+.org {
+    color: #4340b1;
+}
+
+.beta {
+    color: #e7088e !important;
+}
+
+/* Input cells */
+.input code,
+.input pre {
+    background-color: var(--md-code-bg-color) !important;
+}
+
+/* Output cells */
+.output code {
+    background-color: transparent !important;
+}
+
+.output .md-clipboard {
+    display: none !important;
+}
+
+/* Grid feature */
+.md-typeset .grid ul {
+    grid-gap: 0.4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    list-style: none;
+    margin: 1em 0 0 -1em;
+}
+
+.md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
+.md-typeset .grid > .card {
+    border: 0.05rem solid var(--md-default-fg-color--lightest);
+    border-radius: 0.1rem;
+    display: block;
+    margin: 0;
+    padding: 0.8rem;
+    -webkit-transition: border 0.25s, box-shadow 0.25s;
+    transition: border 0.25s, box-shadow 0.25s;
+}
+
+.md-typeset .result {
+    border: 0.05remsolidvar (--md-code-bg-color);
+    border-bottom-left-radius: 0.1rem;
+    border-bottom-right-radius: 0.1rem;
+    border-top-width: 0.1rem;
+    margin-top: -1.125em;
+    overflow: visible;
+    padding: 0 1em;
+}
+
+.md-typeset .lg {
+    font-size: 1.4em;
+}
+
+.md-typeset .middle {
+    vertical-align: middle;
+}
+
+.docs-image {
+    display: flex;
+    -webkit-box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-width: 480px !important;
+    margin: 1.2rem auto 0;
+}
+
+.md-typeset h1,
+.md-typeset h2 {
+    font-weight: 700;
+}
+
+.md-typeset h3 {
+    font-weight: 600;
+}
+/*
+.md-typeset h1 {
+    color: #312e81;
+}
+
+.md-typeset h2 {
+    color: #581c87;
+} */
+
+.md-typeset .grid.cards > :-webkit-any(ul, ol) > li,
+.md-typeset .grid > .card {
+    border-radius: 0.5rem;
+}
+
+[data-md-color-scheme="default"]
+    .md-typeset
+    .grid.cards
+    > :-webkit-any(ul, ol)
+    > li,
+.md-typeset .grid > .card {
+    /* shadow */
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
+        0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+        var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    /* rounded-lg */
+    border: none;
+}
+
+[data-md-color-scheme="default"]
+    .md-typeset
+    .grid.cards
+    > :-webkit-any(ul, ol)
+    > li:hover,
+.md-typeset .grid > .card:hover {
+    background-color: rgb(249 250 251);
+}

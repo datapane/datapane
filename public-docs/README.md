@@ -37,11 +37,13 @@ Use metadata to show or hide input/output cells in notebooks.
 
 The docs include many Jupyter notebook (`ipynb`) files that must have their output and metadata (except `tags`) cleared before a commit.
 
-The `.gitattributes` in the `/docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
+The `.gitattributes` in the `/public-docs` directory expects the `clear-notebook-output` filter. Please add it to your config with the following command:
 
 ```bash
-git config filter.clear-notebook-output.clean "./docs/clear-notebook-output.sh"
+git config filter.clear-notebook-output.clean "./public-docs/clear-notebook-output.sh"
 ```
+
+(this also requires the `jq` command to be installed)
 
 ## Deploying
 

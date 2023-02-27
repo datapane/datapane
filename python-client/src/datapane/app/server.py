@@ -143,8 +143,13 @@ def serve_app(
     """
     Main app serve entrypoint.
 
-    Pass `port` to run on a specific port, otherwise one will be chosen automatically.
-
+    Args:
+        port: Select a specific port, otherwise one will be chosen automatically.
+        host: Specify a specific host.
+        debug: Enable debug mode.
+        ui: Select a specific UI to use (`console` or `ipywidgets`).
+        public: Expose the app to the Internet with ngrok (requires auth_token).
+        embed_mode: Allows embedding in some third-party products by disabling security policies which will not work in an iframe.
     """
     wrapped_entry = Blocks.wrap_blocks(entry)
     if not wrapped_entry.has_compute:
@@ -514,7 +519,7 @@ class IPyWidgetsControllerUI(ControllerUI):
                     + "   <li>You're seeing this message because 'Jupyer Widgets' is not installed in your Jupyter notebook/lab environment. "
                     + "    so the UI for controlling the app server is not visible. See "
                     + '    <a href="https://ipywidgets.readthedocs.io/en/latest/user_install.html">Jupyter Widgets Installation instructions</a></li>'
-                    + '  <li>Use <code>dp.serve(ui="console")</code> to use the console UI instead.</li>'
+                    + '  <li>Use <code>dp.serve_app(ui="console")</code> to use the console UI instead.</li>'
                     + "</ul>"
                 ),
             )

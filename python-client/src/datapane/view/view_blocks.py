@@ -89,6 +89,10 @@ class Blocks(ContainerBlock):
         return any(isinstance(block, Compute) for block in self.blocks)
 
 
+class View(Blocks):
+    pass
+
+
 BlocksT = t.Union[Blocks, t.List[BlockOrPrimitive], t.Mapping[str, BlockOrPrimitive]]
 
 

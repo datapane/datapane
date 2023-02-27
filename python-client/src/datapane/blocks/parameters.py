@@ -98,6 +98,14 @@ class Switch(Parameter[bool]):
         *,
         initial: bool = False,
     ):
+        """
+        A switch allowing the user to select on/true or off/false
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+        """
         super().__init__(name, label, initial)
         self._check_instance()
 
@@ -114,6 +122,15 @@ class TextBox(Parameter[str]):
         initial: str = "",
         allow_empty: bool = False,
     ):
+        """
+        A single-line text field where the user can enter data.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+            allow_empty: Whether to allow the user to enter an empty string.
+        """
         super().__init__(name, label, initial, allow_empty=allow_empty)
         self._check_instance()
 
@@ -127,8 +144,16 @@ class NumberBox(Parameter[float]):
         name: t.Optional[str] = None,
         label: t.Optional[str] = None,
         *,
-        initial: float,
+        initial: float = 0,
     ):
+        """
+        A number field where the user can enter data.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+        """
         super().__init__(name, label, initial)
         self._check_instance()
 
@@ -147,6 +172,17 @@ class Range(Parameter):
         max: Numeric,
         step: t.Optional[Numeric] = None,
     ):
+        """
+        A slider where the user can select a value within a range.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+            min: The minimum allowed value of the parameter.
+            max: The maximum allowed value of the parameter.
+            step: The step size of the parameter.
+        """
         super().__init__(name, label, self._T(initial))
         if any(isinstance(v, float) and (math.isinf(v) or math.isnan(v)) for v in (min, max, step)):
             raise DPClientError("min/max/step must not be `inf` or `nan`")
@@ -160,8 +196,6 @@ class Range(Parameter):
 
 
 class Choice(Parameter[str]):
-    """Choose a single element from a set"""
-
     _T = str
     _tag = "Choice"
 
@@ -173,6 +207,15 @@ class Choice(Parameter[str]):
         options: SList,
         initial: t.Optional[str] = None,
     ):
+        """
+        A drop-down allowing the selection of a single value from a list.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            options: The list of options to choose from.
+            initial: The initial value of the parameter.
+        """
         # valid params
         if not options:
             raise DPClientError("At least one option must be provided")
@@ -194,8 +237,6 @@ class Choice(Parameter[str]):
 
 
 class MultiChoice(Parameter[SList]):
-    """Choose multiple elements from a set"""
-
     _T = SList
     _tag = "MultiChoice"
 
@@ -208,6 +249,16 @@ class MultiChoice(Parameter[SList]):
         options: SList,
         allow_empty: bool = False,
     ):
+        """
+        A drop-down allowing the selection of a multiple values from a list.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            options: The list of options to choose from.
+            initial: The initial value of the parameter.
+            allow_empty: Whether to allow the user to select no options.
+        """
         # valid params
         initial = initial or []
         if not options:
@@ -233,8 +284,6 @@ class MultiChoice(Parameter[SList]):
 
 
 class Tags(Parameter[SList]):
-    """Create a list of strings"""
-
     _T = SList
     _tag = "Tags"
 
@@ -246,6 +295,15 @@ class Tags(Parameter[SList]):
         initial: SList = [],
         allow_empty: bool = False,
     ):
+        """
+        A drop-down allowing the selection of multiple values from a list. Allows adding new items to the list.
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: An initial selection of tags
+            allow_empty: Whether to allow the user to select no tags.
+        """
         initial = initial or []
         if any(x in ("", '"') for x in initial):
             raise DPClientError("Empty initial tags or those consisting of a single quote not supported")
@@ -264,6 +322,14 @@ class Date(Parameter[date]):
         *,
         initial: t.Optional[date] = None,
     ):
+        """
+        A control allowing the selection of a date (`dd/mm/yyyy`).
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+        """
         super().__init__(name, label, initial)
         self._check_instance()
 
@@ -282,6 +348,14 @@ class Time(Parameter[time]):
         *,
         initial: t.Optional[time] = None,
     ):
+        """
+        A control allowing the entry of a time (`hh:mm:ss`).
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+        """
         super().__init__(name, label, initial)
         self._check_instance()
 
@@ -300,6 +374,14 @@ class DateTime(Parameter[datetime]):
         *,
         initial: t.Optional[datetime] = None,
     ):
+        """
+        A control allowing the selection of a date and time (`dd/mm/yyyy, hh:mm:ss`).
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+        """
         super().__init__(name, label, initial)
         self._check_instance()
 
@@ -340,6 +422,16 @@ class File(Parameter[B64Path]):
         initial: t.Optional[B64Path] = None,
         allow_empty: bool = False,
     ):
+        """
+        A control allowing the upload of a File from the user's device. Max size 25MB
+
+        Args:
+            name: The name of the parameter.
+            label: The label of the parameter, visible to the user.
+            initial: The initial value of the parameter.
+            allow_empty: Whether to allow the user to not upload a file.
+        """
+
         # Set default to None to mark an optional File
         super().__init__(name, label, initial, allow_empty=allow_empty)
         self._check_instance()

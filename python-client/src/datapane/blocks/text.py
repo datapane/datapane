@@ -33,7 +33,7 @@ class Text(EmbeddedTextBlock):
     You can add short or long-form Markdown content to your app with the `Text` block.
 
     !!! info
-        Markdown is a lightweight markup language that allows you to include formatted text in your app, and can be access through `dp.Text`, or by passing in a string directly.&#x20;
+        Markdown is a lightweight markup language that allows you to include formatted text in your app, and can be accessed through `dp.Text`, or by passing in a string directly.&#x20;
 
         Check [here](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for more information on how to format your text with markdown.
     """
@@ -105,7 +105,7 @@ def Divider() -> Text:
 
 class Code(EmbeddedTextBlock):
     """
-    The code block allows you to embed syntax highlighted source code into your app.
+    The code block allows you to embed syntax-highlighted source code into your app.
 
     !!! note
         This block currently supports Python and JavaScript.
@@ -178,7 +178,7 @@ class Embed(EmbeddedTextBlock):
     The Embed block lets you embed content from other platforms e.g. Youtube, Spotify.
 
     !!! tip
-        If you're trying to embed an `iframe`, you can wrap it in an [`HTML`](/catalogs/blocks/html) block.
+        If you're trying to embed an `iframe`, you can wrap it in an `HTML` block.
     """
 
     _tag = "Embed"

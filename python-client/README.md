@@ -4,10 +4,9 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://datapane.com/cloud">Cloud</a> |
   <a href="https://docs.datapane.com">Docs</a> |
-      <a href="#demos-and-examples">Examples</a> |
-  <a href="https://datapane.nolt.io">Roadmap</a> | <a href="https://forum.datapane.com">Forum</a> |
+  <a href="https://datapane.com/cloud">Cloud</a> |
+ <a href="https://forum.datapane.com">Discussions</a> |
   <a href="https://chat.datapane.com">Discord</a>
 </p>
 <p align='center'>
@@ -23,10 +22,10 @@
 </p>
 
 <p align='center'>
-  <h1 align='center'>From notebook to shareable data app in 10 seconds.</h1>
+  <h1 align='center'>Build full-stack data analytics apps in Python</h1>
 </p>
-Datapane is a python framework that makes it super easy to build, host, and share interactive data apps straight from your Jupyter notebook.
-<br>
+Datapane is an open-source framework for building robust, high-performance data apps from Python and Jupyter.
+<br><br>
 <br>
 <br>
 
@@ -36,17 +35,37 @@ Datapane is a python framework that makes it super easy to build, host, and shar
   </a>
 </p>
 
-### What makes Datapane special?
+## Why use Datapane?
 
-- **Static generation:** Sharing an app shouldn't require deploying an app. Render a standalone HTML bundle which you can share or host on the web.
-- **API-first and programmatic:** Programmatically generate apps from inside of Spark, Airflow, or Jupyter. Schedule updates to build real-time dashboards.
-- **Dynamic front-end components**: Say goodbye to writing HTML. Build apps from a set of interactive components, like DataTables, tabs, and selects.
+#### **🚀 Not just for demos**
+
+Build performant, robust full-stack apps which are simple to deploy and manage on any hosting platform. Add background processing, auth, and monitoring to go beyond MVPs.
+
+#### **📈 Share standalone reports with no server**
+
+Export static HTML reports which you can share on Slack or Email, with no backend required.
+
+#### **📙 Ship apps from Jupyter**
+
+Build and ship data apps from inside your Jupyter Notebook and existing scripts in <5 lines of code.
+
+## Other Features
+
+- User sessions and state handling
+- Intelligent caching
+- Sub-5ms function response time
+- Easy integration with authentication/authorization
+- Integrate into existing web frameworks (like Flask or FastAPI)
+- Host on existing web-hosts, like Fly and Heroku
+- Background processing
+
+## How is Datapane's architecture unique?
+
+Datapane Apps use a combination of pre-rendered frontend elements and backend Python functions which are called on-demand. Result: low-latency apps which are simple to build, host, and scale.
 
 # Getting Started
 
-Want a head start? Check out our _Datapane in 3 minutes_ video:
-
-https://user-images.githubusercontent.com/15690380/179759362-e577a4f8-d1b7-4b8d-9190-0c13d5015728.mp4
+Want a head start? Check out our [Getting Started guide](TODO) to build a data science web app in 3m.
 
 ## Installing Datapane
 
@@ -70,11 +89,11 @@ Datapane also works well in hosted Jupyter environments such as Colab or Binder,
 !pip3 install --quiet datapane
 ```
 
-# Creating apps
+# Examples
 
-### 📊 Include plots and data
+### 📊 Share plots, data, and more as reports
 
-Create an app from pandas DataFrames, plots from your favorite libraries, and text.
+Create reports from pandas DataFrames, plots from your favorite libraries, and text.
 
 <p>
 
@@ -101,14 +120,14 @@ view = dp.Blocks(
     dp.Plot(fig),
     dp.DataTable(df)
 )
-dp.save_report(path="my_app.html")
+dp.save_report(view, path="my_app.html")
 ```
 
 </p>
 
 ### 🎛 Layout using interactive blocks
 
-Add dropdowns, selects, grid, pages, and 10+ other blocks to enhance your apps.
+Add dropdowns, selects, grid, pages, and 10+ other interactive blocks.
 
 <p>
 
@@ -117,7 +136,7 @@ Add dropdowns, selects, grid, pages, and 10+ other blocks to enhance your apps.
 <p>
 
 ```python
-import datapane as dp
+...
 
 view = dp.Blocks(
     dp.Formula("x^2 + y^2 = z^2"),
@@ -140,11 +159,47 @@ view = dp.Blocks(
 dp.save_report(view, path="layout_example.html")
 ```
 
+### Add functions to create full-stack apps
+
+Add forms which run backend functions, or refresh your app automatically to build dashboards. Serve locally or deploy to your favorite web-host.
+
+<p>
+
+<img width='485px' align='left' alt="Functions" src="https://user-images.githubusercontent.com/3541695/221241943-dc2a03ae-1fd9-4278-8636-6344c5098a5c.gif">
+
+<p>
+
+```python
+import altair as alt
+from vega_datasets import data
+import datapane as dp
+
+df = data.iris()
+
+def gen_assets(params):
+    subset = df[df['species'] == params['species']]
+
+    fig = alt.Chart(subset)
+            .mark_point()
+            .encode( x="petalLength:Q", y="petalWidth:Q")
+
+    return [dp.Plot(fig), dp.DataTable(subset)]
+
+view = dp.Form(
+    on_submit=gen_assets,
+    controls=dp.Controls(
+      species=dp.Choice(options=list(df['species'].unique())
+    )
+)
+
+dp.serve_app(view)
+```
+
 # Get involved
 
 ## Discord
 
-Our Discord community is for people who believe that insights, visualizations, and apps are better created with Python instead of drag-and-drop tools. Get help from the team, share what you're building, and get to know others in the space!
+Get help from the team, share what you're building, and get to know others in the space!
 
 ### 💬 [Join our discord server](https://chat.datapane.com)
 
@@ -156,7 +211,7 @@ Leave us some feedback, ask questions and request features.
 
 ## Forums
 
-Need technical help? Ask our experts on the forums.
+Need technical help? Reach out on GitHub discussions.
 
 ### 📜 [Ask a question](https://forum.datapane.com/)
 
@@ -166,35 +221,10 @@ Looking for ways to contribute to Datapane?
 
 ### ✨ [Visit the contribution guide](https://github.com/datapane/datapane/blob/main/CONTRIBUTING.md).
 
-# Hosting Apps
-
-In addition to saving apps locally or hosting them yourself, you can host and share your apps using [Datapane Cloud](https://datapane.com/cloud).
-
-To get your API key, [create a free account](https://cloud.datapane.com/accounts/signup/).
-
-Next, in your Python notebook or script, change the `save` function to `upload`:
-
-```python
-view = dp.Blocks(
-    ...
-)
-dp.upload_report(view, name="Hello world")
-```
-
-# Demos and Examples
-
-Here a few samples of the top apps created by the Datapane community.
-
-- [Coindesk analysis](https://cloud.datapane.com/apps/wAwZqpk/initial-coindesk-article-data/) by Greg Allan
-- [COVID-19 Trends by Quarter](https://cloud.datapane.com/apps/q34yW57/covid-19-trends-by-quarter-with-data-through-march-2021/) by Keith Johnson
-- [Ecommerce Report](https://cloud.datapane.com/apps/dA9yQwA/e-commerce-report/) by Leo Anthias
-- [Example Academic Paper](https://cloud.datapane.com/apps/wAwneRk/towards-orientation-invariant-sensorimotor-object-recognition-based-on-hierarchical-temporal-memory-with-cortical-grid-cells/) by Kalvyn Roux
-- [Exploration of Restaurants in Kyoto](https://cloud.datapane.com/apps/0kz48Y3/exploration-of-restaurants-in-kyoto-and-the-stations-theyre-closest-to/) by Ryan Hildebrandt
-
 # Next Steps
 
 - [Join Discord](https://chat.datapane.com)
-- [Sign up for a free account](https://datapane.com/accounts/signup)
+- [Sign up for a free account](https://cloud.datapane.com/accounts/signup)
 - [Read the documentation](https://docs.datapane.com)
 - [Ask a question](https://forum.datapane.com/)
 

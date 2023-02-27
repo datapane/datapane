@@ -11,7 +11,7 @@ done when making significant changes to server.py
 * Create an example app in `simple.py`
 
     import datapane as dp
-    dp.serve(dp.View(dp.Text("Some text")))
+    dp.serve_app(dp.Blocks(dp.Text("Some text")))
 
 * run directly: python simple.py
 
@@ -80,10 +80,10 @@ done when making significant changes to server.py
 
     import datapane as dp
 
-    dp.serve(
-        dp.View(
-            dp.Interactive(
-                lambda params: 1 / 0, target="target", controls=dp.Controls(dp.TextBox("input", "Input", default="X"))
+    dp.serve_app(
+        dp.Blocks(
+            dp.Compute(
+                lambda params: 1 / 0, target="target", controls=dp.Controls(dp.TextBox("input", "Input", initial="X"))
             ),
             dp.Empty(name="target"),
         )
@@ -111,6 +111,6 @@ done when making significant changes to server.py
       - Your app is running on: http://127.0.0.1:8080
       - You're seeing this message because 'Jupyer Widgets' is not installed in your Jupyter notebook/lab environment.
          so the UI for controlling the app server is not visible. See Jupyter Widgets Installation instructions
-      - Use dp.serve(ui="console") to use the console UI instead.
+      - Use dp.serve_app(ui="console") to use the console UI instead.
 
 """
