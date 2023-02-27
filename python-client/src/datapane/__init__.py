@@ -15,7 +15,7 @@ else:
     __is_dev_build__ = getattr(_version, "__is_dev_build__", False)
     del _version
 
-__version__ = "0.15.7"
+__version__ = "0.16.0"
 
 
 # Public API re-exports
