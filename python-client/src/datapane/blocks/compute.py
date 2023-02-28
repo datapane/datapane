@@ -265,10 +265,12 @@ def Dynamic(
     elif on_load:
         f = on_load
         target = target or TargetMode.SELF
+        trigger = Trigger.LOAD
     elif on_timer:
         f = on_timer
         target = target or TargetMode.BELOW
+        trigger = Trigger.SCHEDULE
     else:
         raise DPClientError("Must provide one of on_load or on_timer")
 
-    return Compute(function=f, target=target, timer=seconds)
+    return Compute(function=f, target=target, timer=seconds, trigger=trigger)

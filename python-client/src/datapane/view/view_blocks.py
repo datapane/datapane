@@ -24,7 +24,7 @@ class Blocks(ContainerBlock):
     # that is composable.
     # TODO - move to datapane.blocks ?
 
-    _tag = "<Unused>"
+    _tag = "Blocks"
 
     def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
         # if passed a single View into a View object, pull out the contained blocks and use instead

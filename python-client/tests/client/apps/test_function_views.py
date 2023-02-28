@@ -9,6 +9,7 @@ import pytest
 from glom import glom
 
 import datapane as dp
+from datapane.blocks.parameters import Parameter
 from datapane.common.viewxml_utils import ElementT
 from tests.client.views import test_views as tv
 
@@ -17,7 +18,7 @@ def f(params):
     return dp.Blocks("Hello")
 
 
-def mk_params_tml() -> t.Dict[str, t.Callable[..., dp.blocks.parameters.Parameter]]:
+def mk_params_tml() -> t.Dict[str, t.Callable[..., Parameter]]:
     p = partial
     return dict(
         switch=p(dp.Switch, label="switch-label"),
@@ -33,11 +34,11 @@ def mk_params_tml() -> t.Dict[str, t.Callable[..., dp.blocks.parameters.Paramete
     )
 
 
-def mk_params_as_dict():
+def mk_params_as_dict() -> t.Dict[str, Parameter]:
     return {k: v() for k, v in mk_params_tml().items()}
 
 
-def mk_params_as_list():
+def mk_params_as_list() -> t.List[Parameter]:
     return [v(name=k) for k, v in mk_params_tml().items()]
 
 
@@ -53,13 +54,39 @@ def mk_controls(request):
     return request.param
 
 
-def test_dp_function():
-    view = dp.Blocks(dp.Compute(f, target="x"))
-    tv.assert_view(view, 0, 2)  # inc empty Controls element
+def _asset_compute(view: dp.Blocks, expected_blocks: int) -> ElementT:
+    tv.assert_view(view, 0, expected_blocks)  # inc empty Controls element
     root = view.get_dom()
     _controls: t.List[ElementT] = root.xpath("//Controls/*")
     assert len(_controls) == 0
     assert glom(view, ("blocks", ["_tag"])) == ["Compute"]
+    return root.find(".//Compute")
+
+
+def test_dp_function():
+    view = dp.Blocks(dp.Compute(f, target="x"))
+    _asset_compute(view, 2)
+
+
+def test_dp_dynamic_load():
+    view = dp.Blocks(dp.Dynamic(on_load=f))
+    compute = _asset_compute(view, 2)
+    assert compute.get("trigger") == "mount"
+    assert compute.get("target") == compute.get("name")
+
+
+def test_dp_dynamic_timer():
+    view = dp.Blocks(dp.Dynamic(on_timer=f, seconds=10))
+    compute = _asset_compute(view, 5)
+    assert compute.get("trigger") == "schedule"
+    assert compute.get("target") != compute.get("name")
+
+
+def test_dp_form():
+    view = dp.Blocks(dp.Form(on_submit=f))
+    compute = _asset_compute(view, 5)
+    assert compute.get("trigger") == "submit"
+    assert compute.get("target") != compute.get("name")
 
 
 def test_dp_function_controls(mk_controls):

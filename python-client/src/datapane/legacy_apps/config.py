@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import ClassVar, List, Optional
 
 import dacite
-import stringcase
 import yaml
+from boltons.strutils import slugify
 from typing_extensions import Self
 
 from datapane.client import log
@@ -33,7 +33,8 @@ re_check_name = re.compile(r"^[\S ]+$")
 
 
 def generate_name(postfix: str) -> str:
-    dir_name = stringcase.titlecase(os.path.basename(os.getcwd()))
+    cwd = os.path.basename(os.getcwd())
+    dir_name = slugify(cwd, lower=False, delim=" ").title()
     return f"{dir_name} {postfix}"
 
 

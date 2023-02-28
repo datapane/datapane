@@ -8,7 +8,7 @@ const p = defineProps<{
     columns: number;
     widths?: number[];
     store: any;
-    valign: VAlign;
+    valign?: VAlign;
 }>();
 
 const rootStore = useRootStore();
@@ -17,14 +17,13 @@ const { children } = storeToRefs(p.store);
 
 const alignItems: ComputedRef<string> = computed(() => {
     switch (p.valign) {
+        default:
         case VAlign.TOP:
             return "start";
         case VAlign.CENTER:
             return "center";
         case VAlign.BOTTOM:
             return "end";
-        default:
-            throw new Error("Alignment not recognised");
     }
 });
 

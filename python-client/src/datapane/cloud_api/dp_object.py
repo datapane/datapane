@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Optional, Type, cast
 from urllib import parse as up
 
-import validators as v
+from pydantic import AnyHttpUrl, ValidationError, validate_arguments
 from requests import HTTPError
 
 from datapane._vendor.munch import Munch
@@ -24,6 +24,12 @@ from datapane.common import JSON, URL, SDict
 from .common import FileAttachmentList, Resource
 
 U = t.TypeVar("U", bound="DPObjectRef")
+
+
+@validate_arguments
+def _is_url(x: AnyHttpUrl) -> AnyHttpUrl:
+    # URL check
+    return x
 
 
 class DPObjectRef:
@@ -66,8 +72,10 @@ class DPObjectRef:
             url = cast(str, id_or_url)
             if not url.startswith("http"):
                 url = f"https://{url}"
-            if not v.url(url):
-                raise DPClientError(f"{url} is not a valid object ref")
+            try:
+                _is_url(url)
+            except ValidationError as v:
+                raise DPClientError(f"{url} is not a valid object ref") from v
             x: up.SplitResult = up.urlsplit(url)
             _id = list(filter(None, x.path.split("/")))[-1]
         else:
