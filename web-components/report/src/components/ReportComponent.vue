@@ -47,7 +47,7 @@ const isCloudEmbed = window.location.href.includes("/embed/");
 <template>
     <template v-if="p.report">
         <nav-bar
-            v-if="!isIPythonEmbed && !singleBlockEmbed"
+            v-if="hasPages || !(isIPythonEmbed || singleBlockEmbed)"
             :reset-app="p.resetApp"
             :is-served-app="p.isServedApp"
             :labels="pageLabels"
