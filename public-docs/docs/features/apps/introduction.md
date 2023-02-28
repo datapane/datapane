@@ -36,7 +36,7 @@ dp.serve_app(app)
 
 Apps build upon Reports and add a few simple concepts to make them dynamic:
 
-- [Compute Blocks](./blocks.md), such as [dp.Form][datapane.blocks.compute.Form] and [dp.Dynamic][datapane.blocks.compute.Dynamic] are added to your app alongside any static [Display](../display_blocks.md) and [Layout](../layout_blocks.md) blocks, and provide the interface into backend functions.
+- [Compute Blocks](./blocks.md), such as [dp.Form][datapane.blocks.compute.Form] and [dp.Dynamic][datapane.blocks.compute.Dynamic] are added to your app alongside any static [Display](../display_blocks.ipynb) and [Layout](../layout_blocks.ipynb) blocks, and provide the interface into backend functions.
 - [Parameters](./functions_controls.md), such as [dp.TextBox][datapane.blocks.parameters.TextBox] above, and more complex controls such as [dp.Range][datapane.blocks.parameters.Range], provide an interactive set of Controls to use in your Forms in order to allow your viewers to specify parameters.
 - [Backend functions](./functions_controls.md), such as `filter_df` above, take these parameters, run any processing needed, and return Display and Layout blocks.
 

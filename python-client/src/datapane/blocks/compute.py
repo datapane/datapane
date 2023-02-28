@@ -25,7 +25,7 @@ def gen_name() -> str:
 
 class Empty(BaseBlock):
     """
-    An empty block that can be patched later
+    An empty block that can be updated / replaced later
 
     Args:
         name: A unique name for the block to reference when updating the report

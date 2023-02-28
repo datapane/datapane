@@ -42,7 +42,7 @@ dp.Form(on_submit=f,
 
 ### Returning Values
 
-Datapane functions can return any [Datapane block][api-reference] or raw Python objects that are supported by Datapane. You can return these directly, as a list, or return a layout or container block like `dp.Blocks` or `dp.Group` for a more advanced layout.
+Datapane functions can return any [Datapane block](../display_blocks.ipynb) or [raw Python objects](../display_blocks.ipynb#automatic-conversion) that are supported by Datapane. You can return these directly, as a list, or return a layout or container block like `dp.Blocks` or `dp.Group` for a more advanced layout.
 
 !!! tip
     You can even return compute blocks like `dp.Form` and `dp.Dynamic` from a function, allowing you to chain functions together that build more complex operations and interactive apps, such as wizards.

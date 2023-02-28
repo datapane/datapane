@@ -124,6 +124,7 @@ markdown_extensions:
       alternate_style: true
   - toc:
       permalink: true
+      baselevel: 1  # default
   - meta
   - admonition
   - abbr
