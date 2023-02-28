@@ -2,3 +2,5 @@ munch @ git+https://github.com/Infinidat/munch.git
 
 # Using `master` for bottle as is highly stable and has newer fixes for eventual 0.13 release
 bottle @ git+https://github.com/bottlepy/bottle.git
+
+base64io @ git+https://github.com/aws/base64io-python.git

@@ -10,9 +10,9 @@ import typing as t
 from pathlib import Path
 from shutil import copyfileobj
 
-import base64io
 from typing_extensions import Self
 
+from datapane._vendor import base64io
 from datapane.common import guess_type
 
 SERVED_REPORT_ASSETS_DIR = "assets"

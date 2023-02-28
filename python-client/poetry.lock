@@ -206,18 +206,6 @@ files = [
 ]
 
 [[package]]
-name = "base64io"
-version = "1.0.3"
-description = ""
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "base64io-1.0.3-py2.py3-none-any.whl", hash = "sha256:e9a6c9f470e34f8debaad26134bcf3f0bcbf677dac73e32295cfb2915d30815b"},
-    {file = "base64io-1.0.3.tar.gz", hash = "sha256:24f2d0fe765c35339e1b2d33aa95f9137b1b765b594164fad1016c15827a7073"},
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.11.2"
 description = "Screen-scraping library"
@@ -3927,4 +3915,4 @@ plotting = ["matplotlib", "bokeh", "plotly", "folium", "plotapi"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0, < 3.12.0"
-content-hash = "88a7d367311911a7211fc7d633e0dadcdd8af6cd4af5206a2daa0faa471da422"
+content-hash = "5cc9c5723edb01af386b0fcd79c989447b2c0d97af429a0ab899c3f5bb40cb06"
