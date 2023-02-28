@@ -230,18 +230,6 @@ files = [
 ]
 
 [[package]]
-name = "base64io"
-version = "1.0.3"
-description = ""
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "base64io-1.0.3-py2.py3-none-any.whl", hash = "sha256:e9a6c9f470e34f8debaad26134bcf3f0bcbf677dac73e32295cfb2915d30815b"},
-    {file = "base64io-1.0.3.tar.gz", hash = "sha256:24f2d0fe765c35339e1b2d33aa95f9137b1b765b594164fad1016c15827a7073"},
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.11.2"
 description = "Screen-scraping library"
@@ -759,7 +747,7 @@ six = "*"
 
 [[package]]
 name = "datapane"
-version = "0.16.0"
+version = "0.16.1"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
@@ -769,7 +757,6 @@ develop = true
 
 [package.dependencies]
 altair = "^4.0.0"
-base64io = "^1.0.3"
 bokeh = {version = "^2.3.0", optional = true}
 boltons = ">=20.0.0,<22.0.0"
 chardet = ">=4.0.0,<6.0.0"
@@ -805,11 +792,9 @@ pyngrok = "^5.2.1"
 PyYAML = ">=5.4.0,<7.0.0"
 requests = "^2.19.0"
 requests-toolbelt = ">=0.9.1, <0.11.0"
-stringcase = "^1.2.0"
 tabulate = ">=0.8.9, < 0.10.0"
 toolz = ">=0.11.0,<0.13.0"
 typing-extensions = "^4.4.0"
-validators = ">=0.18.0,<0.21.0"
 vega-datasets = ">=0.9.0,<1.0.0"
 
 [package.extras]
@@ -3846,17 +3831,6 @@ pure-eval = "*"
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
-name = "stringcase"
-version = "1.2.0"
-description = "String case converter."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "stringcase-1.2.0.tar.gz", hash = "sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008"},
-]
-
-[[package]]
 name = "tabulate"
 version = "0.9.0"
 description = "Pretty-print tabular data"
@@ -4051,23 +4025,6 @@ files = [
 brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)", "brotlipy (>=0.6.0)"]
 secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)", "urllib3-secure-extra"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
-
-[[package]]
-name = "validators"
-version = "0.20.0"
-description = "Python Data Validation for Humans™."
-category = "main"
-optional = false
-python-versions = ">=3.4"
-files = [
-    {file = "validators-0.20.0.tar.gz", hash = "sha256:24148ce4e64100a2d5e267233e23e7afeb55316b47d30faae7eb6e7292bc226a"},
-]
-
-[package.dependencies]
-decorator = ">=3.4.0"
-
-[package.extras]
-test = ["flake8 (>=2.4.0)", "isort (>=4.2.2)", "pytest (>=2.2.3)"]
 
 [[package]]
 name = "vega-datasets"
