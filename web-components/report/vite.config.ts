@@ -4,6 +4,7 @@ import vueESM from "../shared/rollup-plugin-vue-esm";
 import path from "path";
 import tailwindcss from "tailwindcss";
 import vue from "@vitejs/plugin-vue";
+import copy from "rollup-plugin-copy";
 
 module.exports = defineConfig(({ mode }) => ({
     resolve: {
@@ -69,7 +70,19 @@ module.exports = defineConfig(({ mode }) => ({
                 },
             },
             external: ["vue", "katex"],
-            plugins: [vueESM()],
+            plugins: [
+                vueESM(),
+                // Cast as `any` as there seems to be a type conflict between the rollup plugin and Vite's typed config (which uses rollup under the hood)
+                copy({
+                    targets: [
+                        {
+                            src: "./node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js",
+                            dest: "./dist/assets",
+                        },
+                    ],
+                    verbose: true,
+                }) as any,
+            ],
         },
     },
 }));

@@ -3,6 +3,7 @@ import { plugin as formkitPlugin, defaultConfig } from "@formkit/vue";
 import { formkitConfig } from "./src/components/controls/formkit";
 import Report from "./src/components/ReportContainer.vue";
 import TableBlock from "./src/components/blocks/Table.ce.vue";
+import iframeResize from "iframe-resizer/js/iframeResizer";
 import { createPinia } from "pinia";
 import "./src/styles/report.scss";
 import "highlight.js/styles/stackoverflow-light.css";
@@ -31,4 +32,9 @@ const mountReport = (props: any) => {
     return app;
 };
 
-export { mountReport, parseElementProps };
+export {
+    mountReport,
+    parseElementProps,
+    // Export iframeResize for use in ipython embedding
+    iframeResize,
+};
