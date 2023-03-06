@@ -34,6 +34,7 @@ from datapane.client.commands import failure_msg
 from datapane.client.exceptions import IncompatibleVersionError, ReportTooLargeError, UnsupportedResourceError
 from datapane.client.utils import TEST_ENV
 from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
+from datapane.common.ops_utils import inmemory_compress
 
 ################################################################################
 # Tmpfile handling
@@ -183,14 +184,25 @@ class Resource:
     def post_files(self, files: FileAttachmentList, overwrite: bool = False, **data: JSON) -> Munch:
         # upload files using custom json-data protocol
         # build the fields
-        file_header = {"Content-Encoding": "gzip"}
 
         def _mk_file_fields(field_name: str, fobj: t.BinaryIO):
             fobj.flush()
             fobj.seek(0)
+            mime_type: str = guess_type(Path(fobj.name))
+            if should_compress_mime_type_for_upload(mime_type):
+                return_file = inmemory_compress(fobj)
+                file_header = {"Content-Encoding": "gzip"}
+                # Server side, our upload handler does not make it easy to
+                # access the 'Content-Encoding' header and handle properly. But
+                # we can access Content-Type, so we use a subtype parameter for
+                # this, as per https://httpwg.org/specs/rfc9110.html#media.type
+                mime_type = f"{mime_type}; gzipped=True"
+            else:
+                return_file = fobj
+                file_header = {}
             return (
                 field_name,
-                (fobj.name, fobj, guess_type(Path(fobj.name)), file_header),
+                (fobj.name, return_file, mime_type, file_header),
             )
 
         fields = [_mk_file_fields(k, x) for (k, v) in files.items() for x in v]
@@ -285,3 +297,44 @@ def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = N
             for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
                 ffile.write(chunk)
     return fn
+
+
+def should_compress_mime_type_for_upload(mime_type: str) -> bool:
+    # Most file types people deal with are fairly well compressed already, and
+    # there are many, so we use the approach of listing ones we guess will
+    # benefit from compression rather than the other way around.
+    return mime_type in _SHOULD_COMPRESS_MIME_TYPES
+
+
+# Mostly borrowed from here: https://letstalkaboutwebperf.com/en/gzip-brotli-server-config/
+_SHOULD_COMPRESS_MIME_TYPES = {
+    "application/atom+xml",
+    "application/javascript",
+    "application/json",
+    "application/manifest+json",
+    "application/vnd.pickle+binary",
+    "application/rss+xml",
+    "application/vnd.api+json",
+    "application/vnd.ms-fontobject",
+    "application/x-font-opentype",
+    "application/x-font-truetype",
+    "application/x-font-ttf",
+    "application/x-javascript",
+    "application/xhtml+xml",
+    "application/xhtml+xml",
+    "application/xml",
+    "font/eot",
+    "font/opentype",
+    "font/otf",
+    "font/ttf",
+    "image/svg+xml",
+    "image/vnd.microsoft.icon",
+    "image/x-icon",
+    "text/css",
+    "text/csv",
+    "text/html",
+    "text/javascript",
+    "text/plain",
+    "text/x-component",
+    "text/xml",
+}

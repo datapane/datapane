@@ -83,7 +83,7 @@ def compress_file(f_name: NPath, level: int = 6) -> t.Generator[str, None, None]
             os.unlink(f_name_gz)
 
 
-def inmemory_compress(content: io.BytesIO) -> io.BytesIO:
+def inmemory_compress(content: t.BinaryIO) -> t.BinaryIO:
     """(x-plat) Memory-based gzip compression"""
     content.seek(0)
     zbuf = io.BytesIO()
