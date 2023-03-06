@@ -35,6 +35,7 @@ from datapane.client.exceptions import IncompatibleVersionError, ReportTooLargeE
 from datapane.client.utils import TEST_ENV
 from datapane.common import JSON, MIME, SIZE_1_MB, NPath, guess_type
 from datapane.common.ops_utils import inmemory_compress
+from datapane.common.utils import should_compress_mime_type_for_upload
 
 ################################################################################
 # Tmpfile handling
@@ -297,44 +298,3 @@ def do_download_file(download_url: t.Union[str, furl], fn: t.Optional[NPath] = N
             for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
                 ffile.write(chunk)
     return fn
-
-
-def should_compress_mime_type_for_upload(mime_type: str) -> bool:
-    # Most file types people deal with are fairly well compressed already, and
-    # there are many, so we use the approach of listing ones we guess will
-    # benefit from compression rather than the other way around.
-    return mime_type in _SHOULD_COMPRESS_MIME_TYPES
-
-
-# Mostly borrowed from here: https://letstalkaboutwebperf.com/en/gzip-brotli-server-config/
-_SHOULD_COMPRESS_MIME_TYPES = {
-    "application/atom+xml",
-    "application/javascript",
-    "application/json",
-    "application/manifest+json",
-    "application/vnd.pickle+binary",
-    "application/rss+xml",
-    "application/vnd.api+json",
-    "application/vnd.ms-fontobject",
-    "application/x-font-opentype",
-    "application/x-font-truetype",
-    "application/x-font-ttf",
-    "application/x-javascript",
-    "application/xhtml+xml",
-    "application/xhtml+xml",
-    "application/xml",
-    "font/eot",
-    "font/opentype",
-    "font/otf",
-    "font/ttf",
-    "image/svg+xml",
-    "image/vnd.microsoft.icon",
-    "image/x-icon",
-    "text/css",
-    "text/csv",
-    "text/html",
-    "text/javascript",
-    "text/plain",
-    "text/x-component",
-    "text/xml",
-}
