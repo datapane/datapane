@@ -86,7 +86,7 @@ class Blocks(ContainerBlock):
 
     @property
     def has_compute(self):
-        return any(isinstance(block, Compute) for block in self.blocks)
+        return any(isinstance(block, Compute) for block in self)
 
 
 class View(Blocks):
