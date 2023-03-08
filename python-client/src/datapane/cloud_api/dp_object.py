@@ -138,6 +138,7 @@ class DPObjectRef:
         files: FileAttachmentList = None,
         file: t.Optional[Path] = None,
         overwrite: bool = False,
+        files_already_gzipped: bool = False,
         **data: JSON,
     ) -> U:
         # TODO - move into UploadedFileMixin ?
@@ -145,9 +146,13 @@ class DPObjectRef:
             with file.open("rb") as f:
                 # wrap up a single file into a FileList
                 files: FileAttachmentList = dict(uploaded_file=[f])
-                res = Resource(cls.endpoint).post_files(files=files, overwrite=overwrite, **data)
+                res = Resource(cls.endpoint).post_files(
+                    files=files, overwrite=overwrite, files_already_gzipped=files_already_gzipped, **data
+                )
         else:
-            res = Resource(cls.endpoint).post_files(files=files, overwrite=overwrite, **data)
+            res = Resource(cls.endpoint).post_files(
+                files=files, overwrite=overwrite, files_already_gzipped=files_already_gzipped, **data
+            )
         return cls(dto=res)
 
     @classmethod

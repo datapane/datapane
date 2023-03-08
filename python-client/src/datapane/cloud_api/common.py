@@ -182,7 +182,9 @@ class Resource:
         r = self.session.post(self.url, headers=extra_headers, json=data, params=params, timeout=self.timeout)
         return _process_res(r)
 
-    def post_files(self, files: FileAttachmentList, overwrite: bool = False, **data: JSON) -> Munch:
+    def post_files(
+        self, files: FileAttachmentList, overwrite: bool = False, files_already_gzipped: bool = False, **data: JSON
+    ) -> Munch:
         # upload files using custom json-data protocol
         # build the fields
 
@@ -190,8 +192,11 @@ class Resource:
             fobj.flush()
             fobj.seek(0)
             mime_type: str = guess_type(Path(fobj.name))
-            if should_compress_mime_type_for_upload(mime_type):
-                return_file = inmemory_compress(fobj)
+            if files_already_gzipped or should_compress_mime_type_for_upload(mime_type):
+                if files_already_gzipped:
+                    return_file = fobj
+                else:
+                    return_file = inmemory_compress(fobj)
                 file_header = {"Content-Encoding": "gzip"}
                 # Server side, our upload handler does not make it easy to
                 # access the 'Content-Encoding' header and handle properly. But

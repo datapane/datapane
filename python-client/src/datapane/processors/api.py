@@ -193,7 +193,9 @@ def upload_report(
 
     # attach the view and upload as an App
     files: FileAttachmentList = dict(attachments=file_list)
-    report = CloudReport.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
+    report = CloudReport.post_with_files(
+        files, overwrite=overwrite, document=view_xml, files_already_gzipped=True, **kwargs
+    )
 
     if open:
         open_in_browser(report.web_url)
