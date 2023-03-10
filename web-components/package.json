@@ -44,7 +44,7 @@
         "file-saver": "^2.0.5",
         "he": "^1.2.0",
         "highlight.js": "^11.6.0",
-        "htmx.org": "^1.8.4",
+        "htmx.org": "^1.8.6",
         "iframe-resizer": "^4.3.2",
         "jquery": "^3.6.1",
         "katex": "^0.16.3",
