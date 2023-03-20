@@ -12,14 +12,14 @@ import datapane as dp
 def f(first_name: str):
     return dp.Text(f"Hello, {first_name}!")
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Text("Welcome to my app"),
     dp.Form(on_submit=f,
             controls=dp.Controls(first_name=dp.TextBox()),
             label="Enter your name:"),
 )
 
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 You typically provide `dp.Form` with two parameters:
@@ -44,12 +44,12 @@ import datapane as dp
 def get_time() -> str:
     return datetime.now().time().isoformat()
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Text(f"This app was created at {get_time()},\n the app was loaded at..."),
     dp.Dynamic(on_load=get_time)
 )
 
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 `dp.Dynamic` also has an `on_timer` parameter which can be used to call a backend function on a regular schedule - see the [API docs][datapane.blocks.compute.Dynamic] for more information.

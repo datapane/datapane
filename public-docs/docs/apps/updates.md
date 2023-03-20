@@ -15,13 +15,13 @@ import datapane as dp
 def f(name: str):
     return dp.Text(f"Hello, {name.title()}!")
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(on_submit=f,
             controls=dp.Controls(name=dp.TextBox()), target="replace_me"),
     dp.Text("This will be replaced", name='replace_me')
 )
 
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 !!! tip
@@ -43,11 +43,11 @@ import datapane as dp
 def f(name: str):
     return dp.Text(f"Hello, {name.title()}!")
 
-app = dp.Blocks(
+view = dp.View(
     dp.Form(on_submit=f, controls=dp.Controls(name=dp.TextBox()), target=dp.TargetMode.BELOW),
 )
 
-dp.serve_app(app)
+dp.serve_app(view)
 ```
 
 #### Insert below (default)
@@ -86,12 +86,12 @@ import datapane as dp
 def f(name: str):
     return dp.Text(f"Hello, {name.title()}!")
 
-app = dp.Blocks(
+view = dp.View(
     dp.Compute(function=f, controls=dp.Controls(name=dp.TextBox()), target='my_grid', swap=dp.Swap.PREPEND),
     dp.Group(columns=2, name="my_grid")
 )
 
-dp.serve_app(app)
+dp.serve_app(view)
 ```
 
 ### Replace (default)

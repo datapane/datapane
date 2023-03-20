@@ -10,9 +10,9 @@ To host your app, run `dp.serve_app`.
 ```python
 import datapane as dp
 
-app = dp.Blocks(...)
+view = dp.View(...)
 
-dp.serve_app(app)
+dp.serve_app(view)
 ```
 
 ### Creating a public URL

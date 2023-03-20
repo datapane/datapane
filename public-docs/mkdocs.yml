@@ -6,8 +6,8 @@ copyright: © 2023 <a href="https://datapane.com" target="_blank">Datapane</a>. 
 
 nav:
   - Introduction: index.md
-  - Installing Datapane: "misc/installing-datapane.md"
-  - Quickstart: "misc/quickstart.ipynb"
+  - Installing Datapane: installing-datapane.md
+  - Quickstart: quickstart.ipynb
   - Blocks and Views:
     - Overview: "blocks/overview.ipynb"
     - Display Blocks: "blocks/display-blocks.ipynb"
@@ -22,11 +22,10 @@ nav:
     - Functions and Controls: "apps/functions-controls.md"
     - Displaying Updates: "apps/updates.md"
     - Advanced Features: "apps/advanced.md"
-    - Example: "apps/example.md"
     - Deployment: "apps/deployment.md"
   - Resources:
-      - Examples: "misc/examples.md"
-      - Cookbook / Snippets: "misc/cookbook.md"
+      - Examples: examples.md
+      - Cookbook / Snippets: cookbook.md
   - API Reference:
       - Display Blocks:
           - Plots: "reference/display-blocks/plots.ipynb"

@@ -20,7 +20,7 @@ def filter_df(column: str):
     return dp.DataTable(df[column])
 
 # We define the App similar to a Report
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(
         on_submit=filter_df,
         controls=dp.Controls(column=dp.Choice(options=list(df.columns), label="Select column to filter"))
@@ -28,7 +28,7 @@ blocks = dp.Blocks(
 )
 
 # Start serving the app (by default on http://localhost:8000)
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 <!-- TODO - embed this app... -->

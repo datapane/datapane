@@ -18,13 +18,13 @@ df = data.iris()
 def filter_df(column: str):
     return dp.DataTable(df[column])
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(
         on_submit=filter_df,
         controls=dp.Controls(column = dp.Choice(options=list(df.columns), label="Select column to filter"))
     )
 )
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 In the example above, `df` is referenced by `filter_df` and can be accessed in that function by all users when the function is called. It's important to note that Datapane supports multiple users by default, and Datapane will call ``filter_df` automatically for each user individually upon submitting the form.
@@ -64,13 +64,13 @@ def load_file(file: Path):
         dp.Form(on_submit=process_df, controls=dict(col_name=dp.TextBox()))
     ]
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(
         on_submit=load_file,
         controls=dict(file=dp.File())
     )
 )
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 In the above, the function chaining is isolated for each user, and uploaded `df` is stored independently to other users currently using the app.
@@ -96,7 +96,7 @@ def calc(x: int, y: int):
     z = x+y
     return dp.BigNumber("Result", x+y)
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(
         on_submit=calc,
         controls=[dp.NumberBox('x', initial=2), dp.NumberBox('y', initial=3)],
@@ -105,7 +105,7 @@ blocks = dp.Blocks(
     )
 )
 
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```
 
 ## Session State
@@ -132,7 +132,7 @@ def calc(params: dict, session: dict):
     session['acc'] = result
     return dp.BigNumber("Result", result)
 
-blocks = dp.Blocks(
+view = dp.View(
     dp.Form(
         on_submit=calc,
         controls=[dp.NumberBox('x', initial=2), dp.NumberBox('y', initial=3)],
@@ -140,5 +140,5 @@ blocks = dp.Blocks(
     )
 )
 
-dp.serve_app(blocks)
+dp.serve_app(view)
 ```

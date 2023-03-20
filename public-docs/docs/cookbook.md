@@ -1,8 +1,54 @@
-## Introduction
-
 Find some recipes for useful things you can build using Datapane!
 
-## Using DuckDB and Altair to build a data exploration tool
+## Iris dimension visualization
+
+This example demonstrates an app that allows the user to visualize different dimensions of the Iris flower dataset.
+
+```python
+import random
+import altair as alt
+import datapane as dp
+from vega_datasets import data
+
+# load the dataset as a global value
+dataset = data.iris()
+columns = list(dataset.columns)
+
+def plot(x_axis: str, y_axis: str, color: str) -> dp.Plot:
+    """Create and return the plot"""
+    fig = (
+        alt.Chart(dataset)
+        .mark_point()
+        .encode(
+            x=alt.X(x_axis, scale=alt.Scale(zero=False)),
+            y=alt.X(y_axis, scale=alt.Scale(zero=False)),
+            color=color,
+            tooltip=columns,
+        )
+    )
+
+    return dp.Plot(fig)
+
+# App setup
+controls = dp.Controls(
+    dp.Choice("x_axis", options=columns, initial=random.choice(columns)),
+    dp.Choice("y_axis", options=columns, initial=random.choice(columns)),
+    dp.Choice("color", options=columns, initial=random.choice(columns)),
+)
+view = dp.View(
+    "# Iris Dataset Plotter",
+    dp.Form(plot, submit_label="Plot", controls=controls),
+)
+dp.serve_app(view)
+```
+
+<!-- We've deployed the app to Fly.io using our [deployment docs](/deployment/deployed_apps/). You can view it here:
+
+## TODO
+ - iframe to app on fly.io (served using `embed_mode=True`) -->
+
+
+## Data exploration via DuckDB
 
 [DuckDB](https://duckdb.org/) provides a great way to do fast analytics in SQL. Combine it with Datapane to build an app to query a database using forms. The following app allows you to explore the airports in the USA, and plots the results on a map.
 
@@ -43,7 +89,7 @@ def get_sample(params):
     )
     return [background + points, dp.DataTable(sample)]
 
-v = dp.Blocks(
+v = dp.View(
   dp.Text("# Airport searcher"),
   dp.Form(
       on_submit=get_sample,
@@ -59,7 +105,7 @@ v = dp.Blocks(
 dp.serve_app(v)
 ```
 
-## Using image processing libraries to process an uploaded image
+## Processing an uploaded image
 
 This example demonstrates how to create an app with Datapane. The app allows the user to upload an image, which is then processed to remove its background. The original and processed images are then displayed to the user, along with a download link for each.
 
@@ -90,7 +136,7 @@ def process_image(params):
     )
 
 
-v = dp.Blocks(
+v = dp.View(
     "# Background Remover 🪄",
     dp.Form(
         process_image,
@@ -99,5 +145,5 @@ v = dp.Blocks(
     ),
 )
 
-dp.serve_app(v, embed_mode=True)
+dp.serve_app(v)
 ```
