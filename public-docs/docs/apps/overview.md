@@ -12,22 +12,23 @@ In just a few lines we have built a simple data app that allows multiple users t
 from vega_datasets import data
 import datapane as dp
 
+# a globally-accessible DataFrame
 df = data.iris()
 
-def filter_df(params):
+def filter_df(column: str):
     # Our dynamic function
-    return dp.DataTable(df[params['column']])
+    return dp.DataTable(df[column])
 
 # We define the App similar to a Report
-app = dp.Blocks(
+blocks = dp.Blocks(
     dp.Form(
         on_submit=filter_df,
-        controls=[dp.TextBox(name='name')]
+        controls=dp.Controls(column=dp.Choice(options=list(df.columns), label="Select column to filter"))
     )
 )
 
 # Start serving the app (by default on http://localhost:8000)
-dp.serve_app(app)
+dp.serve_app(blocks)
 ```
 
 <!-- TODO - embed this app... -->
@@ -36,10 +37,9 @@ dp.serve_app(app)
 
 Apps build upon Reports and add a few simple concepts to make them dynamic:
 
-- [Compute Blocks](./blocks.md), such as [dp.Form][datapane.blocks.compute.Form] and [dp.Dynamic][datapane.blocks.compute.Dynamic] are added to your app alongside any static [Display](../display_blocks.ipynb) and [Layout](../layout_blocks.ipynb) blocks, and provide the interface into backend functions.
-- [Parameters](./functions_controls.md), such as [dp.TextBox][datapane.blocks.parameters.TextBox] above, and more complex controls such as [dp.Range][datapane.blocks.parameters.Range], provide an interactive set of Controls to use in your Forms in order to allow your viewers to specify parameters.
-- [Backend functions](./functions_controls.md), such as `filter_df` above, take these parameters, run any processing needed, and return Display and Layout blocks.
-
+- [Compute Blocks](./blocks.md), such as [dp.Form][datapane.blocks.compute.Form] and [dp.Dynamic][datapane.blocks.compute.Dynamic] are added to your app alongside any static [Display](../blocks/display-blocks.ipynb) and [Layout](../blocks/layout-blocks.ipynb) blocks, and provide the interface into backend functions.
+- [Parameters](./functions-controls.md), such as [dp.TextBox][datapane.blocks.parameters.TextBox] above, and more complex controls such as [dp.Range][datapane.blocks.parameters.Range], provide an interactive set of Controls to use in your Forms in order to allow your viewers to specify parameters.
+- [Backend functions](./functions-controls.md), such as `filter_df` above, take these parameters, run any processing needed, and return Display and Layout blocks.
 
 Most other data app frameworks work by running your app from top to bottom every time something changes.
 

@@ -4,7 +4,7 @@ import typing as t
 from collections import deque
 from functools import reduce
 
-from datapane.client import DPClientError
+from datapane.client import DPClientError, log
 from datapane.common.dp_types import StrEnum
 
 from .base import BaseBlock, BlockId, BlockList, BlockOrPrimitive, wrap_block
@@ -36,11 +36,11 @@ class ContainerBlock(BaseBlock):
     """
 
     blocks: BlockList
+    # how many blocks must there be in the container
+    report_minimum_blocks: int = 1
 
     def __init__(self, *arg_blocks: BlockOrPrimitive, blocks: t.List[BlockOrPrimitive] = None, **kwargs):
         self.blocks = blocks or list(arg_blocks)
-        if len(self.blocks) == 0:
-            raise DPClientError(f"Can't create {self._tag} with 0 entries")
         self.blocks = [wrap_block(b) for b in self.blocks]
 
         super().__init__(**kwargs)
@@ -123,6 +123,7 @@ class Select(ContainerBlock):
     """
 
     _tag = "Select"
+    report_minimum_blocks = 2
 
     def __init__(
         self,
@@ -145,7 +146,7 @@ class Select(ContainerBlock):
         """
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=type)
         if len(self.blocks) < 2:
-            raise DPClientError("Can't create Select with less than 2 objects")
+            log.warning("Creating a Select with less than 2 objects")
 
 
 class Group(ContainerBlock):
@@ -200,6 +201,7 @@ class Toggle(ContainerBlock):
     """
 
     _tag = "Toggle"
+    report_minimum_blocks = 1
 
     def __init__(
         self,

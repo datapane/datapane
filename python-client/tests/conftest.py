@@ -1,3 +1,7 @@
+import os
+
+os.environ["DP_TEST_ENV"] = "true"
+
 import pytest
 
 from datapane import DPMode, set_dp_mode

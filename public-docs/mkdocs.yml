@@ -1,30 +1,32 @@
-site_name: Datapane Docs
+site_name: Datapane
 repo_name: datapane/datapane
 repo_url: https://github.com/datapane/datapane/
 edit_uri: "edit/master/docs/docs/"
 copyright: © 2023 <a href="https://datapane.com" target="_blank">Datapane</a>. All rights reserved.
 
 nav:
-  - Introduction: index.ipynb
-  - Installing Datapane: install-datapane.md
-  - Quickstart: quickstart.ipynb
-  - Features:
-    - Display Blocks: "features/display_blocks.ipynb"
-    - Layout Blocks: "features/layout_blocks.ipynb"
-    - Reports: "features/reports.ipynb"
-    - Apps:
-      - Introduction: "features/apps/introduction.md"
-      - App Blocks: "features/apps/blocks.md"
-      - Functions and Controls: "features/apps/functions_controls.md"
-      - Displaying updates: "features/apps/updates.md"
-      - Advanced Apps: "features/apps/advanced.md"
-      - Example: "features/apps/example.md"
-    - Working with Jupyter: "jupyter-integration.ipynb"
-    - Styling: "features/styling.ipynb"
-  - Deployment:
-      - Sharing Reports: "deployment/sharing_reports.md"
-      - Self-Hosting Apps: "deployment/local_apps.md"
-      - Deploying Apps: "deployment/deployed_apps.md"
+  - Introduction: index.md
+  - Installing Datapane: "misc/installing-datapane.md"
+  - Quickstart: "misc/quickstart.ipynb"
+  - Blocks and Views:
+    - Overview: "blocks/overview.ipynb"
+    - Display Blocks: "blocks/display-blocks.ipynb"
+    - Layout Blocks: "blocks/layout-blocks.ipynb"
+  - Reports:
+    - Overview: "reports/overview.ipynb"
+    - Jupyter Integration: "reports/jupyter-integration.ipynb"
+    - Styling: "reports/styling.ipynb"
+  - Apps and Functions:
+    - Overview: "apps/overview.md"
+    - App Blocks: "apps/blocks.md"
+    - Functions and Controls: "apps/functions-controls.md"
+    - Displaying Updates: "apps/updates.md"
+    - Advanced Features: "apps/advanced.md"
+    - Example: "apps/example.md"
+    - Deployment: "apps/deployment.md"
+  - Resources:
+      - Examples: "misc/examples.md"
+      - Cookbook / Snippets: "misc/cookbook.md"
   - API Reference:
       - Display Blocks:
           - Plots: "reference/display-blocks/plots.ipynb"
@@ -41,8 +43,7 @@ nav:
           - Compute Blocks: "reference/apps/compute.ipynb"
           - Controls & Parameters: "reference/apps/controls.ipynb"
           - Apps API Reference: "reference/apps/reference.ipynb"
-  - Cookbook: cookbook.md
-  - Release Notes: releasenotes.md
+  # - Release Notes: releasenotes.md
 
 theme:
   name: material
@@ -110,9 +111,9 @@ plugins:
       lang: en
   - redirects:
       redirect_maps:
-        "tutorials/index.md": "index.ipynb"
-        "tutorials/basics/create-a-report.md": "features/reports.md"
-        "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "deployment/sharing_report.md"
+        # "tutorials/index.md": "index.ipynb"
+        # "tutorials/basics/create-a-report.md": "features/reports.md"
+        # "tutorials/datapane-cloud/upload-a-report-to-datapane-cloud.md": "deployment/sharing_report.md"
 
 markdown_extensions:
   - pymdownx.highlight:

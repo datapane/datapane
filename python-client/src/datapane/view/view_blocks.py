@@ -14,7 +14,7 @@ from datapane.blocks.layout import ContainerBlock
 if t.TYPE_CHECKING:
     from typing_extensions import Self
 
-    from datapane.cloud_api.app import AppFormatting
+    from datapane.processors.types import Formatting
 
 
 class Blocks(ContainerBlock):
@@ -93,7 +93,7 @@ class View(Blocks):
     pass
 
 
-BlocksT = t.Union[Blocks, t.List[BlockOrPrimitive], t.Mapping[str, BlockOrPrimitive]]
+BlocksT = t.Union[Blocks, t.List[BlockOrPrimitive], t.Mapping[str, BlockOrPrimitive], BlockOrPrimitive]
 
 
 class App(Blocks):
@@ -125,7 +125,7 @@ class App(Blocks):
         tags: t.Optional[t.List[str]] = None,
         project: t.Optional[str] = None,
         open: bool = False,
-        formatting: t.Optional[AppFormatting] = None,
+        formatting: t.Optional[Formatting] = None,
         overwrite: bool = False,
         **kwargs,
     ) -> None:
@@ -152,7 +152,7 @@ class App(Blocks):
         standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
-        formatting: t.Optional[AppFormatting] = None,
+        formatting: t.Optional[Formatting] = None,
         cdn_base: t.Optional[str] = None,
     ) -> None:
         from ..processors import save_report
@@ -170,7 +170,7 @@ class App(Blocks):
         standalone: bool = False,
         name: t.Optional[str] = None,
         author: t.Optional[str] = None,
-        formatting: t.Optional[AppFormatting] = None,
+        formatting: t.Optional[Formatting] = None,
         cdn_base: t.Optional[str] = None,
         template_name: str = "template.html",
     ) -> str:
@@ -186,3 +186,7 @@ class App(Blocks):
             raise ValueError('save(template_name="...") is no longer supported, sorry!')
 
         return stringify_report(blocks=self, name=name, formatting=formatting)
+
+
+class Report(App):
+    pass

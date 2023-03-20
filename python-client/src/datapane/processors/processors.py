@@ -20,13 +20,12 @@ from datapane.client import config as c
 from datapane.client.analytics import _NO_ANALYTICS, capture
 from datapane.client.exceptions import InvalidReportError
 from datapane.client.utils import display_msg, log, open_in_browser
-from datapane.cloud_api import AppFormatting, AppWidth
 from datapane.common import HTML, NPath, timestamp, validate_view_doc
 from datapane.common.viewxml_utils import ElementT, local_view_resources
 from datapane.view import CollectFunctions, PreProcess, XMLBuilder
 
 from .file_store import FileEntry
-from .types import BaseProcessor
+from .types import BaseProcessor, Formatting
 
 if t.TYPE_CHECKING:
     pass
@@ -34,6 +33,10 @@ if t.TYPE_CHECKING:
 
 class PreProcessView(BaseProcessor):
     """Optimisations to improve the layout of the view using the Block-API"""
+
+    def __init__(self, *, is_finalised: bool = True) -> None:
+        self.is_finalised = is_finalised
+        super().__init__()
 
     def __call__(self, _: t.Any) -> None:
         # AST checks
@@ -53,7 +56,7 @@ class PreProcessView(BaseProcessor):
             ]
 
         # Block-API visitors
-        pp = PreProcess()
+        pp = PreProcess(is_finalised=self.is_finalised)
         v.accept(pp)
         v1 = pp.root
         # v1 = copy(v)
@@ -191,12 +194,12 @@ class BaseExportHTML(BaseProcessor, ABC):
     def _write_html_template(
         self,
         name: str,
-        formatting: t.Optional[AppFormatting] = None,
+        formatting: t.Optional[Formatting] = None,
         app_runner: bool = False,
     ) -> t.Tuple[str, str]:
         """Internal method to write the ViewXML and assets into a HTML container and associated files"""
         name = name or "app"
-        formatting = formatting or AppFormatting()
+        formatting = formatting or Formatting()
 
         report_id: str = uuid4().hex
 
@@ -213,7 +216,7 @@ class BaseExportHTML(BaseProcessor, ABC):
         html = self.template.render(
             # Escape JS multi-line strings
             app_data=self.escape_json_htmlsafe(app_data),
-            report_width_class=report_width_classes.get(formatting.width),
+            report_width_class=formatting.width.to_css(),
             report_name=name,
             report_date=timestamp(),
             css_header=formatting.to_css(),
@@ -235,7 +238,7 @@ class ExportBaseHTMLOnly(BaseExportHTML):
     # TODO (JB) - Create base HTML-only template
     template_name = "local_template.html"
 
-    def __init__(self, debug: bool, formatting: t.Optional[AppFormatting] = None):
+    def __init__(self, debug: bool, formatting: t.Optional[Formatting] = None):
         self.debug = debug
         self.formatting = formatting
 
@@ -261,7 +264,7 @@ class ExportHTMLInlineAssets(BaseExportHTML):
 
     template_name = "local_template.html"
 
-    def __init__(self, path: str, open: bool = False, name: str = "app", formatting: t.Optional[AppFormatting] = None):
+    def __init__(self, path: str, open: bool = False, name: str = "app", formatting: t.Optional[Formatting] = None):
         self.path = path
         self.open = open
         self.name = name
@@ -291,7 +294,7 @@ class ExportHTMLFileAssets(BaseExportHTML):
 
     template_name = "local_template.html"
 
-    def __init__(self, app_dir: Path, name: str = "app", formatting: t.Optional[AppFormatting] = None):
+    def __init__(self, app_dir: Path, name: str = "app", formatting: t.Optional[Formatting] = None):
         self.app_dir = app_dir
         self.name = name
         self.formatting = formatting
@@ -320,7 +323,7 @@ class ExportHTMLStringInlineAssets(BaseExportHTML):
     def __init__(
         self,
         name: str = "Stringified App",
-        formatting: t.Optional[AppFormatting] = None,
+        formatting: t.Optional[Formatting] = None,
     ):
         self.name = name
         self.formatting = formatting
@@ -329,11 +332,3 @@ class ExportHTMLStringInlineAssets(BaseExportHTML):
         html, report_id = self._write_html_template(name=self.name, formatting=self.formatting)
 
         return HTML(html)
-
-
-# TODO - Refactor to share dp_tags.widths
-report_width_classes = {
-    AppWidth.NARROW: "max-w-3xl",
-    AppWidth.MEDIUM: "max-w-screen-xl",
-    AppWidth.FULL: "max-w-full",
-}

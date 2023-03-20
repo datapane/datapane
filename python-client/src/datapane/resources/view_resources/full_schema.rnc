@@ -160,7 +160,8 @@ LayoutBlock = Group | Select | Toggle
 Select = element Select {
   block_label_or_name,
   attribute type { string "dropdown" | string "tabs" }?,
-  Block, Block+  # at least 2 block elements in a Select
+  # Selects used to require at least 2 elements (for Reports), with Apps this has been relaxed
+  Block*
 }
 
 Group = element Group {

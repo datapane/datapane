@@ -12,6 +12,7 @@ from multimethod import multimethod
 from datapane import blocks as bk
 from datapane.blocks import BaseBlock, Compute
 from datapane.blocks.layout import ContainerBlock
+from datapane.client import DPClientError, log
 
 from .view_blocks import Blocks
 
@@ -85,9 +86,11 @@ class PreProcess(ViewVisitor):
     or the XML DOM via lxml.
     """
 
+    in_collapsible_group: bool = False
+    # is_finalised determines if we allow dynamic blocks or validate based on their static/current subblocks
+    is_finalised: bool = True
     current_state: list[BaseBlock] = dc.field(default_factory=list)
     current_text: list[bk.Text] = dc.field(default_factory=list)
-    in_collapsible_group: bool = False
 
     @multimethod
     def visit(self, b: BaseBlock):
@@ -105,6 +108,13 @@ class PreProcess(ViewVisitor):
     @multimethod
     def visit(self, b: ContainerBlock):
         self.merge_text()
+
+        if len(b.blocks) < b.report_minimum_blocks:
+            msg = f"{b.__class__.__name__} has less than {b.report_minimum_blocks} objects"
+            if self.is_finalised:
+                raise DPClientError(msg)
+            else:
+                log.warning(msg)
 
         with self.fresh_state(b):
             self.in_collapsible_group = isinstance(b, Blocks) or (isinstance(b, bk.Group) and b.columns == 1)

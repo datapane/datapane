@@ -42,11 +42,10 @@ dp.Form(on_submit=f,
 
 ### Returning Values
 
-Datapane functions can return any [Datapane block](../display_blocks.ipynb) or [raw Python objects](../display_blocks.ipynb#automatic-conversion) that are supported by Datapane. You can return these directly, as a list, or return a layout or container block like `dp.Blocks` or `dp.Group` for a more advanced layout.
+Datapane functions can return any [Datapane block](../blocks/display-blocks.ipynb) or [raw Python objects](../blocks/display-blocks.ipynb#automatic-conversion) that are supported by Datapane. You can return these directly, as a list, or return a layout or container block like `dp.Blocks` or `dp.Group` for a more advanced layout.
 
 !!! tip
     You can even return compute blocks like `dp.Form` and `dp.Dynamic` from a function, allowing you to chain functions together that build more complex operations and interactive apps, such as wizards.
-
 
 ## Controls
 
@@ -56,7 +55,7 @@ These parameters are collected from the user and passed by Datapane into the res
 
 When the user submits the form, Datapane automatically handles uploading the user's input, validates it, converts it to the correct type, and provides initial values if none are given. From there, Datapane calls the Compute function with the params in the `params` dict as mentioned [above](#compute-functions).
 
-When adding a Compute Block to your code, you pass in the collection of parameters that make up your contols via a `dp.Controls` object.
+When adding a Compute Block to your code, you pass in the collection of parameters that make up your controls via a `dp.Controls` object.
 
 ```python
 dp.Form(on_submit=f,
@@ -89,4 +88,4 @@ The built-in parameters include,
 | [DateTime][datapane.blocks.parameters.DateTime] | `datetime.datetime` | Select a date and a time |
 | [File][datapane.blocks.parameters.File] | `pathlib.Path`| Upload a file |
 
-The [Controls API docs](../../reference/apps/controls.ipynb) also include detailed information and live samples of each parameter type.
+The [Controls API docs](../reference/apps/controls.ipynb) also include detailed information and live samples of each parameter type.

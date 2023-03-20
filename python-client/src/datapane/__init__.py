@@ -33,6 +33,7 @@ from .blocks import (
     HTML,
     Attachment,
     BigNumber,
+    Block,
     Choice,
     Code,
     Compute,
@@ -40,7 +41,6 @@ from .blocks import (
     DataTable,
     Date,
     DateTime,
-    Divider,
     Dynamic,
     Embed,
     Empty,
@@ -69,12 +69,19 @@ from .blocks import (
     VAlign,
     wrap_block,
 )
-from .cloud_api import AppFormatting, AppWidth
+from .cloud_api import CloudReport
 from .cloud_api import File as CloudFile
-from .cloud_api import FontChoice
-from .cloud_api import Report as CloudApp
-from .cloud_api import TextAlignment, hello_world, login, logout, ping, signup
-from .processors import build_report, save_report, stringify_report, upload_report
+from .cloud_api import hello_world, login, logout, ping, signup
+from .processors import (
+    FontChoice,
+    Formatting,
+    TextAlignment,
+    Width,
+    build_report,
+    save_report,
+    stringify_report,
+    upload_report,
+)
 from .view import App, Blocks, View
 
 # Other useful re-exports
@@ -84,13 +91,9 @@ X = wrap_block
 
 __all__ = [
     "App",
-    "AppFormatting",
-    "AppWidth",
     "DPClientError",
     "CloudFile",
-    "CloudApp",
-    "FontChoice",
-    "TextAlignment",
+    "CloudReport",
     "builtins",
     "hello_world",
     "login",
@@ -99,6 +102,7 @@ __all__ = [
     "signup",
     "enable_logging",
     "load_params_from_command_line",
+    "Block",
     "Attachment",
     "BigNumber",
     "Empty",
@@ -111,7 +115,6 @@ __all__ = [
     "Formula",
     "HTML",
     "Code",
-    "Divider",
     "Embed",
     "Group",
     "Text",
@@ -144,6 +147,10 @@ __all__ = [
     "TargetMode",
     "Page",
     "View",
+    "Width",
+    "FontChoice",
+    "Formatting",
+    "TextAlignment",
 ]
 
 

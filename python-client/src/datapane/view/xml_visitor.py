@@ -15,6 +15,7 @@ from datapane.blocks.asset import AssetBlock
 from datapane.blocks.compute import Compute, TargetMode, gen_name
 from datapane.blocks.layout import ContainerBlock
 from datapane.blocks.text import EmbeddedTextBlock
+from datapane.client import log
 from datapane.common.viewxml_utils import ElementT, mk_attribs
 from datapane.view.view_blocks import Blocks
 from datapane.view.visitors import ViewVisitor
@@ -88,6 +89,8 @@ class XMLBuilder(ViewVisitor):
         sub_elements = self._visit_subnodes(b)
 
         # Blocks are converted to Group internally
+        if label := b._attributes.get("label"):
+            log.info(f"Found label {label} in top-level Blocks/View")
         element = E.Group(*sub_elements, columns="1", valign="top")
         return self.add_element(b, element)
 

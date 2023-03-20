@@ -1,4 +1,3 @@
-
 Datapane automatically handles taking the results from your compute function and updating the user's view of the app. By default, the output of your functions will be inserted directly below where the compute block, i.e. a Form, in your app.
 
 This works for most common cases, however you may want to specify this behavior - for instance you may want to add the results to the user's existing `Group` block, add a new `Page`, or even replace the `Form` itself. To accomplish this, Datapane compute blocks accept two arguments, `target=` and `swap=` that are used to specify how to update the View of your user's app with the results.
@@ -13,17 +12,16 @@ All blocks have an optional `name` property which is used for referencing and ta
 ```python
 import datapane as dp
 
-def f(params):
-    first_name = params["first_name"]
-    return dp.Text(f"Hello, {first_name}!")
+def f(name: str):
+    return dp.Text(f"Hello, {name.title()}!")
 
-app = dp.Blocks(
+blocks = dp.Blocks(
     dp.Form(on_submit=f,
             controls=dp.Controls(name=dp.TextBox()), target="replace_me"),
     dp.Text("This will be replaced", name='replace_me')
 )
 
-dp.serve_app(app)
+dp.serve_app(blocks)
 ```
 
 !!! tip
@@ -31,7 +29,6 @@ dp.serve_app(app)
 
 !!! note
     the `target` parameter can also be given a block object directly to use as the target
-
 
 ### Target modes
 
@@ -43,18 +40,18 @@ When using `dp.TargetMode` you don't need to create empty blocks or think about 
 ```python
 import datapane as dp
 
-def f(params):
-    first_name = params["first_name"]
-    return dp.Text(f"Hello, {first_name}!")
+def f(name: str):
+    return dp.Text(f"Hello, {name.title()}!")
 
 app = dp.Blocks(
-    dp.Form(on_submit=f, controls=dict(first_name=dp.TextBox()), target=dp.TargetMode.BELOW),
+    dp.Form(on_submit=f, controls=dp.Controls(name=dp.TextBox()), target=dp.TargetMode.BELOW),
 )
 
 dp.serve_app(app)
 ```
 
 #### Insert below (default)
+
 Insert the result blocks directly below the form using `dp.TargetMode.BELOW`.
 
 <div style='display: flex; justify-content:center'>
@@ -69,7 +66,6 @@ Insert the result blocks to right side of the form using `dp.TargetMode.SIDE`
     <img src="/img/advanced/side.png" style='width:50%'/>
 </div>
 
-
 #### Replace self
 
 Replace the form itself using `dp.TargetMode.SELF`. This helpful for forms which should only be called a single time.
@@ -80,19 +76,18 @@ Replace the form itself using `dp.TargetMode.SELF`. This helpful for forms which
 
 ## Block Swapping
 
-In addition to choosing _where_ to insert your block, Datapane also provides helpers around _how_ to insert a block. This is more of an advanced feature only available on the `dp.Compute` block that is primarily useful when you are inserting blocks into a [layout block](../layout_blocks.ipynb) -- for instance, if you had a form which prepended/appended a result to a list upon each run.
+In addition to choosing _where_ to insert your block, Datapane also provides helpers around _how_ to insert a block. This is more of an advanced feature only available on the `dp.Compute` block that is primarily useful when you are inserting blocks into a [layout block](../blocks/layout-blocks.ipynb) -- for instance, if you had a form which prepended/appended a result to a list upon each run.
 
-This behavior is configured using the `dp.Swap` enum which is passed into a Compute block via the `swap` parameter. In the example below, every time the form is s`ubmitted, the results are prepended to the front of the previous data inside the 2-column `dp.Group` block.
+This behavior is configured using the `dp.Swap` enum which is passed into a Compute block via the `swap` parameter. In the example below, every time the form is submitted, the results are prepended to the front of the previous data inside the 2-column `dp.Group` block.
 
 ```python
 import datapane as dp
 
-def f(params):
-    first_name = params["first_name"]
-    return dp.Text(f"Hello, {first_name}!")
+def f(name: str):
+    return dp.Text(f"Hello, {name.title()}!")
 
 app = dp.Blocks(
-    dp.Compute(function=f, controls=dp.Controls(first_name=dp.TextBox()), target='my_grid', swap=dp.Swap.PREPEND),
+    dp.Compute(function=f, controls=dp.Controls(name=dp.TextBox()), target='my_grid', swap=dp.Swap.PREPEND),
     dp.Group(columns=2, name="my_grid")
 )
 

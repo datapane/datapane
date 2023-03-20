@@ -2,6 +2,8 @@
 Datapane Processors
 
 API for processing Views, e.g. rendering it locally and publishing to a remote server
+
+# TODO - move this out into a new top-level module
 """
 
 from __future__ import annotations
@@ -14,7 +16,7 @@ from shutil import rmtree
 from datapane.client import DPClientError
 from datapane.client import config as c
 from datapane.client.utils import display_msg, open_in_browser
-from datapane.cloud_api.app import AppFormatting, Report
+from datapane.cloud_api.report import CloudReport
 from datapane.common import NPath, dict_drop_empty
 from datapane.view import Blocks, BlocksT
 
@@ -27,7 +29,7 @@ from .processors import (
     PreProcessView,
     PreUploadProcessor,
 )
-from .types import Pipeline, ViewState
+from .types import Formatting, Pipeline, ViewState
 
 if t.TYPE_CHECKING:
     from datapane.cloud_api.common import FileAttachmentList
@@ -40,9 +42,9 @@ __all__ = ["upload_report", "save_report", "build_report", "stringify_report"]
 # exported public API
 def build_report(
     blocks: BlocksT,
-    name: str = "app",
+    name: str = "Report",
     dest: t.Optional[NPath] = None,
-    formatting: t.Optional[AppFormatting] = None,
+    formatting: t.Optional[Formatting] = None,
     overwrite: bool = False,
 ) -> None:
     """Build an (static) app with a directory structure, which can be served by a local http server
@@ -75,7 +77,7 @@ def build_report(
     s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
     _: str = (
         Pipeline(s)
-        .pipe(PreProcessView())
+        .pipe(PreProcessView(is_finalised=True))
         .pipe(ConvertXML())
         .pipe(ExportHTMLFileAssets(app_dir=app_dir, name=name, formatting=formatting))
         .result
@@ -87,7 +89,7 @@ def save_report(
     path: str,
     open: bool = False,
     name: str = "Report",
-    formatting: t.Optional[AppFormatting] = None,
+    formatting: t.Optional[Formatting] = None,
 ) -> None:
     """Save the app document to a local HTML file
     Args:
@@ -101,7 +103,7 @@ def save_report(
     s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=B64FileEntry)
     _: str = (
         Pipeline(s)
-        .pipe(PreProcessView())
+        .pipe(PreProcessView(is_finalised=True))
         .pipe(ConvertXML())
         .pipe(ExportHTMLInlineAssets(path=path, open=open, name=name, formatting=formatting))
         .result
@@ -111,7 +113,7 @@ def save_report(
 def stringify_report(
     blocks: BlocksT,
     name: t.Optional[str] = None,
-    formatting: t.Optional[AppFormatting] = None,
+    formatting: t.Optional[Formatting] = None,
 ) -> str:
     """Stringify the app document to a HTML string
 
@@ -124,7 +126,7 @@ def stringify_report(
     s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=B64FileEntry)
     report_html: str = (
         Pipeline(s)
-        .pipe(PreProcessView())
+        .pipe(PreProcessView(is_finalised=False))
         .pipe(ConvertXML())
         .pipe(ExportHTMLStringInlineAssets(name=name, formatting=formatting))
         .result
@@ -142,10 +144,10 @@ def upload_report(
     tags: t.Optional[t.List[str]] = None,
     project: t.Optional[str] = None,
     open: bool = False,
-    formatting: t.Optional[AppFormatting] = None,
+    formatting: t.Optional[Formatting] = None,
     overwrite: bool = False,
     **kwargs,
-) -> Report:
+) -> CloudReport:
     """
     Upload as a report, including its attached assets, to the logged-in Datapane Server.
     Args:
@@ -185,11 +187,13 @@ def upload_report(
     kwargs = dict_drop_empty(kwargs)
 
     s = ViewState(blocks=Blocks.wrap_blocks(blocks), file_entry_klass=GzipTmpFileEntry)
-    (view_xml, file_list) = Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).pipe(PreUploadProcessor()).result
+    (view_xml, file_list) = (
+        Pipeline(s).pipe(PreProcessView(is_finalised=True)).pipe(ConvertXML()).pipe(PreUploadProcessor()).result
+    )
 
     # attach the view and upload as an App
     files: FileAttachmentList = dict(attachments=file_list)
-    report = Report.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
+    report = CloudReport.post_with_files(files, overwrite=overwrite, document=view_xml, **kwargs)
 
     if open:
         open_in_browser(report.web_url)

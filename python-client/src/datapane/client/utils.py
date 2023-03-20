@@ -18,7 +18,7 @@ from datapane.common import JDict
 ##############
 # Client constants
 TEST_ENV = bool(os.environ.get("DP_TEST_ENV", ""))
-IN_PYTEST = "pytest" in sys.modules
+IN_PYTEST = "pytest" in sys.modules  # and TEST_ENV
 # we're running on datapane platform
 ON_DATAPANE: bool = "DATAPANE_ON_DATAPANE" in os.environ
 

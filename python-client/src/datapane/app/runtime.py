@@ -196,7 +196,11 @@ def apply_ref(g_s: GlobalState, s_s: SessionState, ref: FunctionRef, params: t.D
         vs = ViewState(blocks=blocks, file_entry_klass=GzipTmpFileEntry, dir_path=assets_dir)
 
         return (
-            Pipeline(vs).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML(fragment=is_fragment)).state
+            Pipeline(vs)
+            .pipe(PreProcessView(is_finalised=False))
+            .pipe(AppTransformations())
+            .pipe(ConvertXML(fragment=is_fragment))
+            .state
         )
 
     def build_rpc_res(vs: ViewState) -> dict:

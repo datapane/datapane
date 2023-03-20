@@ -21,22 +21,6 @@ if t.TYPE_CHECKING:
 
 E = ElementMaker()  # XML Tag Factory
 
-# only these types will be documented by default
-# __all__ = [
-#     "BaseElement",
-#     "SelectType",
-#     "View",
-# ]
-#
-# __pdoc__ = {
-#     "Media.caption": False,
-#     "Media.file": False,
-#     "Attachment.caption": False,
-#     "Attachment.file": False,
-#     "Plot.file": False,
-#     "DataTable.file": False,
-# }
-
 
 BlockId = str
 
@@ -119,8 +103,9 @@ class DataBlock(BaseBlock):
     """
 
 
-BlockOrPrimitive = t.Union["Block", t.Any]  # TODO - expand
-BlockList = t.List["Block"]
+BlockOrPrimitive = t.Union["BaseBlock", t.Any]  # TODO - expand
+BlockList = t.List["BaseBlock"]
+# Block = BaseBlock
 
 
 def wrap_block(b: BlockOrPrimitive) -> Block:

@@ -8,6 +8,7 @@ import pandas as pd
 from pandas.io.formats.style import Styler
 
 from datapane.common import NPath, SSDict
+from datapane.common.df_processor import to_df
 from datapane.common.viewxml_utils import mk_attribs
 
 from .base import BlockId, DataBlock
@@ -206,6 +207,8 @@ class DataTable(AssetBlock):
             name: A unique name for the block to reference when adding text or embedding (optional)
             label: A label used when displaying the block (optional)
         """
+        # create a copy of the df to process
+        df = to_df(df)
         super().__init__(data=df, caption=caption, name=name, label=label)
         # TODO - support pyarrow schema for local reports
         (rows, columns) = df.shape

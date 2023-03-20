@@ -1,6 +1,5 @@
 Compute blocks, such as `dp.Form`, allow you to take parameters from end-users or update your app dynamically by triggering backend functions. When you add a Compute block, you specify a Python function which returns... you guessed it, blocks! The use of compute blocks require a running server, so won't they work in reports.
 
-
 ## Forms
 
 Build forms using [dp.Form][datapane.blocks.compute.Form], which expose controls, such as textboxes, file uploads, and number ranges. When a user submits the form, it runs the backend Python function you have chosen, and automatically updates the user's display with the result.
@@ -10,17 +9,17 @@ This means you can calculate complex analytics on demand in response to user inp
 ```python
 import datapane as dp
 
-def f(params):
-    first_name = params["first_name"]
+def f(first_name: str):
     return dp.Text(f"Hello, {first_name}!")
 
-app = dp.Blocks(
+blocks = dp.Blocks(
     dp.Text("Welcome to my app"),
     dp.Form(on_submit=f,
-            controls=dp.Controls(first_name=dp.TextBox())),
+            controls=dp.Controls(first_name=dp.TextBox()),
+            label="Enter your name:"),
 )
 
-dp.serve_app(app)
+dp.serve_app(blocks)
 ```
 
 You typically provide `dp.Form` with two parameters:
@@ -42,16 +41,15 @@ In the example below, the `on_load` parameter to `dp.Dynamic` - this instructs t
 from datetime import datetime
 import datapane as dp
 
-def get_time():
-    return dp.Text(datetime.now().time().isoformat())
+def get_time() -> str:
+    return datetime.now().time().isoformat()
 
-app = dp.Blocks(
-    dp.Text(f"This app was created at {get_time()}"),
-    dp.Text("The current time is ..."),
+blocks = dp.Blocks(
+    dp.Text(f"This app was created at {get_time()},\n the app was loaded at..."),
     dp.Dynamic(on_load=get_time)
 )
 
-dp.serve_app(app)
+dp.serve_app(blocks)
 ```
 
 `dp.Dynamic` also has an `on_timer` parameter which can be used to call a backend function on a regular schedule - see the [API docs][datapane.blocks.compute.Dynamic] for more information.

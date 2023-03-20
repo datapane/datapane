@@ -114,7 +114,7 @@ def gen_view_complex_with_files(
     big_number = dp.BigNumber(heading="Tests written", value=1234)
     big_number_1 = dp.BigNumber(heading="Real Tests written :)", value=11, change=2, is_upward_change=True)
     embed_block = dp.Embed(url="https://www.youtube.com/watch?v=JDe14ulcfLA")
-    divider_block = dp.Divider()
+    divider_block = dp.Text("---")
     empty_block = dp.Empty(name="empty-block")
 
     # assets

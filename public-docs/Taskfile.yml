@@ -23,6 +23,13 @@ tasks:
       - cmd: poetry run ./nbbuild.sh
       - cmd: poetry run mkdocs build
 
+  build-docs-only:
+    desc: "Locally build the docs only (don't run notebooks)"
+    env:
+      DATAPANE_CDN_BASE: '{{ .DATAPANE_CDN_BASE | default "" }}'
+    cmds:
+      - cmd: poetry run mkdocs build
+
   build:inline-statics:
     desc: "Build a package ready for a deploy, with report statics loaded into the build"
     cmds:

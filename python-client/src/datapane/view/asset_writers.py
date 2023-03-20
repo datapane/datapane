@@ -21,7 +21,6 @@ from pandas.io.formats.style import Styler
 from datapane import optional_libs as opt
 from datapane.client import DPClientError, log
 from datapane.common import ArrowFormat
-from datapane.common.df_processor import to_df
 
 from .xml_visitor import AssetMeta
 
@@ -79,12 +78,10 @@ class DataTableWriter:
 
     @multimethod
     def write_file(self, x: pd.DataFrame, f) -> None:
-        # create a copy of the df to process
-        df = to_df(x)
-        if df.size == 0:
+        if x.size == 0:
             raise DPClientError("Empty DataFrame provided")
         # process_df called in Arrow.save_file
-        ArrowFormat.save_file(f, df)
+        ArrowFormat.save_file(f, x)
 
 
 class HTMLTableWriter:

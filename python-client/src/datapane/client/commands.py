@@ -357,7 +357,7 @@ def run(
                 if r.result:
                     success_msg(f"App result - '{r.result}'")
                 if r.report:
-                    report = api.Report.by_id(r.report)
+                    report = api.CloudReport.by_id(r.report)
                     success_msg(f"Report generated at {report.web_url}")
             else:
                 failure_msg(f"App run failed/cancelled\n{r.error_msg}: {r.error_detail}")
@@ -411,14 +411,14 @@ def report_init(name: str, format: str):
 @click.option("--project")
 def delete(name: str, project: str):
     """Delete a report"""
-    api.Report.get(name, project).delete()
+    api.CloudReport.get(name, project).delete()
     success_msg(f"Deleted Report {name}")
 
 
 @report.command("list")
 def report_list():
     """List Reports"""
-    print_table(api.Report.list(), "Reports")
+    print_table(api.CloudReport.list(), "Reports")
 
 
 # NOTE - NYI - disabled

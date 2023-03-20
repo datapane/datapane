@@ -343,22 +343,19 @@
   </define>
   <define name="Select">
     <element name="Select">
-      <group>
-        <ref name="block_label_or_name"/>
-        <optional>
-          <attribute name="type">
-            <choice>
-              <value type="string" datatypeLibrary="">dropdown</value>
-              <value type="string" datatypeLibrary="">tabs</value>
-            </choice>
-          </attribute>
-        </optional>
+      <ref name="block_label_or_name"/>
+      <optional>
+        <attribute name="type">
+          <choice>
+            <value type="string" datatypeLibrary="">dropdown</value>
+            <value type="string" datatypeLibrary="">tabs</value>
+          </choice>
+        </attribute>
+      </optional>
+      <zeroOrMore>
+        <!-- Selects used to require at least 2 elements (for Reports), with Apps this has been relaxed -->
         <ref name="Block"/>
-        <oneOrMore>
-          <ref name="Block"/>
-        </oneOrMore>
-      </group>
-      <!-- at least 2 block elements in a Select -->
+      </zeroOrMore>
     </element>
   </define>
   <define name="Group">

@@ -2,4 +2,4 @@
 from .api import build_report, save_report, stringify_report, upload_report
 from .file_store import FileEntry, FileStore
 from .processors import AppTransformations, ConvertXML, PreProcessView
-from .types import Pipeline, ViewState, mk_null_pipe
+from .types import FontChoice, Formatting, Pipeline, TextAlignment, ViewState, Width, mk_null_pipe

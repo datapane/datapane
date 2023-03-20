@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import textwrap
 import typing as t
 from collections import deque
 from pathlib import Path
@@ -52,7 +53,7 @@ class Text(EmbeddedTextBlock):
             File encodings are auto-detected, if this fails please read the file manually with an explicit encoding and use the text parameter on dp.Attachment
         """
         if text:
-            text = text.strip()
+            text = textwrap.dedent(text).strip()
 
         assert text or file
         content = text or utf_read_text(Path(file).expanduser())
@@ -97,10 +98,6 @@ class Text(EmbeddedTextBlock):
                     blocks.append(Text(x))
 
         return Group(blocks=blocks)
-
-
-def Divider() -> Text:
-    return Text("---")
 
 
 class Code(EmbeddedTextBlock):
