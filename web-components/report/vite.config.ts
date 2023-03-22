@@ -79,6 +79,10 @@ module.exports = defineConfig(({ mode }) => ({
                             src: "./node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js",
                             dest: "./dist/assets",
                         },
+                        {
+                            src: "./node_modules/iframe-resizer/js/iframeResizer.contentWindow.map",
+                            dest: "./dist/assets",
+                        },
                     ],
                     verbose: true,
                 }) as any,
