@@ -146,7 +146,7 @@ class Select(ContainerBlock):
         """
         super().__init__(*arg_blocks, blocks=blocks, name=name, label=label, type=type)
         if len(self.blocks) < 2:
-            log.warning("Creating a Select with less than 2 objects")
+            log.info("Creating a Select with less than 2 objects")
 
 
 class Group(ContainerBlock):

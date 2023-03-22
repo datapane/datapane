@@ -4,13 +4,16 @@
   </a>
 </p>
 <p align="center">
+  <a href="https://datapane.com">Home</a> |
   <a href="https://docs.datapane.com">Docs</a> |
-  <a href="https://datapane.com/cloud">Cloud</a> |
- <a href="https://forum.datapane.com">Discussions</a> |
   <a href="https://datapane.com/gallery">Gallery</a> |
-  <a href="https://chat.datapane.com">Discord</a>
+  <a href="https://github.com/datapane/examples">Examples</a> |
+  <a href="https://forum.datapane.com">Discuss</a>
 </p>
 <p align='center'>
+  <a href="https://github.com/datapane/datapane/">
+      <img src="https://img.shields.io/github/stars/datapane/datapane?style=social" alt="GitHub Stars" />
+  </a>
   <a href="https://pypi.org/project/datapane/">
       <img src="https://img.shields.io/pypi/dm/datapane?label=pip%20downloads" alt="Pip Downloads" />
   </a>
@@ -217,21 +220,9 @@ dp.serve_app(view)
 
 # Get involved
 
-## Discord
-
-Get help from the team, share what you're building, and get to know others in the space!
-
-### 💬 [Join our discord server](https://chat.datapane.com)
-
-## Feedback
-
-Leave us some feedback, ask questions and request features.
-
-### 📮 [Give feedback](https://datapane.nolt.io)
-
 ## Forums
 
-Need technical help? Reach out on GitHub discussions.
+Leave us some feedback, get help, ask questions and request features.
 
 ### 📜 [Ask a question](https://forum.datapane.com/)
 
@@ -243,10 +234,10 @@ Looking for ways to contribute to Datapane?
 
 # Next Steps
 
-- [Join Discord](https://chat.datapane.com)
-- [Sign up for a free account](https://cloud.datapane.com/accounts/signup)
+- [View Examples](https://github.com/datapane/examples)
 - [Read the documentation](https://docs.datapane.com)
-- [Ask a question](https://forum.datapane.com/)
+- [Discuss with the community](https://forum.datapane.com/)
+- [Sign up for a free Cloud account](https://cloud.datapane.com/accounts/signup)
 
 ## Analytics
 

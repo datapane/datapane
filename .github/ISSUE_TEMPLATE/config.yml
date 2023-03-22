@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question
+    url: https://github.com/orgs/datapane/discussions
+    about: Ask questions and discuss with the Datapane Team and community
+  - name: Get Help
+    url: https://github.com/orgs/datapane/discussions/new?category=help
+    about: Ask the community for help and guidance
+  - name: Feature request
+    url: https://github.com/orgs/datapane/discussions/new?category=ideas
+    about: Discuss and request new feature and ideas
+  - name: Docs
+    url: https://docs.datapane.com
+    about: Datapane Documentation

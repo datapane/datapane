@@ -159,4 +159,4 @@ Consider adding this directory to PATH or, if you prefer to suppress this warnin
 To fix this, adjust your `%PATH%` to include your specific `Scripts` path as mentioned in the `pip` warning (see [here](https://datatofish.com/add-python-to-windows-path/) for more detailed instructions). Alternatively, you can try running the Datapane client directly, using the command `python3.exe -m datapane.client` instead.
 
 !!! info
-    If you are still having problems installing, please ask on our [Datapane Discord server](https://chat.datapane.com)
+    If you are still having problems installing, please ask on our [Forums](https://forum.datapane.com)

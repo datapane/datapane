@@ -45,7 +45,7 @@ const dropdownMenuActions = [
 ];
 
 const dropdownMenuLinks = [
-    { label: "Get help", href: "https://chat.datapane.com" },
+    { label: "Get help", href: "https://forum.datapane.com" },
     { label: "Documentation", href: "https://docs.datapane.com" },
 ];
 </script>

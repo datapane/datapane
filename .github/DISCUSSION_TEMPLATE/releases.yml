@@ -1,0 +1,31 @@
+title: "Release: "
+labels: ["release"]
+body:
+
+  - type: textarea
+    attributes:
+      label: Main
+      description: Provide information about the release using the template below
+      value: |
+
+        We are excited to release Datapane version x.y.z. - this release is / is not backwards compatible
+
+        # Overview
+
+        High-level overview of the release.
+
+        # Changes
+
+        List the new features, bugfixes, and more
+
+        # Code changes
+
+        Optional - detail the code changes that will be required
+
+        # Examples
+
+        Add some examples / images / videos
+
+      render: markdown
+    validations:
+      required: true

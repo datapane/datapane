@@ -217,10 +217,9 @@ def hello_world():
     _run_script("hello.py")
 
     display_msg(
-        "\nWe’d also love to invite you to join our Discord {chat_url:l}, suggest a feature {nolt_url:l}, and be part of our open source community {github_url:l}.",
-        chat_url="https://chat.datapane.com",
-        nolt_url="https://datapane.nolt.io",
+        "\nWe’d also love to invite you to join our open source community {github_url:l} and forum {forum_url:l}.",
         github_url="https://github.com/datapane/datapane",
+        forum_url="https://forum.datapane.com",
     )
 
 
@@ -239,10 +238,9 @@ def template(url: URL, execute: bool):
     )
 
     display_msg(
-        "\nWe’d also love to invite you to join our Discord {chat_url:l}, suggest a feature {nolt_url:l}, and be part of our open source community {github_url:l}.",
-        chat_url="https://chat.datapane.com",
-        nolt_url="https://datapane.nolt.io",
+        "\nWe’d also love to invite you to join our open source community {github_url:l} and forum {forum_url:l}.",
         github_url="https://github.com/datapane/datapane",
+        forum_url="https://forum.datapane.com",
     )
 
 
