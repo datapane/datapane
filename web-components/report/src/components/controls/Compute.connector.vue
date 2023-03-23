@@ -21,6 +21,7 @@ const p = defineProps<{
     figure: BlockFigureProps;
     timer?: number;
     subtitle?: string;
+    immediate?: boolean;
 }>();
 
 const { children } = storeToRefs(p.store);
@@ -57,6 +58,7 @@ const update = async () => {
             :trigger="p.trigger"
             :timer="p.timer"
             :prompt="p.prompt"
+            :immediate="p.immediate"
             :error="error"
             :loading="loading"
         />

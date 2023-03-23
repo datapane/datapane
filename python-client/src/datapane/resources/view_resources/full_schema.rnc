@@ -73,6 +73,7 @@ Compute = element Compute {
   attribute swap { string "replace" | string "prepend" | string "append" | string "inner" },
   attribute submit_label { xsd:string { minLength = "1" maxLength = "32" } }?,
   attribute timer { xsd:positiveInteger }?,
+  attribute immediate { xsd:boolean }?,
 
   # internal controls
   Controls

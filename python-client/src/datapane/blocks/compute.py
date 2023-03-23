@@ -147,6 +147,7 @@ class Compute(BaseBlock):
         label: t.Optional[str] = None,
         swap: Swap = Swap.REPLACE,
         trigger: Trigger = Trigger.SUBMIT,
+        immediate: bool = False,
         # function params - wrap around @dp.function
         cache: bool = False,
         submit_label: str = "Go",
@@ -199,7 +200,7 @@ class Compute(BaseBlock):
         if trigger == Trigger.SUBMIT:
             opt_attribs.update(submit_label=submit_label)
         elif trigger == Trigger.SCHEDULE:
-            opt_attribs.update(timer=timer)
+            opt_attribs.update(timer=timer, immediate=immediate)
         elif trigger in (Trigger.LOAD, Trigger.VISIBLE):
             trigger = Trigger.MOUNT
 
@@ -247,6 +248,7 @@ def Dynamic(
     on_timer: t.Optional[FunctionT] = None,
     target: t.Optional[TargetT] = None,
     seconds: int = 30,
+    immediate: bool = False,
 ) -> Compute:
     """
     Create a dynamically updating block that runs the provided function to update the View.
@@ -256,6 +258,7 @@ def Dynamic(
         on_timer: Function to run on a regular timer
         target (optional): Where the results from the function should be viewed
         seconds (optional, default=30): Number of seconds between running the function specified by on_timer
+        immediate (optional, default=False): Run the specified function immediately on page load
 
     Returns: A Compute block representing the Dynamic behaviour
     """
@@ -273,4 +276,4 @@ def Dynamic(
     else:
         raise DPClientError("Must provide one of on_load or on_timer")
 
-    return Compute(function=f, target=target, timer=seconds, trigger=trigger)
+    return Compute(function=f, target=target, timer=seconds, trigger=trigger, immediate=immediate)

@@ -19,6 +19,7 @@ const p = defineProps<{
     timer?: number;
     subtitle?: string;
     error?: string;
+    immediate?: boolean;
 }>();
 
 // Disable function runs for local reports
@@ -32,17 +33,33 @@ const isVisible = p.trigger === TriggerType.SUBMIT || p.children.length;
 
 const updateIfValid = () => {
     const node = getNode(formId);
-    if (node?.context?.state.valid) {
+    if (node?.context?.state.valid || !isVisible) {
+        p.update();
+    }
+};
+
+const setAutomaticFunctionUpdates = () => {
+    /**
+     * Set schedule and on-mount updates
+     */
+    if (functionRunDisabled) {
+        return;
+    }
+
+    if (p.trigger === TriggerType.SCHEDULE && p.timer) {
+        scheduleInterval.value = setInterval(updateIfValid, p.timer * 1000);
+    } else if (p.trigger === TriggerType.MOUNT) {
+        p.update();
+    }
+
+    // Run schedule if `immediate=True`
+    if (p.trigger === TriggerType.SCHEDULE && p.immediate) {
         p.update();
     }
 };
 
 onMounted(() => {
-    if (p.trigger === TriggerType.SCHEDULE && p.timer && !functionRunDisabled) {
-        scheduleInterval.value = setInterval(updateIfValid, p.timer * 1000);
-    } else if (p.trigger === TriggerType.MOUNT) {
-        p.update();
-    }
+    setAutomaticFunctionUpdates();
 });
 
 onUnmounted(() => {

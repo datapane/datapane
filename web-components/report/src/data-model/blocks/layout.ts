@@ -158,6 +158,7 @@ export class ComputeBlock extends ParentBlock<ControlsField> {
             function_id,
             trigger,
             timer,
+            immediate,
         } = elem.attributes;
 
         this.store = useControlStore(this.children, target, swap)();
@@ -168,6 +169,7 @@ export class ComputeBlock extends ParentBlock<ControlsField> {
             functionId: function_id,
             store: this.store,
             timer: +timer,
+            immediate: immediate ? JSON.parse(immediate) : undefined,
             label,
             subtitle,
             trigger,
