@@ -7,6 +7,7 @@
   <a href="https://docs.datapane.com">Docs</a> |
   <a href="https://datapane.com/cloud">Cloud</a> |
  <a href="https://forum.datapane.com">Discussions</a> |
+  <a href="https://datapane.com/gallery">Gallery</a> |
   <a href="https://chat.datapane.com">Discord</a>
 </p>
 <p align='center'>
@@ -22,42 +23,61 @@
 </p>
 
 <p align='center'>
-  <h1 align='center'>Build full-stack data analytics apps in Python</h1>
+  <h1 align='center'>Build internal analytics products in minutes using Python</h1>
 </p>
-Datapane is an open-source framework for building robust, high-performance data apps from Python and Jupyter.
-<br><br>
-<br>
-<br>
 
-<p align="center">
-  <a href="https://datapane.com">
-    <img src="https://user-images.githubusercontent.com/3541695/176545400-919a327d-ddee-4755-b29f-bf85fbfdb4ef.png"  width='75%'>
-  </a>
-</p>
+Datapane is an app development platform which gives you everything you need to build internal data analytics products using Python.
+
+### Progress & Roadmap
+
+- [x] [Blocks & Views](https://docs.datapane.com/blocks/overview/)
+  - [x] Display blocks
+  - [x] Layout blocks
+  - [x] Static site export
+- [x] [App server](https://docs.datapane.com/apps/overview/)
+  - [x] Backend functions
+  - [x] Forms
+  - [x] Client-side events (e.g. onload)
+  - [x] Caching
+  - [x] Sessions
+- [x] [Reports](https://docs.datapane.com/reports/overview/)
+  - [x] HTML reports
+  - [x] Cloud reports
+- [x] [Deployment](https://docs.datapane.com/apps/deployment/#deploying-your-app)
+  - [x] Fly.io
+  - [x] Dockerfile generation
+- [x] [Components library](https://github.com/datapane/components)
+- [ ] Tasks
+  - [ ] Scheduled tasks
+  - [ ] Background tasks
+- [ ] Data layer
+  - [ ] Files
+  - [ ] Analytics DB (DuckDB)
+  - [ ] App state DB (sqlite)
+- [ ] Integrations & Messaging
+  - [ ] Slack
+  - [ ] Email
+  - [ ] Webhooks
 
 ## Why use Datapane?
 
-#### **🚀 Not just for demos**
+#### **🐍 100% Python**
 
-Build performant, robust full-stack apps which are simple to deploy and manage on any hosting platform. Add background processing, auth, and monitoring to go beyond MVPs.
+Build apps and reporting tools without writing HTML, CSS, or worrying about infrastructure.
 
-#### **📈 Share standalone reports with no server**
+#### **🔋 Batteries included**
 
-Export static HTML reports which you can share on Slack or Email, with no backend required.
+Not just for demos and MVPs. Build products with background processing, integrations, reporting, and more.
 
-#### **📙 Ship apps from Jupyter**
+#### **🚀 Simple to host**
 
-Build and ship data apps from inside your Jupyter Notebook and existing scripts in <5 lines of code.
+Deploy to any web host, run on your own server, or embed into existing frameworks like Flask and Django.
 
-## Other Features
+## Gallery
 
-- User sessions and state handling
-- Intelligent caching
-- Sub-5ms function response time
-- Easy integration with authentication/authorization
-- Integrate into existing web frameworks (like Flask or FastAPI)
-- Host on existing web-hosts, like Fly and Heroku
-- Background processing
+Check out example reports and apps in our gallery:
+
+https://datapane.com/gallery
 
 ## How is Datapane's architecture unique?
 
@@ -65,7 +85,7 @@ Datapane Apps use a combination of pre-rendered frontend elements and backend Py
 
 # Getting Started
 
-Want a head start? Check out our [Getting Started guide](TODO) to build a data science web app in 3m.
+Check out our [Quickstart](https://docs.datapane.com/quickstart) to build a data science web app in 3m.
 
 ## Installing Datapane
 
@@ -80,7 +100,7 @@ $ pip3 install -U datapane
 #### conda
 
 ```
-$ conda install -c conda-forge "datapane>=0.15.6"
+$ conda install -c conda-forge "datapane>=0.16.1"
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
