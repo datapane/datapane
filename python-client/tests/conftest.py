@@ -1,3 +1,6 @@
+# ruff: noqa: E402
+# We need to modify environment variables before importing Datapane
+
 import os
 
 os.environ["DP_TEST_ENV"] = "true"

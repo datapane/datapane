@@ -125,6 +125,17 @@ line-length = 120
 target-version = ['py37']
 include = '\.pyi?$'
 
+[tool.ruff]
+extend = "../pyproject.toml"
+target-version = 'py38'
+
+extend-ignore = [
+    # Don't complain about not using X|Y or builtin collections for types
+    # Ruff warns about this on py38 when using __future__.annotations
+    "UP006",
+    "UP007",
+]
+
 [tool.vendoring]  # https://github.com/pradyunsg/vendoring
 # ref implementation: https://github.com/pypa/pip/blob/031d6ec3f81fd497eec63302fffe703b9707ac5e/pyproject.toml#L29
 destination = "src/datapane/_vendor/"

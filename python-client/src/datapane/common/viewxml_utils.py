@@ -1,5 +1,6 @@
 import dataclasses as dc
 import json
+import math
 import re
 import typing as t
 from collections.abc import Sized
@@ -46,9 +47,6 @@ def validate_view_doc(
             xml_str = xml_str if xml_str else etree.tounicode(xml_doc, pretty_print=True)
             log.error(f"Error validating report document:\n\n{xml_str}\n{rng_validator.error_log}\n")
         raise
-
-
-import math
 
 
 def conv_attrib(v: t.Any) -> t.Optional[str]:
