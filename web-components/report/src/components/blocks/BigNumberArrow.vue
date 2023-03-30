@@ -5,6 +5,7 @@ const p = defineProps<{
     isPositiveIntent: boolean;
     isUpwardChange: boolean;
     change?: string;
+    prevValue?: string;
 }>();
 
 const bgColor: ComputedRef<string> = computed(() =>
@@ -17,21 +18,17 @@ const textColor: ComputedRef<string> = computed(() =>
 </script>
 
 <template>
-    <div
-        v-if="p.change"
-        :class="[
-            `items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium leading-5 ${bgColor} ${textColor} md:mt-2 lg:mt-0`,
-        ]"
-    >
-        <i
+    <div v-if="p.change" class="flex justify-start align-center">
+        <div
+            v-if="p.change"
             :class="[
-                'mr-1 fa',
-                {
-                    'fa-arrow-up': p.isUpwardChange,
-                    'fa-arrow-down': !p.isUpwardChange,
-                },
+                `items-baseline px-2.5 py-0.5 rounded-lg text-sm font-medium leading-5 ${bgColor} ${textColor}`,
             ]"
-        />
-        {{ p.change }}
+        >
+            {{ p.isUpwardChange ? "+" : "-" }}{{ p.change }}
+        </div>
+        <div v-if="p.prevValue" class="pl-1 text-gray-500">
+            from {{ p.prevValue }}
+        </div>
     </div>
 </template>

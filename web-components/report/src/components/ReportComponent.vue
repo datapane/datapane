@@ -41,7 +41,6 @@ const handlePageChange = (newPageNumber: number) =>
     p.report!.store.setTab(newPageNumber);
 
 const { isIPythonEmbed } = window;
-const isCloudEmbed = window.location.href.includes("/embed/");
 </script>
 
 <template>
@@ -57,23 +56,12 @@ const isCloudEmbed = window.location.href.includes("/embed/");
         />
         <main
             :class="[
-                'w-full bg-dp-background mx-auto',
+                'w-full bg-dp-background mx-auto pb-4 min-h-screen',
                 p.reportWidthClass,
-                {
-                    'h-iframe pb-16 overflow-auto':
-                        isCloudEmbed && !singleBlockEmbed,
-                },
             ]"
             data-cy="report-component"
         >
-            <div
-                :class="[
-                    'flex flex-col justify-end bg-dp-background',
-                    {
-                        'pb-6': p.mode === 'EMBED',
-                    },
-                ]"
-            >
+            <div class="flex flex-col justify-end bg-dp-background">
                 <div class="sm:flex block">
                     <div class="flex-1 flex flex-col min-w-0">
                         <div class="grow px-4">
@@ -82,6 +70,7 @@ const isCloudEmbed = window.location.href.includes("/embed/");
                                 v-for="child in currentPage"
                                 :key="child.refId"
                                 v-bind="child.componentProps"
+                                class="py-4"
                             />
                         </div>
                     </div>

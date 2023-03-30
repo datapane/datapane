@@ -59,14 +59,14 @@ const setTabNumberFromEvent = (ev: Event) =>
             />
         </div>
         <div :class="['hidden', { 'sm:block': sectionType === 'tabs' }]">
-            <nav class="flex space-x-4 mb-2">
+            <nav class="flex space-x-4 mb-2 border-b-2 border-gray-200">
                 <a
                     v-for="(child, idx) in children"
                     role="button"
                     :key="idx"
                     :data-cy="`tab-${idx}`"
                     :class="[
-                        'px-3 py-2 font-medium text-sm rounded-md',
+                        'px-3 py-2 font-medium text-sm rounded-md rounded-b-none',
                         {
                             'text-dp-accent bg-dp-accent-light':
                                 tabNumber === idx,
@@ -85,6 +85,7 @@ const setTabNumberFromEvent = (ev: Event) =>
                 :is="children[tabNumber].component"
                 v-bind="children[tabNumber].componentProps"
                 :key="children[tabNumber].refId"
+                class="py-4"
             />
         </div>
     </div>

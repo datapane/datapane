@@ -44,7 +44,7 @@ const gridTemplateColumns: ComputedRef<string | undefined> = computed(() => {
             'w-full sm:grid sm:gap-4',
             {
                 'grid-flow-col grid-cols-fit': !p.columns,
-                'py-4': !singleBlockEmbed,
+                'py-4 px-1': !singleBlockEmbed,
             },
         ]"
         :style="{ gridTemplateColumns, alignItems }"

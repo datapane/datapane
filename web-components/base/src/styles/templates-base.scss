@@ -14,11 +14,6 @@ a.dotted {
     cursor: pointer;
 }
 
-pre:not(.form-input) {
-    overflow-x: auto;
-    padding: 1em;
-}
-
 button:disabled {
     cursor: not-allowed !important;
 }

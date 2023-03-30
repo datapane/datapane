@@ -23,7 +23,7 @@ const p = defineProps<{
                         {{ p.heading }}
                     </dt>
                     <dd
-                        class="mt-1 text-3xl leading-9 font-semibold text-gray-900"
+                        class="mt-1 text-4xl leading-9 font-semibold text-gray-900"
                     >
                         {{ p.value }}
                     </dd>

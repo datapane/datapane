@@ -17,18 +17,6 @@ log = logging.getLogger("datapane")
 # CONSTANTS
 ON_WINDOWS = sys.platform == "win32"
 
-DEFAULT_CSS_HEADER = """:root {
-    --dp-accent-color: #4E46E5;
-    --dp-bg-color: #FFF;
-    --dp-text-align: justify;
-    --dp-font-family: Inter var, ui-sans-serif, system-ui;
-}"""
-
-DEFAULT_HTML_HEADER = f"""<style type="text/css">
-{DEFAULT_CSS_HEADER}
-</style>"""
-
-
 ################################################################################
 # MIME-type handling
 mimetypes.init(files=[str(ir.files("datapane.resources") / "mime.types")])

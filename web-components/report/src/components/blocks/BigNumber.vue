@@ -19,7 +19,7 @@ const p = defineProps<{
     <block-wrapper :figure="p.figure" :single-block-embed="singleBlockEmbed">
         <div
             data-cy="block-bignumber"
-            class="rounded-lg bg-white overflow-hidden border border-gray-300 w-full"
+            class="rounded-md bg-white overflow-hidden border border-gray-300 w-full"
         >
             <div class="px-4 py-5 sm:p-6">
                 <dl>
@@ -32,26 +32,15 @@ const p = defineProps<{
                         class="mt-1 flex justify-between items-baseline md:block lg:flex"
                     >
                         <div
-                            class="flex items-baseline text-2xl leading-8 font-semibold text-dp-accent"
+                            class="flex items-baseline text-4xl leading-8 font-semibold text-dp-accent"
                         >
                             {{ p.value }}
-                            <span
-                                v-if="p.prevValue"
-                                class="ml-2 text-sm leading-5 font-medium text-gray-500"
-                            >
-                                from {{ p.prevValue }}
-                            </span>
-                            <big-number-arrow
-                                class="hidden lg:hidden sm:inline-flex ml-2"
-                                :is-positive-intent="p.isPositiveIntent"
-                                :is-upward-change="p.isUpwardChange"
-                                :change="p.change"
-                            />
                         </div>
                         <big-number-arrow
                             class="inline-flex lg:inline-flex sm:hidden"
                             :is-positive-intent="p.isPositiveIntent"
                             :is-upward-change="p.isUpwardChange"
+                            :prev-value="p.prevValue"
                             :change="p.change"
                         />
                     </dd>

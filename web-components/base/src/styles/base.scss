@@ -39,3 +39,8 @@
     height: 8px;
     content: "";
 }
+
+pre:not(.form-input) {
+    overflow-x: auto;
+    padding: 1em;
+}

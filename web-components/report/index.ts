@@ -5,6 +5,7 @@ import Report from "./src/components/ReportContainer.vue";
 import TableBlock from "./src/components/blocks/Table.ce.vue";
 import iframeResize from "iframe-resizer/js/iframeResizer";
 import { createPinia } from "pinia";
+import "../base/src/styles/base.scss";
 import "./src/styles/report.scss";
 import "highlight.js/styles/stackoverflow-light.css";
 import "codemirror/lib/codemirror.css";

@@ -117,7 +117,7 @@ class Formatting:
     bg_color: str = "#FFF"
     accent_color: str = "#4E46E5"
     font: t.Union[FontChoice, str] = FontChoice.DEFAULT
-    text_alignment: TextAlignment = TextAlignment.JUSTIFY
+    text_alignment: TextAlignment = TextAlignment.LEFT
     width: Width = Width.MEDIUM
     light_prose: bool = False
 

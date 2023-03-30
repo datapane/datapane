@@ -55,7 +55,7 @@ const resetApp = async () => {
 setApp();
 
 const storeProps = storeToRefs(rootStore);
-const { singleBlockEmbed, report } = storeProps;
+const { report } = storeProps;
 
 onMounted(() => {
     /* View tracking */
@@ -98,7 +98,7 @@ const { dpAppRunner } = window;
 </script>
 
 <template>
-    <div v-if="!singleBlockEmbed" id="html-header" v-html="htmlHeader" />
+    <div id="html-header" v-html="htmlHeader" />
     <report-component
         v-if="isView(report) && !error"
         :reset-app="resetApp"

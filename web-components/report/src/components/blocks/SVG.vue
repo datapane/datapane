@@ -12,7 +12,7 @@ const p = defineProps<{
         data-cy="block-svg"
         loading="lazy"
         :class="[
-            'mx-auto p-1',
+            'mx-auto',
             {
                 'w-full': p.responsive,
                 'h-full': p.responsive && p.singleBlockEmbed,

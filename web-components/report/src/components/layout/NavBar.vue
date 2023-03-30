@@ -35,6 +35,8 @@ onUnmounted(() => {
     document.removeEventListener("click", hideDropdownOnClickAway);
 });
 
+const showWidgets = !window.dpLocal || window.dpAppRunner;
+
 const alwaysShowPagesDropdown = computed(() => p.labels.length > 6);
 
 const dropdownMenuActions = [
@@ -55,13 +57,16 @@ const dropdownMenuLinks = [
         :class="[
             // z-40 to be below modals and side bars on datapane.com
             'bg-white relative z-40',
-            { 'shadow sticky top-0': labels.length > 0 },
+            { 'border-b border-gray-100 sticky top-0': labels.length > 0 },
         ]"
     >
         <div class="mx-auto px-4" :class="p.reportWidthClass">
             <div class="flex h-16 justify-between">
                 <div class="flex">
-                    <div class="flex flex-shrink-0 items-center">
+                    <div
+                        class="flex flex-shrink-0 items-center"
+                        v-if="showWidgets"
+                    >
                         <a href="https://datapane.com" target="_blank">
                             <img
                                 class="block h-8 w-auto"
@@ -83,7 +88,7 @@ const dropdownMenuLinks = [
                                 {
                                     'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700':
                                         idx !== p.pageNumber,
-                                    'border-indigo-500 text-gray-900':
+                                    'border-dp-accent text-gray-900':
                                         idx === p.pageNumber,
                                 },
                             ]"
@@ -115,7 +120,7 @@ const dropdownMenuLinks = [
                         </a>
                     </div>
                 </div>
-                <div class="ml-6 flex items-center">
+                <div class="ml-6 flex items-center" v-if="showWidgets">
                     <div class="relative">
                         <button
                             type="button"
