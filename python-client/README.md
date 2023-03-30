@@ -23,7 +23,7 @@
 </p>
 
 <p align='center'>
-  <h1 align='center'>Build internal analytics products in minutes using Python</h1>
+  <h1 align='center'>Build full-stack data apps in 100% Python</h1>
 </p>
 
 Datapane is an app development platform which gives you everything you need to build internal data analytics products using Python.
