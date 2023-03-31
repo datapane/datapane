@@ -56,7 +56,7 @@ const { isIPythonEmbed } = window;
         />
         <main
             :class="[
-                'w-full bg-dp-background mx-auto pb-4 min-h-screen',
+                'w-full bg-dp-background mx-auto pb-4',
                 p.reportWidthClass,
             ]"
             data-cy="report-component"
