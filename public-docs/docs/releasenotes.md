@@ -255,7 +255,7 @@ Admins on Datapane Enterprise have a lot more control over their instance, as we
 
 ### On-premise installation
 
-Datapane Enterprise can now be installed in your own cloud environment (AWS or GCP). This is perfect for users with stricter security requirements who want to ensure that confidential data doesn't leave their system. We use docker-compose to ensure that you can get up and running within 15 minutes.
+Datapane Enterprise can now be installed in your own cloud environment (AWS or GCP). This is perfect for users with stricter security requirements who want to ensure that confidential data doesn't leave their system. We use docker compose to ensure that you can get up and running within 15 minutes.
 
 Read our [installation guide](https://github.com/datapane/datapane-onpremise) on Github for more.
 
