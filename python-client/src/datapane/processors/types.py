@@ -98,7 +98,7 @@ class TextAlignment(Enum):
 
 
 class FontChoice(Enum):
-    DEFAULT = "Inter var, ui-sans-serif, system-ui"
+    DEFAULT = "Inter, ui-sans-serif, system-ui"
     SANS = "ui-sans-serif, sans-serif, system-ui"
     SERIF = "ui-serif, serif, system-ui"
     MONOSPACE = "ui-monospace, monospace, system-ui"

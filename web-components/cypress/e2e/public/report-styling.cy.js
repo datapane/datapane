@@ -69,7 +69,7 @@ describe("Changing a report's style", () => {
             .and(
                 "have.css",
                 "font-family",
-                '"Inter var", ui-sans-serif, system-ui',
+                '"Inter", ui-sans-serif, system-ui',
             );
         cy.get("[data-cy=report-component").should(
             "have.css",

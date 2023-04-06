@@ -40,7 +40,7 @@ module.exports = {
                 },
             },
             fontFamily: {
-                sans: ["Inter var", ...defaultTheme.fontFamily.sans],
+                sans: ["Inter", ...defaultTheme.fontFamily.sans],
             },
             width: {
                 80: "20rem",
