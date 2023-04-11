@@ -3,6 +3,6 @@
 # flake8: noqa:F401
 from .analytics import capture, capture_event
 from .exceptions import DPClientError
-from .utils import IN_PYTEST, DPMode, display_msg, enable_logging, get_dp_mode, log, set_dp_mode
+from .utils import IN_PYTEST, DPMode, display_msg, enable_logging, get_dp_mode, log, print_debug_info, set_dp_mode
 
 # from .config import init  # isort:skip  otherwise circular import issue

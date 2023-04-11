@@ -24,6 +24,7 @@ from .client import (  # isort:skip  otherwise circular import issue
     DPClientError,
     DPMode,
     enable_logging,
+    print_debug_info,
     get_dp_mode,
     set_dp_mode,
 )  # isort:skip  otherwise circular import issue
@@ -101,6 +102,7 @@ __all__ = [
     "ping",
     "signup",
     "enable_logging",
+    "print_debug_info",
     "load_params_from_command_line",
     "Block",
     "Attachment",

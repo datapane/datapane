@@ -95,6 +95,27 @@ def enable_logging():
     _setup_dp_logging(verbosity=2)
 
 
+def print_debug_info():
+    """Print useful debugging information"""
+    from .analytics import user_properties
+
+    fields = user_properties()
+
+    # Known dependencies
+    import numpy as np
+    import pandas as pd
+    import pyarrow as pa
+
+    fields["pandas_version"] = pd.__version__
+    fields["numpy_version"] = np.__version__
+    fields["pyarrow_version"] = pa.__version__
+
+    print("Datapane Debugging Info")
+    print("(please copy/paste into a GitHub Issue at https://github.com/datapane/datapane/issues)")
+    for (k, v) in fields.items():
+        print(f"{k}: {v}")
+
+
 ################################################################################
 # Output
 def open_in_browser(url: str):
