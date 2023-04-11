@@ -23,6 +23,7 @@ const onChange = (value: string) => {
             :options="options"
             :value="initial"
             @input="onChange"
+            data-cy="select-field"
         />
     </span>
 </template>

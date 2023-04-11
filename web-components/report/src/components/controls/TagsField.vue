@@ -32,7 +32,7 @@ const setListeners = (node: any) => {
 </script>
 
 <template>
-    <div :data-cy="`tags-field-${p.name}`" class="mb-6">
+    <div class="mb-6" data-cy="tags-field">
         <form-kit
             type="multiSelectField"
             :label="label || name"

@@ -28,7 +28,7 @@ const validation: ComputedRef = computed(() =>
         step="any"
         validation-visibility="live"
         @input="onChange"
-        data-cy="number-field"
         outer-class="flex-1"
+        data-cy="number-field"
     />
 </template>

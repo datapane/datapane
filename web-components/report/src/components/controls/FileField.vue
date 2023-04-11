@@ -69,7 +69,6 @@ const id = `file_${p.name}`;
         no-files-icon="fileDoc"
         validation-visibility="live"
         form="params-form"
-        data-cy="file-field"
         @node="setupListeners"
     >
         <template #noFiles>
@@ -79,7 +78,7 @@ const id = `file_${p.name}`;
                 :for="id"
             >
                 <cloud-arrow-up-icon class="w-6 h-6" />
-                <div class="flex flex-col">
+                <div class="flex flex-col" data-cy="file-field">
                     <span class="font-semibold text-sm">Upload a file</span
                     ><span class="text-xs">Up to 25mb supported.</span>
                 </div>

@@ -17,12 +17,15 @@ describe("Changing a report's style", () => {
 
         // Submit empty local visual form
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
-        cy.get("[name=is_light_prose]").should("be.checked");
+        cy.get("#id_prose_color").select("light_on_dark");
         cy.get("[name=style_header]").clear();
         cy.get("[type=submit]").click();
 
+        cy.visit(URLS.STYLE_REPORT);
+
         // Verify global theme still applied
-        cy.get("[data-cy=page-0]").should(
+        cy.get("[data-cy=page-1]").click();
+        cy.scrollToFirst("[data-cy=tab-0]").should(
             "have.css",
             "color",
             "rgb(0, 128, 0)",
@@ -55,11 +58,14 @@ describe("Changing a report's style", () => {
         cy.visit(`${URLS.STYLE_REPORT}settings-visual`);
         cy.get("[data-cy=button-load-global-theme]").click();
         cy.get("[name=style_header]").clear().type(HTML_HEADER_LIGHT);
-        cy.get("[name=is_light_prose]").uncheck();
+        cy.get("#id_prose_color").select("dark_on_light");
         cy.get("[type=submit]").click();
 
+        cy.visit(URLS.STYLE_REPORT);
+
         // Verify local theme applied
-        cy.get("[data-cy=page-0]").should(
+        cy.get("[data-cy=page-1]").click();
+        cy.scrollToFirst("[data-cy=tab-0]").should(
             "have.css",
             "color",
             "rgb(255, 0, 0)",
@@ -86,8 +92,11 @@ describe("Changing a report's style", () => {
         cy.get("[name=style_header]").clear();
         cy.get("[type=submit]").click();
 
+        cy.visit(URLS.STYLE_REPORT);
+
         // Verify default (indigo) theme
-        cy.get("[data-cy=page-0]").should(
+        cy.get("[data-cy=page-1]").click();
+        cy.scrollToFirst("[data-cy=tab-0]").should(
             "have.css",
             "color",
             "rgb(78, 70, 229)",

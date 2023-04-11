@@ -15,6 +15,7 @@
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/e2e/public/*\"",
         "test:org": "node_modules/.bin/cypress run --spec \"cypress/e2e/org/*\"",
         "test:open": "node_modules/.bin/cypress open --browser electron",
+        "test:unit": "vitest --config ./report/vite.config.ts",
         "typecheck": "node_modules/.bin/vue-tsc --noEmit",
         "storybook": "start-storybook -p 6006",
         "build:storybook": "node --max_old_space_size=16384 node_modules/.bin/build-storybook -o dist/storybook"
@@ -103,6 +104,8 @@
         "cypress-file-upload": "^5.0.8",
         "esbuild": "^0.15.3",
         "eslint-plugin-vue": "^9.7.0",
+        "jsdom": "^21.1.0",
+        "msw": "^1.1.0",
         "postcss": "^8.4.7",
         "rollup-plugin-copy": "^3.4.0",
         "rollup-plugin-esbuild": "^5.0.0",
@@ -110,6 +113,7 @@
         "terser": "^5.15.1",
         "typescript": "^4.8.4",
         "vite": "^3.2.3",
+        "vitest": "^0.29.1",
         "vue-loader": "^17.0.1",
         "vue-tsc": "^1.0.9"
     }

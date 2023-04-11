@@ -7,6 +7,11 @@ import vue from "@vitejs/plugin-vue";
 import copy from "rollup-plugin-copy";
 
 module.exports = defineConfig(({ mode }) => ({
+    test: {
+        include: ["./report/tests/*.test.ts"],
+        setupFiles: ["./report/tests/setup.ts"],
+        environment: "jsdom",
+    },
     resolve: {
         alias: {
             emitter: require.resolve("emitter-component"),

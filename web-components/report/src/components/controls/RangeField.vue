@@ -33,7 +33,7 @@ watch(inputValue, () => void onChange(`${inputValue.value}`));
         :min="min"
         :max="max"
         :step="step"
-        data-cy="int-field-bounded"
+        data-cy="range-field"
         outer-class="flex-1"
     >
         <template #prefix>

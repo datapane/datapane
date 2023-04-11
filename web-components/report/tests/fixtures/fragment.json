@@ -1,0 +1,9 @@
+{
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+        "is_fragment": true,
+        "view_xml": "<View version=\"1\" fragment=\"true\"><Text name=\"replaced\"><![CDATA[replaced]]></Text></View>",
+        "assets": {}
+    }
+}

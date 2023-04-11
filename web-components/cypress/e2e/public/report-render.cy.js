@@ -120,4 +120,17 @@ describe("Report rendering", () => {
             .find("revo-grid")
             .should("be.visible");
     });
+
+    // Disabled as we don't yet support Compute on dp-server
+    // it("Should find all rendered controls", () => {
+    //     cy.scrollToFirst("[data-cy=date-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=file-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=multi-select-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=number-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=range-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=select-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=switch-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=tags-field]").should("be.visible");
+    //     cy.scrollToFirst("[data-cy=text-field]").should("be.visible");
+    // });
 });

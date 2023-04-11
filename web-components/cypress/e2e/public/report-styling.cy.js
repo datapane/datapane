@@ -27,13 +27,14 @@ describe("Changing a report's style", () => {
     it("(e2e): Should change the report to a dark theme then reset to default", () => {
         // Change to accent-green bg-black theme
         cy.get("#id_style_header").clear().type(CSS_HEADER);
-        cy.get("#id_is_light_prose").check();
+        cy.get("#id_prose_color").select("light_on_dark");
         cy.get("button[type=submit]").click();
 
         cy.visit(URLS.STYLE_REPORT);
 
         // Verify theme applied
-        cy.get("[data-cy=page-0]").should(
+        cy.get("[data-cy=page-1]").click();
+        cy.scrollToFirst("[data-cy=tab-0]").should(
             "have.css",
             "color",
             "rgb(0, 128, 0)",
@@ -53,11 +54,14 @@ describe("Changing a report's style", () => {
 
         // Revert to default theme
         cy.get("[data-cy=button-load-global-theme]").click();
-        cy.get("#id_is_light_prose").uncheck();
+        cy.get("#id_prose_color").select("dark_on_light");
         cy.get("button[type=submit]").click();
 
+        cy.visit(URLS.STYLE_REPORT);
+
         // Verify theme reverted
-        cy.get("[data-cy=page-0]").should(
+        cy.get("[data-cy=page-1]").click();
+        cy.scrollToFirst("[data-cy=tab-0]").should(
             "have.css",
             "color",
             "rgb(78, 70, 229)",

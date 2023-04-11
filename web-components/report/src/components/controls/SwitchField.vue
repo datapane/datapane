@@ -24,7 +24,7 @@ const onChange = (value: boolean) => {
             :label="label || name"
             :name="name"
             @input="onChange"
-            data-cy="boolean-field"
+            data-cy="switch-field"
         />
     </span>
 </template>

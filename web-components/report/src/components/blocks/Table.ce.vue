@@ -21,7 +21,7 @@ const tableRef = (node: any): void => {
 </script>
 
 <template>
-    <link v-if="!dpLocal" rel="stylesheet" href="/static/report/style.css" />
+    <link v-if="!dpLocal" rel="stylesheet" href="/static/report/index.css" />
     <div
         :ref="tableRef"
         :class="['w-full', { 'h-full absolute top-0': p.singleBlockEmbed }]"

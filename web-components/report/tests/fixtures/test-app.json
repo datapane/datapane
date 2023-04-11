@@ -1,0 +1,48 @@
+{
+    "data": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+            "is_fragment": false,
+            "view_xml": "<View version=\"1\" fragment=\"false\"><Compute function_id=\"app.5178279056\" trigger=\"submit\" swap=\"replace\" target=\"to-replace\" submit_label=\"Go\"><Controls><TextBox name=\"msg\" required=\"true\" initial=\"replaced\"/></Controls></Compute><Text name=\"to-replace\"><![CDATA[replace-me]]></Text><Group name=\"group\" columns=\"1\" valign=\"top\"><Text name=\"inner-text\"><![CDATA[Group content]]></Text></Group></View>",
+            "assets": {}
+        }
+    },
+    "status": 200,
+    "statusText": "OK",
+    "headers": {
+        "access-control-allow-origin": "*",
+        "content-length": "500",
+        "content-type": "application/json",
+        "date": "Wed, 01 Mar 2023 07:55:21 GMT",
+        "server": "Cheroot/9.0.0"
+    },
+    "config": {
+        "transitional": {
+            "silentJSONParsing": true,
+            "forcedJSONParsing": true,
+            "clarifyTimeoutError": false
+        },
+        "adapter": ["xhr", "http"],
+        "transformRequest": [null],
+        "transformResponse": [null],
+        "timeout": 0,
+        "xsrfCookieName": "XSRF-TOKEN",
+        "xsrfHeaderName": "X-XSRF-TOKEN",
+        "maxContentLength": -1,
+        "maxBodyLength": -1,
+        "env": {},
+        "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/json"
+        },
+        "method": "post",
+        "url": "/app-rpc-call/",
+        "data": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"app.main\",\"params\":{}}",
+        "axios-retry": {
+            "retryCount": 0,
+            "lastRequestTime": 1677657321830
+        }
+    },
+    "request": {}
+}
