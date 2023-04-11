@@ -18,6 +18,7 @@ export type ReportProps = {
     report: IReport;
     assetStore: any;
     reportWidthClass: "max-w-3xl" | "max-w-screen-xl" | "max-w-full";
+    id: string;
 };
 
 export type AppDataResult = {

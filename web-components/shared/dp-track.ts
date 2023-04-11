@@ -6,9 +6,6 @@ import FastMutex from "fast-mutex";
 type ReportViewPayload = {
     id: string;
     web_url: string;
-    published: boolean;
-    num_blocks: number;
-    author_username: string;
     is_embed: boolean;
 };
 
@@ -21,6 +18,16 @@ const KPIS_ENDPOINT = urljoin(
 //const KPIS_ENDPOINT = "http://localhost:8090/dp-kpis/";
 const LOCK_NAME = "ph_datapane_store";
 const mutex = new FastMutex();
+
+function getCookie(n: string): string | undefined {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+    const rawCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(n))
+        ?.split("=")[1];
+
+    return rawCookie ? decodeURIComponent(rawCookie) : undefined;
+}
 
 export const setupPostHog = async (
     apiKey: string,
@@ -70,9 +77,9 @@ const getPostHog = async (): Promise<any> => {
 };
 
 export const getDeviceId = async (): Promise<string> => {
-    // await for posthog to ensure localStorage is configured first
+    // await for posthog to ensure cookie is configured first
     await getPostHog();
-    const device = localStorage.getItem(LOCK_NAME);
+    const device = getCookie(LOCK_NAME);
 
     if (!device) {
         throw new Error("Couldn't access device ID");
@@ -120,10 +127,6 @@ const asyncDPTrackEvent = async (
 
 /** Used for tracking usage for billing and for PostHog analytics */
 export const trackReportView = (properties: ReportViewPayload) => {
-    asyncDPTrackEvent("REPORT_VIEW", {
-        object_id: properties.id,
-    });
-
     asyncPosthogCapture("Report View", properties);
 };
 

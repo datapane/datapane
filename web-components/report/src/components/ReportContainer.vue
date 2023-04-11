@@ -4,7 +4,10 @@ import LoadingSpinner from "./LoadingSpinner.vue";
 import ErrorCallout from "./ErrorCallout.vue";
 import { AppData, AppMetaData, ReportProps } from "../data-model/types";
 import { computed, onMounted, ref } from "vue";
-import { trackLocalReportView } from "../../../shared/dp-track";
+import {
+    trackLocalReportView,
+    trackReportView,
+} from "../../../shared/dp-track";
 import { useRootStore } from "../data-model/root-store";
 import { storeToRefs } from "pinia";
 import { isView } from "../data-model/blocks";
@@ -17,6 +20,7 @@ const p = defineProps<{
     isLightProse: ReportProps["isLightProse"];
     reportWidthClass: ReportProps["reportWidthClass"];
     mode: ReportProps["mode"];
+    id: ReportProps["id"];
     htmlHeader: ReportProps["htmlHeader"];
     webUrl?: AppMetaData["webUrl"];
     appData?: AppData;
@@ -62,16 +66,15 @@ onMounted(() => {
     if (window.dpLocal) {
         trackLocalReportView("CLI_REPORT_VIEW");
     } else {
-        // TODO - get app metadata for tracking
-        // const { web_url, id, published, username, num_blocks } = p.report;
-        // trackReportView({
-        //     id: id,
-        //     web_url: web_url,
-        //     published,
-        //     author_username: username,
-        //     num_blocks,
-        //     is_embed: window.location.href.includes("/embed/"),
-        // });
+        if (!p.webUrl) {
+            // Fail silently rather than throwing on missing property for analytics
+            return;
+        }
+        trackReportView({
+            id: p.id,
+            web_url: p.webUrl,
+            is_embed: p.mode === "EMBED",
+        });
     }
 });
 
