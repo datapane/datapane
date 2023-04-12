@@ -747,7 +747,7 @@ six = "*"
 
 [[package]]
 name = "datapane"
-version = "0.16.3"
+version = "0.16.4"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
