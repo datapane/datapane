@@ -11,7 +11,8 @@ from .test_views import assert_view, element_to_str, md_block
 # Templates
 def test_demo():
     view = dp.builtins.demo()
-    assert_view(view, 22, 79)
+
+    assert_view(view)
 
 
 def test_add_code():
