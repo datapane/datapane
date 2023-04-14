@@ -103,12 +103,8 @@ describe("Changing a report's style", () => {
         );
         cy.scrollToFirst("[data-cy=block-markdown]")
             .find("p")
-            .should("have.css", "text-align", "justify")
-            .and(
-                "have.css",
-                "font-family",
-                '"Inter", ui-sans-serif, system-ui',
-            );
+            .should("have.css", "text-align", "left")
+            .and("have.css", "font-family", "Inter, ui-sans-serif, system-ui");
         cy.get("[data-cy=report-component").should(
             "have.css",
             "background-color",
