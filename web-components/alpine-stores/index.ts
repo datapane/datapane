@@ -1,3 +1,0 @@
-import "./src/store";
-
-export {};

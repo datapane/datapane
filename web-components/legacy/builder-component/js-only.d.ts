@@ -16,5 +16,4 @@ declare module "marked";
 declare module "prismjs";
 
 declare module "fast-mutex";
-declare module "alpinejs";
 declare module "url-join";

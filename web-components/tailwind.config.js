@@ -12,6 +12,8 @@ config.content = [
     // Report renderer
     "./report/src/**/*.{vue,js,ts}",
     "./node_modules/@variantjs/**/*.ts",
+    // Web components
+    "./template-components/src/**/*.{vue,js,ts}",
 ];
 
 module.exports = config;

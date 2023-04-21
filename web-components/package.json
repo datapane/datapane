@@ -7,10 +7,11 @@
         "npm": ">=8.1 <9"
     },
     "scripts": {
-        "build:alpine-stores": "NODE_ENV=production vite build --config alpine-stores/vite.config.ts",
         "build:base": "NODE_ENV=production vite build --config base/vite.config.ts",
         "build:report": "NODE_ENV=production node --max_old_space_size=16384 node_modules/.bin/vite build --config report/vite.config.ts",
-        "build": "npm run build:base && npm run build:report && npm run build:alpine-stores",
+        "build:template-components": "NODE_ENV=production node --max_old_space_size=16384 node_modules/.bin/vite build --config template-components/vite.config.ts",
+        "dev:template-components": "NODE_ENV=development node --max_old_space_size=16384 node_modules/.bin/vite build --watch --mode development --config template-components/vite.config.ts",
+        "build": "npm run build:base && npm run build:report && npm run build:template-components",
         "dev:report": "NODE_ENV=development vite build --mode development --config base/vite.config.ts && NODE_ENV=development vite build --watch --mode development --config report/vite.config.ts",
         "test:public": "node_modules/.bin/cypress run --spec \"cypress/e2e/public/*\"",
         "test:org": "node_modules/.bin/cypress run --spec \"cypress/e2e/org/*\"",

@@ -44,3 +44,8 @@ pre:not(.form-input) {
     overflow-x: auto;
     padding: 1em;
 }
+
+.dp-invisible {
+    visibility: hidden;
+    height: 0 !important;
+}
