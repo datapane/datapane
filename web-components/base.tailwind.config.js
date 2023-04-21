@@ -2,6 +2,7 @@
 
 const defaultTheme = require("tailwindcss/defaultTheme");
 const { colors: fontFamily } = defaultTheme;
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
     darkMode: "class",
@@ -88,6 +89,29 @@ module.exports = {
         require("@tailwindcss/typography"),
         require("@tailwindcss/aspect-ratio"),
         require("@formkit/themes/tailwindcss"),
+
+        plugin(function ({ matchUtilities }) {
+            // If we have this in a template:
+            //   <svg class="stroke-width-[1.25]">
+            //
+            // then we want tailwind to produce CSS like this:
+            // .stroke-width-\[1.25\] > svg {
+            //    stroke-width: 1.25
+            // }
+            //
+            // This is used with nested <svg> elements to override the
+            // `stroke-width` attribute on the inner <svg>.
+            matchUtilities(
+                {
+                    "stroke-width": (value) => ({
+                        ["> svg"]: {
+                            "stroke-width": value,
+                        },
+                    }),
+                },
+                { values: { "\\d+(\\.\\d+)?": true } },
+            );
+        }),
     ],
     content: [],
     safelist: [
