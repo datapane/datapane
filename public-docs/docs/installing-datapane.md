@@ -71,24 +71,6 @@ If you installed `datapane` via conda, run the following command, adding the `--
 conda update datapane OR conda update --all
 ```
 
-## Datapane Cloud
-
-[Datapane Cloud](https://cloud.datapane.com) is a free and paid-for platform for hosting, sharing, and embedding reports, apps, functions and more securely.
-
-Simply create your account, sign in, and add your API token to your local environment by running the following from the terminal or within Python respectively,
-
-```bash
-datapane login {TOKEN}
-```
-
-```python
-import datapane as dp
-dp.login({TOKEN})
-```
-
-Datapane Cloud comes with a generous free tier for individual use and public sharing, and paid plans for teams usage, permissions, authentication and more - see [here](https://datapane.com/pricing/)
-
-
 ## Analytics
 
 By default, the Datapane Python library collects error reports and usage telemetry.

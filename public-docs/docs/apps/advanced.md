@@ -29,7 +29,7 @@ dp.serve_app(view)
 
 In the example above, `df` is referenced by `filter_df` and can be accessed in that function by all users when the function is called. It's important to note that Datapane supports multiple users by default, and Datapane will call ``filter_df` automatically for each user individually upon submitting the form.
 
-!!! warning:
+!!! warning
     Datapane apps support multiple users via threads, so normal considerations apply when modifying shared data structures across different threads
 
 When shutting down the server, no state is preserved, this means that all users will lose any unsaved data and will need to reload their apps within the browser upon restarting the server again.

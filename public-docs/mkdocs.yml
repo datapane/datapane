@@ -12,20 +12,12 @@ nav:
     - Overview: "blocks/overview.ipynb"
     - Display Blocks: "blocks/display-blocks.ipynb"
     - Layout Blocks: "blocks/layout-blocks.ipynb"
-  - Reports:
+  - Sharing Reports:
     - Overview: "reports/overview.ipynb"
-    - Jupyter Integration: "reports/jupyter-integration.ipynb"
     - Styling: "reports/styling.ipynb"
-  - Apps and Functions:
-    - Overview: "apps/overview.md"
-    - App Blocks: "apps/blocks.md"
-    - Functions and Controls: "apps/functions-controls.md"
-    - Displaying Updates: "apps/updates.md"
-    - Advanced Features: "apps/advanced.md"
-    - Deployment: "apps/deployment.md"
   - Resources:
+      - Jupyter Integration: "reports/jupyter-integration.ipynb"
       - Examples: examples.md
-      - Cookbook / Snippets: cookbook.md
   - API Reference:
       - Display Blocks:
           - Plots: "reference/display-blocks/plots.ipynb"
@@ -38,10 +30,7 @@ nav:
           - Pages: "reference/layout-blocks/page.ipynb"
           - Toggle: "reference/layout-blocks/toggle.ipynb"
       - Reports: "reference/reports.md"
-      - Apps:
-          - Compute Blocks: "reference/apps/compute.ipynb"
-          - Controls & Parameters: "reference/apps/controls.ipynb"
-          - Apps API Reference: "reference/apps/reference.ipynb"
+
   # - Release Notes: releasenotes.md
 
 theme:

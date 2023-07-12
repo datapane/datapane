@@ -26,71 +26,33 @@
 </p>
 
 <p align='center'>
-  <h1 align='center'>Build full-stack data apps in 100% Python</h1>
+  <h1 align='center'>Build interactive reports in seconds using Python.</h1>
 </p>
 
-Datapane is an app development platform which gives you everything you need to build internal data analytics products using Python.
+Datapane makes it simple to build interactive reports in seconds using Python.
 
-### Progress & Roadmap
+Import Datpane's Python library into your script or notebook and build reports programmatically by wrapping components such as:
 
-- [x] [Blocks & Views](https://docs.datapane.com/blocks/overview/)
-  - [x] Display blocks
-  - [x] Layout blocks
-  - [x] Static site export
-- [x] [App server](https://docs.datapane.com/apps/overview/)
-  - [x] Backend functions
-  - [x] Forms
-  - [x] Client-side events (e.g. onload)
-  - [x] Caching
-  - [x] Sessions
-- [x] [Reports](https://docs.datapane.com/reports/overview/)
-  - [x] HTML reports
-  - [x] Cloud reports
-- [x] [Deployment](https://docs.datapane.com/apps/deployment/#deploying-your-app)
-  - [x] Fly.io
-  - [x] Dockerfile generation
-- [x] [Components library](https://github.com/datapane/components)
-- [ ] Tasks
-  - [ ] Scheduled tasks
-  - [ ] Background tasks
-- [ ] Data layer
-  - [ ] Files
-  - [ ] Analytics DB (DuckDB)
-  - [ ] App state DB (sqlite)
-- [ ] Integrations & Messaging
-  - [ ] Slack
-  - [ ] Email
-  - [ ] Webhooks
+- Pandas DataFrames
+- Plots from Python visualization libraries such as Bokeh, Altair, Plotly, and Folium
+- Markdown and text
+- Files, such as images, PDFs, JSON data, etc.
+- Interactive forms which run backend Python functions
 
-## Why use Datapane?
-
-#### **🐍 100% Python**
-
-Build apps and reporting tools without writing HTML, CSS, or worrying about infrastructure.
-
-#### **🔋 Batteries included**
-
-Not just for demos and MVPs. Build products with background processing, integrations, reporting, and more.
-
-#### **🚀 Simple to host**
-
-Deploy to any web host, run on your own server, or embed into existing frameworks like Flask and Django.
+Datapane reports are interactive and can also contain pages, tabs, drop downs, and more. Once created, reports can be exported as HTML, shared as standalone files, or embedded into your own application, where your viewers can interact with your data and visualizations.
 
 ## Gallery
 
-Check out example reports and apps in our gallery:
+Check out example reports in our gallery and view their source:
 
-https://datapane.com/gallery
+- https://datapane.com/gallery
+- https://github.com/datapane/examples
 
-## How is Datapane's architecture unique?
+## Getting Started
 
-Datapane Apps use a combination of pre-rendered frontend elements and backend Python functions which are called on-demand. Result: low-latency apps which are simple to build, host, and scale.
+Check out our [Quickstart](https://docs.datapane.com/quickstart) to build a report in 3m.
 
-# Getting Started
-
-Check out our [Quickstart](https://docs.datapane.com/quickstart) to build a data science web app in 3m.
-
-## Installing Datapane
+### Installing Datapane
 
 The best way to install Datapane is through pip or conda.
 
@@ -112,7 +74,7 @@ Datapane also works well in hosted Jupyter environments such as Colab or Binder,
 !pip3 install --quiet datapane
 ```
 
-# Examples
+## Examples
 
 ### 📊 Share plots, data, and more as reports
 
@@ -182,62 +144,12 @@ view = dp.Blocks(
 dp.save_report(view, path="layout_example.html")
 ```
 
-### Add functions to create full-stack apps
+## Next Steps
 
-Add forms which run backend functions, or refresh your app automatically to build dashboards. Serve locally or deploy to your favorite web-host.
-
-<p>
-
-<img width='485px' align='left' alt="Functions" src="https://user-images.githubusercontent.com/3541695/221241943-dc2a03ae-1fd9-4278-8636-6344c5098a5c.gif">
-
-<p>
-
-```python
-import altair as alt
-from vega_datasets import data
-import datapane as dp
-
-df = data.iris()
-
-def gen_assets(params):
-    subset = df[df['species'] == params['species']]
-
-    fig = alt.Chart(subset)
-            .mark_point()
-            .encode( x="petalLength:Q", y="petalWidth:Q")
-
-    return [dp.Plot(fig), dp.DataTable(subset)]
-
-view = dp.Form(
-    on_submit=gen_assets,
-    controls=dp.Controls(
-      species=dp.Choice(options=list(df['species'].unique())
-    )
-)
-
-dp.serve_app(view)
-```
-
-# Get involved
-
-## Forums
-
-Leave us some feedback, get help, ask questions and request features.
-
-### 📜 [Ask a question](https://forum.datapane.com/)
-
-## Contribute
-
-Looking for ways to contribute to Datapane?
-
-### ✨ [Visit the contribution guide](https://github.com/datapane/datapane/blob/main/CONTRIBUTING.md).
-
-# Next Steps
-
+- [Quickstart](https://docs.datapane.com/quickstart) - build a report in 3m
+- [Visit our Forums](https://forum.datapane.com/) - leave feedback, get help, ask questions and request features
 - [View Examples](https://github.com/datapane/examples)
 - [Read the documentation](https://docs.datapane.com)
-- [Discuss with the community](https://forum.datapane.com/)
-- [Sign up for a free Cloud account](https://cloud.datapane.com/accounts/signup)
 
 ## Analytics
 

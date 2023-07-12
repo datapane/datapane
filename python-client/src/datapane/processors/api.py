@@ -149,6 +149,7 @@ def upload_report(
     **kwargs,
 ) -> CloudReport:
     """
+    (No longer supported for Datapane Cloud from August 11th 2023).
     Upload as a report, including its attached assets, to the logged-in Datapane Server.
     Args:
         blocks: The `Blocks` object or a list of Blocks
@@ -156,7 +157,7 @@ def upload_report(
         description: A high-level description for the document, this is displayed in searches and thumbnails
         source_url: A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook
         publicly_visible: Visible to anyone with the link
-        tags: A list of tags (as strings) used to categorise your document
+        tags: A list of tags (as strings) used to categorize your document
         project: Project to add the app to
         open: Open the file in your browser after creating
         formatting: Set the basic styling for your app
@@ -165,8 +166,10 @@ def upload_report(
     # NOTE - this will become App deploy entrypoint also
 
     if c.config.is_public:
-        display_msg("NOTE: Datapane Cloud is being replaced and will not support Report uploading from August 11th 2023. Learn more {shutdown_url:l}",
-                    shutdown_url="https://datapane.com/blog/post/datapane-enterprise-reports-plus")
+        display_msg(
+            "NOTE: Datapane Cloud is being replaced and will not support Report uploading from August 11th 2023. Learn more {shutdown_url:l}",
+            shutdown_url="https://datapane.com/blog/post/datapane-enterprise-reports-plus",
+        )
 
     display_msg("Uploading report and associated data - *please wait...*")
 

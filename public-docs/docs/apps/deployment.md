@@ -27,12 +27,6 @@ dp.serve_app(app, public=True)
 
 If you are embedding your app in a third-party product, you will need to pass `embed_mode=True` to `dp.serve`. This disables specific security policies which will not work within an `iframe`.
 
-## Datapane Cloud
-
-Datapane Cloud will shortly provide App hosting specific and optimized to the needs of App running and hosting, including access-controls, security and authentication features that organizations require.
-
-At the same time, you can easily host your app via any web server hosting service (especially those that work with Python  / WSGI-based apps), including the services listed here.
-
 ## Fly.io
 
 [Fly.io](https://fly.io) provides a simple way to build and deploy your app. Fly has a generous free tier where you can host your data app on the web. Note that the free tier is limited to 256mb of RAM, so if you are doing any data processing, you may want to upgrade.

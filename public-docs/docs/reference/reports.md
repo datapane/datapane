@@ -10,4 +10,7 @@ Once you have built up the blocks that make up your report, you can use one of t
 
 ::: datapane.processors.api.upload_report
 
+!!! warning
+    Report uploading to Datapane Cloud will no longer be supported from August 11th 2023. [Learn more](https://datapane.com/blog/post/datapane-enterprise-reports-plus){target=_blank}
+
 ::: datapane.processors.api.stringify_report
