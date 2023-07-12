@@ -38,7 +38,8 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.0, < 3.12.0"
+python = ">=3.8.0, < 4.0.0"
+#python = ">=3.8.0"
 
 # DS
 # numpy = "^1.21.2"
@@ -85,7 +86,7 @@ requests = "^2.19.0"
 requests-toolbelt = ">=0.9.1, <0.11.0"
 tabulate = ">=0.8.9, < 0.10.0"
 toolz = ">=0.11.0,<0.13.0"
-ipynbname = "^2021.3.2"
+ipynbname = ">=2021.3.2"
 cheroot = "^9.0.0"
 multimethod = "^1.9"
 typing-extensions = "^4.4.0"
@@ -112,7 +113,8 @@ pytest-dotenv = "^0.5.2"
 hypothesis = {extras = ["cli"], version = "^6.67.1"}
 # pinned, as this library is more targetted for use by pip
 vendoring = "1.2.0"
-webtest = {git = "https://github.com/Pylons/webtest.git", rev = "8ef619f"}
+# vendoring = { version = "1.2.0", python = ">=3.8.0, < 4.0.0" }
+webtest = {git = "https://github.com/Pylons/webtest.git", branch = "main"}
 
 [tool.poetry.scripts]
 datapane = "datapane.client.__main__:main"

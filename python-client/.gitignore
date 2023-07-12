@@ -7,3 +7,6 @@
 /src/datapane/resources/local_report/report/**
 
 .hypothesis/
+
+*-project/
+

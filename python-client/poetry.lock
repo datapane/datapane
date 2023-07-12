@@ -3924,10 +3924,10 @@ test = ["websockets"]
 [[package]]
 name = "WebTest"
 version = "3.0.1.dev0"
-description = "Helper to test WSGI applications"
+description = ""
 category = "dev"
 optional = false
-python-versions = ">=3.7, <4"
+python-versions = ">=3.7"
 files = []
 develop = false
 
@@ -3943,8 +3943,8 @@ tests = ["PasteDeploy", "WSGIProxy2", "coverage", "pyquery", "pytest", "pytest-c
 [package.source]
 type = "git"
 url = "https://github.com/Pylons/webtest.git"
-reference = "8ef619f"
-resolved_reference = "8ef619fff5127af55b66c1e6c4f8568f3a29acf4"
+reference = "main"
+resolved_reference = "5bc6841351a71569889e11f443a7948cb3ca64f0"
 
 [[package]]
 name = "y-py"
@@ -4064,5 +4064,5 @@ plotting = ["bokeh", "folium", "matplotlib", "plotapi", "plotly"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8.0, < 3.12.0"
-content-hash = "729f18b476f0ca5869e6d3f220988e51afc9883add211dbfc4d95f42ce0caecb"
+python-versions = ">=3.8.0, < 4.0.0"
+content-hash = "9e2096736dd96b6b14f42e7fec85f658b4539007a73453ddb852034eecba76ee"

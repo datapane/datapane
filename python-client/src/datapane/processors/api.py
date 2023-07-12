@@ -164,6 +164,10 @@ def upload_report(
     """
     # NOTE - this will become App deploy entrypoint also
 
+    if c.config.is_public:
+        display_msg("NOTE: Datapane Cloud is being replaced and will not support Report uploading from August 11th 2023. Learn more {shutdown_url:l}",
+                    shutdown_url="https://datapane.com/blog/post/datapane-enterprise-reports-plus")
+
     display_msg("Uploading report and associated data - *please wait...*")
 
     kwargs.update(
