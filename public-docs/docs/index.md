@@ -6,7 +6,7 @@
 
 Datapane makes it simple to build interactive reports in seconds using Python.
 
-Import Datpane's Python library into your script or notebook and build reports programmatically by wrapping components such as:
+Import Datapane's Python library into your script or notebook and build reports programmatically by wrapping components such as:
 
 - Pandas DataFrames
 - Plots from Python visualization libraries such as Bokeh, Altair, Plotly, and Folium
