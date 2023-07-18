@@ -149,7 +149,7 @@ def upload_report(
     **kwargs,
 ) -> CloudReport:
     """
-    (No longer supported for Datapane Cloud from August 11th 2023).
+    (No longer supported for Datapane Cloud from August 18th 2023).
     Upload as a report, including its attached assets, to the logged-in Datapane Server.
     Args:
         blocks: The `Blocks` object or a list of Blocks
@@ -167,7 +167,7 @@ def upload_report(
 
     if c.config.is_public:
         display_msg(
-            "NOTE: Datapane Cloud is being replaced and will not support Report uploading from August 11th 2023. Learn more {shutdown_url:l}",
+            "NOTE: Datapane Cloud is being replaced and will not support Report uploading from August 18th 2023. Learn more {shutdown_url:l}",
             shutdown_url="https://datapane.com/blog/post/datapane-enterprise-reports-plus",
         )
 
