@@ -751,7 +751,7 @@ version = "0.16.4"
 description = "Datapane client library and CLI tool"
 category = "main"
 optional = false
-python-versions = ">=3.8.0, < 3.12.0"
+python-versions = ">=3.8.0, < 4.0.0"
 files = []
 develop = true
 
@@ -774,7 +774,7 @@ folium = {version = ">=0.12.0, <0.15.0", optional = true}
 furl = "^2.0.0"
 glom = ">=22.1.0,<24.0.0"
 importlib_resources = ">=3.0.0,<6.0.0"
-ipynbname = "^2021.3.2"
+ipynbname = ">=2021.3.2"
 jsonschema = ">=3.2.0,<5.0.0"
 lxml = "^4.0.0"
 matplotlib = {version = "^3.2.0", optional = true}
