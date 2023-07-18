@@ -4065,4 +4065,4 @@ plotting = ["bokeh", "folium", "matplotlib", "plotapi", "plotly"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0, < 4.0.0"
-content-hash = "9e2096736dd96b6b14f42e7fec85f658b4539007a73453ddb852034eecba76ee"
+content-hash = "80622a68d26fbcb788f63a324b8b2d8945dbe687e2d146a06ae6795395d5a094"
