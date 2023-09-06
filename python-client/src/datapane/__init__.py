@@ -70,9 +70,8 @@ from .blocks import (
     VAlign,
     wrap_block,
 )
-from .cloud_api import CloudReport
+from .cloud_api import CloudReport, hello_world, login, logout, ping, signup
 from .cloud_api import File as CloudFile
-from .cloud_api import hello_world, login, logout, ping, signup
 from .processors import (
     FontChoice,
     Formatting,
@@ -86,6 +85,7 @@ from .processors import (
 from .view import App, Blocks, View
 
 # Other useful re-exports
+# ruff: noqa: I001
 from . import builtins  # isort:skip  otherwise circular import issue
 
 X = wrap_block
