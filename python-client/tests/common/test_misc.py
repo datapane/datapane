@@ -34,7 +34,7 @@ def test_version():
         ("video/mp4", False),
         ("application/zip", False),
         # Our special cases:
-        ("application/vnd.vegalite.v2+json", True),
+        ("application/vnd.vegalite.v5+json", True),
         ("application/vnd.datapane.table+html", True),
         ("application/vnd.pickle+binary", True),
         ("application/vnd.apache.arrow+binary", True),

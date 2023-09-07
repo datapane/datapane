@@ -10,7 +10,7 @@ from copy import copy
 from multimethod import multimethod
 
 from datapane import blocks as bk
-from datapane.blocks import BaseBlock, Compute
+from datapane.blocks import BaseBlock
 from datapane.blocks.layout import ContainerBlock
 from datapane.client import DPClientError, log
 
@@ -44,31 +44,6 @@ class PrettyPrinter(ViewVisitor):
         self.indent += 2
         _ = b.traverse(self)
         self.indent -= 2
-
-
-@dc.dataclass
-class CollectFunctions(ViewVisitor):
-    """Collect all the Function blocks in the View"""
-
-    entries: FEntries = dc.field(default_factory=dict)
-
-    @multimethod
-    def visit(self, b: BaseBlock):
-        return self
-
-    @multimethod
-    def visit(self, b: ContainerBlock):
-        b.traverse(self)
-
-    @multimethod
-    def visit(self, b: Compute):
-        # TODO - move this to common.types??
-        from datapane.app.runtime import FunctionRef
-
-        # NOTE - do we move to a method on Interactive??
-        self.entries[b.function_id] = FunctionRef(
-            f=b.function, f_id=b.function_id, controls=b.controls, cache=b.cache, swap=b.swap
-        )
 
 
 # TODO - split out into BlockBuilder helper here

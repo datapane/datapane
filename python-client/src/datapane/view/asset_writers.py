@@ -98,7 +98,7 @@ class HTMLTableWriter:
     @multimethod
     def write_file(self, x: Styler, f) -> None:
         self._check(x.data)
-        out = x.render().encode()
+        out = x.to_html().encode()
         f.write(out)
 
     def _check(self, df: pd.DataFrame) -> None:
@@ -115,7 +115,7 @@ class PlotWriter:
     # Altair (always installed)
     @multimethod
     def get_meta(self, x: SchemaBase) -> AssetMeta:
-        return AssetMeta(mime="application/vnd.vegalite.v4+json", ext=".vl.json")
+        return AssetMeta(mime="application/vnd.vegalite.v5+json", ext=".vl.json")
 
     @multimethod
     def write_file(self, x: SchemaBase, f) -> None:
@@ -130,17 +130,6 @@ class PlotWriter:
         @multimethod
         def write_file(self, x: opt.Map, f) -> None:
             html: str = x.get_root().render()
-            f.write(html.encode())
-
-    if opt.HAVE_PLOTAPI:
-
-        @multimethod
-        def get_meta(self, x: opt.Visualisation) -> AssetMeta:
-            return AssetMeta(mime="application/vnd.plotapi+html", ext=".plotapi.html")
-
-        @multimethod
-        def write_file(self, x: opt.Visualisation, f) -> None:
-            html: str = x.to_string()
             f.write(html.encode())
 
     if opt.HAVE_BOKEH:

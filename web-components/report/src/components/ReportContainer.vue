@@ -4,10 +4,6 @@ import LoadingSpinner from "./LoadingSpinner.vue";
 import ErrorCallout from "./ErrorCallout.vue";
 import { AppData, AppMetaData, ReportProps } from "../data-model/types";
 import { computed, onMounted, ref } from "vue";
-import {
-    trackLocalReportView,
-    trackReportView,
-} from "../../../shared/dp-track";
 import { useRootStore } from "../data-model/root-store";
 import { storeToRefs } from "pinia";
 import { isView } from "../data-model/blocks";
@@ -62,20 +58,7 @@ const storeProps = storeToRefs(rootStore);
 const { report } = storeProps;
 
 onMounted(() => {
-    /* View tracking */
-    if (window.dpLocal) {
-        trackLocalReportView("CLI_REPORT_VIEW");
-    } else {
-        if (!p.webUrl) {
-            // Fail silently rather than throwing on missing property for analytics
-            return;
-        }
-        trackReportView({
-            id: p.id,
-            web_url: p.webUrl,
-            is_embed: p.mode === "EMBED",
-        });
-    }
+    return;
 });
 
 const htmlHeader = computed(() => {

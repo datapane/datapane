@@ -44,15 +44,6 @@ except ImportError:
     HAVE_FOLIUM = False
     log.debug("No folium found")
 
-# Plotapi
-try:
-    from plotapi import Visualisation
-
-    HAVE_PLOTAPI = True
-except ImportError:
-    HAVE_PLOTAPI = False
-    log.debug("No plotapi found")
-
 # Bokeh
 try:
     import bokeh

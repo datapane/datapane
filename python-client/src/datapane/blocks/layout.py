@@ -8,7 +8,7 @@ from datapane.client import DPClientError, log
 from datapane.common.dp_types import StrEnum
 
 from .base import BaseBlock, BlockId, BlockList, BlockOrPrimitive, wrap_block
-from .compute import Empty, gen_name
+from .empty import Empty, gen_name
 
 if t.TYPE_CHECKING:
     from typing_extensions import Self

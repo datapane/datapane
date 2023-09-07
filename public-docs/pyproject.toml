@@ -6,25 +6,15 @@ authors = ["Datapane <info@datapane.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12.0"
-datapane = { path = "../python-client", develop = true, extras= ["cloud", "plotting"] }
+datapane = { path = "../python-client", develop = true, extras= ["plotting"] }
 
 # mkdocs
 mkdocs-redirects = "^1.2.0"
-mkdocstrings = {version = "^0.20.0", extras = ["python"]}
-mkdocs-material = "^8.3.7"
-mknotebooks = "^0.7.1"
+mkdocstrings = {version = "^0.23.0", extras = ["python"]}
+mkdocs-material = "^9.2.0"
+mknotebooks = "^0.8.0"
 
 # DS helpers
-#pyarrow = ">=6.0.0,<11.0.0"
-#altair = "^4.0.0"
-#vega-datasets = ">=0.9.0,<1.0.0"
-#matplotlib = "^3.0.0"
-#plotly = ">=4.0.0,<6.0.0"
-#bokeh = "~2.4.2"
-#folium = "0.12.*"
-#plotapi = "^5.0.0"
-#datacommons = "^1.4.3"
-#datacommons-pandas = "^0.0.3"
 jupyterlab = "^3.4.3"
 seaborn = "^0.11.2"
 openpyxl = "^3.0.10"

@@ -71,33 +71,6 @@ If you installed `datapane` via conda, run the following command, adding the `--
 conda update datapane OR conda update --all
 ```
 
-## Analytics
-
-By default, the Datapane Python library collects error reports and usage telemetry.
-This is used by us to help make the product better and to fix bugs.
-If you would like to disable this, simply create a file called `no_analytics` in your `datapane` config directory, e.g.
-
-### Linux
-
-```bash
-$ mkdir -p ~/.config/datapane && touch ~/.config/datapane/no_analytics
-```
-
-### macOS
-
-```bash
-$ mkdir -p ~/Library/Application\ Support/datapane && touch ~/Library/Application\ Support/datapane/no_analytics
-```
-
-### Windows (PowerShell)
-
-```powershell
-PS> mkdir ~/AppData/Roaming/datapane -ea 0
-PS> ni ~/AppData/Roaming/datapane/no_analytics -ea 0
-```
-
-You may need to try `~/AppData/Local` instead of `~/AppData/Roaming` on certain Windows configurations depending on the type of your user-account.
-
 
 ## Windows Tips and Troubleshooting
 
@@ -126,19 +99,3 @@ If so, try installing the [Visual C++ Redistributables for Windows](https://supp
 This usually occurs when you are running a 32-bit version of Python and installing via `pip`. Either try using `conda` or install a 64-bit version of Python (for example from the Windows Store as mentioned above).
 
 This may also occur when using Windows 7 - we only support directly Windows 10, however, it may be worth trying to install via `conda` instead, if you are stuck on Windows 7.
-
-#### 'datapane.exe' is not recognized as an internal or external command
-
-This occurs when your Windows `%PATH%` doesn't include all the Python directories, specifically the `Scripts` directory.
-
-You may notice during the Datapane install messages such as (or similar to):
-
-```
-The script datapane.exe is installed in 'C:\users\<USERNAME>\appdata\local\programs\python\python37\Scripts' which is not on PATH.
-Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
-```
-
-To fix this, adjust your `%PATH%` to include your specific `Scripts` path as mentioned in the `pip` warning (see [here](https://datatofish.com/add-python-to-windows-path/) for more detailed instructions). Alternatively, you can try running the Datapane client directly, using the command `python3.exe -m datapane.client` instead.
-
-!!! info
-    If you are still having problems installing, please ask on our [Forums](https://forum.datapane.com)

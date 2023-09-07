@@ -2,7 +2,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from tempfile import mktemp
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -10,10 +9,7 @@ import vega_datasets as vd
 
 from datapane.common import ArrowFormat, SList, log
 from datapane.common.df_processor import (
-    PD_1_3_GREATER,
     PD_VERSION,
-    PD_1_1_x,
-    PD_1_2_x,
     convert_axis,
     downcast_numbers,
     obj_to_str,
@@ -195,8 +191,6 @@ def test_e2e_df_processing(tmp_path: Path):
     def _test_df(
         df: pd.DataFrame,
         expected_types_pd13: SList,
-        expected_types_pd12: Optional[SList] = None,
-        expected_types_pd11: Optional[SList] = None,
     ):
         df_conv = df.convert_dtypes()
         df_proc = process_df(df, copy=True)
@@ -210,25 +204,13 @@ def test_e2e_df_processing(tmp_path: Path):
         pd.testing.assert_frame_equal(df_proc, df2)
 
         log.info(f"Using PD_VERSION={PD_VERSION}")
-        if PD_VERSION in PD_1_3_GREATER:
-            expected_types = expected_types_pd13
-        elif PD_VERSION in PD_1_2_x:
-            expected_types = expected_types_pd12
-        elif PD_VERSION in PD_1_1_x:
-            expected_types = expected_types_pd11
-        else:
-            raise AssertionError(f"Invalid PD_VERSION={PD_VERSION}")
+        expected_types = expected_types_pd13
 
         assert [str(x) for x in df2.dtypes] == expected_types
 
     # DF 1
     df = vd.data.cars()
-    _test_df(
-        df,
-        ["string", "Float64", "UInt8", "Float64", "UInt8", "UInt16", "Float64", "datetime64[ns]", "category"],
-        ["string", "Float64", "UInt8", "Float64", "Float64", "UInt16", "Float64", "datetime64[ns]", "category"],
-        ["string", "float64", "UInt8", "float64", "float64", "UInt16", "float64", "datetime64[ns]", "category"],
-    )
+    _test_df(df, ["string", "Float64", "UInt8", "Float64", "UInt8", "UInt16", "Float64", "datetime64[ns]", "category"])
 
     # DF 2 - float64/int64 downcasting for older pandas versions
     df = pd.DataFrame(
@@ -247,8 +229,6 @@ def test_e2e_df_processing(tmp_path: Path):
         df,
         # convert_dtypes doesn't convert Float64 -> Int64 on Windows
         ["UInt8", "Int64", "Int8", "Float64" if sys.platform == "win32" else "Int64", "Float64"],
-        ["UInt8", "Int64", "Float64", "Float64", "Float64"],
-        ["UInt8", "Int64", "float64", "float64", "float64"],
     )
 
     # DF 3 - basic types
@@ -266,32 +246,7 @@ def test_e2e_df_processing(tmp_path: Path):
             cat_obj_col=[("a", "b") for x in range(30)],
         )
     )
-    _test_df(
-        df,
-        ["string", "category", "UInt8", "Int64", "Float64", "string", "datetime64[ns]", "string", "category"],
-        [
-            "string",
-            "category",
-            "UInt8",
-            "Int64",
-            "Float64",
-            "string",
-            "datetime64[ns]",
-            "string",
-            "category",
-        ],
-        [
-            "string",
-            "category",
-            "UInt8",
-            "Int64",
-            "float64",
-            "string",
-            "datetime64[ns]",
-            "string",
-            "category",
-        ],
-    )
+    _test_df(df, ["string", "category", "UInt8", "Int64", "Float64", "string", "datetime64[ns]", "string", "category"])
 
     # DF 4 - nullable
     df = pd.DataFrame(
@@ -305,9 +260,4 @@ def test_e2e_df_processing(tmp_path: Path):
             date_col=[datetime.utcnow() for x in range(30)] + [pd.NaT, pd.NaT],
         )
     )
-    _test_df(
-        df,
-        ["string", "category", "UInt8", "Float64", "string", "datetime64[ns]"],
-        ["string", "category", "Float64", "Float64", "string", "datetime64[ns]"],
-        ["string", "category", "float64", "float64", "string", "datetime64[ns]"],
-    )
+    _test_df(df, ["string", "category", "UInt8", "Float64", "string", "datetime64[ns]"])

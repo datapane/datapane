@@ -1,7 +1,6 @@
 # Copyright 2020 StackHut Limited (trading as Datapane)
 # SPDX-License-Identifier: Apache-2.0
 import sys
-import typing as t
 from pathlib import Path
 
 try:
@@ -29,49 +28,28 @@ from .client import (  # isort:skip  otherwise circular import issue
     set_dp_mode,
 )  # isort:skip  otherwise circular import issue
 
-from .app.server import serve_app
 from .blocks import (
     HTML,
     Attachment,
     BigNumber,
     Block,
-    Choice,
     Code,
-    Compute,
-    Controls,
     DataTable,
-    Date,
-    DateTime,
-    Dynamic,
     Embed,
     Empty,
-    File,
-    Form,
     Formula,
     Group,
     Media,
-    MultiChoice,
-    NumberBox,
     Page,
     Plot,
-    Range,
     Select,
     SelectType,
-    Swap,
-    Switch,
     Table,
-    Tags,
-    TargetMode,
     Text,
-    TextBox,
-    Time,
     Toggle,
-    Trigger,
     VAlign,
     wrap_block,
 )
-from .cloud_api import CloudReport, hello_world, login, logout, ping, signup
-from .cloud_api import File as CloudFile
 from .processors import (
     FontChoice,
     Formatting,
@@ -82,7 +60,7 @@ from .processors import (
     stringify_report,
     upload_report,
 )
-from .view import App, Blocks, View
+from .view import App, Blocks, Report, View
 
 # Other useful re-exports
 # ruff: noqa: I001
@@ -92,18 +70,11 @@ X = wrap_block
 
 __all__ = [
     "App",
+    "Report",
     "DPClientError",
-    "CloudFile",
-    "CloudReport",
     "builtins",
-    "hello_world",
-    "login",
-    "logout",
-    "ping",
-    "signup",
     "enable_logging",
     "print_debug_info",
-    "load_params_from_command_line",
     "Block",
     "Attachment",
     "BigNumber",
@@ -121,32 +92,13 @@ __all__ = [
     "Group",
     "Text",
     "Toggle",
-    "Controls",
     "VAlign",
-    "Compute",
-    "Form",
-    "Dynamic",
     "Blocks",
     "upload_report",
     "save_report",
-    "serve_app",
     "build_report",
     "stringify_report",
     "X",
-    "Range",
-    "Switch",
-    "TextBox",
-    "NumberBox",
-    "Choice",
-    "MultiChoice",
-    "Tags",
-    "Date",
-    "DateTime",
-    "Time",
-    "File",
-    "Swap",
-    "Trigger",
-    "TargetMode",
     "Page",
     "View",
     "Width",
@@ -173,13 +125,3 @@ if get_dp_mode() == DPMode.LIBRARY and not IN_PYTEST:
     from .client.config import init
 
     init()
-
-
-def load_params_from_command_line() -> t.Dict:
-    """Call this from your own scripts to read any CLI parameters into the global Params object"""
-    from .client.utils import log, parse_command_line
-
-    config = parse_command_line()
-    log.debug(config)
-    # Params.replace(config)
-    return config

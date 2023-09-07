@@ -7,7 +7,7 @@ from copy import copy
 from lxml import etree
 from lxml.etree import _Element as ElementT
 
-from datapane.blocks import Compute, Group
+from datapane.blocks import Group
 from datapane.blocks.base import BlockOrPrimitive
 from datapane.blocks.layout import ContainerBlock
 
@@ -86,7 +86,7 @@ class Blocks(ContainerBlock):
 
     @property
     def has_compute(self):
-        return any(isinstance(block, Compute) for block in self)
+        return False
 
 
 class View(Blocks):
@@ -118,32 +118,12 @@ class App(Blocks):
 
     def upload(
         self,
-        name: str,
-        description: str = "",
-        source_url: str = "",
-        publicly_visible: t.Optional[bool] = None,
-        tags: t.Optional[t.List[str]] = None,
-        project: t.Optional[str] = None,
-        open: bool = False,
-        formatting: t.Optional[Formatting] = None,
-        overwrite: bool = False,
+        *args,
         **kwargs,
     ) -> None:
         from ..processors import upload_report
 
-        upload_report(
-            blocks=self,
-            name=name,
-            description=description,
-            source_url=source_url,
-            publicly_visible=publicly_visible,
-            tags=tags,
-            project=project,
-            open=open,
-            formatting=formatting,
-            overwrite=overwrite,
-            **kwargs,
-        )
+        upload_report(*args, **kwargs)
 
     def save(
         self,

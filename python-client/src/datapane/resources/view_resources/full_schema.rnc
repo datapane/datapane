@@ -50,107 +50,11 @@ block_label_or_name = block_name?, block_label?
 #  block_label_or_name, Block+
 #}
 
-Block = LayoutBlock | DataBlock | Compute | Empty
+Block = LayoutBlock | DataBlock | Empty
 
 # Used to describe a Placeholder element we can patch - like empty div in HTML
 Empty = element Empty {
   block_name
-}
-
-
-################################################################################
-# Compute block handling
-Compute = element Compute {
-  block_label_or_name,
-
-  # htmx-like attributes
-  attribute function_id { xsd:string { minLength = "1" maxLength = "32" } },
-  # attribute function_id { xsd:positiveInteger },
-  attribute target { xsd:string { minLength = "1" } },
-  # submit has hard-coded "Go" button
-  # schedule is hard-coded to 30s for now
-  attribute trigger { string "submit" | string "schedule" | string "visible" | string "load" | string "mount" },
-  attribute swap { string "replace" | string "prepend" | string "append" | string "inner" },
-  attribute submit_label { xsd:string { minLength = "1" maxLength = "32" } }?,
-  attribute timer { xsd:positiveInteger }?,
-  attribute immediate { xsd:boolean }?,
-
-  # internal controls
-  Controls
-}
-
-Controls = element Controls {
-  attribute label { xsd:string { minLength = "1"} }?,
-  Param*
-}
-
-Param = PTextBox | PNumberBox | PRange | PSwitch | PChoice | PMultiChoice | PTags | PDate | PTime | PDateTime | PFile
-
-paramAttributes =
-  attribute name { xsd:string { minLength = "1" } },
-  attribute label { xsd:string { minLength = "1" } }?,
-  attribute required { xsd:boolean }
-
-PTextBox = element TextBox {
-  paramAttributes,
-  attribute initial { xsd:string }?
-}
-
-PNumberBox = element NumberBox {
-  paramAttributes,
-  attribute initial { xsd:double }?
-}
-
-PRange = element Range {
-  paramAttributes,
-  attribute initial { xsd:double }?,
-  attribute min { xsd:double },
-  attribute max { xsd:double },
-  attribute step { xsd:double }?
-}
-
-PSwitch = element Switch {
-  attribute initial { xsd:boolean }?,
-  paramAttributes
-}
-
-PChoice = element Choice {
-  paramAttributes,
-  attribute initial { xsd:string }?,
-  # json list of strings, non empty
-  attribute options { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }
-}
-
-PMultiChoice = element MultiChoice {
-  paramAttributes,
-  # json list of strings, non empty
-  attribute initial { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }?,
-  attribute options { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }
-}
-
-PTags = element Tags {
-  paramAttributes,
-  # json list of strings, non empty
-  attribute initial { xsd:string { minLength = "2" pattern = """\["([^"]|\\")+"(,\s*"([^"]|\\")+")*\]""" } }?
-}
-
-PDate = element Date {
-  paramAttributes,
-  attribute initial { xsd:date  }?
-}
-
-PTime = element Time {
-  paramAttributes,
-  attribute initial { xsd:time  }?
-}
-
-PDateTime = element DateTime {
-  paramAttributes,
-  attribute initial { xsd:dateTime  }?
-}
-
-PFile = element File {
-  paramAttributes
 }
 
 

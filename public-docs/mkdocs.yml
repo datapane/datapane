@@ -129,13 +129,6 @@ markdown_extensions:
 
 extra:
   generator: false
-  analytics:
-    provider: posthog
-    api_key: phc_wxtD2Qxd3RMlmCCSYDC0rW1We22yh06cMcffnfSJTZy
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/datapane/datapane
-    - icon: fontawesome/brands/discourse
-      link: https://forum.datapane.com/
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/datapaneapp

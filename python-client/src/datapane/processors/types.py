@@ -10,9 +10,6 @@ from datapane.view import Blocks
 
 from .file_store import DummyFileEntry, FileEntry, FileStore
 
-if t.TYPE_CHECKING:
-    from datapane.app.runtime import FunctionRef
-
 
 @dc.dataclass
 class ViewState:
@@ -21,7 +18,7 @@ class ViewState:
     file_entry_klass: dc.InitVar[t.Type[FileEntry]]
     store: FileStore = dc.field(init=False)
     view_xml: ViewXML = ""
-    entries: t.Dict[str, FunctionRef] = dc.field(default_factory=dict)
+    entries: t.Dict[str, str] = dc.field(default_factory=dict)
     dir_path: dc.InitVar[t.Optional[Path]] = None
 
     def __post_init__(self, file_entry_klass, dir_path):

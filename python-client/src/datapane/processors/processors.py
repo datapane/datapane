@@ -16,13 +16,11 @@ from lxml import etree
 
 from datapane import blocks as b
 from datapane._vendor.bottle import SimpleTemplate
-from datapane.client import config as c
-from datapane.client.analytics import _NO_ANALYTICS, capture
 from datapane.client.exceptions import InvalidReportError
 from datapane.client.utils import display_msg, log, open_in_browser
 from datapane.common import HTML, NPath, timestamp, validate_view_doc
 from datapane.common.viewxml_utils import ElementT, local_view_resources
-from datapane.view import CollectFunctions, PreProcess, XMLBuilder
+from datapane.view import PreProcess, XMLBuilder
 
 from .file_store import FileEntry
 from .types import BaseProcessor, Formatting
@@ -64,17 +62,6 @@ class PreProcessView(BaseProcessor):
         # update the processor state
         self.s.blocks = v1
 
-        return None
-
-
-class AppTransformations(BaseProcessor):
-    """Transform an app prior to running"""
-
-    def __call__(self, _: t.Any) -> None:
-        ci = CollectFunctions()
-        self.s.blocks.accept(ci)
-        # s1 = dc.replace(s, entries=ci.entries)
-        self.s.entries = ci.entries
         return None
 
 
@@ -128,12 +115,6 @@ class PreUploadProcessor(BaseProcessor):
         pre-upload pass of the XML doc so can be uploaded to DPCloud
         modifies the document based on the FileStore
         """
-
-        # check no functions exist in the uploaded app
-        if self.s.blocks.has_compute:
-            raise InvalidReportError(
-                "Reports with compute blocks can't currently be uploaded, please use dp.serve_app to serve as an app locally"
-            )
 
         # NOTE - this currently relies on all assets existing linearly in document order
         # in the asset store - if we move to a cas we will need to update the algorithm here
@@ -221,9 +202,8 @@ class BaseExportHTML(BaseProcessor, ABC):
             report_date=timestamp(),
             css_header=formatting.to_css(),
             is_light_prose=json.dumps(formatting.light_prose),
+            events=False,
             report_id=report_id,
-            author_id=c.config.session_id,
-            events=json.dumps(not _NO_ANALYTICS),
             cdn_static="https://datapane-cdn.com/static",
             cdn_base=self.get_cdn(),
             app_runner=app_runner,
@@ -281,7 +261,6 @@ class ExportHTMLInlineAssets(BaseExportHTML):
             path_uri = f"file://{osp.realpath(osp.expanduser(self.path))}"
             open_in_browser(path_uri)
 
-        capture("CLI Report Save", report_id=report_id)
         return report_id
 
 

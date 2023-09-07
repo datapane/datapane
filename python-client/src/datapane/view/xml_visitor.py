@@ -12,7 +12,7 @@ from multimethod import DispatchError, multimethod
 from datapane import DPClientError
 from datapane.blocks import BaseBlock
 from datapane.blocks.asset import AssetBlock
-from datapane.blocks.compute import Compute, TargetMode, gen_name
+from datapane.blocks.empty import gen_name
 from datapane.blocks.layout import ContainerBlock
 from datapane.blocks.text import EmbeddedTextBlock
 from datapane.client import log
@@ -99,30 +99,6 @@ class XMLBuilder(ViewVisitor):
         # NOTE - do we use etree.CDATA wrapper?
         _E = getattr(E, b._tag)
         return self.add_element(b, _E(etree.CDATA(b.content), **b._attributes))
-
-    @multimethod
-    def visit(self, b: Compute) -> XMLBuilder:
-        c_e = b.controls._to_xml()
-
-        # Target handling - this occurs during XML gen for now, could move to Preprocess
-        if b.target == TargetMode.SELF:
-            name = gen_name()
-            e = E.Compute(c_e, **{**b._attributes, "target": name, "name": name})
-        elif b.target in (TargetMode.BELOW, TargetMode.SIDE):
-            # desugar to create a Group(Interactive, Result)
-            cols = "1" if b.target == TargetMode.BELOW else "2"
-            name = gen_name()
-            e = E.Group(
-                E.Compute(c_e, **{**b._attributes, "target": name}),
-                E.Group(E.Empty(name=gen_name()), name=name, columns="1", valign="top"),
-                columns=cols,
-                valign="top",
-            )
-        else:
-            # use default target
-            e = E.Compute(c_e, **b._attributes)
-
-        return self.add_element(b, e)
 
     @multimethod
     def visit(self, b: AssetBlock):

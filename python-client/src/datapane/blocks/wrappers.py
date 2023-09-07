@@ -73,13 +73,6 @@ if opt.HAVE_FOLIUM:
         return b.Plot(x)
 
 
-if opt.HAVE_PLOTAPI:
-
-    @multimethod
-    def convert_to_block(x: opt.Visualisation) -> DataBlock:
-        return b.Plot(x)
-
-
 if opt.HAVE_MATPLOTLIB:
 
     @multimethod

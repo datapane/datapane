@@ -4,11 +4,8 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://datapane.com">Home</a> |
   <a href="https://docs.datapane.com">Docs</a> |
-  <a href="https://datapane.com/gallery">Gallery</a> |
   <a href="https://github.com/datapane/examples">Examples</a> |
-  <a href="https://forum.datapane.com">Discuss</a>
 </p>
 <p align='center'>
   <a href="https://github.com/datapane/datapane/">
@@ -24,6 +21,16 @@
       <img alt="Conda (channel only)" src="https://img.shields.io/conda/vn/conda-forge/datapane">
   </a>
 </p>
+
+## NOTE: Datapane is no longer actively maintained.
+
+We've made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. If you would like to take over maintaining this project independently, please let us know so we can add a link to your forked project here.
+
+The final release, `0.17.0`, has been optimized to focus on free local report saving, with unused features and analytics removed, and libraries updated to allow usage for as long as possible.
+
+Thank You.
+
+## Overview
 
 <p align='center'>
   <h1 align='center'>Build interactive reports in seconds using Python.</h1>
@@ -43,9 +50,8 @@ Datapane reports are interactive and can also contain pages, tabs, drop downs, a
 
 ## Gallery
 
-Check out example reports in our gallery and view their source:
+Check out example reports:
 
-- https://datapane.com/gallery
 - https://github.com/datapane/examples
 
 ## Getting Started
@@ -65,7 +71,7 @@ $ pip3 install -U datapane
 #### conda
 
 ```
-$ conda install -c conda-forge "datapane>=0.16.1"
+$ conda install -c conda-forge "datapane>=0.17.0"
 ```
 
 Datapane also works well in hosted Jupyter environments such as Colab or Binder, where you can install as follows:
@@ -147,33 +153,5 @@ dp.save_report(view, path="layout_example.html")
 ## Next Steps
 
 - [Quickstart](https://docs.datapane.com/quickstart) - build a report in 3m
-- [Visit our Forums](https://forum.datapane.com/) - leave feedback, get help, ask questions and request features
 - [View Examples](https://github.com/datapane/examples)
 - [Read the documentation](https://docs.datapane.com)
-
-## Analytics
-
-By default, the Datapane Python library collects error reports and usage telemetry.
-This is used by us to help make the product better and to fix bugs.
-If you would like to disable this, simply create a file called `no_analytics` in your `datapane` config directory, e.g.
-
-### Linux
-
-```bash
-$ mkdir -p ~/.config/datapane && touch ~/.config/datapane/no_analytics
-```
-
-### macOS
-
-```bash
-$ mkdir -p ~/Library/Application\ Support/datapane && touch ~/Library/Application\ Support/datapane/no_analytics
-```
-
-### Windows (PowerShell)
-
-```powershell
-PS> mkdir ~/AppData/Roaming/datapane -ea 0
-PS> ni ~/AppData/Roaming/datapane/no_analytics -ea 0
-```
-
-You may need to try `~/AppData/Local` instead of `~/AppData/Roaming` on certain Windows configurations depending on the type of your user-account.

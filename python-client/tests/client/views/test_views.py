@@ -14,7 +14,7 @@ from datapane.blocks import BaseBlock
 from datapane.builtins import gen_df, gen_plot
 from datapane.client.exceptions import DPClientError
 from datapane.common.viewxml_utils import load_doc, validate_view_doc
-from datapane.processors import AppTransformations, ConvertXML, Pipeline, PreProcessView, ViewState
+from datapane.processors import ConvertXML, Pipeline, PreProcessView, ViewState
 from datapane.processors.file_store import B64FileEntry
 from datapane.processors.types import mk_null_pipe
 
@@ -38,7 +38,7 @@ def num_blocks(view_str: str) -> int:
 def _view_to_xml_and_files(app_or_view: t.Union[dp.Blocks, dp.App]) -> ViewState:
     """Create a viewstate resulting from converting the View to XML & in-mem B64 files"""
     s = ViewState(blocks=app_or_view, file_entry_klass=B64FileEntry)
-    return Pipeline(s).pipe(PreProcessView()).pipe(AppTransformations()).pipe(ConvertXML()).state
+    return Pipeline(s).pipe(PreProcessView()).pipe(ConvertXML()).state
 
 
 def assert_view(
@@ -97,9 +97,7 @@ def gen_view_complex_no_files() -> dp.Blocks:
     )
 
 
-def gen_view_complex_with_files(
-    datadir: Path, single_file: bool = False, local_report: bool = False, include_fun: bool = False
-) -> dp.Blocks:
+def gen_view_complex_with_files(datadir: Path, single_file: bool = False, local_report: bool = False) -> dp.Blocks:
     # Asset tests
     lis = [1, 2, 3]
     small_df = gen_df()
@@ -129,14 +127,6 @@ def gen_view_complex_with_files(
         table_asset if local_report else dp.DataTable(df=big_df, name="big-table-block", caption="Test DataTable")
     )
 
-    fun = dp.Compute(
-        lambda params: dp.Blocks("Hellow"),
-        target="x",
-        controls=dp.Controls(
-            dp.TextBox("name", initial="xyz"), dp.Choice("lang", label="Language", options=["py", "rb"], initial="py")
-        ),
-    )
-
     if single_file:
         return dp.Blocks(dp.Group(blocks=[md_block, dt_asset]))
     else:
@@ -156,7 +146,7 @@ def gen_view_complex_with_files(
                 img_asset,
                 table_asset,
                 dt_asset,
-                fun if include_fun else dp.Empty("empty"),
+                dp.Empty("empty"),
             ),
         )
 
@@ -298,11 +288,6 @@ def test_gen_view_complex_no_files():
 def test_gen_view_with_files(datadir: Path):
     view = gen_view_complex_with_files(datadir)
     assert_view(view, 5, 25)
-
-
-def test_gen_view_with_function(datadir: Path):
-    view = gen_view_complex_with_files(datadir, include_fun=True)
-    assert_view(view, 5, 28)
 
 
 ################################################################################

@@ -9,8 +9,6 @@ from packaging.version import Version
 
 PD_VERSION = Version(pd.__version__)
 PD_1_3_GREATER = SpecifierSet(">=1.3.0")
-PD_1_2_x = SpecifierSet("~=1.2.0")
-PD_1_1_x = SpecifierSet("~=1.1.0")
 
 
 def convert_axis(df: pd.DataFrame):
@@ -131,9 +129,8 @@ def bipartite_to_bool(df: pd.DataFrame):
 def str_to_arrow_str(df: pd.DataFrame):
     """Use the memory-efficient pyarrow string dtype (pandas >= 1.3 only)"""
     # convert objects to str / NA
-    if PD_VERSION in PD_1_3_GREATER:
-        df_str = df.select_dtypes("string")
-        df[df_str.columns] = df_str.astype("string[pyarrow]")
+    df_str = df.select_dtypes("string")
+    df[df_str.columns] = df_str.astype("string[pyarrow]")
 
 
 def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
@@ -153,22 +150,8 @@ def process_df(df: pd.DataFrame, copy: bool = False) -> pd.DataFrame:
     timedelta_to_str(df)
 
     # NOTE - pandas >= 1.3 handles downcasting of nullable values correctly
-    if PD_VERSION in PD_1_3_GREATER:
-        df = df.convert_dtypes()
-        downcast_numbers(df)
-    else:
-        # downcast first as can't downcast Int64 correctly after
-        downcast_numbers(df)
-        # convert all non-floating vals
-
-        non_f = df.select_dtypes(exclude="floating")
-        # pandas version < 1.3 raises ValueError when running convert_dtypes on empty dataframes so we need to check it
-        if len(non_f.columns) > 0:
-            df[non_f.columns] = non_f.convert_dtypes()
-        # convert all floating vals, but disable float64->int64 conversioon
-        f = df.select_dtypes(include="floating")
-        if len(f.columns) > 0:
-            df[f.columns] = f.convert_dtypes(convert_integer=False)
+    df = df.convert_dtypes()
+    downcast_numbers(df)
 
     # save timedeltas cols (unneeded whilst timedelta_to_str used)
     # td_col = df.select_dtypes("timedelta")

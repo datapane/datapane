@@ -16,13 +16,8 @@
 <script>
   // analytics config
   // TODO -- pass these in as props for consistency?
-  window.dpAppRunner = "{{ app_runner }}" === "True";
+  window.dpAppRunner = false;
   window.dpLocal = true;
-  % if events:
-    window.dpLocalViewEvent = {{events}};
-    window.dpReportId = "{{report_id}}";
-    window.dpAuthorId = "{{author_id}}";
-  % end
 
   /* construct the view */
   const htmlHeader = `<style type="text/css">{{ !css_header }}</style>`;
