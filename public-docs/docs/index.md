@@ -4,7 +4,7 @@
   </a>
 </p>
 
-!!! warning
+!!! note
     Datapane is no longer actively maintained.
 
     We've made the difficult decision to stop driving this project and therefore we will no longer actively respond to issues or pull requests. If you would like to take over maintaining this project independently, please let us know so we can add a link to your forked project on our [GitHub](https://github.com/datapane/datapane).
